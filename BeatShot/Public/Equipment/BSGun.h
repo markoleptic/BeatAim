@@ -80,6 +80,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetShowMuzzleFlash(const bool bShow);
 
+	UFUNCTION(BlueprintCallable)
+	void TriggerFireAudio(USoundBase* Sound, AActor* OwningActor);
+
 	/** GameMode binds to this delegate to keep track of number of shots fired */
 	FOnShotFired OnShotFired;
 
@@ -92,6 +95,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon|Components")
 	USceneComponent* MuzzleLocationComp;
 
+	UPROPERTY()
+	UAudioComponent* FireAudioComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Audio")
+	FName FireTriggerParameterName = "Fire";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Audio")
+	FName FireAttachPointName = "hand_r";
+	
 	/** Whether or not the player is holding down left click */
 	UPROPERTY(BlueprintReadWrite, Category = "Weapon|State")
 	bool bIsFiring;

@@ -6,6 +6,8 @@
 #include "BSGameMode.h"
 #include "BeatShot/BSGameplayTags.h"
 #include "Character/BSCharacterBase.h"
+#include "Components/AudioComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ABSGun::ABSGun()
 {
@@ -131,4 +133,21 @@ void ABSGun::SetShowMuzzleFlash(const bool bShow)
 		return;
 	}
 	RemoveGameplayTag(BSGameplayTags::State_Weapon_ShowMuzzleFlash);
+}
+
+void ABSGun::TriggerFireAudio(USoundBase* Sound, AActor* OwningActor)
+{
+	if (!FireAudioComponent)
+	{
+		if (USkeletalMeshComponent* MeshComponent = OwningActor->GetComponentByClass<USkeletalMeshComponent>())
+		{
+			FireAudioComponent = UGameplayStatics::SpawnSoundAttached(Sound, MeshComponent, FireAttachPointName,
+				FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset,
+				false, 1.f, 1.f, 0.f, nullptr, nullptr, true);
+		}
+	}
+	if (FireAudioComponent)
+	{
+		FireAudioComponent->SetTriggerParameter(FireTriggerParameterName);
+	}
 }
