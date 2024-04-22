@@ -10,7 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "PhysicsEngine/PhysicsSettings.h"
-#include "System/BSAudioSettings.h"
+#include "BSAudioSettings.h"
 
 static TAutoConsoleVariable CVarShowPos(TEXT("cl.ShowPos"), 0, TEXT("Show position and movement information.\n"),
 	ECVF_Default);
@@ -30,67 +30,67 @@ UBSCharacterMovementComponent::UBSCharacterMovementComponent()
 {
 	// We have our own air movement handling, so we can allow for full air control through UE's logic
 	AirControl = 1.0f;
-	
+
 	// Disable air control boost
 	AirControlBoostMultiplier = 0.0f;
 	AirControlBoostVelocityThreshold = 0.0f;
-	
+
 	// HL2 cl_(forward & side)speed = 450Hu
 	MaxAcceleration = 857.25f;
-	
+
 	// Set the default walk speed
 	MaxWalkSpeed = RunSpeed;
-	
+
 	// HL2 like friction (sv_friction)
 	GroundFriction = 4.0f;
 	BrakingFriction = 4.0f;
 	bUseSeparateBrakingFriction = false;
-	
+
 	// No multiplier
 	BrakingFrictionFactor = 1.0f;
-	
+
 	// Historical value for Source
 	BrakingSubStepTime = 0.015f;
-	
+
 	// Avoid breaking up time step
 	MaxSimulationTimeStep = 0.5f;
 	MaxSimulationIterations = 1;
-	
+
 	// Braking deceleration (sv_stopspeed)
 	FallingLateralFriction = 0.0f;
 	BrakingDecelerationFalling = 0.0f;
 	BrakingDecelerationFlying = 190.5f;
 	BrakingDecelerationSwimming = 190.5f;
 	BrakingDecelerationWalking = 190.5f;
-	
+
 	// HL2 step height
 	MaxStepHeight = 34.29f;
 	DefaultStepHeight = MaxStepHeight;
-	
+
 	// Jump z from HL2's 160Hu
 	// 21Hu jump height
 	// 510ms jump time
 	JumpZVelocity = 304.8f;
-	
+
 	// Don't bounce off characters
 	JumpOffJumpZFactor = 0.0f;
-	
+
 	// Default show pos to false
 	bShowPos = false;
-	
+
 	// We aren't on a ladder at first
 	bOnLadder = false;
 	OffLadderTicks = LADDER_MOUNT_TIMEOUT;
-	
+
 	// Speed multiplier bounds
 	SpeedMultMin = SprintSpeed * 1.7f;
 	SpeedMultMax = SprintSpeed * 2.5f;
-	
+
 	// Start out braking
 	bBrakingWindowElapsed = true;
 	BrakingWindowTimeElapsed = 0.f;
 	BrakingWindow = 15.f;
-	
+
 	// Crouching
 	SetCrouchedHalfHeight(55.f);
 	MaxWalkSpeedCrouched = RunSpeed * 0.33333333f;
@@ -100,48 +100,48 @@ UBSCharacterMovementComponent::UBSCharacterMovementComponent()
 	SetWalkableFloorZ(0.7f);
 	DefaultWalkableFloorZ = GetWalkableFloorZ();
 	AxisSpeedLimit = 6667.5f;
-	
+
 	// Tune physics interactions
 	StandingDownwardForceScale = 1.0f;
-	
+
 	// Reasonable values polled from NASA (https://msis.jsc.nasa.gov/sections/section04.htm#Figure%204.9.3-6)
 	// and Standard Handbook of Machine Design
 	InitialPushForceFactor = 100.0f;
 	PushForceFactor = 500.0f;
-	
+
 	// Let's not do any weird stuff...Gordon isn't a trampoline
 	RepulsionForce = 0.0f;
 	MaxTouchForce = 0.0f;
 	TouchForceFactor = 0.0f;
-	
+
 	// Just push all objects based on their impact point
 	// it might be weird with a lot of dev objects due to scale, but
 	// it's much more realistic.
 	bPushForceUsingZOffset = false;
 	PushForcePointZOffsetFactor = -0.66f;
-	
+
 	// Scale push force down if we are slow
 	bScalePushForceToVelocity = true;
-	
+
 	// Don't push more if there's more mass
 	bPushForceScaledToMass = false;
 	bTouchForceScaledToMass = false;
 	Mass = 85.0f; // player.mdl is 85kg
-	
+
 	// Don't smooth rotation at all
 	bUseControllerDesiredRotation = false;
-	
+
 	// Flat base
 	bUseFlatBaseForFloorChecks = true;
-	
+
 	// Agent props
 	NavAgentProps.bCanCrouch = true;
 	NavAgentProps.bCanJump = true;
 	NavAgentProps.bCanFly = true;
-	
+
 	// Make sure gravity is correct for player movement
 	GravityScale = DesiredGravity / UPhysicsSettings::Get()->DefaultGravityZ;
-	
+
 	// Make sure ramp movement in correct
 	bMaintainHorizontalGroundVelocity = true;
 }
@@ -208,14 +208,14 @@ const FCharacterGroundInfo& UBSCharacterMovementComponent::GetGroundInfo()
 			: ECC_Pawn);
 		const FVector TraceStart(GetActorLocation());
 		const FVector TraceEnd(TraceStart.X, TraceStart.Y, TraceStart.Z - GroundTraceDistance - CapsuleHalfHeight);
-		
+
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(CharacterOwner);
 		QueryParams.bReturnPhysicalMaterial = true;
-		
+
 		FHitResult HitResult;
 		GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, CollisionChannel, QueryParams);
-		
+
 		CachedGroundInfo.GroundHitResult = HitResult;
 		CachedGroundInfo.GroundDistance = GroundTraceDistance;
 
@@ -1027,9 +1027,9 @@ void UBSCharacterMovementComponent::DoCrouchResize(float TargetTime, float Delta
 		bIsInCrouchTransition = false;
 		CharacterOwner->bIsCrouched = true;
 	}
-	
+
 	CurrentCrouchProgress = TargetAlpha;
-	
+
 	// Determine the target height for this tick
 	const float TargetCrouchedHalfHeight = OldUnscaledHalfHeight - FullCrouchDiff * TargetAlpha;
 	// Height is not allowed to be smaller than radius.
@@ -1159,7 +1159,7 @@ void UBSCharacterMovementComponent::DoUnCrouchResize(float TargetTime, float Del
 	}
 
 	CurrentCrouchProgress = 1 - TargetAlpha;
-	
+
 	const float HalfHeightAdjust = FullCrouchDiff * TargetAlphaDiff;
 	const float ScaledHalfHeightAdjust = HalfHeightAdjust * ComponentScale;
 
@@ -1282,15 +1282,14 @@ void UBSCharacterMovementComponent::DoUnCrouchResize(float TargetTime, float Del
 	const float NewHalfHeight = OldUnscaledHalfHeight + HalfHeightAdjust;
 
 	// Now call SetCapsuleSize() to cause touch/un-touch events and actually grow the capsule
-	CharacterCapsule->SetCapsuleSize(DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleRadius(),
-		NewHalfHeight, true);
-	
+	CharacterCapsule->SetCapsuleSize(DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleRadius(), NewHalfHeight,
+		true);
+
 	// OnEndCrouch takes the change from the Default size, not the current one
-	const float MeshAdjust = DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() -
-		NewHalfHeight;
+	const float MeshAdjust = DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() - NewHalfHeight;
 
 	AdjustProxyCapsuleSize();
-	
+
 	CharacterOwner->OnEndCrouch(MeshAdjust, MeshAdjust * ComponentScale);
 	bCrouchFrameTolerated = false;
 
@@ -1609,8 +1608,8 @@ void UBSCharacterMovementComponent::PlayMovementSound_Implementation(const FName
 			for (const TObjectPtr<USoundBase>& Sound : Sounds)
 			{
 				UGameplayStatics::SpawnSoundAttached(Sound.Get(), StaticMeshComponent, Bone, LocationOffset,
-					RotationOffset, EAttachLocation::KeepRelativeOffset, false, AudioVolume, AudioPitch, 0.0f,
-					nullptr, nullptr, true);
+					RotationOffset, EAttachLocation::KeepRelativeOffset, false, AudioVolume, AudioPitch, 0.0f, nullptr,
+					nullptr, true);
 			}
 		}
 	}

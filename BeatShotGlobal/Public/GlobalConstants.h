@@ -5,7 +5,7 @@
 namespace Constants
 {
 	inline constexpr int32 CustomGameModeVersion = 1;
-	
+
 	/** Min Value allowed for a BandFrequency channel */
 	inline constexpr float MinValue_BandFrequency = 0.f;
 
@@ -101,8 +101,10 @@ namespace Constants
 	inline constexpr float DefaultGlobalVolume = 50.f;
 	inline constexpr float DefaultMenuVolume = 50.f;
 	inline constexpr float DefaultMusicVolume = 10.f;
+	inline constexpr float DefaultSoundFXVolume = 25.f;
 	inline constexpr int32 DefaultFrameRateLimitMenu = 60.f;
 	inline constexpr int32 DefaultFrameRateLimitGame = 0.f;
+	inline constexpr int32 DefaultFrameRateLimitBackground = 30.f;
 
 	inline constexpr float DefaultBandLimitThreshold = 2.1f;
 	inline constexpr int32 DefaultNumBandChannels = 10;
@@ -359,7 +361,7 @@ namespace Constants
 	inline constexpr float MinValue_HorizontalSpread = 100.f;
 	inline constexpr float MaxValue_HorizontalSpread = 3200.f;
 	inline constexpr float SnapSize_HorizontalSpread = 100.f;
-	
+
 	inline constexpr float MinValue_VerticalSpread = 100.f;
 	inline constexpr float MaxValue_VerticalSpread = 1000.f;
 	inline constexpr float SnapSize_VerticalSpread = 100.f;
@@ -368,7 +370,7 @@ namespace Constants
 	inline constexpr float MinValue_ForwardSpread = 0.f;
 	inline constexpr float MaxValue_ForwardSpread = 2000.f;
 	inline constexpr float SnapSize_ForwardSpread = 50.f;
-	
+
 	inline const FVector MinValue_DynamicSpread(0.f, 100.f, 100.f);
 	inline const FVector MaxValue_DynamicSpread(2000.f, 3200.f, 1000.f);
 	inline const FVector SnapSize_DynamicSpread(50.f, 100.f, 100.f);

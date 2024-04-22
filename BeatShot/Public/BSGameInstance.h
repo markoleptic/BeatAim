@@ -9,6 +9,8 @@
 #include "Engine/GameInstance.h"
 #include "BSGameInstance.generated.h"
 
+class USoundControlBus;
+class USoundControlBusMix;
 class ABSPlayerController;
 class SLoadingScreenWidget;
 class ATimeOfDayManager;
@@ -16,16 +18,18 @@ class USteamManager;
 
 /** Base GameInstance for this game */
 UCLASS()
-class BEATSHOT_API UBSGameInstance : public UGameInstance, public IBSPlayerSettingsInterface, public IHttpRequestInterface, public IBSPlayerScoreInterface
+class BEATSHOT_API UBSGameInstance : public UGameInstance, public IBSPlayerSettingsInterface,
+                                     public IHttpRequestInterface, public IBSPlayerScoreInterface
 {
 	GENERATED_BODY()
 
 	virtual void Init() override;
-	
+
 	#if WITH_EDITOR
-	virtual FGameInstancePIEResult PostCreateGameModeForPIE(const FGameInstancePIEParameters& Params, AGameModeBase* GameMode) override;
+	virtual FGameInstancePIEResult PostCreateGameModeForPIE(const FGameInstancePIEParameters& Params,
+		AGameModeBase* GameMode) override;
 	#endif WITH_EDITOR
-	
+
 	/** Called after a level has been loaded */
 	void OnPostLoadMapWithWorld(UWorld* World);
 
@@ -34,13 +38,13 @@ class BEATSHOT_API UBSGameInstance : public UGameInstance, public IBSPlayerSetti
 
 	/** Prepares the loading screen widget for the MoviePlayer. */
 	void PrepareLoadingScreen();
-	
+
 	/** Called when the game instance is started either normally or through PIE. */
 	virtual void OnStart() override;
 
 	/** Runs a hardware benchmark if not done previously, loads video settings, initializes DLSS settings, and saves video settings. */
 	void InitVideoSettings(UGameUserSettings* GameUserSettings, FPlayerSettings& PlayerSettings);
-	
+
 	/** Initializes the sound classes. */
 	void InitSoundSettings(const FPlayerSettings_VideoAndSound& VideoAndSoundSettings);
 
@@ -71,7 +75,7 @@ public:
 
 	/** Handles saving scores to database, called by BSGameMode. */
 	void SavePlayerScoresToDatabase(ABSPlayerController* PC, const bool bWasValidToSave);
-	
+
 	/** A function pair that can be called externally, executes OnSteamOverlayIsActive(). */
 	void OnSteamOverlayIsOn();
 	void OnSteamOverlayIsOff();
@@ -89,7 +93,7 @@ public:
 
 protected:
 	void SetBSConfig(const FBSConfig& InConfig);
-	
+
 	/** Creates SteamManager object and allows it initialize. Assigns Game Instance and binds to functions. */
 	void InitializeSteamManager();
 
@@ -101,7 +105,7 @@ protected:
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_User& UserSettings) override;
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_CrossHair& CrossHairSettings) override;
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_VideoAndSound& VideoAndSoundSettings) override;
-	
+
 	/** Object that interfaces with Steam API. */
 	UPROPERTY()
 	TObjectPtr<USteamManager> SteamManager;
@@ -112,18 +116,21 @@ protected:
 
 	/** Shared pointer to loading screen slate widget. */
 	TSharedPtr<SLoadingScreenWidget> LoadingScreenWidget;
-	
+
 	/** The defining game mode options that are populated from a menu widget, and accessed by the GameMode. */
 	TSharedPtr<FBSConfig> BSConfig;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
 	USoundClass* GlobalSound;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
 	USoundClass* MenuSound;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
 	USoundMix* GlobalSoundMix;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
+	USoundBase* LoadingScreenSound;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Levels")
 	FName MainMenuLevelName;
@@ -131,14 +138,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Levels")
 	FName RangeLevelName;
 
-	/** Whether or not the Steam Overlay is active. */
+	// Loading Screen Sound Control Bus Mix
+	UPROPERTY(Transient)
+	TObjectPtr<USoundControlBusMix> LoadingScreenMix = nullptr;
+
+	/** Whether the Steam Overlay is active. */
 	bool IsSteamOverlayActive = false;
-	
-	/** Whether or not to postpone QuitGame until after a save game Http response. */
+
+	/** Whether to postpone QuitGame until after a save game Http response. */
 	bool bQuitToDesktopAfterSave = false;
 
-	/** Whether or not the loading screen is the initial one, which changes how the loading screen is rendered. */
+	/** Whether the loading screen is the initial one, which changes how the loading screen is rendered. */
 	bool bIsInitialLoadingScreen = true;
+
+	UPROPERTY(Transient)
+	UAudioComponent* LoadingScreenAudioComponent = nullptr;
 };
 
 template <typename... T>

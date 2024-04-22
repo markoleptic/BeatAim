@@ -53,7 +53,7 @@ public:
 	/** Returns the value for the constant EditableTextBox */
 	float GetConstantEditableTextBoxValue(const bool bClamped) const;
 
-	/** Returns true if the if the CheckBox is checked and only one slider and editable text box is visible */
+	/** Returns true if the CheckBox is checked and only one slider and editable text box is visible */
 	bool IsInConstantMode() const;
 	
 	/** Sets the Min and Max values of the sliders and sets the grid snap size */
@@ -74,7 +74,7 @@ public:
 	/** Locks or unlocks the Checkbox for constant mode */
 	void SetConstantModeLocked(const bool bLock) const;
 
-	/** Sets the the value of bUseMinAsConstant */
+	/** Sets the value of bUseMinAsConstant */
 	void SetUseMinAsConstant(const bool bInUseMinAsConstant) { bUseMinAsConstant = bInUseMinAsConstant; }
 	
 	/** Locks or unlocks the slider and sets the EditableTextBox to read-only or not */
@@ -91,7 +91,7 @@ protected:
 	virtual void NativePreConstruct() override;
 	virtual void SetStyling() override;
 		
-	/** If true, collapses BSBox_Max and MinText. Otherwise sets them visible and sets the MinText */
+	/** If true, collapses BSBox_Max and MinText. Otherwise, sets them visible and sets the MinText */
 	void UpdateMinMaxDependencies(const bool bConstant) const;
 
 	UFUNCTION()
@@ -107,7 +107,7 @@ protected:
 	
 	float GridSnapSize = 1.f;
 
-	/** Whether or not to use the minimum or maximum slider when the checkbox is checked. */
+	/** Whether to use the minimum or maximum slider when the checkbox is checked. */
 	bool bUseMinAsConstant = true;
 
 	

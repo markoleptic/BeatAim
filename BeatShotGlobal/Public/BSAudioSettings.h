@@ -13,7 +13,7 @@ class USoundSubmix;
 enum EPhysicalSurface : int;
 
 USTRUCT()
-struct BEATSHOT_API FBSSubmixEffectChainMap
+struct BEATSHOTGLOBAL_API FBSSubmixEffectChainMap
 {
 	GENERATED_BODY()
 
@@ -26,10 +26,10 @@ struct BEATSHOT_API FBSSubmixEffectChainMap
 
 /** Audio settings that are editable within the Unreal Editor. */
 UCLASS(config = Game, defaultconfig, meta = (DisplayName = "BeatShotAudioSettings"))
-class BEATSHOT_API UBSAudioSettings : public UDeveloperSettings
+class BEATSHOTGLOBAL_API UBSAudioSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
-	
+
 public:
 	/** Maps a physical surface to the Gameplay Tag representation of the surface. */
 	UPROPERTY(config, EditAnywhere, Category = PhysicalSurfaces)
@@ -54,6 +54,11 @@ public:
 	UPROPERTY(config, EditAnywhere, Category = "UserMixSettings",
 		meta = (AllowedClasses = "/Script/AudioModulation.SoundControlBus"))
 	FSoftObjectPath OverallVolumeControlBus;
+
+	/** Control Bus assigned to the Menu sound volume setting */
+	UPROPERTY(config, EditAnywhere, Category = "UserMixSettings",
+		meta = (AllowedClasses = "/Script/AudioModulation.SoundControlBus"))
+	FSoftObjectPath MenuVolumeControlBus;
 
 	/** Control Bus assigned to the Music sound volume setting */
 	UPROPERTY(config, EditAnywhere, Category = "UserMixSettings",

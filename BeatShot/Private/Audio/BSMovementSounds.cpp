@@ -2,7 +2,7 @@
 
 
 #include "Audio/BSMovementSounds.h"
-#include "System/BSAudioSettings.h"
+#include "BSAudioSettings.h"
 
 void UBSMovementSounds::PostLoad()
 {
@@ -27,9 +27,8 @@ void UBSMovementSounds::GetFootstepSounds(const FGameplayTag Effect, const FGame
 	{
 		for (const auto& FootstepSound : FootstepSounds)
 		{
-			if (Effect.MatchesTagExact(FootstepSound.Key.EffectTag)
-				&& Context.HasAllExact(FootstepSound.Key.Context)
-				&& Context.IsEmpty() == FootstepSound.Key.Context.IsEmpty())
+			if (Effect.MatchesTagExact(FootstepSound.Key.EffectTag) && Context.HasAllExact(FootstepSound.Key.Context) &&
+				Context.IsEmpty() == FootstepSound.Key.Context.IsEmpty())
 			{
 				Sounds.Append(FootstepSound.Value.Sounds);
 			}

@@ -2,7 +2,11 @@
 
 
 #include "BSGameInstance.h"
+
+#include "AudioModulationStatics.h"
+#include "BSAudioSettings.h"
 #include "BSGameMode.h"
+#include "BSGameUserSettings.h"
 #include "Player/BSPlayerController.h"
 #include "System/SteamManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -12,12 +16,41 @@
 #include "GameFramework/GameUserSettings.h"
 #include "SaveGamePlayerSettings.h"
 #include "OverlayWidgets/LoadingScreenWidgets/SLoadingScreenWidget.h"
-#include "System/BSLoadingScreenSettings.h"
+#include "BSLoadingScreenSettings.h"
 
 void UBSGameInstance::Init()
 {
 	Super::Init();
+	auto Settings = UBSGameUserSettings::Get();
+	Settings->LoadUserControlBusMix();
+	const auto AudioSettings = GetDefault<UBSAudioSettings>();
+	if (UObject* ObjPath = AudioSettings->LoadingScreenControlBusMix.TryLoad())
+	{
+		if (USoundControlBusMix* SoundControlBusMix = Cast<USoundControlBusMix>(ObjPath))
+		{
+			LoadingScreenMix = SoundControlBusMix;
+		}
+	}
 	GetMoviePlayer()->OnPrepareLoadingScreen().AddUObject(this, &ThisClass::PrepareLoadingScreen);
+	GetMoviePlayer()->OnMoviePlaybackStarted().AddLambda([this]()
+	{
+		const UWorld* World = GetWorld();
+		if (LoadingScreenMix && World)
+		{
+			UAudioModulationStatics::ActivateBusMix(World, LoadingScreenMix);
+			LoadingScreenAudioComponent = UGameplayStatics::CreateSound2D(World, LoadingScreenSound);
+			LoadingScreenAudioComponent->Play();
+		}
+	});
+	GetMoviePlayer()->OnMoviePlaybackFinished().AddLambda([this]()
+	{
+		const UWorld* World = GetWorld();
+		if (LoadingScreenMix && World)
+		{
+			UAudioModulationStatics::DeactivateBusMix(World, LoadingScreenMix);
+			LoadingScreenAudioComponent = nullptr;
+		}
+	});
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &ThisClass::OnPostLoadMapWithWorld);
 	InitializeSteamManager();
 }
@@ -52,7 +85,7 @@ void UBSGameInstance::OnLoadingScreenFadeOutComplete()
 
 	// No longer the initial loading screen
 	bIsInitialLoadingScreen = false;
-	
+
 	if (GetWorld()->GetMapName().Contains(MainMenuLevelName.ToString()))
 	{
 		if (ABSPlayerController* PC = Cast<ABSPlayerController>(GetFirstLocalPlayerController(GetWorld())))
@@ -73,12 +106,13 @@ void UBSGameInstance::PrepareLoadingScreen()
 	Attributes.MinimumLoadingScreenDisplayTime = LoadingScreenSettings->MinimumLoadingScreenDisplayTime;
 	if (LoadingScreenSettings->LoadingScreenStyle && LoadingScreenSettings->LoadingScreenStyle->CustomStyle)
 	{
-		if (const FLoadingScreenStyle* Style = static_cast<const struct FLoadingScreenStyle*>(
-			LoadingScreenSettings->LoadingScreenStyle->CustomStyle->GetStyle()))
+		if (const FLoadingScreenStyle* Style = static_cast<const struct FLoadingScreenStyle*>(LoadingScreenSettings->
+			LoadingScreenStyle->CustomStyle->GetStyle()))
 		{
-			SAssignNew(LoadingScreenWidget, SLoadingScreenWidget).LoadingScreenStyle(Style).OnFadeOutComplete(
-				BIND_UOBJECT_DELEGATE(FOnFadeOutComplete, OnLoadingScreenFadeOutComplete)).bIsInitialLoadingScreen(
-				bIsInitialLoadingScreen);
+			SAssignNew(LoadingScreenWidget, SLoadingScreenWidget)
+			.LoadingScreenStyle(Style)
+			.OnFadeOutComplete(BIND_UOBJECT_DELEGATE(FOnFadeOutComplete, OnLoadingScreenFadeOutComplete))
+			.bIsInitialLoadingScreen(bIsInitialLoadingScreen);
 		}
 	}
 	Attributes.WidgetLoadingScreen = LoadingScreenWidget;
@@ -89,14 +123,14 @@ void UBSGameInstance::OnStart()
 {
 	Super::OnStart();
 	FPlayerSettings PlayerSettings = LoadPlayerSettings();
-	InitVideoSettings(UGameUserSettings::GetGameUserSettings(), PlayerSettings);
-	InitSoundSettings(PlayerSettings.VideoAndSound);
+	//InitVideoSettings(UGameUserSettings::GetGameUserSettings(), PlayerSettings);
+	//InitSoundSettings(PlayerSettings.VideoAndSound);
 }
 
 void UBSGameInstance::InitVideoSettings(UGameUserSettings* GameUserSettings, FPlayerSettings& PlayerSettings)
 {
 	// Run hardware benchmark if first time launching game
-	if (!PlayerSettings.User.bHasRanBenchmark)
+	/*if (!PlayerSettings.User.bHasRanBenchmark)
 	{
 		GameUserSettings->RunHardwareBenchmark();
 		GameUserSettings->ApplyHardwareBenchmarkResults();
@@ -104,16 +138,11 @@ void UBSGameInstance::InitVideoSettings(UGameUserSettings* GameUserSettings, FPl
 		SavePlayerSettings(PlayerSettings.User);
 	}
 	InitDLSSSettings(PlayerSettings.VideoAndSound);
-	SavePlayerSettings(PlayerSettings.VideoAndSound);
+	SavePlayerSettings(PlayerSettings.VideoAndSound);*/
 }
 
 void UBSGameInstance::InitSoundSettings(const FPlayerSettings_VideoAndSound& VideoAndSoundSettings)
 {
-	UGameplayStatics::SetBaseSoundMix(GetWorld(), GlobalSoundMix);
-	UGameplayStatics::SetSoundMixClassOverride(GetWorld(), GlobalSoundMix, GlobalSound,
-		VideoAndSoundSettings.GlobalVolume / 100, 1, 0.0f, true);
-	UGameplayStatics::SetSoundMixClassOverride(GetWorld(), GlobalSoundMix, MenuSound,
-		VideoAndSoundSettings.MenuVolume / 100, 1, 0.0f, true);
 }
 
 void UBSGameInstance::SetBSConfig(const FBSConfig& InConfig)
@@ -191,8 +220,7 @@ void UBSGameInstance::EndBSGameMode(const FGameModeTransitionState& NewGameModeT
 {
 	if (ABSGameMode* GM = Cast<ABSGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
 	{
-		GM->EndGameMode(NewGameModeTransitionState.bSaveCurrentScores,
-			NewGameModeTransitionState.TransitionState);
+		GM->EndGameMode(NewGameModeTransitionState.bSaveCurrentScores, NewGameModeTransitionState.TransitionState);
 	}
 }
 
@@ -320,5 +348,3 @@ void UBSGameInstance::OnPlayerSettingsChanged(const FPlayerSettings_VideoAndSoun
 {
 	OnPlayerSettingsChangedDelegate_VideoAndSound.Broadcast(VideoAndSoundSettings);
 }
-
-

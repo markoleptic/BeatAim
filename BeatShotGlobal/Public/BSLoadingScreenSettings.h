@@ -11,10 +11,10 @@ class USlateWidgetStyleAsset;
 
 /** Loading screen settings that are editable within the Unreal Editor. */
 UCLASS(config = Game, defaultconfig, meta = (DisplayName = "BeatShotLoadingScreenSettings"))
-class BEATSHOT_API UBSLoadingScreenSettings : public UDeveloperSettings
+class BEATSHOTGLOBAL_API UBSLoadingScreenSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
-	
+
 public:
 	/** The style of the loading screen. */
 	UPROPERTY(config, EditAnywhere)

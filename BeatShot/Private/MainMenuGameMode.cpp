@@ -123,10 +123,10 @@ void AMainMenuGameMode::OnGameModeBreakingChange(const bool bIsGameModeBreakingC
 
 void AMainMenuGameMode::FadeInMainMenuMusic(const float FadeInDuration)
 {
-	MainMenuMusicComp->FadeIn(FadeInDuration, 1.f, 0.f, EAudioFaderCurve::SCurve);
+	MainMenuMusicComp->Play();
 }
 
 void AMainMenuGameMode::FadeOutMainMenuMusic(const float FadeOutDuration)
 {
-	MainMenuMusicComp->FadeOut(FadeOutDuration, 0.f, EAudioFaderCurve::Linear);
+	MainMenuMusicComp->SetTriggerParameter(FName("Stop"));
 }
