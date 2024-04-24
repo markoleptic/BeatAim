@@ -27,7 +27,8 @@ class UBSButton;
 
 /** Settings category widget holding Video and Sound settings */
 UCLASS()
-class USERINTERFACE_API USettingsMenuWidget_VideoAndSound : public UBSSettingCategoryWidget, public IBSPlayerSettingsInterface
+class USERINTERFACE_API USettingsMenuWidget_VideoAndSound : public UBSSettingCategoryWidget,
+                                                            public IBSPlayerSettingsInterface
 {
 	GENERATED_BODY()
 
@@ -35,8 +36,8 @@ class USERINTERFACE_API USettingsMenuWidget_VideoAndSound : public UBSSettingCat
 
 	virtual void NativeConstruct() override;
 
-	/** Populates the settings menu with InVideoAndSoundSettings */
-	void InitializeVideoAndSoundSettings(const FPlayerSettings_VideoAndSound& InVideoAndSoundSettings);
+	/** Populates the settings menu with BSGameUserSettings */
+	void InitializeVideoAndSoundSettings();
 
 	/** Returns the video and sound settings that are currently populated in the menu */
 	FPlayerSettings_VideoAndSound GetVideoAndSoundSettings() const;
@@ -141,6 +142,8 @@ protected:
 	UEditableTextBoxOptionWidget* EditableTextBoxOption_FPSLimitMenu;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UEditableTextBoxOptionWidget* EditableTextBoxOption_FPSLimitGame;
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UEditableTextBoxOptionWidget* EditableTextBoxOption_FPSLimitBackground;
 
 private:
 	/** Adds the ConfirmVideoSettingsMessage to viewport, and starts the RevertVideoSettingsTimer */
@@ -200,6 +203,8 @@ private:
 	void OnTextCommitted_FPSLimitMenu(const FText& Text, ETextCommit::Type CommitType);
 	UFUNCTION()
 	void OnTextCommitted_FPSLimitGame(const FText& Text, ETextCommit::Type CommitType);
+	UFUNCTION()
+	void OnTextCommitted_FPSLimitBackground(const FText& Text, ETextCommit::Type CommitType);
 
 	/** Function bound to RevertVideoSettingsTimer_UpdateSecond */
 	UFUNCTION()

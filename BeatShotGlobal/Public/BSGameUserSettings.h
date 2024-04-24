@@ -14,10 +14,8 @@ enum class ENISEnabledMode : uint8;
 enum class EDLSSEnabledMode : uint8;
 class USoundControlBusMix;
 class USoundControlBus;
-/**
- * 
- */
-UCLASS()
+/** Video and Sound Settings that are saved to GameUserSettings.ini */
+UCLASS(config=GameUserSettings, configdonotcheckdefaults)
 class BEATSHOTGLOBAL_API UBSGameUserSettings : public UGameUserSettings
 {
 	GENERATED_BODY()
@@ -42,8 +40,15 @@ public:
 	virtual void SetOverallScalabilityLevel(int32 Value) override;
 	//~End of UGameUserSettings interface
 
-	/** Initializes DLSS settings for a FPlayerSettings_VideoAndSound struct, if DLSS is supported. */
+	/** Initializes DLSS and NIS settings. */
 	void InitDLSSSettings();
+
+	/** Initializes Audio Control Buses and UserMix. */
+	void LoadUserControlBusMix();
+
+	bool IsDLSSSupported();
+
+	bool IsNISSupported();
 
 	UFUNCTION()
 	bool GetShowFPSCounter() const;
@@ -81,6 +86,8 @@ public:
 	float GetSoundFXVolume() const;
 	UFUNCTION()
 	FString GetAudioOutputDeviceId() const;
+	UFUNCTION()
+	TEnumAsByte<EAntiAliasingMethod> GetAntiAliasingMethod() const;
 
 	UFUNCTION()
 	void SetShowFPSCounter(bool InShowFPSCounter);
@@ -119,8 +126,10 @@ public:
 	void SetDLSSSharpness(float InDLSSSharpness);
 	UFUNCTION()
 	void SetNISSharpness(float InNISSharpness);
-
-	void LoadUserControlBusMix();
+	UFUNCTION()
+	void SetAntiAliasingMethod(TEnumAsByte<EAntiAliasingMethod> InAntiAliasingMethod);
+	UFUNCTION()
+	void SetResolutionScaleChecked(float InResolutionScale);
 
 private:
 	void SetBSSettingsToDefaults();
@@ -194,6 +203,9 @@ private:
 	UPROPERTY(Config)
 	UStreamlineReflexMode StreamlineReflexMode;
 
+	UPROPERTY(Config)
+	TEnumAsByte<EAntiAliasingMethod> AntiAliasingMethod;
+
 	// Sound class to control bus map
 	UPROPERTY(Transient)
 	TMap<FName, TObjectPtr<USoundControlBus>> ControlBusMap;
@@ -206,4 +218,10 @@ private:
 
 	UPROPERTY(Transient)
 	bool bDLSSInitialized;
+
+	UPROPERTY(Transient)
+	bool bDLSSSupported;
+
+	UPROPERTY(Transient)
+	bool bNISSupported;
 };

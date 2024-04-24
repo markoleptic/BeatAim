@@ -62,6 +62,8 @@ void ABSPlayerController::BeginPlay()
 		}
 	}*/
 
+	UE_LOG(LogTemp, Warning, TEXT("PlayerController::BeginPlay"));
+
 	const UBSLoadingScreenSettings* LoadingScreenSettings = GetDefault<UBSLoadingScreenSettings>();
 	ScreenFadeWidgetAnimationDuration = LoadingScreenSettings->ScreenFadeWidgetAnimationDuration;
 
@@ -89,6 +91,9 @@ void ABSPlayerController::BeginPlay()
 	if (UGameplayStatics::GetCurrentLevelName(GetWorld()).Contains("MainMenu"))
 	{
 		ShowMainMenu();
+		#if WITH_EDITOR
+		FadeScreenFromBlack();
+		#endif
 	}
 }
 

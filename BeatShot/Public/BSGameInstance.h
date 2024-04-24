@@ -9,6 +9,7 @@
 #include "Engine/GameInstance.h"
 #include "BSGameInstance.generated.h"
 
+class ULoadingScreenWidgetStyle;
 class USoundControlBus;
 class USoundControlBusMix;
 class ABSPlayerController;
@@ -41,12 +42,6 @@ class BEATSHOT_API UBSGameInstance : public UGameInstance, public IBSPlayerSetti
 
 	/** Called when the game instance is started either normally or through PIE. */
 	virtual void OnStart() override;
-
-	/** Runs a hardware benchmark if not done previously, loads video settings, initializes DLSS settings, and saves video settings. */
-	void InitVideoSettings(UGameUserSettings* GameUserSettings, FPlayerSettings& PlayerSettings);
-
-	/** Initializes the sound classes. */
-	void InitSoundSettings(const FPlayerSettings_VideoAndSound& VideoAndSoundSettings);
 
 public:
 	/** Handles game mode transitions initiated by Main Menu, Pause Menu, or Post Game Menu */
@@ -94,6 +89,8 @@ public:
 protected:
 	void SetBSConfig(const FBSConfig& InConfig);
 
+	void InitializeLoadingScreen();
+
 	/** Creates SteamManager object and allows it initialize. Assigns Game Instance and binds to functions. */
 	void InitializeSteamManager();
 
@@ -138,9 +135,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Levels")
 	FName RangeLevelName;
 
-	// Loading Screen Sound Control Bus Mix
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "LoadingScreen")
+	TObjectPtr<USlateWidgetStyleAsset> LoadingScreenStyle;
+	
 	UPROPERTY(Transient)
 	TObjectPtr<USoundControlBusMix> LoadingScreenMix = nullptr;
+
+	UPROPERTY(Transient)
+	UAudioComponent* LoadingScreenAudioComponent = nullptr;
 
 	/** Whether the Steam Overlay is active. */
 	bool IsSteamOverlayActive = false;
@@ -151,8 +153,7 @@ protected:
 	/** Whether the loading screen is the initial one, which changes how the loading screen is rendered. */
 	bool bIsInitialLoadingScreen = true;
 
-	UPROPERTY(Transient)
-	UAudioComponent* LoadingScreenAudioComponent = nullptr;
+
 };
 
 template <typename... T>

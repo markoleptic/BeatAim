@@ -10,8 +10,8 @@ class UObject;
 class USlateWidgetStyleAsset;
 
 /** Loading screen settings that are editable within the Unreal Editor. */
-UCLASS(config = Game, defaultconfig, meta = (DisplayName = "BeatShotLoadingScreenSettings"))
-class BEATSHOTGLOBAL_API UBSLoadingScreenSettings : public UDeveloperSettings
+UCLASS(config = Game, defaultconfig, MinimalAPI, meta = (DisplayName = "BeatShot Loading Screen"))
+class UBSLoadingScreenSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 

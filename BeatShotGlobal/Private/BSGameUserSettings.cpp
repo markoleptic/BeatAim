@@ -119,8 +119,10 @@ void UBSGameUserSettings::InitDLSSSettings()
 {
 	// DLSS
 	bool bDisableDLSS = true;
+	bDLSSSupported = UDLSSLibrary::IsDLSSSupported();
+	bNISSupported = UNISLibrary::IsNISSupported();
 
-	if (UDLSSLibrary::IsDLSSSupported())
+	if (bDLSSSupported)
 	{
 		UDLSSMode LocalDLSSMode = DLSSMode;
 
@@ -161,8 +163,7 @@ void UBSGameUserSettings::InitDLSSSettings()
 	}
 
 	// NIS
-	if (UNISLibrary::IsNISSupported() && UNISLibrary::IsNISModeSupported(NISMode) && DLSSEnabledMode ==
-		EDLSSEnabledMode::Off)
+	if (bNISSupported && UNISLibrary::IsNISModeSupported(NISMode) && DLSSEnabledMode == EDLSSEnabledMode::Off)
 	{
 		// TODO: Sometimes this causes an exception when called early?
 		UNISLibrary::SetNISMode(NISMode);
@@ -291,6 +292,24 @@ void UBSGameUserSettings::LoadUserControlBusMix()
 	}
 }
 
+bool UBSGameUserSettings::IsDLSSSupported()
+{
+	if (!bDLSSInitialized)
+	{
+		InitDLSSSettings();
+	}
+	return bDLSSSupported;
+}
+
+bool UBSGameUserSettings::IsNISSupported()
+{
+	if (!bDLSSInitialized)
+	{
+		InitDLSSSettings();
+	}
+	return bNISSupported;
+}
+
 void UBSGameUserSettings::SetVolumeForControlBus(const FName& ControlBusKey, const float InVolume)
 {
 	if (!bSoundControlBusMixLoaded)
@@ -408,6 +427,11 @@ FString UBSGameUserSettings::GetAudioOutputDeviceId() const
 	return AudioOutputDeviceId;
 }
 
+TEnumAsByte<EAntiAliasingMethod> UBSGameUserSettings::GetAntiAliasingMethod() const
+{
+	return AntiAliasingMethod;
+}
+
 float UBSGameUserSettings::GetDisplayGamma() const
 {
 	return DisplayGamma;
@@ -415,22 +439,22 @@ float UBSGameUserSettings::GetDisplayGamma() const
 
 void UBSGameUserSettings::SetShowFPSCounter(const bool InShowFPSCounter)
 {
-	this->bShowFPSCounter = InShowFPSCounter;
+	bShowFPSCounter = InShowFPSCounter;
 }
 
 void UBSGameUserSettings::SetFrameRateLimitMenu(const int32 InFrameRateLimitMenu)
 {
-	this->FrameRateLimitMenu = InFrameRateLimitMenu;
+	FrameRateLimitMenu = InFrameRateLimitMenu;
 }
 
 void UBSGameUserSettings::SetFrameRateLimitGame(const int32 InFrameRateLimitGame)
 {
-	this->FrameRateLimitGame = InFrameRateLimitGame;
+	FrameRateLimitGame = InFrameRateLimitGame;
 }
 
 void UBSGameUserSettings::SetFrameRateLimitBackground(const int32 InFrameRateLimitBackground)
 {
-	this->FrameRateLimitBackground = InFrameRateLimitBackground;
+	FrameRateLimitBackground = InFrameRateLimitBackground;
 }
 
 void UBSGameUserSettings::SetDLSSEnabledMode(const EDLSSEnabledMode InDLSSEnabledMode)
@@ -440,7 +464,7 @@ void UBSGameUserSettings::SetDLSSEnabledMode(const EDLSSEnabledMode InDLSSEnable
 		InitDLSSSettings();
 	}
 
-	this->DLSSEnabledMode = InDLSSEnabledMode;
+	DLSSEnabledMode = InDLSSEnabledMode;
 }
 
 void UBSGameUserSettings::SetNISEnabledMode(const ENISEnabledMode InNISEnabledMode)
@@ -452,11 +476,11 @@ void UBSGameUserSettings::SetNISEnabledMode(const ENISEnabledMode InNISEnabledMo
 
 	if (UNISLibrary::IsNISSupported() && DLSSEnabledMode == EDLSSEnabledMode::Off)
 	{
-		this->NISEnabledMode = InNISEnabledMode;
+		NISEnabledMode = InNISEnabledMode;
 	}
 	else
 	{
-		this->NISEnabledMode = ENISEnabledMode::Off;
+		NISEnabledMode = ENISEnabledMode::Off;
 	}
 }
 
@@ -470,11 +494,11 @@ void UBSGameUserSettings::SetFrameGenerationEnabledMode(const UStreamlineDLSSGMo
 		UStreamlineLibraryDLSSG::IsDLSSGModeSupported(InFrameGenerationEnabledMode))
 	{
 		UStreamlineLibraryDLSSG::SetDLSSGMode(InFrameGenerationEnabledMode);
-		this->FrameGenerationEnabledMode = InFrameGenerationEnabledMode;
+		FrameGenerationEnabledMode = InFrameGenerationEnabledMode;
 	}
 	else
 	{
-		this->FrameGenerationEnabledMode = UStreamlineDLSSGMode::Off;
+		FrameGenerationEnabledMode = UStreamlineDLSSGMode::Off;
 	}
 }
 
@@ -522,11 +546,11 @@ void UBSGameUserSettings::SetDLSSMode(const UDLSSMode InDLSSMode)
 
 	if (ApplyDLSSMode(LocalDLSSMode, GetScreenResolution()))
 	{
-		this->DLSSMode = LocalDLSSMode;
+		DLSSMode = LocalDLSSMode;
 	}
 	else
 	{
-		this->DLSSMode = UDLSSMode::Off;
+		DLSSMode = UDLSSMode::Off;
 	}
 
 	SetFrameGenerationEnabledMode(LocalFrameGenerationEnabledMode);
@@ -546,7 +570,10 @@ void UBSGameUserSettings::SetDLSSMode(const UDLSSMode InDLSSMode)
 		}
 	}
 
-	// TODO: Set resolution scale to 1?
+	if (DLSSEnabledMode == EDLSSEnabledMode::On || NISEnabledMode == ENISEnabledMode::On)
+	{
+		SetResolutionScaleValueEx(100.f);
+	}
 }
 
 void UBSGameUserSettings::SetNISMode(const UNISMode InNISMode)
@@ -560,11 +587,11 @@ void UBSGameUserSettings::SetNISMode(const UNISMode InNISMode)
 		InNISMode))
 	{
 		UNISLibrary::SetNISMode(InNISMode);
-		this->NISMode = InNISMode;
+		NISMode = InNISMode;
 	}
 	else
 	{
-		this->NISMode = UNISMode::Off;
+		NISMode = UNISMode::Off;
 	}
 }
 
@@ -578,11 +605,11 @@ void UBSGameUserSettings::SetStreamlineReflexMode(const UStreamlineReflexMode In
 	if (UStreamlineLibraryReflex::IsReflexSupported())
 	{
 		UStreamlineLibraryReflex::SetReflexMode(InStreamlineReflexMode);
-		this->StreamlineReflexMode = InStreamlineReflexMode;
+		StreamlineReflexMode = InStreamlineReflexMode;
 	}
 	else
 	{
-		this->StreamlineReflexMode = UStreamlineReflexMode::Disabled;
+		StreamlineReflexMode = UStreamlineReflexMode::Disabled;
 	}
 }
 
@@ -612,21 +639,53 @@ void UBSGameUserSettings::SetSoundFXVolume(const float InVolume)
 
 void UBSGameUserSettings::SetAudioOutputDeviceId(const FString& InAudioOutputDeviceId)
 {
-	this->AudioOutputDeviceId = InAudioOutputDeviceId;
+	AudioOutputDeviceId = InAudioOutputDeviceId;
 }
 
 void UBSGameUserSettings::SetDisplayGamma(const float InGamma)
 {
-	DisplayGamma = InGamma;
+	// TODO: Fix this or revert to using old brightness
+	DisplayGamma = FMath::GetMappedRangeValueClamped(FVector2d(0.0, 100.0), FVector2d(0.0, 7.0), InGamma);
 	ApplyDisplayGamma();
 }
 
 void UBSGameUserSettings::SetDLSSSharpness(const float InDLSSSharpness)
 {
-	this->DLSSSharpness = InDLSSSharpness;
+	DLSSSharpness = InDLSSSharpness;
+	if (UDLSSLibrary::IsDLSSEnabled())
+	{
+		UDLSSLibrary::SetDLSSSharpness(DLSSSharpness);
+	}
 }
 
 void UBSGameUserSettings::SetNISSharpness(const float InNISSharpness)
 {
-	this->NISSharpness = InNISSharpness;
+	NISSharpness = InNISSharpness;
+	if (!UDLSSLibrary::IsDLSSEnabled() && NISEnabledMode == ENISEnabledMode::On)
+	{
+		UNISLibrary::SetNISSharpness(NISSharpness);
+	}
+}
+
+void UBSGameUserSettings::SetAntiAliasingMethod(const TEnumAsByte<EAntiAliasingMethod> InAntiAliasingMethod)
+{
+	if (IConsoleVariable* CVarAntiAliasingMethod = IConsoleManager::Get().FindConsoleVariable(
+		TEXT("r.AntiAliasingMethod")))
+	{
+		CVarAntiAliasingMethod->Set(InAntiAliasingMethod, ECVF_SetByGameOverride);
+	}
+	if (GConfig)
+	{
+		const FString Value = FString::FromInt(InAntiAliasingMethod);
+		GConfig->SetString(TEXT("/Script/Engine.RendererSettings"), TEXT("r.AntiAliasingMethod"), *Value, GEngineIni);
+		GConfig->Flush(false, GEngineIni);
+	}
+}
+
+void UBSGameUserSettings::SetResolutionScaleChecked(const float InResolutionScale)
+{
+	if (!UDLSSLibrary::IsDLSSEnabled() && NISEnabledMode != ENISEnabledMode::On)
+	{
+		SetResolutionScaleValueEx(InResolutionScale * 100.f);
+	}
 }

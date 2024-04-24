@@ -13,7 +13,7 @@ class USoundSubmix;
 enum EPhysicalSurface : int;
 
 USTRUCT()
-struct BEATSHOTGLOBAL_API FBSSubmixEffectChainMap
+struct FBSSubmixEffectChainMap
 {
 	GENERATED_BODY()
 
@@ -25,8 +25,8 @@ struct BEATSHOTGLOBAL_API FBSSubmixEffectChainMap
 };
 
 /** Audio settings that are editable within the Unreal Editor. */
-UCLASS(config = Game, defaultconfig, meta = (DisplayName = "BeatShotAudioSettings"))
-class BEATSHOTGLOBAL_API UBSAudioSettings : public UDeveloperSettings
+UCLASS(config = Game, defaultconfig, MinimalAPI, meta = (DisplayName = "BeatShot Audio"))
+class UBSAudioSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 
