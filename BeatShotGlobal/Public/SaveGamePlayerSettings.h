@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BSSettingTypes.h"
 #include "DLSSLibrary.h"
 #include "GlobalConstants.h"
 #include "NISLibrary.h"
@@ -12,27 +13,6 @@
 #include "GameFramework/SaveGame.h"
 #include "UserSettings/EnhancedInputUserSettings.h"
 #include "SaveGamePlayerSettings.generated.h"
-
-/** Nvidia DLSS Enabled Mode */
-UENUM(BlueprintType)
-enum class EDLSSEnabledMode : uint8
-{
-	Off UMETA(DisplayName = "Off"),
-	On UMETA(DisplayName = "On"),
-};
-
-ENUM_RANGE_BY_FIRST_AND_LAST(EDLSSEnabledMode, EDLSSEnabledMode::Off, EDLSSEnabledMode::On);
-
-
-/** Nvidia NIS Enabled Mode */
-UENUM(BlueprintType)
-enum class ENISEnabledMode : uint8
-{
-	Off UMETA(DisplayName = "Off"),
-	On UMETA(DisplayName = "On"),
-};
-
-ENUM_RANGE_BY_FIRST_AND_LAST(ENISEnabledMode, ENISEnabledMode::Off, ENISEnabledMode::On);
 
 /** Game settings */
 USTRUCT(BlueprintType)
@@ -255,7 +235,8 @@ struct FPlayerSettings_VideoAndSound
 
 	float GetPostProcessBiasFromBrightness() const
 	{
-		return FMath::GetMappedRangeValueClamped(FVector2D(Constants::MinValue_Brightness, Constants::MaxValue_Brightness),
+		return FMath::GetMappedRangeValueClamped(
+			FVector2D(Constants::MinValue_Brightness, Constants::MaxValue_Brightness),
 			FVector2D(Constants::MinValue_ExposureCompensation, Constants::MaxValue_ExposureCompensation), Brightness);
 	}
 
@@ -314,7 +295,7 @@ struct FPlayerSettings_User
 			FGameplayTagContainer Failure;
 			FMapPlayerKeyArgs Args;
 			Args.NewKey = Keybinding.Value;
-			
+
 			FString StringKey = Keybinding.Key.ToString();
 			if (StringKey.Len() > 2 && StringKey.EndsWith("_2"))
 			{
@@ -514,14 +495,14 @@ class BEATSHOTGLOBAL_API USaveGamePlayerSettings : public USaveGame
 public:
 	/** Returns a copy of PlayerSettings */
 	FPlayerSettings GetPlayerSettings() const;
-	
+
 	/** Saves Game specific settings, preserving all other settings */
 	void SavePlayerSettings(const FPlayerSettings_Game& InGameSettings);
 
-	/** Saves Audio Analyzer specific settings, preserving all other settings */ 
+	/** Saves Audio Analyzer specific settings, preserving all other settings */
 	void SavePlayerSettings(const FPlayerSettings_AudioAnalyzer& InAudioAnalyzerSettings);
 
-	/** Saves User specific settings, preserving all other settings */ 
+	/** Saves User specific settings, preserving all other settings */
 	void SavePlayerSettings(const FPlayerSettings_User& InUserSettings);
 
 	/** Saves CrossHair specific settings, preserving all other settings */
@@ -529,7 +510,7 @@ public:
 
 	/** Saves VideoAndSound settings, preserving all other settings */
 	void SavePlayerSettings(const FPlayerSettings_VideoAndSound& InVideoAndSoundSettings);
-	
+
 private:
 	UPROPERTY()
 	FPlayerSettings PlayerSettings;

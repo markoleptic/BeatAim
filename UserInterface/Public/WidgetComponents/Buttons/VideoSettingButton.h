@@ -4,23 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "BSButton.h"
+#include "BSSettingTypes.h"
 #include "Delegates/DelegateCombinations.h"
 #include "VideoSettingButton.generated.h"
-
-UENUM()
-enum class EVideoSettingType : uint8
-{
-	AntiAliasing UMETA(DisplayName="AntiAliasing"),
-	GlobalIllumination UMETA(DisplayName="GlobalIllumination"),
-	PostProcessing UMETA(DisplayName="PostProcessing"),
-	Reflection UMETA(DisplayName="Reflection"),
-	Shadow UMETA(DisplayName="Shadow"),
-	Shading UMETA(DisplayName="Shading"),
-	Texture UMETA(DisplayName="Texture"),
-	ViewDistance UMETA(DisplayName="ViewDistance"),
-	VisualEffect UMETA(DisplayName="VisualEffect")};
-
-ENUM_RANGE_BY_FIRST_AND_LAST(EVideoSettingType, EVideoSettingType::AntiAliasing, EVideoSettingType::VisualEffect);
 
 /** Button representing a video setting designed to be stored in a linked list. Contains a pointer to the next one */
 UCLASS()

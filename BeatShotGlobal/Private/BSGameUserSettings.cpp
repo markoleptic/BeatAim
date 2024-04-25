@@ -5,9 +5,25 @@
 
 #include "AudioModulationStatics.h"
 #include "BSAudioSettings.h"
+#include "BSSettingTypes.h"
 #include "GlobalConstants.h"
 #include "SaveGamePlayerSettings.h"
 #include "SoundControlBusMix.h"
+
+ENUM_RANGE_BY_FIRST_AND_LAST(UDLSSSupport, UDLSSSupport::Supported,
+	UDLSSSupport::NotSupportedIncompatibleAPICaptureToolActive);
+
+ENUM_RANGE_BY_FIRST_AND_LAST(UDLSSMode, UDLSSMode::Off, UDLSSMode::UltraPerformance);
+
+ENUM_RANGE_BY_FIRST_AND_LAST(UNISMode, UNISMode::Off, UNISMode::Custom);
+
+ENUM_RANGE_BY_FIRST_AND_LAST(UStreamlineReflexMode, UStreamlineReflexMode::Disabled,
+	UStreamlineReflexMode::EnabledPlusBoost);
+
+ENUM_RANGE_BY_FIRST_AND_LAST(UStreamlineDLSSGMode, UStreamlineDLSSGMode::Off, UStreamlineDLSSGMode::On);
+
+ENUM_RANGE_BY_FIRST_AND_LAST(EWindowMode::Type, EWindowMode::Type::Fullscreen, EWindowMode::Type::WindowedFullscreen);
+
 
 namespace
 {
@@ -91,7 +107,6 @@ void UBSGameUserSettings::BeginDestroy()
 void UBSGameUserSettings::SetToDefaults()
 {
 	Super::SetToDefaults();
-	SetBSSettingsToDefaults();
 }
 
 void UBSGameUserSettings::SetBSSettingsToDefaults()
@@ -193,6 +208,7 @@ void UBSGameUserSettings::InitDLSSSettings()
 void UBSGameUserSettings::LoadSettings(const bool bForceReload)
 {
 	Super::LoadSettings(bForceReload);
+	UE_LOG(LogTemp, Warning, TEXT("UBSGameUserSettings::LoadSettings"));
 }
 
 void UBSGameUserSettings::ConfirmVideoMode()
@@ -225,6 +241,21 @@ int32 UBSGameUserSettings::GetOverallScalabilityLevel() const
 void UBSGameUserSettings::SetOverallScalabilityLevel(const int32 Value)
 {
 	Super::SetOverallScalabilityLevel(Value);
+}
+
+bool UBSGameUserSettings::IsVersionValid()
+{
+	return Super::IsVersionValid();
+}
+
+void UBSGameUserSettings::UpdateVersion()
+{
+	Super::UpdateVersion();
+}
+
+void UBSGameUserSettings::ValidateSettings()
+{
+	Super::ValidateSettings();
 }
 
 void UBSGameUserSettings::ApplyDisplayGamma()
@@ -688,4 +719,11 @@ void UBSGameUserSettings::SetResolutionScaleChecked(const float InResolutionScal
 	{
 		SetResolutionScaleValueEx(InResolutionScale * 100.f);
 	}
+}
+
+
+template <typename T>
+TMap<uint8, FString> UBSGameUserSettings::GetSupportedVideoSettingModes() const
+{
+	return TMap<uint8, FString>();
 }

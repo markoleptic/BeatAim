@@ -213,33 +213,34 @@ private:
 	/** Clears and repopulates the ComboBox_Resolution based on the resolutions from GetSupportedFullscreenResolutions or GetConvenientWindowedResolutions */
 	void PopulateResolutionComboBox();
 
-	/** Sets enabled/disabled states for any NVIDIA DLSS related settings */
+	// TODO: Fix
+	/*/** Sets enabled/disabled states for any NVIDIA DLSS related settings #1#
 	void HandleDLSSEnabledChanged(const EDLSSEnabledMode DLSSEnabledMode);
 
-	/** Forces certain DLSS/NIS settings depending on if DLSS is enabled, and changes those selected options. Only called when a user changes the DLSS Enabled Mode selection */
+	/** Forces certain DLSS/NIS settings depending on if DLSS is enabled, and changes those selected options. Only called when a user changes the DLSS Enabled Mode selection #1#
 	void HandleDLSSDependencies(const EDLSSEnabledMode DLSSEnabledMode);
 
-	/** Returns the selected DLSS enabled mode */
+	/** Returns the selected DLSS enabled mode #1#
 	EDLSSEnabledMode GetSelectedDLSSEnabledMode() const;
 
-	/** Returns the selected Frame Generation mode */
+	/** Returns the selected Frame Generation mode #1#
 	UStreamlineDLSSGMode GetSelectedFrameGenerationMode() const;
 
-	/** Returns the selected DLSS mode (Super Resolution) */
+	/** Returns the selected DLSS mode (Super Resolution) #1#
 	UDLSSMode GetSelectedDLSSMode() const;
 
-	/** Returns the selected NIS enabled mode */
+	/** Returns the selected NIS enabled mode #1#
 	ENISEnabledMode GetSelectedNISEnabledMode() const;
 
-	/** Returns the selected NIS mode */
+	/** Returns the selected NIS mode #1#
 	UNISMode GetSelectedNISMode() const;
 
-	/** Returns the selected reflex mode */
+	/** Returns the selected reflex mode #1#
 	UStreamlineReflexMode GetSelectedReflexMode() const;
 
 	FString GetComboBoxEntryTooltipStringTableKey_DLSS_FrameGeneration(const FString& EnumString);
 	FString GetComboBoxEntryTooltipStringTableKey_DLSS_SuperResolution(const FString& EnumString);
-	FString GetComboBoxEntryTooltipStringTableKey_Reflex(const FString& EnumString);
+	FString GetComboBoxEntryTooltipStringTableKey_Reflex(const FString& EnumString);*/
 
 	/** Holds the last confirmed resolution */
 	FIntPoint LastConfirmedResolution;

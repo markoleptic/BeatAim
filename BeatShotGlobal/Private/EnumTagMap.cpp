@@ -6,11 +6,6 @@
 
 UEnumTagMap::UEnumTagMap()
 {
-	for (const UEnum* Enum : EnumsToInclude)
-	{
-		EnumTagMappings.AddUnique(Enum);
-	}
-	EnumTagMappings.Sort();
 }
 
 void UEnumTagMap::PreSave(FObjectPreSaveContext ObjectSaveContext)
@@ -28,7 +23,7 @@ void UEnumTagMap::PreSave(FObjectPreSaveContext ObjectSaveContext)
 void UEnumTagMap::PostLoad()
 {
 	// Add any Enum Types not present in EnumTagMappings
-	for (const UEnum* Enum : EnumsToInclude)
+	for (const UEnum* Enum : EnumsTypes)
 	{
 		FEnumTagMapping TagMapping(Enum);
 		const int32 Index = EnumTagMappings.Find(TagMapping);
@@ -49,7 +44,6 @@ void UEnumTagMap::PostLoad()
 				}
 			}
 		}
-			
 	}
 	EnumTagMappings.Sort();
 	Super::PostLoad();
@@ -58,4 +52,13 @@ void UEnumTagMap::PostLoad()
 const TArray<FEnumTagMapping>* UEnumTagMap::GetEnumTagMappings() const
 {
 	return &EnumTagMappings;
+}
+
+void UEnumTagMap::PopulateEnumTypes(const TSet<UEnum*>& InTypes)
+{
+	for (const UEnum* Enum : InTypes)
+	{
+		EnumTagMappings.AddUnique(Enum);
+	}
+	EnumTagMappings.Sort();
 }

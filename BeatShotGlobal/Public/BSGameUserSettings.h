@@ -3,17 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DLSSLibrary.h"
-#include "NISLibrary.h"
-#include "StreamlineLibraryDLSSG.h"
-#include "StreamlineLibraryReflex.h"
 #include "GameFramework/GameUserSettings.h"
 #include "BSGameUserSettings.generated.h"
 
+enum class UStreamlineReflexMode : uint8;
+enum class UNISMode : uint8;
+enum class UDLSSMode : uint8;
+enum class UStreamlineDLSSGMode : uint8;
 enum class ENISEnabledMode : uint8;
 enum class EDLSSEnabledMode : uint8;
 class USoundControlBusMix;
 class USoundControlBus;
+
+
 /** Video and Sound Settings that are saved to GameUserSettings.ini */
 UCLASS(config=GameUserSettings, configdonotcheckdefaults)
 class BEATSHOTGLOBAL_API UBSGameUserSettings : public UGameUserSettings
@@ -38,6 +40,9 @@ public:
 	virtual void ApplyNonResolutionSettings() override;
 	virtual int32 GetOverallScalabilityLevel() const override;
 	virtual void SetOverallScalabilityLevel(int32 Value) override;
+	virtual bool IsVersionValid() override;
+	virtual void UpdateVersion() override;
+	virtual void ValidateSettings() override;
 	//~End of UGameUserSettings interface
 
 	/** Initializes DLSS and NIS settings. */
@@ -130,6 +135,9 @@ public:
 	void SetAntiAliasingMethod(TEnumAsByte<EAntiAliasingMethod> InAntiAliasingMethod);
 	UFUNCTION()
 	void SetResolutionScaleChecked(float InResolutionScale);
+
+	template <typename T>
+	TMap<uint8, FString> GetSupportedVideoSettingModes() const;
 
 private:
 	void SetBSSettingsToDefaults();
@@ -224,4 +232,7 @@ private:
 
 	UPROPERTY(Transient)
 	bool bNISSupported;
+
+	UPROPERTY(Config)
+	uint32 BSVersion;
 };

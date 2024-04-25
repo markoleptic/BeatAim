@@ -3,11 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BSGameModeDataAsset.h"
 #include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "EnumTagMap.generated.h"
-
 
 class UGameModeCategoryTagWidget;
 
@@ -170,20 +168,12 @@ public:
 	T FindEnumFromString(const FString& EnumString);
 
 protected:
+	void PopulateEnumTypes(const TSet<UEnum*>& InTypes);
+
 	UPROPERTY(EditDefaultsOnly, meta = (TitleProperty="{EnumClass}"))
 	TArray<FEnumTagMapping> EnumTagMappings;
 
-	TArray<UEnum*> EnumsToInclude = {
-		StaticEnum<EBoundsScalingPolicy>(), StaticEnum<EMovingTargetDirectionMode>(),
-		StaticEnum<EConsecutiveTargetScalePolicy>(), StaticEnum<ETargetDamageType>(),
-		StaticEnum<ETargetActivationSelectionPolicy>(), StaticEnum<ERecentTargetMemoryPolicy>(),
-		StaticEnum<ETargetDeactivationCondition>(), StaticEnum<ETargetDestructionCondition>(),
-		StaticEnum<ETargetActivationResponse>(), StaticEnum<ETargetDeactivationResponse>(),
-		StaticEnum<EDynamicBoundsScalingPolicy>(), StaticEnum<ETargetSpawningPolicy>(),
-		StaticEnum<ETargetDistributionPolicy>(), StaticEnum<EReinforcementLearningMode>(),
-		StaticEnum<EReinforcementLearningHyperParameterMode>(), StaticEnum<ETargetSpawnResponse>(),
-		StaticEnum<ERuntimeTargetSpawningLocationSelectionMode>()
-	};
+	TSet<UEnum*> EnumsTypes;
 };
 
 template <typename T>
@@ -213,7 +203,7 @@ const FEnumTagMapping* UEnumTagMap::GetEnumTagMapping()
 	{
 		return nullptr;
 	}
-	
+
 	const int32 Index = EnumTagMappings.Find(FEnumTagMapping(EnumClass, true));
 
 	if (!EnumTagMappings.IsValidIndex(Index))

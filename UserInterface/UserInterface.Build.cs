@@ -10,7 +10,7 @@ public class UserInterface : ModuleRules
 		PublicDependencyModuleNames.AddRange(new[]
 		{
 			"Core", "ApplicationCore", "CoreUObject", "Engine", "UMG", "Slate", "SlateCore", "WebBrowserWidget",
-			"WebBrowser", "BeatShotGlobal", "DLSSBlueprint", "NISBlueprint", "StreamlineBlueprint", "GameplayTags", 
+			"WebBrowser", "BeatShotGlobal", "GameplayTags",
 			"InputCore", "CommonUI", "MoviePlayer"
 		});
 
@@ -27,9 +27,5 @@ public class UserInterface : ModuleRules
 			"../Plugins/AudioAnalyzer/Source/Thirdparty/miniaudio/include",
 			"../Plugins/AudioAnalyzer/Source/AudioAnalyzer/Thirdparty/stb"
 		});
-
-		PublicIncludePaths.Add(Path.Combine(EngineDirectory, "Plugins/Marketplace/DLSS/Source/ThirdParty/NGX/Include"));
-		PublicIncludePaths.Add(Path.Combine(EngineDirectory,
-			"Plugins/Marketplace/Streamline/Source/ThirdParty/Streamline/include"));
 	}
 }
