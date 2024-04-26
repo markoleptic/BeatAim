@@ -7,7 +7,7 @@
 
 UBSGameModeEnumTagMap::UBSGameModeEnumTagMap()
 {
-	EnumsTypes = TSet({
+	EnumTypes = TSet({
 		StaticEnum<EBoundsScalingPolicy>(), StaticEnum<EMovingTargetDirectionMode>(),
 		StaticEnum<EConsecutiveTargetScalePolicy>(), StaticEnum<ETargetDamageType>(),
 		StaticEnum<ETargetActivationSelectionPolicy>(), StaticEnum<ERecentTargetMemoryPolicy>(),
@@ -18,5 +18,5 @@ UBSGameModeEnumTagMap::UBSGameModeEnumTagMap()
 		StaticEnum<EReinforcementLearningHyperParameterMode>(), StaticEnum<ETargetSpawnResponse>(),
 		StaticEnum<ERuntimeTargetSpawningLocationSelectionMode>()
 	});
-	PopulateEnumTypes(EnumsTypes);
+	PopulateEnumTypes(EnumTypes);
 }

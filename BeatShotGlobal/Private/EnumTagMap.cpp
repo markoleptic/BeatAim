@@ -10,55 +10,54 @@ UEnumTagMap::UEnumTagMap()
 
 void UEnumTagMap::PreSave(FObjectPreSaveContext ObjectSaveContext)
 {
-	for (FEnumTagMapping& TagMapping : EnumTagMappings)
+	for (auto& [Enum, EnumTageMapping] : EnumTagMap)
 	{
-		for (FEnumTagPair& TagPair : TagMapping.EnumTagPairs)
+		for (auto& [Index, EnumTagPair] : EnumTageMapping.NewEnumTagPairs)
 		{
-			TagPair.AddParentTags(TagMapping.ParentTags);
+			EnumTagPair.AddParentTags(EnumTageMapping.ParentTags);
 		}
 	}
+
 	Super::PreSave(ObjectSaveContext);
 }
 
 void UEnumTagMap::PostLoad()
 {
 	// Add any Enum Types not present in EnumTagMappings
-	for (const UEnum* Enum : EnumsTypes)
+	for (UEnum* Enum : EnumTypes)
 	{
-		FEnumTagMapping TagMapping(Enum);
-		const int32 Index = EnumTagMappings.Find(TagMapping);
-		if (Index == INDEX_NONE)
+		FEnumTagMapping* Found = EnumTagMap.Find(Enum);
+		if (!Found)
 		{
-			EnumTagMappings.Add(TagMapping);
+			EnumTagMap.Emplace(Enum, FEnumTagMapping(Enum));
 		}
-		else
+
+		// Add any Enum Values not present in EnumTagPairs
+		for (int64 i = 0; i < Enum->GetMaxEnumValue(); i++)
 		{
-			// Add any Enum Values not present in EnumTagPairs
-			TArray<FEnumTagPair>& EnumTagPairs = EnumTagMappings[Index].EnumTagPairs;
-			for (int64 i = 0; i < Enum->GetMaxEnumValue(); i++)
+			if (!Found->NewEnumTagPairs.Find(i))
 			{
-				if (EnumTagPairs.Find(FEnumTagPair(i)) == INDEX_NONE)
-				{
-					const FText EnumValueText = Enum->GetDisplayNameTextByValue(i);
-					EnumTagPairs.Emplace(EnumValueText.ToString(), i);
-				}
+				const FText EnumValueText = Enum->GetDisplayNameTextByValue(i);
+				Found->NewEnumTagPairs.Emplace(i, FEnumTagPair(EnumValueText.ToString(), i));
 			}
 		}
 	}
-	EnumTagMappings.Sort();
+
 	Super::PostLoad();
 }
 
-const TArray<FEnumTagMapping>* UEnumTagMap::GetEnumTagMappings() const
+const TMap<UEnum*, FEnumTagMapping>& UEnumTagMap::GetEnumTagMap() const
 {
-	return &EnumTagMappings;
+	return EnumTagMap;
 }
 
 void UEnumTagMap::PopulateEnumTypes(const TSet<UEnum*>& InTypes)
 {
-	for (const UEnum* Enum : InTypes)
+	for (UEnum* Enum : InTypes)
 	{
-		EnumTagMappings.AddUnique(Enum);
+		if (!EnumTagMap.Contains(Enum))
+		{
+			EnumTagMap.Emplace(Enum, FEnumTagMapping(Enum));
+		}
 	}
-	EnumTagMappings.Sort();
 }

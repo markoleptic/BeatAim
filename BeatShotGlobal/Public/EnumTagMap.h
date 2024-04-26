@@ -7,8 +7,6 @@
 #include "Engine/DataAsset.h"
 #include "EnumTagMap.generated.h"
 
-class UGameModeCategoryTagWidget;
-
 /** Display name and associated GameplayTags for an enum */
 USTRUCT(BlueprintType, meta=(ShowOnlyInnerProperties))
 struct FEnumTagPair
@@ -20,43 +18,25 @@ struct FEnumTagPair
 	FString DisplayName;
 
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, meta = (NoResetToDefault))
-	int32 Index;
+	uint8 Index;
 
 	/** Gameplay Tags inherited from the Enum Class */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (Categories="GameModeCategory"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	FGameplayTagContainer ParentTags;
 
 	/** Gameplay Tags associated with the Enum Value */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (Categories="GameModeCategory"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	FGameplayTagContainer Tags;
 
-	FEnumTagPair()
-	{
-		DisplayName = "";
-		ParentTags = FGameplayTagContainer();
-		Tags = FGameplayTagContainer();
-		Index = -1;
-	}
+	FEnumTagPair() = default;
 
-	FEnumTagPair(const FString& InEnumValue, const int32 InIndex)
+	FEnumTagPair(const FString& InEnumValue, const uint8 InIndex) : DisplayName(InEnumValue), Index(InIndex)
 	{
-		DisplayName = InEnumValue;
-		Index = InIndex;
-		ParentTags = FGameplayTagContainer();
-		Tags = FGameplayTagContainer();
-	}
-
-	FEnumTagPair(const int32 InIndex)
-	{
-		DisplayName = "";
-		Index = InIndex;
-		ParentTags = FGameplayTagContainer();
-		Tags = FGameplayTagContainer();
 	}
 
 	void AddParentTags(const FGameplayTagContainer& InParentTags)
 	{
-		ParentTags = InParentTags;
+		ParentTags.AppendTags(InParentTags);
 
 		for (const FGameplayTag& Tag : InParentTags)
 		{
@@ -88,28 +68,20 @@ struct FEnumTagMapping
 	FString EnumClass;
 
 	/** Any EnumTagPairs inherit these tags. Must save to show changes in editor */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (Categories="GameModeCategory"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	FGameplayTagContainer ParentTags;
 
 	/** Gameplay Tags associated with an Enum Value */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (TitleProperty="{DisplayName}"))
-	TArray<FEnumTagPair> EnumTagPairs;
+	TMap<uint8, FEnumTagPair> NewEnumTagPairs;
 
-	FEnumTagMapping()
-	{
-		Enum = nullptr;
-		EnumClass = FString();
-	}
+	FEnumTagMapping() = default;
 
-	FEnumTagMapping(const UEnum* InEnum, const bool bComparison = false)
+	explicit FEnumTagMapping(const UEnum* InEnum)
 	{
 		Enum = InEnum;
-
-		if (!bComparison)
-		{
-			EnumClass = Enum->CppType;
-			CreateEnumTagPairs();
-		}
+		EnumClass = Enum->CppType;
+		CreateEnumTagPairs();
 	}
 
 	void CreateEnumTagPairs()
@@ -117,7 +89,7 @@ struct FEnumTagMapping
 		for (int64 i = 0; i < Enum->GetMaxEnumValue(); i++)
 		{
 			const FText EnumValueText = Enum->GetDisplayNameTextByValue(i);
-			EnumTagPairs.Emplace(EnumValueText.ToString(), i);
+			NewEnumTagPairs.Emplace(i, FEnumTagPair(EnumValueText.ToString(), i));
 		}
 	}
 
@@ -157,7 +129,7 @@ public:
 	const FEnumTagMapping* GetEnumTagMapping();
 
 	/** Returns a pointer to the entire EnumTagMappings array */
-	const TArray<FEnumTagMapping>* GetEnumTagMappings() const;
+	const TMap<UEnum*, FEnumTagMapping>& GetEnumTagMap() const;
 
 	/** Returns the string associated with a specific full enum name */
 	template <typename T>
@@ -170,10 +142,13 @@ public:
 protected:
 	void PopulateEnumTypes(const TSet<UEnum*>& InTypes);
 
-	UPROPERTY(EditDefaultsOnly, meta = (TitleProperty="{EnumClass}"))
-	TArray<FEnumTagMapping> EnumTagMappings;
+	UPROPERTY(EditDefaultsOnly, meta = (TitleProperty="{UEnum}"))
+	TMap<UEnum*, FEnumTagMapping> EnumTagMap;
 
-	TSet<UEnum*> EnumsTypes;
+	TSet<UEnum*> EnumTypes;
+
+	template <typename T>
+	FEnumTagMapping* GetEditableEnumTagMapping();
 };
 
 template <typename T>
@@ -185,14 +160,12 @@ FGameplayTagContainer UEnumTagMap::GetTagsForEnum(const T& InEnum)
 		return FGameplayTagContainer();
 	}
 
-	const int32 Index = EnumTagMapping->EnumTagPairs.Find(FEnumTagPair(static_cast<int64>(InEnum)));
-
-	if (!EnumTagMapping->EnumTagPairs.IsValidIndex(Index))
+	if (const auto Found = EnumTagMapping->NewEnumTagPairs.Find(static_cast<uint8>(InEnum)))
 	{
-		return FGameplayTagContainer();
+		return Found->Tags;
 	}
 
-	return EnumTagMapping->EnumTagPairs[Index].Tags;
+	return FGameplayTagContainer();
 }
 
 template <typename T>
@@ -203,14 +176,7 @@ const FEnumTagMapping* UEnumTagMap::GetEnumTagMapping()
 	{
 		return nullptr;
 	}
-
-	const int32 Index = EnumTagMappings.Find(FEnumTagMapping(EnumClass, true));
-
-	if (!EnumTagMappings.IsValidIndex(Index))
-	{
-		return nullptr;
-	}
-	return &EnumTagMappings[Index];
+	return EnumTagMap.Find(EnumClass);
 }
 
 template <typename T>
@@ -221,32 +187,39 @@ FString UEnumTagMap::GetStringFromEnumTagPair(const T& InEnum)
 	{
 		return FString();
 	}
-
-	const int32 Index = EnumTagMapping->EnumTagPairs.Find(FEnumTagPair(static_cast<int64>(InEnum)));
-
-	if (!EnumTagMapping->EnumTagPairs.IsValidIndex(Index))
+	if (const auto Found = EnumTagMapping->NewEnumTagPairs.Find(static_cast<uint8>(InEnum)))
 	{
-		UE_LOG(LogTemp, Display, TEXT("Didn't find mapping for %llu"), static_cast<int64>(InEnum));
-		return FString();
+		return Found->DisplayName;
 	}
 
-	return EnumTagMapping->EnumTagPairs[Index].DisplayName;
+	UE_LOG(LogTemp, Display, TEXT("Didn't find mapping for %d"), static_cast<uint8>(InEnum));
+	return FString();
 }
 
 template <typename T>
 T UEnumTagMap::FindEnumFromString(const FString& EnumString)
 {
-	const FEnumTagMapping* EnumTagMapping = GetEnumTagMapping<T>();
-
-	if (EnumTagMapping)
+	if (const FEnumTagMapping* EnumTagMapping = GetEnumTagMapping<T>())
 	{
-		for (const auto& Pair : EnumTagMapping->EnumTagPairs)
+		for (const auto& [Key, Value] : EnumTagMapping->NewEnumTagPairs)
 		{
-			if (Pair.DisplayName.Equals(EnumString))
+			if (Value.DisplayName.Equals(EnumString))
 			{
-				return static_cast<T>(Pair.Index);
+				return static_cast<T>(Value.Index);
 			}
 		}
 	}
 	return static_cast<T>(0);
+}
+
+template <typename T>
+FEnumTagMapping* UEnumTagMap::GetEditableEnumTagMapping()
+{
+	const UEnum* EnumClass = StaticEnum<T>();
+	if (!EnumClass)
+	{
+		return nullptr;
+	}
+
+	return EnumTagMap.Find(EnumClass);
 }

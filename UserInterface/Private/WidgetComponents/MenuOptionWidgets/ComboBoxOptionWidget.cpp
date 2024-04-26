@@ -74,42 +74,39 @@ UWidget* UComboBoxOptionWidget::AddGameModeCategoryTagWidgets(UBSComboBoxEntry_T
 	}
 	const FString CompareString = ComboBoxEntry->GetEntryText().ToString();
 
-	const FEnumTagPair* Found = EnumTagMapping.EnumTagPairs.FindByPredicate(
-		[this, &CompareString](const FEnumTagPair& EnumTagPair)
+	for (auto& [Index, EnumTagPair] : EnumTagMapping.NewEnumTagPairs)
+	{
+		if (EnumTagPair.DisplayName.Equals(CompareString))
 		{
-			return EnumTagPair.DisplayName.Equals(CompareString);
-		});
+			TArray<UGameModeCategoryTagWidget*> ParentTagWidgetsToAdd;
+			TArray<UGameModeCategoryTagWidget*> TagWidgetsToAdd;
 
-	if (!Found)
-	{
-		return ComboBoxEntry;
+			for (const FGameplayTag& Tag : EnumTagPair.ParentTags)
+			{
+				const TSubclassOf<UUserWidget> SubClass = GameModeCategoryTagMap->GetWidgetByGameModeCategoryTag(Tag);
+				if (!SubClass) continue;
+
+				UGameModeCategoryTagWidget* TagWidget = CreateWidget<UGameModeCategoryTagWidget>(this, SubClass);
+				ParentTagWidgetsToAdd.Add(TagWidget);
+			}
+
+			for (const FGameplayTag& Tag : EnumTagPair.Tags)
+			{
+				const TSubclassOf<UUserWidget> SubClass = GameModeCategoryTagMap->GetWidgetByGameModeCategoryTag(Tag);
+				if (!SubClass) continue;
+
+				UGameModeCategoryTagWidget* TagWidget = CreateWidget<UGameModeCategoryTagWidget>(this, SubClass);
+				TagWidgetsToAdd.Add(TagWidget);
+			}
+
+			ComboBoxEntry->AddGameModeCategoryTagWidget(ParentTagWidgetsToAdd, TagWidgetsToAdd,
+				MenuOptionStyle->Padding_TagWidget, MenuOptionStyle->VerticalAlignment_TagWidget,
+				MenuOptionStyle->HorizontalAlignment_TagWidget);
+
+			break;
+		}
 	}
 
-	const FEnumTagPair& EnumTagPair = EnumTagMapping.EnumTagPairs[Found->Index];
-	TArray<UGameModeCategoryTagWidget*> ParentTagWidgetsToAdd;
-	TArray<UGameModeCategoryTagWidget*> TagWidgetsToAdd;
-
-	for (const FGameplayTag& Tag : EnumTagPair.ParentTags)
-	{
-		const TSubclassOf<UUserWidget> SubClass = GameModeCategoryTagMap->GetWidgetByGameModeCategoryTag(Tag);
-		if (!SubClass) continue;
-		
-		UGameModeCategoryTagWidget* TagWidget = CreateWidget<UGameModeCategoryTagWidget>(this, SubClass);
-		ParentTagWidgetsToAdd.Add(TagWidget);
-	}
-
-	for (const FGameplayTag& Tag : EnumTagPair.Tags)
-	{
-		const TSubclassOf<UUserWidget> SubClass = GameModeCategoryTagMap->GetWidgetByGameModeCategoryTag(Tag);
-		if (!SubClass) continue;
-		
-		UGameModeCategoryTagWidget* TagWidget = CreateWidget<UGameModeCategoryTagWidget>(this, SubClass);
-		TagWidgetsToAdd.Add(TagWidget);
-	}
-
-	ComboBoxEntry->AddGameModeCategoryTagWidget(ParentTagWidgetsToAdd, TagWidgetsToAdd,
-		MenuOptionStyle->Padding_TagWidget, MenuOptionStyle->VerticalAlignment_TagWidget,
-		MenuOptionStyle->HorizontalAlignment_TagWidget);
 	return ComboBoxEntry;
 }
 
