@@ -254,6 +254,12 @@ private:
 	/** Timer that starts when window mode or resolution is changed, and calls RevertVideoSettingsTimerCallback every second */
 	FTimerHandle RevertVideoSettingsTimer_UpdateSecond;
 
-	TMap<FString, EWindowMode::Type> WindowModeMap;
-	TMap<FString, EAntiAliasingMethod> AntiAliasingMethodMap;
+	TMap<FString, uint8> WindowModeMap;
+	TMap<FString, uint8> AntiAliasingMethodMap;
+	TMap<FString, uint8> DLSSModeMap;
+	TMap<FString, uint8> DLSSEnabledModeMap;
+	TMap<FString, uint8> NISModeMap;
+	TMap<FString, uint8> NISEnabledModeMap;
+	TMap<FString, uint8> FrameGenerationEnabledModeMap;
+	TMap<FString, uint8> StreamlineReflexModeMap;
 };

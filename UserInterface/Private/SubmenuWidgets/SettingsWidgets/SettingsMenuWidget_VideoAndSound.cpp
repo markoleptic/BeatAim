@@ -20,7 +20,7 @@
 #include "Kismet/KismetStringLibrary.h"
 #include "OverlayWidgets/PopupWidgets/PopupMessageWidget.h"
 
-
+enum class UDLSSMode : uint8;
 using namespace Constants;
 
 void USettingsMenuWidget_VideoAndSound::NativeConstruct()
@@ -164,93 +164,45 @@ void USettingsMenuWidget_VideoAndSound::NativeConstruct()
 
 	Button_Reset->SetDefaults(static_cast<uint8>(ESettingButtonType::Reset));
 	Button_Save->SetDefaults(static_cast<uint8>(ESettingButtonType::Save));
+
 	TArray<FString> Options;
 
-	// Window Modes
+	auto AddSettingOptions = [](const TMap<FString, uint8>& InMap, TArray<FString>& InOptions,
+		UComboBoxOptionWidget* ComboBoxOptionWidget)
+	{
+		InMap.GetKeys(InOptions);
+		ComboBoxOptionWidget->SortAndAddOptions(InOptions);
+		InOptions.Empty();
+	};
+
 	WindowModeMap.Add("Fullscreen", EWindowMode::Type::Fullscreen);
-	WindowModeMap.Add("Windowed", EWindowMode::Type::Windowed);
 	WindowModeMap.Add("Windowed Fullscreen", EWindowMode::Type::WindowedFullscreen);
-	WindowModeMap.GetKeys(Options);
-	ComboBoxOption_WindowMode->SortAndAddOptions(Options);
-	Options.Empty();
-
-	UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
-
-	// TODO: Fix
-	/*// DLSS On/Off
-	Options.Add(GetStringFromEnum(EDLSSEnabledMode::Off));
-	if (GameUserSettings->IsDLSSSupported())
-	{
-		Options.Add(GetStringFromEnum(EDLSSEnabledMode::On));
-	}
-	ComboBoxOption_DLSS->SortAndAddOptions(Options);
-	Options.Empty();
-
-	// Frame Generation
-	for (const UStreamlineDLSSGMode Mode : UStreamlineLibraryDLSSG::GetSupportedDLSSGModes())
-	{
-		Options.Add(GetStringFromEnum(Mode));
-	}
-	ComboBoxOption_DLSS_FrameGeneration->SortAndAddOptions(Options);
-	Options.Empty();
-
-	// Super Resolution (DLSS Modes)
-	Options.Add(GetStringFromEnum(UDLSSMode::Off));
-	Options.Add(GetStringFromEnum(UDLSSMode::Auto));
-	for (const UDLSSMode Mode : UDLSSLibrary::GetSupportedDLSSModes())
-	{
-		if (Mode != UDLSSMode::Off && Mode != UDLSSMode::Auto)
-		{
-			Options.Add(GetStringFromEnum(Mode));
-		}
-	}
-	ComboBoxOption_DLSS_SuperResolution->SortAndAddOptions(Options);
-	// Make DLAA the last option
-	if (ComboBoxOption_DLSS_SuperResolution->ComboBox->GetIndexOfOption(GetStringFromEnum(UDLSSMode::DLAA)) !=
-		INDEX_NONE)
-	{
-		ComboBoxOption_DLSS_SuperResolution->ComboBox->RemoveOption(GetStringFromEnum(UDLSSMode::DLAA));
-		ComboBoxOption_DLSS_SuperResolution->ComboBox->AddOption(GetStringFromEnum(UDLSSMode::DLAA));
-	}
-	Options.Empty();
-
-	// NIS On/Off
-	Options.Add(GetStringFromEnum(ENISEnabledMode::Off));
-	if (GameUserSettings->IsNISSupported())
-	{
-		Options.Add(GetStringFromEnum(ENISEnabledMode::On));
-	}
-	ComboBoxOption_NIS->SortAndAddOptions(Options);
-	Options.Empty();
-
-	// NIS Modes
-	for (const UNISMode Mode : UNISLibrary::GetSupportedNISModes())
-	{
-		if (Mode != UNISMode::Custom)
-		{
-			Options.Add(GetStringFromEnum(Mode));
-		}
-	}
-	ComboBoxOption_NIS_Mode->SortAndAddOptions(Options);
-	Options.Empty();
-
-	// Reflex
-	Options.Add(GetStringFromEnum(UStreamlineReflexMode::Disabled));
-	if (UStreamlineLibraryReflex::IsReflexSupported())
-	{
-		Options.Add(GetStringFromEnum(UStreamlineReflexMode::Enabled));
-		Options.Add(GetStringFromEnum(UStreamlineReflexMode::EnabledPlusBoost));
-	}
-	ComboBoxOption_Reflex->SortAndAddOptions(Options);
-	Options.Empty();*/
+	WindowModeMap.Add("Windowed", EWindowMode::Type::Windowed);
 
 	AntiAliasingMethodMap.Add("None", AAM_None);
 	AntiAliasingMethodMap.Add("Fast Approximate Anti-Aliasing (FXAA)", AAM_FXAA);
 	AntiAliasingMethodMap.Add("Temporal Anti-Aliasing (TAA)", AAM_TemporalAA);
 	AntiAliasingMethodMap.Add("Temporal Super-Resolution (TSR)", AAM_TSR);
-	AntiAliasingMethodMap.GetKeys(Options);
-	ComboBoxOption_AntiAliasingMethod->SortAndAddOptions(Options);
-	Options.Empty();
+
+	UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
+
+	DLSSEnabledModeMap = GameUserSettings->GetSupportedNvidiaSettingModes(ENvidiaSettingType::DLSSEnabledMode);
+	DLSSModeMap = GameUserSettings->GetSupportedNvidiaSettingModes(ENvidiaSettingType::DLSSMode);
+	NISEnabledModeMap = GameUserSettings->GetSupportedNvidiaSettingModes(ENvidiaSettingType::NISEnabledMode);
+	NISModeMap = GameUserSettings->GetSupportedNvidiaSettingModes(ENvidiaSettingType::NISMode);
+	FrameGenerationEnabledModeMap = GameUserSettings->GetSupportedNvidiaSettingModes(
+		ENvidiaSettingType::FrameGenerationEnabledMode);
+	StreamlineReflexModeMap = GameUserSettings->
+		GetSupportedNvidiaSettingModes(ENvidiaSettingType::StreamlineReflexMode);
+
+	AddSettingOptions(AntiAliasingMethodMap, Options, ComboBoxOption_AntiAliasingMethod);
+	AddSettingOptions(WindowModeMap, Options, ComboBoxOption_WindowMode);
+	AddSettingOptions(DLSSEnabledModeMap, Options, ComboBoxOption_DLSS);
+	AddSettingOptions(DLSSModeMap, Options, ComboBoxOption_DLSS_SuperResolution);
+	AddSettingOptions(NISEnabledModeMap, Options, ComboBoxOption_NIS);
+	AddSettingOptions(NISModeMap, Options, ComboBoxOption_NIS_Mode);
+	AddSettingOptions(FrameGenerationEnabledModeMap, Options, ComboBoxOption_DLSS_FrameGeneration);
+	AddSettingOptions(StreamlineReflexModeMap, Options, ComboBoxOption_Reflex);
 
 	UpdateBrushColors();
 	InitializeVideoAndSoundSettings();
@@ -292,10 +244,10 @@ void USettingsMenuWidget_VideoAndSound::InitializeVideoAndSoundSettings()
 	VideoSettingOptionWidget_VD->SetActiveButton(GameUserSettings->GetViewDistanceQuality());
 	VideoSettingOptionWidget_VEQ->SetActiveButton(GameUserSettings->GetVisualEffectQuality());
 
-	const int32 AntiAliasingValue = GameUserSettings->GetAntiAliasingMethod();
-	for (const TPair<FString, EAntiAliasingMethod>& Pair : AntiAliasingMethodMap)
+	const TEnumAsByte<EAntiAliasingMethod> AntiAliasingValue = GameUserSettings->GetAntiAliasingMethod();
+	for (const TPair<FString, uint8>& Pair : AntiAliasingMethodMap)
 	{
-		if (static_cast<int32>(Pair.Value) == AntiAliasingValue)
+		if (Pair.Value == AntiAliasingValue)
 		{
 			ComboBoxOption_AntiAliasingMethod->ComboBox->SetSelectedOption(Pair.Key);
 			break;
@@ -303,7 +255,7 @@ void USettingsMenuWidget_VideoAndSound::InitializeVideoAndSoundSettings()
 	}
 
 	const EWindowMode::Type WindowMode = GameUserSettings->GetFullscreenMode();
-	for (const TPair<FString, EWindowMode::Type>& Pair : WindowModeMap)
+	for (const TPair<FString, uint8>& Pair : WindowModeMap)
 	{
 		if (Pair.Value == WindowMode)
 		{
@@ -399,25 +351,7 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_WindowMode(const TArr
 	UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 	LastConfirmedResolution = GameUserSettings->GetLastConfirmedScreenResolution();
 	LastConfirmedWindowMode = GameUserSettings->GetLastConfirmedFullscreenMode();
-
-	const EWindowMode::Type* Found = WindowModeMap.Find(SelectedOption);
-	if (!Found) return;
-
-	switch (*Found)
-	{
-	case EWindowMode::Fullscreen:
-		GameUserSettings->SetFullscreenMode(EWindowMode::Type::Fullscreen);
-		break;
-	case EWindowMode::WindowedFullscreen:
-		GameUserSettings->SetFullscreenMode(EWindowMode::Type::WindowedFullscreen);
-		break;
-	case EWindowMode::Windowed:
-		GameUserSettings->SetFullscreenMode(EWindowMode::Type::Windowed);
-		break;
-	case EWindowMode::NumWindowModes:
-		break;
-	default: ;
-	}
+	GameUserSettings->SetFullscreenMode(static_cast<EWindowMode::Type>(WindowModeMap.FindRef(SelectedOption)));
 
 	GameUserSettings->ApplyResolutionSettings(false);
 	ShowConfirmVideoSettingsMessage();
@@ -559,10 +493,14 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_AntiAliasingMethod(co
 		return;
 	}
 
-	if (const EAntiAliasingMethod* Found = AntiAliasingMethodMap.Find(SelectedOptions[0]))
+	for (auto& [Key, Value] : AntiAliasingMethodMap)
 	{
-		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
-		GameUserSettings->SetAntiAliasingMethod(*Found);
+		if (Key == SelectedOptions[0])
+		{
+			UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
+			GameUserSettings->SetAntiAliasingMethod(TEnumAsByte<EAntiAliasingMethod>(Value));
+			break;
+		}
 	}
 }
 
@@ -938,11 +876,11 @@ void USettingsMenuWidget_VideoAndSound::OnButtonPressed_CancelVideoSettings()
 	// TODO: Is this necessary?
 	GameUserSettings->SaveSettings();
 
-	for (const TPair<FString, EWindowMode::Type>& Pair : WindowModeMap)
+	for (const auto& [Key,Value] : WindowModeMap)
 	{
-		if (LastConfirmedWindowMode == Pair.Value)
+		if (LastConfirmedWindowMode == Value)
 		{
-			ComboBoxOption_WindowMode->ComboBox->SetSelectedOption(Pair.Key);
+			ComboBoxOption_WindowMode->ComboBox->SetSelectedOption(Key);
 			break;
 		}
 	}

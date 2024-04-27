@@ -121,23 +121,23 @@ public:
 
 	/** Returns the GameplayTags associated with a specific full enum name */
 	template <typename T>
-	FGameplayTagContainer GetTagsForEnum(const T& InEnum);
+	FGameplayTagContainer GetTagsForEnum(const T& InEnum) const;
 
 	/** Returns the EnumTagMapping associated with a specific enum class,
 	 *  which contains an array of FEnumTagPairs for each enum value in the class */
 	template <typename T>
-	const FEnumTagMapping* GetEnumTagMapping();
+	const FEnumTagMapping* GetEnumTagMapping() const;
 
 	/** Returns a pointer to the entire EnumTagMappings array */
 	const TMap<UEnum*, FEnumTagMapping>& GetEnumTagMap() const;
 
 	/** Returns the string associated with a specific full enum name */
 	template <typename T>
-	FString GetStringFromEnumTagPair(const T& InEnum);
+	FString GetStringFromEnumTagPair(const T& InEnum) const;
 
 	/** Finds the full enum type from the Display Name */
 	template <typename T>
-	T FindEnumFromString(const FString& EnumString);
+	T FindEnumFromString(const FString& EnumString) const;
 
 protected:
 	void PopulateEnumTypes(const TSet<UEnum*>& InTypes);
@@ -152,7 +152,7 @@ protected:
 };
 
 template <typename T>
-FGameplayTagContainer UEnumTagMap::GetTagsForEnum(const T& InEnum)
+FGameplayTagContainer UEnumTagMap::GetTagsForEnum(const T& InEnum) const
 {
 	const FEnumTagMapping* EnumTagMapping = GetEnumTagMapping<T>();
 	if (!EnumTagMapping)
@@ -169,7 +169,7 @@ FGameplayTagContainer UEnumTagMap::GetTagsForEnum(const T& InEnum)
 }
 
 template <typename T>
-const FEnumTagMapping* UEnumTagMap::GetEnumTagMapping()
+const FEnumTagMapping* UEnumTagMap::GetEnumTagMapping() const
 {
 	const UEnum* EnumClass = StaticEnum<T>();
 	if (!EnumClass)
@@ -180,7 +180,7 @@ const FEnumTagMapping* UEnumTagMap::GetEnumTagMapping()
 }
 
 template <typename T>
-FString UEnumTagMap::GetStringFromEnumTagPair(const T& InEnum)
+FString UEnumTagMap::GetStringFromEnumTagPair(const T& InEnum) const
 {
 	const FEnumTagMapping* EnumTagMapping = GetEnumTagMapping<T>();
 	if (!EnumTagMapping)
@@ -197,7 +197,7 @@ FString UEnumTagMap::GetStringFromEnumTagPair(const T& InEnum)
 }
 
 template <typename T>
-T UEnumTagMap::FindEnumFromString(const FString& EnumString)
+T UEnumTagMap::FindEnumFromString(const FString& EnumString) const
 {
 	if (const FEnumTagMapping* EnumTagMapping = GetEnumTagMapping<T>())
 	{

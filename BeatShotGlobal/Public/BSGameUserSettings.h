@@ -6,6 +6,8 @@
 #include "GameFramework/GameUserSettings.h"
 #include "BSGameUserSettings.generated.h"
 
+class UVideoSettingEnumTagMap;
+enum class ENvidiaSettingType : uint8;
 enum class UStreamlineReflexMode : uint8;
 enum class UNISMode : uint8;
 enum class UDLSSMode : uint8;
@@ -24,6 +26,8 @@ class BEATSHOTGLOBAL_API UBSGameUserSettings : public UGameUserSettings
 
 public:
 	UBSGameUserSettings();
+
+	virtual void PostLoad() override;
 
 	static UBSGameUserSettings* Get();
 
@@ -51,10 +55,10 @@ public:
 	/** Initializes Audio Control Buses and UserMix. */
 	void LoadUserControlBusMix();
 
-	bool IsDLSSSupported();
-
-	bool IsNISSupported();
-
+	UFUNCTION()
+	bool IsDLSSSupported() const;
+	UFUNCTION()
+	bool IsNISSupported() const;
 	UFUNCTION()
 	bool GetShowFPSCounter() const;
 	UFUNCTION()
@@ -136,8 +140,7 @@ public:
 	UFUNCTION()
 	void SetResolutionScaleChecked(float InResolutionScale);
 
-	template <typename T>
-	TMap<uint8, FString> GetSupportedVideoSettingModes() const;
+	TMap<FString, uint8> GetSupportedNvidiaSettingModes(ENvidiaSettingType NvidiaSettingType) const;
 
 private:
 	void SetBSSettingsToDefaults();
@@ -235,4 +238,7 @@ private:
 
 	UPROPERTY(Config)
 	uint32 BSVersion;
+
+	UPROPERTY(Transient)
+	const UVideoSettingEnumTagMap* VideoSettingEnumMap;
 };

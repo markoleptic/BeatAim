@@ -9,6 +9,11 @@
 #include "GlobalConstants.h"
 #include "SaveGamePlayerSettings.h"
 #include "SoundControlBusMix.h"
+#include "VideoSettingEnumTagMap.h"
+#include "DLSSLibrary.h"
+#include "NISLibrary.h"
+#include "StreamlineLibraryDLSSG.h"
+#include "StreamlineLibraryReflex.h"
 
 ENUM_RANGE_BY_FIRST_AND_LAST(UDLSSSupport, UDLSSSupport::Supported,
 	UDLSSSupport::NotSupportedIncompatibleAPICaptureToolActive);
@@ -92,6 +97,14 @@ namespace
 UBSGameUserSettings::UBSGameUserSettings()
 {
 	SetBSSettingsToDefaults();
+	VideoSettingEnumMap = GetDefault<UVideoSettingEnumTagMap>();
+	InitDLSSSettings();
+}
+
+void UBSGameUserSettings::PostLoad()
+{
+	Super::PostLoad();
+	InitDLSSSettings();
 }
 
 UBSGameUserSettings* UBSGameUserSettings::Get()
@@ -107,6 +120,64 @@ void UBSGameUserSettings::BeginDestroy()
 void UBSGameUserSettings::SetToDefaults()
 {
 	Super::SetToDefaults();
+}
+
+TMap<FString, uint8> UBSGameUserSettings::GetSupportedNvidiaSettingModes(
+	const ENvidiaSettingType NvidiaSettingType) const
+{
+	TMap<FString, uint8> Out;
+	switch (NvidiaSettingType)
+	{
+	case ENvidiaSettingType::DLSSEnabledMode:
+		{
+			TArray<EDLSSEnabledMode> Modes = IsDLSSSupported()
+				? TArray{EDLSSEnabledMode::On, EDLSSEnabledMode::Off}
+				: TArray{EDLSSEnabledMode::Off};
+			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
+		}
+		break;
+	case ENvidiaSettingType::FrameGenerationEnabledMode:
+		{
+			TArray<UStreamlineDLSSGMode> Modes = UStreamlineLibraryDLSSG::GetSupportedDLSSGModes();
+			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
+		}
+		break;
+	case ENvidiaSettingType::DLSSMode:
+		{
+			TArray<UDLSSMode> Modes = UDLSSLibrary::GetSupportedDLSSModes();
+			Modes.AddUnique(UDLSSMode::Auto);
+			Modes.AddUnique(UDLSSMode::Off);
+			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
+		}
+		break;
+	case ENvidiaSettingType::NISEnabledMode:
+		{
+			TArray<ENISEnabledMode> Modes = IsNISSupported()
+				? TArray{ENISEnabledMode::On, ENISEnabledMode::Off}
+				: TArray{ENISEnabledMode::Off};
+			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
+		}
+		break;
+	case ENvidiaSettingType::NISMode:
+		{
+			TArray<UNISMode> Modes = UNISLibrary::GetSupportedNISModes();
+			Modes.Remove(UNISMode::Custom);
+			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
+		}
+		break;
+	case ENvidiaSettingType::StreamlineReflexMode:
+		{
+			TArray<UStreamlineReflexMode> Modes = TArray{UStreamlineReflexMode::Disabled};
+			if (UStreamlineLibraryReflex::IsReflexSupported())
+			{
+				Modes.Add(UStreamlineReflexMode::Enabled);
+				Modes.Add(UStreamlineReflexMode::EnabledPlusBoost);
+			}
+			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
+		}
+		break;
+	}
+	return Out;
 }
 
 void UBSGameUserSettings::SetBSSettingsToDefaults()
@@ -132,6 +203,36 @@ void UBSGameUserSettings::SetBSSettingsToDefaults()
 
 void UBSGameUserSettings::InitDLSSSettings()
 {
+	if (!FModuleManager::Get().IsModuleLoaded(FName("DLSS")))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DLSS not loaded"));
+		return;
+	}
+	if (!FModuleManager::Get().IsModuleLoaded(FName("DLSSBlueprint")))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DLSSBlueprint not loaded"));
+		return;
+	}
+	if (!FModuleManager::Get().IsModuleLoaded(FName("NISBlueprint")))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NISBlueprint not loaded"));
+		return;
+	}
+	if (!FModuleManager::Get().IsModuleLoaded(FName("StreamlineCore")))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("StreamlineCore not loaded"));
+		return;
+	}
+	if (!FModuleManager::Get().IsModuleLoaded(FName("StreamlineCore")))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("StreamlineCore not loaded"));
+		return;
+	}
+	if (!FModuleManager::Get().IsModuleLoaded(FName("StreamlineBlueprint")))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("StreamlineBlueprint not loaded"));
+		return;
+	}
 	// DLSS
 	bool bDisableDLSS = true;
 	bDLSSSupported = UDLSSLibrary::IsDLSSSupported();
@@ -323,21 +424,13 @@ void UBSGameUserSettings::LoadUserControlBusMix()
 	}
 }
 
-bool UBSGameUserSettings::IsDLSSSupported()
+bool UBSGameUserSettings::IsDLSSSupported() const
 {
-	if (!bDLSSInitialized)
-	{
-		InitDLSSSettings();
-	}
 	return bDLSSSupported;
 }
 
-bool UBSGameUserSettings::IsNISSupported()
+bool UBSGameUserSettings::IsNISSupported() const
 {
-	if (!bDLSSInitialized)
-	{
-		InitDLSSSettings();
-	}
 	return bNISSupported;
 }
 
@@ -676,7 +769,7 @@ void UBSGameUserSettings::SetAudioOutputDeviceId(const FString& InAudioOutputDev
 void UBSGameUserSettings::SetDisplayGamma(const float InGamma)
 {
 	// TODO: Fix this or revert to using old brightness
-	DisplayGamma = FMath::GetMappedRangeValueClamped(FVector2d(0.0, 100.0), FVector2d(0.0, 7.0), InGamma);
+	DisplayGamma = FMath::GetMappedRangeValueClamped(FVector2d(0.0, 100.0), FVector2d(0.0, 4.4), InGamma);
 	ApplyDisplayGamma();
 }
 
@@ -719,11 +812,4 @@ void UBSGameUserSettings::SetResolutionScaleChecked(const float InResolutionScal
 	{
 		SetResolutionScaleValueEx(InResolutionScale * 100.f);
 	}
-}
-
-
-template <typename T>
-TMap<uint8, FString> UBSGameUserSettings::GetSupportedVideoSettingModes() const
-{
-	return TMap<uint8, FString>();
 }
