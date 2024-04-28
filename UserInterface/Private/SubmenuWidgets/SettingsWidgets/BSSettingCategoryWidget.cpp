@@ -2,7 +2,10 @@
 
 
 #include "SubmenuWidgets/SettingsWidgets/BSSettingCategoryWidget.h"
+
+#include "Blueprint/WidgetTree.h"
 #include "WidgetComponents/Boxes/BSVerticalBox.h"
+#include "WidgetComponents/MenuOptionWidgets/MenuOptionWidget.h"
 #include "WidgetComponents/Tooltips/TooltipWidget.h"
 
 void UBSSettingCategoryWidget::NativeConstruct()
@@ -15,6 +18,20 @@ void UBSSettingCategoryWidget::NativeConstruct()
 void UBSSettingCategoryWidget::InitSettingCategoryWidget()
 {
 	AddContainer(MainContainer);
+	WidgetTree->ForEachWidget([&](UWidget* Widget)
+	{
+		if (auto Component = Cast<UMenuOptionWidget>(Widget))
+		{
+			if (!Component->ShouldShowTooltip())
+			{
+				return;
+			}
+			if (UTooltipImage* TooltipImage = Component->GetTooltipImage())
+			{
+				SetupTooltip(TooltipImage, Component->GetTooltipImageText());
+			}
+		}
+	});
 	UpdateBrushColors();
 }
 

@@ -46,6 +46,7 @@ void USettingsMenuWidget_VideoAndSound::NativeConstruct()
 	SliderTextBoxOption_ResolutionScale->SetValues(0.f, 1.f, 0.001f);
 	SliderTextBoxOption_HDRNits->SetValues(1000.f, 2000.f, 1.f);
 	SliderTextBoxOption_Brightness->SetValues(MinValue_Brightness, MaxValue_Brightness, SnapSize_Brightness);
+	SliderTextBoxOption_DisplayGamma->SetValues(MinValue_DisplayGamma, MaxValue_DisplayGamma, SnapSize_DisplayGamma);
 
 	VideoSettingOptionWidget_AA->OnVideoSettingQualityButtonPressed.AddUObject(this,
 		&ThisClass::OnVideoSettingOptionWidget_ButtonPressed);
@@ -80,6 +81,8 @@ void USettingsMenuWidget_VideoAndSound::NativeConstruct()
 		&ThisClass::OnSliderTextBoxValueChanged);
 	SliderTextBoxOption_HDRNits->OnSliderTextBoxValueChanged.AddUObject(this, &ThisClass::OnSliderTextBoxValueChanged);
 	SliderTextBoxOption_Brightness->OnSliderTextBoxValueChanged.AddUObject(this,
+		&ThisClass::OnSliderTextBoxValueChanged);
+	SliderTextBoxOption_DisplayGamma->OnSliderTextBoxValueChanged.AddUObject(this,
 		&ThisClass::OnSliderTextBoxValueChanged);
 
 	ComboBoxOption_WindowMode->ComboBox->OnSelectionChanged.AddDynamic(this, &ThisClass::OnSelectionChanged_WindowMode);
@@ -135,19 +138,6 @@ void USettingsMenuWidget_VideoAndSound::NativeConstruct()
 		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
 	ComboBoxOption_OutputAudioDevice->ComboBox->OnSelectionChanged_GenerateWidgetForMultiSelection.BindDynamic(this,
 		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
-
-	SetupTooltip(ComboBoxOption_DLSS->GetTooltipImage(), ComboBoxOption_DLSS->GetTooltipImageText());
-	SetupTooltip(ComboBoxOption_DLSS_FrameGeneration->GetTooltipImage(),
-		ComboBoxOption_DLSS_FrameGeneration->GetTooltipImageText());
-	SetupTooltip(ComboBoxOption_DLSS_SuperResolution->GetTooltipImage(),
-		ComboBoxOption_DLSS_SuperResolution->GetTooltipImageText());
-	SetupTooltip(ComboBoxOption_NIS->GetTooltipImage(), ComboBoxOption_NIS->GetTooltipImageText());
-	SetupTooltip(ComboBoxOption_Reflex->GetTooltipImage(), ComboBoxOption_Reflex->GetTooltipImageText());
-	SetupTooltip(SliderTextBoxOption_Brightness->GetTooltipImage(),
-		SliderTextBoxOption_Brightness->GetTooltipImageText());
-	SetupTooltip(CheckBoxOption_HDREnabled->GetTooltipImage(), CheckBoxOption_HDREnabled->GetTooltipImageText());
-	SetupTooltip(SliderTextBoxOption_ResolutionScale->GetTooltipImage(),
-		SliderTextBoxOption_ResolutionScale->GetTooltipImageText());
 
 	CheckBoxOption_HDREnabled->CheckBox->OnCheckStateChanged.AddDynamic(this,
 		&ThisClass::OnCheckStateChanged_HDREnabled);
@@ -278,7 +268,8 @@ void USettingsMenuWidget_VideoAndSound::InitializeVideoAndSoundSettings()
 	SliderTextBoxOption_HDRNits->SetSliderAndTextBoxEnabledStates(bSupportsHDR && bHDREnabled);
 
 	// TODO: Change to gamma or implement new gamma widget
-	SliderTextBoxOption_Brightness->SetValue(GameUserSettings->GetDisplayGamma());
+	SliderTextBoxOption_Brightness->SetValue(GameUserSettings->GetBrightness());
+	SliderTextBoxOption_DisplayGamma->SetValue(GameUserSettings->GetDisplayGamma());
 
 	HandleDLSSEnabledChanged(GameUserSettings->IsDLSSEnabled(), GameUserSettings->IsNISEnabled());
 	UpdateNvidiaSettings();
@@ -511,9 +502,13 @@ void USettingsMenuWidget_VideoAndSound::OnSliderTextBoxValueChanged(USliderTextB
 				SliderTextBoxOption_HDRNits->GetSliderValueSnapped());
 		}
 	}
-	else if (Widget == SliderTextBoxOption_Brightness)
+	else if (Widget == SliderTextBoxOption_DisplayGamma)
 	{
 		GameUserSettings->SetDisplayGamma(Value);
+	}
+	else if (Widget == SliderTextBoxOption_Brightness)
+	{
+		GameUserSettings->SetBrightness(Value);
 	}
 	else if (Widget == SliderTextBoxOption_GlobalSound)
 	{

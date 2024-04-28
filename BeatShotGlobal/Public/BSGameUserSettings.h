@@ -74,19 +74,31 @@ public:
 	UFUNCTION()
 	TArray<FString> GetAvailableAudioDeviceNames() const;
 	UFUNCTION()
-	bool GetShowFPSCounter() const;
+	FString GetAudioOutputDeviceId() const;
+	UFUNCTION()
+	float GetOverallVolume() const;
+	UFUNCTION()
+	float GetMenuVolume() const;
+	UFUNCTION()
+	float GetMusicVolume() const;
+	UFUNCTION()
+	float GetSoundFXVolume() const;
+
+	UFUNCTION()
+	uint8 GetAntiAliasingMethod() const;
+	UFUNCTION()
+	float GetBrightness() const;
 	UFUNCTION()
 	float GetDisplayGamma() const;
 	UFUNCTION()
-	float GetDLSSSharpness() const;
-	UFUNCTION()
-	float GetNISSharpness() const;
+	int32 GetFrameRateLimitGame() const;
 	UFUNCTION()
 	int32 GetFrameRateLimitMenu() const;
 	UFUNCTION()
-	int32 GetFrameRateLimitGame() const;
-	UFUNCTION()
 	int32 GetFrameRateLimitBackground() const;
+	UFUNCTION()
+	bool GetShowFPSCounter() const;
+
 	UFUNCTION()
 	uint8 GetDLSSEnabledMode() const;
 	UFUNCTION()
@@ -100,30 +112,42 @@ public:
 	UFUNCTION()
 	uint8 GetStreamlineReflexMode() const;
 	UFUNCTION()
-	float GetOverallVolume() const;
+	float GetDLSSSharpness() const;
 	UFUNCTION()
-	float GetMenuVolume() const;
-	UFUNCTION()
-	float GetMusicVolume() const;
-	UFUNCTION()
-	float GetSoundFXVolume() const;
-	UFUNCTION()
-	FString GetAudioOutputDeviceId() const;
-	UFUNCTION()
-	uint8 GetAntiAliasingMethod() const;
+	float GetNISSharpness() const;
 	UFUNCTION()
 	static bool IsDLSSEnabled();
 	UFUNCTION()
 	bool IsNISEnabled() const;
 
 	UFUNCTION()
-	void SetShowFPSCounter(bool InShowFPSCounter);
+	void SetAudioOutputDeviceId(const FString& InAudioOutputDeviceId);
+	UFUNCTION()
+	void SetOverallVolume(float InVolume);
+	UFUNCTION()
+	void SetMenuVolume(float InVolume);
+	UFUNCTION()
+	void SetMusicVolume(float InVolume);
+	UFUNCTION()
+	void SetSoundFXVolume(float InVolume);
+
+	UFUNCTION()
+	void SetAntiAliasingMethod(uint8 InAntiAliasingMethod);
+	UFUNCTION()
+	void SetBrightness(float InBrightness);
+	UFUNCTION()
+	void SetDisplayGamma(float InGamma);
 	UFUNCTION()
 	void SetFrameRateLimitMenu(int32 InFrameRateLimitMenu);
 	UFUNCTION()
 	void SetFrameRateLimitGame(int32 InFrameRateLimitGame);
 	UFUNCTION()
 	void SetFrameRateLimitBackground(int32 InFrameRateLimitBackground);
+	UFUNCTION()
+	void SetResolutionScaleChecked(float InResolutionScale);
+	UFUNCTION()
+	void SetShowFPSCounter(bool InShowFPSCounter);
+
 	UFUNCTION()
 	void SetDLSSEnabledMode(uint8 InDLSSEnabledMode);
 	UFUNCTION()
@@ -137,26 +161,11 @@ public:
 	UFUNCTION()
 	void SetStreamlineReflexMode(uint8 InStreamlineReflexMode);
 	UFUNCTION()
-	void SetDisplayGamma(float InGamma);
-	UFUNCTION()
-	void SetOverallVolume(float InVolume);
-	UFUNCTION()
-	void SetMenuVolume(float InVolume);
-	UFUNCTION()
-	void SetMusicVolume(float InVolume);
-	UFUNCTION()
-	void SetSoundFXVolume(float InVolume);
-	UFUNCTION()
-	void SetAudioOutputDeviceId(const FString& InAudioOutputDeviceId);
-	UFUNCTION()
 	void SetDLSSSharpness(float InDLSSSharpness);
 	UFUNCTION()
 	void SetNISSharpness(float InNISSharpness);
-	UFUNCTION()
-	void SetAntiAliasingMethod(uint8 InAntiAliasingMethod);
-	UFUNCTION()
-	void SetResolutionScaleChecked(float InResolutionScale);
 
+	/** Broadcast when the Audio Output Device has been changed for the local player. */
 	TMulticastDelegate<void(const FString&)> OnAudioOutputDeviceChanged;
 
 private:
@@ -167,9 +176,6 @@ private:
 	/** Callback function for when the main audio device has been obtained. */
 	UFUNCTION()
 	void HandleMainAudioOutputDeviceObtained(const FString& CurrentDevice);
-
-	/** Applies the value of DisplayGamma to the game engine. */
-	void ApplyDisplayGamma() const;
 
 	/** Current BSGameUserSettings version. */
 	UPROPERTY(Config)
@@ -199,9 +205,13 @@ private:
 	UPROPERTY(Config)
 	bool bShowFPSCounter;
 
-	/** Display Gamma (Brightness?). */
+	/** Brightness in (Game only). */
 	UPROPERTY(Config)
-	float DisplayGamma = 2.2;
+	float Brightness;
+
+	/** Display Gamma (Game and UI). */
+	UPROPERTY(Config)
+	float DisplayGamma;
 
 	/** Nvidia DLSS Sharpness. */
 	UPROPERTY(Config)

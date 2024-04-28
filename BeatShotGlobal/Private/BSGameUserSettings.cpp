@@ -34,6 +34,7 @@ ENUM_RANGE_BY_FIRST_AND_LAST(EWindowMode::Type, EWindowMode::Type::Fullscreen, E
 
 namespace
 {
+	/** Attempts to load a control bus from a soft object path. */
 	USoundControlBus* TryLoadControlBus(const FSoftObjectPath& Path, TMap<FName, TObjectPtr<USoundControlBus>>& Map,
 		const FName& Key)
 	{
@@ -56,6 +57,16 @@ namespace
 		return nullptr;
 	}
 
+	/** Applies the value of DisplayGamma to the game engine. */
+	void ApplyDisplayGamma(const float DisplayGamma)
+	{
+		if (GEngine)
+		{
+			GEngine->DisplayGamma = DisplayGamma;
+		}
+	}
+
+	/** Applies the DLSS Mode and sets the screen percentage CVar. */
 	bool ApplyDLSSMode(const UDLSSMode DLSSMode, const FIntPoint& ScreenRes,
 		const bool bRestoreFullResWhenDisabled = true)
 	{
@@ -138,6 +149,8 @@ void UBSGameUserSettings::SetToBSDefaults()
 	MenuVolume = Constants::DefaultMenuVolume;
 	MusicVolume = Constants::DefaultMusicVolume;
 	SoundFXVolume = Constants::DefaultSoundFXVolume;
+	Brightness = Constants::DefaultBrightness;
+	DisplayGamma = Constants::DefaultDisplayGamma;
 	bShowFPSCounter = false;
 	DLSSSharpness = 0.0;
 	NISSharpness = 0.0;
@@ -425,8 +438,8 @@ void UBSGameUserSettings::ValidateSettings()
 		UpdateBSVersion();
 	}
 
-	DisplayGamma = FMath::Max(DisplayGamma, 0.0);
-	DisplayGamma = FMath::Min(DisplayGamma, 4.4);
+	DisplayGamma = FMath::Clamp(DisplayGamma, Constants::MinValue_DisplayGamma, Constants::MaxValue_DisplayGamma);
+	Brightness = FMath::Clamp(Brightness, Constants::MinValue_Brightness, Constants::MaxValue_Brightness);
 
 	Super::ValidateSettings();
 	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Validate Settings"));
@@ -442,6 +455,8 @@ void UBSGameUserSettings::ApplySettings(bool bForceReload)
 	UE_LOG(LogBSGameUserSettings, Warning, TEXT("ApplySettings"));
 	Super::ApplySettings(bForceReload);
 	SetAntiAliasingMethod(GetAntiAliasingMethod());
+	SetBrightness(GetBrightness());
+	SetDisplayGamma(GetDisplayGamma());
 	// TODO: Apply more settings
 }
 
@@ -508,19 +523,44 @@ TArray<FString> UBSGameUserSettings::GetAvailableAudioDeviceNames() const
 	return AudioDeviceNames;
 }
 
-float UBSGameUserSettings::GetDLSSSharpness() const
+FString UBSGameUserSettings::GetAudioOutputDeviceId() const
 {
-	return DLSSSharpness;
+	return AudioOutputDeviceId;
 }
 
-float UBSGameUserSettings::GetNISSharpness() const
+float UBSGameUserSettings::GetOverallVolume() const
 {
-	return NISSharpness;
+	return OverallVolume;
 }
 
-bool UBSGameUserSettings::GetShowFPSCounter() const
+float UBSGameUserSettings::GetMenuVolume() const
 {
-	return bShowFPSCounter;
+	return MenuVolume;
+}
+
+float UBSGameUserSettings::GetMusicVolume() const
+{
+	return MusicVolume;
+}
+
+float UBSGameUserSettings::GetSoundFXVolume() const
+{
+	return SoundFXVolume;
+}
+
+uint8 UBSGameUserSettings::GetAntiAliasingMethod() const
+{
+	return AntiAliasingMethod.GetIntValue();
+}
+
+float UBSGameUserSettings::GetBrightness() const
+{
+	return Brightness;
+}
+
+float UBSGameUserSettings::GetDisplayGamma() const
+{
+	return DisplayGamma;
 }
 
 int32 UBSGameUserSettings::GetFrameRateLimitMenu() const
@@ -536,6 +576,11 @@ int32 UBSGameUserSettings::GetFrameRateLimitGame() const
 int32 UBSGameUserSettings::GetFrameRateLimitBackground() const
 {
 	return FrameRateLimitBackground;
+}
+
+bool UBSGameUserSettings::GetShowFPSCounter() const
+{
+	return bShowFPSCounter;
 }
 
 uint8 UBSGameUserSettings::GetDLSSEnabledMode() const
@@ -568,34 +613,14 @@ uint8 UBSGameUserSettings::GetStreamlineReflexMode() const
 	return static_cast<uint8>(StreamlineReflexMode);
 }
 
-float UBSGameUserSettings::GetOverallVolume() const
+float UBSGameUserSettings::GetDLSSSharpness() const
 {
-	return OverallVolume;
+	return DLSSSharpness;
 }
 
-float UBSGameUserSettings::GetMenuVolume() const
+float UBSGameUserSettings::GetNISSharpness() const
 {
-	return MenuVolume;
-}
-
-float UBSGameUserSettings::GetMusicVolume() const
-{
-	return MusicVolume;
-}
-
-float UBSGameUserSettings::GetSoundFXVolume() const
-{
-	return SoundFXVolume;
-}
-
-FString UBSGameUserSettings::GetAudioOutputDeviceId() const
-{
-	return AudioOutputDeviceId;
-}
-
-uint8 UBSGameUserSettings::GetAntiAliasingMethod() const
-{
-	return AntiAliasingMethod.GetIntValue();
+	return NISSharpness;
 }
 
 bool UBSGameUserSettings::IsDLSSEnabled()
@@ -608,14 +633,64 @@ bool UBSGameUserSettings::IsNISEnabled() const
 	return NISEnabledMode == ENISEnabledMode::On;
 }
 
-float UBSGameUserSettings::GetDisplayGamma() const
+void UBSGameUserSettings::SetAudioOutputDeviceId(const FString& InAudioOutputDeviceId)
 {
-	return DisplayGamma;
+	AudioOutputDeviceId = InAudioOutputDeviceId;
+	OnAudioOutputDeviceChanged.Broadcast(AudioOutputDeviceId);
 }
 
-void UBSGameUserSettings::SetShowFPSCounter(const bool InShowFPSCounter)
+void UBSGameUserSettings::SetOverallVolume(const float InVolume)
 {
-	bShowFPSCounter = InShowFPSCounter;
+	OverallVolume = InVolume;
+	SetVolumeForControlBus(TEXT("Overall"), OverallVolume);
+}
+
+void UBSGameUserSettings::SetMenuVolume(const float InVolume)
+{
+	MenuVolume = InVolume;
+	SetVolumeForControlBus(TEXT("Menu"), MenuVolume);
+}
+
+void UBSGameUserSettings::SetMusicVolume(const float InVolume)
+{
+	MusicVolume = InVolume;
+	SetVolumeForControlBus(TEXT("Music"), MusicVolume);
+}
+
+void UBSGameUserSettings::SetSoundFXVolume(const float InVolume)
+{
+	SoundFXVolume = InVolume;
+	SetVolumeForControlBus(TEXT("SoundFX"), SoundFXVolume);
+}
+
+void UBSGameUserSettings::SetAntiAliasingMethod(const uint8 InAntiAliasingMethod)
+{
+	AntiAliasingMethod = TEnumAsByte<EAntiAliasingMethod>(InAntiAliasingMethod);
+	if (IConsoleVariable* CVarAntiAliasingMethod = IConsoleManager::Get().FindConsoleVariable(
+		TEXT("r.AntiAliasingMethod")))
+	{
+		CVarAntiAliasingMethod->Set(InAntiAliasingMethod, ECVF_SetByGameOverride);
+	}
+	if (GConfig)
+	{
+		const FString Value = FString::FromInt(InAntiAliasingMethod);
+		GConfig->SetString(TEXT("/Script/Engine.RendererSettings"), TEXT("r.AntiAliasingMethod"), *Value, GEngineIni);
+		GConfig->Flush(false, GEngineIni);
+	}
+}
+
+void UBSGameUserSettings::SetBrightness(const float InBrightness)
+{
+	Brightness = FMath::Max(Constants::MinValue_Brightness, InBrightness);
+	Brightness = FMath::Min(Constants::MaxValue_Brightness, Brightness);
+	// TODO: Broadcast setting changed delegate
+}
+
+void UBSGameUserSettings::SetDisplayGamma(const float InGamma)
+{
+	DisplayGamma = FMath::Max(Constants::MinValue_DisplayGamma, InGamma);
+	DisplayGamma = FMath::Min(Constants::MaxValue_DisplayGamma, DisplayGamma);
+	ApplyDisplayGamma(DisplayGamma);
 }
 
 void UBSGameUserSettings::SetFrameRateLimitMenu(const int32 InFrameRateLimitMenu)
@@ -631,6 +706,19 @@ void UBSGameUserSettings::SetFrameRateLimitGame(const int32 InFrameRateLimitGame
 void UBSGameUserSettings::SetFrameRateLimitBackground(const int32 InFrameRateLimitBackground)
 {
 	FrameRateLimitBackground = InFrameRateLimitBackground;
+}
+
+void UBSGameUserSettings::SetResolutionScaleChecked(const float InResolutionScale)
+{
+	if (!UDLSSLibrary::IsDLSSEnabled() && NISEnabledMode != ENISEnabledMode::On)
+	{
+		SetResolutionScaleValueEx(InResolutionScale * 100.f);
+	}
+}
+
+void UBSGameUserSettings::SetShowFPSCounter(const bool InShowFPSCounter)
+{
+	bShowFPSCounter = InShowFPSCounter;
 }
 
 void UBSGameUserSettings::SetDLSSEnabledMode(const uint8 InDLSSEnabledMode)
@@ -765,45 +853,6 @@ void UBSGameUserSettings::SetStreamlineReflexMode(const uint8 InStreamlineReflex
 	}
 }
 
-void UBSGameUserSettings::SetOverallVolume(const float InVolume)
-{
-	OverallVolume = InVolume;
-	SetVolumeForControlBus(TEXT("Overall"), OverallVolume);
-}
-
-void UBSGameUserSettings::SetMenuVolume(const float InVolume)
-{
-	MenuVolume = InVolume;
-	SetVolumeForControlBus(TEXT("Menu"), MenuVolume);
-}
-
-void UBSGameUserSettings::SetMusicVolume(const float InVolume)
-{
-	MusicVolume = InVolume;
-	SetVolumeForControlBus(TEXT("Music"), MusicVolume);
-}
-
-void UBSGameUserSettings::SetSoundFXVolume(const float InVolume)
-{
-	SoundFXVolume = InVolume;
-	SetVolumeForControlBus(TEXT("SoundFX"), SoundFXVolume);
-}
-
-void UBSGameUserSettings::SetAudioOutputDeviceId(const FString& InAudioOutputDeviceId)
-{
-	AudioOutputDeviceId = InAudioOutputDeviceId;
-	OnAudioOutputDeviceChanged.Broadcast(AudioOutputDeviceId);
-}
-
-void UBSGameUserSettings::SetDisplayGamma(const float InGamma)
-{
-	// TODO: Fix this or revert to using old brightness
-	DisplayGamma = FMath::GetMappedRangeValueClamped(
-		FVector2d(Constants::MinValue_Brightness, Constants::MaxValue_Brightness),
-		FVector2d(Constants::MinValue_DisplayGamma, Constants::MaxValue_DisplayGamma), InGamma);
-	ApplyDisplayGamma();
-}
-
 void UBSGameUserSettings::SetDLSSSharpness(const float InDLSSSharpness)
 {
 	DLSSSharpness = InDLSSSharpness;
@@ -822,30 +871,6 @@ void UBSGameUserSettings::SetNISSharpness(const float InNISSharpness)
 	}
 }
 
-void UBSGameUserSettings::SetAntiAliasingMethod(const uint8 InAntiAliasingMethod)
-{
-	AntiAliasingMethod = TEnumAsByte<EAntiAliasingMethod>(InAntiAliasingMethod);
-	if (IConsoleVariable* CVarAntiAliasingMethod = IConsoleManager::Get().FindConsoleVariable(
-		TEXT("r.AntiAliasingMethod")))
-	{
-		CVarAntiAliasingMethod->Set(InAntiAliasingMethod, ECVF_SetByGameOverride);
-	}
-	if (GConfig)
-	{
-		const FString Value = FString::FromInt(InAntiAliasingMethod);
-		GConfig->SetString(TEXT("/Script/Engine.RendererSettings"), TEXT("r.AntiAliasingMethod"), *Value, GEngineIni);
-		GConfig->Flush(false, GEngineIni);
-	}
-}
-
-void UBSGameUserSettings::SetResolutionScaleChecked(const float InResolutionScale)
-{
-	if (!UDLSSLibrary::IsDLSSEnabled() && NISEnabledMode != ENISEnabledMode::On)
-	{
-		SetResolutionScaleValueEx(InResolutionScale * 100.f);
-	}
-}
-
 void UBSGameUserSettings::HandleAudioOutputDevicesObtained(const TArray<FAudioOutputDeviceInfo>& AvailableDevices)
 {
 	AudioDeviceNames.Empty();
@@ -858,12 +883,4 @@ void UBSGameUserSettings::HandleAudioOutputDevicesObtained(const TArray<FAudioOu
 void UBSGameUserSettings::HandleMainAudioOutputDeviceObtained(const FString& CurrentDevice)
 {
 	AudioOutputDeviceId = CurrentDevice;
-}
-
-void UBSGameUserSettings::ApplyDisplayGamma() const
-{
-	if (GEngine)
-	{
-		GEngine->DisplayGamma = DisplayGamma;
-	}
 }

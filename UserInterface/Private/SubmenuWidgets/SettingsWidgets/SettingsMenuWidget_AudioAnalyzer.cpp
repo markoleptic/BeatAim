@@ -30,11 +30,6 @@ void USettingsMenuWidget_AudioAnalyzer::NativeConstruct()
 	Button_Save->SetDefaults(static_cast<uint8>(ESettingButtonType::Save));
 	Button_SaveAndRestart->SetDefaults(static_cast<uint8>(ESettingButtonType::SaveAndRestart));
 
-	SetupTooltip(ComboBoxOption_NumBandChannels->GetTooltipImage(),
-		ComboBoxOption_NumBandChannels->GetTooltipImageText());
-	SetupTooltip(SliderTextBoxOption_TimeWindow->GetTooltipImage(),
-		SliderTextBoxOption_TimeWindow->GetTooltipImageText());
-
 	SliderTextBoxOption_TimeWindow->SetValues(0, 1.f, 0.01f);
 	SliderTextBoxOption_TimeWindow->OnSliderTextBoxValueChanged.AddUObject(this,
 		&ThisClass::OnSliderTextBoxValueChanged);

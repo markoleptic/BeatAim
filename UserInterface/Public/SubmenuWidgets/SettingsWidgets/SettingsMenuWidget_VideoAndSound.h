@@ -79,6 +79,8 @@ protected:
 	USliderTextBoxOptionWidget* SliderTextBoxOption_HDRNits;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	USliderTextBoxOptionWidget* SliderTextBoxOption_Brightness;
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	USliderTextBoxOptionWidget* SliderTextBoxOption_DisplayGamma;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	USliderTextBoxOptionWidget* SliderTextBoxOption_GlobalSound;

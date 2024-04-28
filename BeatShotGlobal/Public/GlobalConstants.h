@@ -106,6 +106,8 @@ namespace Constants
 	inline constexpr int32 DefaultFrameRateLimitMenu = 60.f;
 	inline constexpr int32 DefaultFrameRateLimitGame = 0.f;
 	inline constexpr int32 DefaultFrameRateLimitBackground = 30.f;
+	inline constexpr float DefaultBrightness = 50.f;
+	inline constexpr float DefaultDisplayGamma = 50.f;
 
 	inline constexpr float DefaultBandLimitThreshold = 2.1f;
 	inline constexpr int32 DefaultNumBandChannels = 10;
@@ -478,8 +480,9 @@ namespace Constants
 	inline constexpr float MaxValue_Brightness = 100.f;
 	inline constexpr float SnapSize_Brightness = 1.f;
 
-	inline constexpr float MinValue_DisplayGamma = 0.5f;
-	inline constexpr float MaxValue_DisplayGamma = 3.9f;
+	inline constexpr float MinValue_DisplayGamma = 0.1f;
+	inline constexpr float MaxValue_DisplayGamma = 4.3f;
+	inline constexpr float SnapSize_DisplayGamma = 0.01f;
 
 	inline constexpr float MinValue_DynamicStartThreshold = 0.f;
 	inline constexpr float MaxValue_DynamicStartThreshold = 100.f;

@@ -18,19 +18,12 @@ void USettingsMenuWidget_Game::NativeConstruct()
 	MenuOption_PeakTargetColor->OnColorChanged.BindUObject(this, &ThisClass::OnOnColorChanged_PeakTarget);
 	MenuOption_EndTargetColor->OnColorChanged.BindUObject(this, &ThisClass::OnOnColorChanged_EndTarget);
 	MenuOption_InactiveColor->OnColorChanged.BindUObject(this, &ThisClass::OnColorChanged_BeatGridInactive);
-	MenuOption_TakingTrackingDamageColor->OnColorChanged.BindUObject(this, &ThisClass::OnColorChanged_TakingTrackingDamageColor);
-	MenuOption_NotTakingTrackingDamageColor->OnColorChanged.BindUObject(this, &ThisClass::OnColorChanged_NotTakingTrackingDamageColor);
+	MenuOption_TakingTrackingDamageColor->OnColorChanged.BindUObject(this,
+		&ThisClass::OnColorChanged_TakingTrackingDamageColor);
+	MenuOption_NotTakingTrackingDamageColor->OnColorChanged.BindUObject(this,
+		&ThisClass::OnColorChanged_NotTakingTrackingDamageColor);
 	MenuOption_TargetOutlineColor->OnColorChanged.BindUObject(this, &ThisClass::OnColorChanged_TargetOutline);
 
-	SetupTooltip(MenuOption_StartTargetColor->GetTooltipImage(), MenuOption_StartTargetColor->GetTooltipImageText());
-	SetupTooltip(MenuOption_PeakTargetColor->GetTooltipImage(), MenuOption_PeakTargetColor->GetTooltipImageText());
-	SetupTooltip(MenuOption_EndTargetColor->GetTooltipImage(), MenuOption_EndTargetColor->GetTooltipImageText());
-	SetupTooltip(MenuOption_InactiveColor->GetTooltipImage(), MenuOption_InactiveColor->GetTooltipImageText());
-	SetupTooltip(MenuOption_TakingTrackingDamageColor->GetTooltipImage(), MenuOption_TakingTrackingDamageColor->GetTooltipImageText());
-	SetupTooltip(MenuOption_NotTakingTrackingDamageColor->GetTooltipImage(), MenuOption_NotTakingTrackingDamageColor->GetTooltipImageText());
-	SetupTooltip(MenuOption_TargetOutlineColor->GetTooltipImage(), MenuOption_TargetOutlineColor->GetTooltipImageText());
-	SetupTooltip(MenuOption_UseSeparateOutlineColor->GetTooltipImage(), MenuOption_UseSeparateOutlineColor->GetTooltipImageText());
-	
 	MenuOption_CombatTextFrequency->OnSliderTextBoxValueChanged.AddUObject(this,
 		&ThisClass::OnSliderTextBoxValueChanged);
 	MenuOption_CombatTextFrequency->SetValues(0, 100, 1);
