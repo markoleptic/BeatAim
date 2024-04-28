@@ -9,30 +9,21 @@ using namespace SaveLoadCommon;
 
 FPlayerSettings IBSPlayerSettingsInterface::LoadPlayerSettings()
 {
-	if (const USaveGamePlayerSettings* SaveGamePlayerSettings = LoadFromSlot<USaveGamePlayerSettings>(TEXT("SettingsSlot"), 0))
+	if (const USaveGamePlayerSettings* SaveGamePlayerSettings = LoadFromSlot<USaveGamePlayerSettings>(
+		TEXT("SettingsSlot"), 0))
 	{
 		return SaveGamePlayerSettings->GetPlayerSettings();
 	}
 	return FPlayerSettings();
 }
 
-void IBSPlayerSettingsInterface::SavePlayerSettings(const FPlayerSettings_User& InSettingsStruct)
+void IBSPlayerSettingsInterface::SavePlayerSettings(const FPlayerSettings_AudioAnalyzer& InSettingsStruct)
 {
 	if (USaveGamePlayerSettings* Settings = LoadFromSlot<USaveGamePlayerSettings>(TEXT("SettingsSlot"), 0))
 	{
 		Settings->SavePlayerSettings(InSettingsStruct);
 		SaveToSlot(Settings, TEXT("SettingsSlot"), 0);
-		OnPlayerSettingsChangedDelegate_User.Broadcast(InSettingsStruct);
-	}
-}
-
-void IBSPlayerSettingsInterface::SavePlayerSettings(const FPlayerSettings_VideoAndSound& InSettingsStruct)
-{
-	if (USaveGamePlayerSettings* Settings = LoadFromSlot<USaveGamePlayerSettings>(TEXT("SettingsSlot"), 0))
-	{
-		Settings->SavePlayerSettings(InSettingsStruct);
-		SaveToSlot(Settings, TEXT("SettingsSlot"), 0);
-		OnPlayerSettingsChangedDelegate_VideoAndSound.Broadcast(InSettingsStruct);
+		OnPlayerSettingsChangedDelegate_AudioAnalyzer.Broadcast(InSettingsStruct);
 	}
 }
 
@@ -56,12 +47,12 @@ void IBSPlayerSettingsInterface::SavePlayerSettings(const FPlayerSettings_Game& 
 	}
 }
 
-void IBSPlayerSettingsInterface::SavePlayerSettings(const FPlayerSettings_AudioAnalyzer& InSettingsStruct)
+void IBSPlayerSettingsInterface::SavePlayerSettings(const FPlayerSettings_User& InSettingsStruct)
 {
 	if (USaveGamePlayerSettings* Settings = LoadFromSlot<USaveGamePlayerSettings>(TEXT("SettingsSlot"), 0))
 	{
 		Settings->SavePlayerSettings(InSettingsStruct);
 		SaveToSlot(Settings, TEXT("SettingsSlot"), 0);
-		OnPlayerSettingsChangedDelegate_AudioAnalyzer.Broadcast(InSettingsStruct);
+		OnPlayerSettingsChangedDelegate_User.Broadcast(InSettingsStruct);
 	}
 }

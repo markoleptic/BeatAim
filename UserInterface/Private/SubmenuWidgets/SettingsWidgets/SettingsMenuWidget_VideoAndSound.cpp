@@ -14,6 +14,7 @@
 #include "WidgetComponents/MenuOptionWidgets/SliderTextBoxOptionWidget.h"
 #include "WidgetComponents/MenuOptionWidgets/VideoSettingOptionWidget.h"
 #include "BSWidgetInterface.h"
+#include "GlobalConstants.h"
 #include "Components/CheckBox.h"
 #include "Components/EditableTextBox.h"
 #include "Kismet/GameplayStatics.h"
@@ -273,38 +274,6 @@ void USettingsMenuWidget_VideoAndSound::InitializeVideoAndSoundSettings()
 
 	HandleDLSSEnabledChanged(GameUserSettings->IsDLSSEnabled(), GameUserSettings->IsNISEnabled());
 	UpdateNvidiaSettings();
-}
-
-FPlayerSettings_VideoAndSound USettingsMenuWidget_VideoAndSound::GetVideoAndSoundSettings() const
-{
-	FPlayerSettings_VideoAndSound ReturnSettings;
-
-	// TODO: Fix
-	/*ReturnSettings.GlobalVolume = SliderTextBoxOption_GlobalSound->GetSliderValueSnapped();
-	ReturnSettings.MenuVolume = SliderTextBoxOption_MenuSound->GetSliderValueSnapped();
-	ReturnSettings.MusicVolume = SliderTextBoxOption_MusicSound->GetSliderValueSnapped();
-	ReturnSettings.DLSSEnabledMode = GetEnumFromString<EDLSSEnabledMode>(
-		ComboBoxOption_DLSS->ComboBox->GetSelectedOption());
-	ReturnSettings.FrameGenerationEnabledMode = GetEnumFromString<UStreamlineDLSSGMode>(
-		ComboBoxOption_DLSS_FrameGeneration->ComboBox->GetSelectedOption());
-	ReturnSettings.DLSSMode = GetEnumFromString<UDLSSMode>(
-		ComboBoxOption_DLSS_SuperResolution->ComboBox->GetSelectedOption());
-	ReturnSettings.DLSSSharpness = SliderTextBoxOption_DLSS_Sharpness->GetSliderValueSnapped();
-	ReturnSettings.NISEnabledMode = GetEnumFromString<ENISEnabledMode>(
-		ComboBoxOption_NIS->ComboBox->GetSelectedOption());
-	ReturnSettings.NISMode = GetEnumFromString<UNISMode>(ComboBoxOption_NIS_Mode->ComboBox->GetSelectedOption());
-	ReturnSettings.NISSharpness = SliderTextBoxOption_NIS_Sharpness->GetSliderValueSnapped();
-	ReturnSettings.StreamlineReflexMode = GetEnumFromString<UStreamlineReflexMode>(
-		ComboBoxOption_Reflex->ComboBox->GetSelectedOption());
-	ReturnSettings.bShowFPSCounter = CheckBoxOption_FPSCounter->CheckBox->IsChecked();
-	ReturnSettings.FrameRateLimitGame = FMath::GridSnap<int32>(
-		FMath::Clamp(FCString::Atof(*EditableTextBoxOption_FPSLimitGame->EditableTextBox->GetText().ToString()),
-			MinValue_FrameRateLimit, MaxValue_FrameRateLimit), SnapSize_FrameRateLimit);
-	ReturnSettings.FrameRateLimitMenu = FMath::GridSnap<int32>(
-		FMath::Clamp(FCString::Atof(*EditableTextBoxOption_FPSLimitMenu->EditableTextBox->GetText().ToString()),
-			MinValue_FrameRateLimit, MaxValue_FrameRateLimit), SnapSize_FrameRateLimit);
-	ReturnSettings.Brightness = SliderTextBoxOption_Brightness->GetSliderValueSnapped();*/
-	return ReturnSettings;
 }
 
 void USettingsMenuWidget_VideoAndSound::OnCheckStateChanged_VSyncEnabled(const bool bIsChecked)

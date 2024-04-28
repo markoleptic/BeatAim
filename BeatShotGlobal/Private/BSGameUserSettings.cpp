@@ -14,6 +14,7 @@
 #include "NISLibrary.h"
 #include "StreamlineLibraryDLSSG.h"
 #include "StreamlineLibraryReflex.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogBSGameUserSettings);
 
@@ -285,11 +286,6 @@ void UBSGameUserSettings::LoadDLSSSettings()
 
 void UBSGameUserSettings::LoadUserControlBusMix()
 {
-	if (bSoundControlBusMixLoaded)
-	{
-		return;
-	}
-
 	if (GEngine)
 	{
 		if (const UWorld* World = GEngine->GetCurrentPlayWorld())
@@ -457,6 +453,7 @@ void UBSGameUserSettings::ApplySettings(bool bForceReload)
 	SetAntiAliasingMethod(GetAntiAliasingMethod());
 	SetBrightness(GetBrightness());
 	SetDisplayGamma(GetDisplayGamma());
+	OnSettingsChanged.Broadcast(this);
 	// TODO: Apply more settings
 }
 
@@ -516,6 +513,56 @@ TMap<FString, uint8> UBSGameUserSettings::GetSupportedNvidiaSettingModes(
 		break;
 	}
 	return Out;
+}
+
+float UBSGameUserSettings::GetPostProcessBiasFromBrightness() const
+{
+	return FMath::GetMappedRangeValueClamped(FVector2D(Constants::MinValue_Brightness, Constants::MaxValue_Brightness),
+		FVector2D(Constants::MinValue_ExposureCompensation, Constants::MaxValue_ExposureCompensation), Brightness);
+}
+
+void UBSGameUserSettings::SetLoadingScreenMixActivationState(const bool bEnable)
+{
+	if (!LoadingScreenControlBusMix)
+	{
+		const UBSAudioSettings* AudioSettings = GetDefault<UBSAudioSettings>();
+		if (UObject* ObjPath = AudioSettings->LoadingScreenControlBusMix.TryLoad())
+		{
+			if (USoundControlBusMix* SoundControlBusMix = Cast<USoundControlBusMix>(ObjPath))
+			{
+				LoadingScreenControlBusMix = SoundControlBusMix;
+			}
+		}
+	}
+	if (!LoadingScreenControlBusMix)
+	{
+		return;
+	}
+
+	if (const UWorld* World = GetWorld())
+	{
+		if (bEnable)
+		{
+			const UBSAudioSettings* AudioSettings = GetDefault<UBSAudioSettings>();
+			if (UObject* ObjPath = AudioSettings->LoadingScreenSound.TryLoad())
+			{
+				if (USoundBase* SoundBase = Cast<USoundBase>(ObjPath))
+				{
+					LoadingScreenAudioComponent = UGameplayStatics::CreateSound2D(World, SoundBase);
+					LoadingScreenAudioComponent->Play();
+				}
+			}
+			UAudioModulationStatics::ActivateBusMix(World, LoadingScreenControlBusMix);
+
+			UE_LOG(LogTemp, Warning, TEXT("Movie Playback Started; Activating LoadingScreenMix"));
+		}
+		else
+		{
+			UAudioModulationStatics::DeactivateBusMix(World, LoadingScreenControlBusMix);
+			LoadingScreenAudioComponent = nullptr;
+			UE_LOG(LogTemp, Warning, TEXT("Movie Playback Ended; Deactivating LoadingScreenMix"));
+		}
+	}
 }
 
 TArray<FString> UBSGameUserSettings::GetAvailableAudioDeviceNames() const

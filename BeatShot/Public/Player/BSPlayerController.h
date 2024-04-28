@@ -11,6 +11,7 @@
 #include "Target/ReinforcementLearningComponent.h"
 #include "BSPlayerController.generated.h"
 
+class UBSGameUserSettings;
 class AFloatingTextActor;
 class URLAgentWidget;
 class ABSCharacterBase;
@@ -32,7 +33,7 @@ DECLARE_DELEGATE(FOnScreenFadeToBlackFinish);
  *  to the viewport (MainMenuWidget, PauseMenu, PostGameModeMenu), and several other overlay widgets. */
 UCLASS()
 class BEATSHOT_API ABSPlayerController : public APlayerController, public IHttpRequestInterface,
-	public IBSPlayerSettingsInterface, public IBSPlayerScoreInterface
+                                         public IBSPlayerSettingsInterface, public IBSPlayerScoreInterface
 {
 	GENERATED_BODY()
 
@@ -53,7 +54,7 @@ public:
 	ABSCharacterBase* GetBSCharacter() const;
 
 	const FPlayerSettings& GetPlayerSettings() const { return PlayerSettings; }
-	
+
 	/** Sets the enabled state of the pawn. */
 	void SetPlayerEnabledState(const bool bPlayerEnabled);
 
@@ -79,7 +80,7 @@ public:
 
 	/** Updates the PlayerHUD widget. */
 	void UpdatePlayerHUD(const FPlayerScore& PlayerScore, const float TimeOffsetNormalized, const float TimeOffsetRaw);
-	
+
 	/** Shows the countdown widget, creating it if it does not exist. */
 	void ShowCountdown();
 	/** Hides and destroys the countdown widget, if it exists. */
@@ -130,16 +131,16 @@ public:
 
 	// Server only
 	virtual void OnPossess(APawn* InPawn) override;
-	
+
 	// Server only
 	virtual void OnRep_PlayerState() override;
-	
+
 	/** Login the user by authenticating using GetAuthTicketForWebApi. */
 	void LoginUser();
 
 	/** Executed when the player requests to try to login through Steam after a failed attempt. */
 	void InitiateSteamLogin();
-	
+
 	/** Delegate that executes when the screen fade widget completes its animation.  */
 	FOnScreenFadeToBlackFinish OnScreenFadeToBlackFinish;
 
@@ -153,47 +154,47 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
 	TSubclassOf<UMainMenuWidget> MainMenuClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
 	TSubclassOf<UCrossHairWidget> CrossHairClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
 	TSubclassOf<UPlayerHUD> PlayerHUDClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
 	TSubclassOf<UPauseMenuWidget> PauseMenuClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
 	TSubclassOf<UCountdownWidget> CountdownClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
 	TSubclassOf<UPostGameMenuWidget> PostGameMenuWidgetClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
 	TSubclassOf<UFPSCounterWidget> FPSCounterClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
 	TSubclassOf<UScreenFadeWidget> ScreenFadeClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
 	TSubclassOf<UUserWidget> InteractInfoWidgetClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
 	TSubclassOf<URLAgentWidget> RLAgentWidgetClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
 	TSubclassOf<AFloatingTextActor> FloatingTextActorClass;
 
 private:
 	/** Callback function for screen fade widget's OnFadeFromBlackFinish delegate. */
 	void OnFadeScreenFromBlackFinish();
-	
+
 	/** Callback functions for when settings change. */
-	virtual void OnPlayerSettingsChanged(const FPlayerSettings_VideoAndSound& NewVideoAndSoundSettings) override;
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_Game& NewGameSettings) override;
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_User& NewUserSettings) override;
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_AudioAnalyzer& NewAudioAnalyzerSettings) override;
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_CrossHair& NewCrossHairSettings) override;
+	void HandleGameUserSettingsChanged(const UBSGameUserSettings* InGameUserSettings);
 
 	/** Calls ResetAuthTicket from SteamAPI if both MainMenuWidget and BeatShot API requests were completed. */
 	void TryResetAuthTicketHandle(const uint32 Handle);
@@ -219,7 +220,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<URLAgentWidget> RLAgentWidget;
 
-	/** Whether or not the user successfully received a steam auth ticket BeatShot api response. */
+	/** Whether the user successfully received a steam auth ticket BeatShot api response. */
 	bool bIsLoggedIn = false;
 
 	/** Number of completed steam auth ticket usages. */
@@ -233,4 +234,7 @@ private:
 
 	UPROPERTY()
 	FPlayerSettings PlayerSettings;
+
+	UPROPERTY()
+	const UBSGameUserSettings* GameUserSettings;
 };

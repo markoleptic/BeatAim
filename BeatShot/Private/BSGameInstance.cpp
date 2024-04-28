@@ -3,8 +3,6 @@
 
 #include "BSGameInstance.h"
 
-#include "AudioModulationStatics.h"
-#include "BSAudioSettings.h"
 #include "BSGameMode.h"
 #include "BSGameUserSettings.h"
 #include "Player/BSPlayerController.h"
@@ -111,38 +109,15 @@ void UBSGameInstance::SetBSConfig(const FBSConfig& InConfig)
 
 void UBSGameInstance::InitializeLoadingScreen()
 {
-	//auto Settings = UBSGameUserSettings::Get();
-	//Settings->LoadUserControlBusMix();
-	const auto AudioSettings = GetDefault<UBSAudioSettings>();
-	if (UObject* ObjPath = AudioSettings->LoadingScreenControlBusMix.TryLoad())
-	{
-		if (USoundControlBusMix* SoundControlBusMix = Cast<USoundControlBusMix>(ObjPath))
-		{
-			LoadingScreenMix = SoundControlBusMix;
-		}
-	}
 	GetMoviePlayer()->OnMoviePlaybackStarted().AddLambda([this]()
 	{
-		const UWorld* World = GetWorld();
-		if (LoadingScreenMix && World)
-		{
-			UE_LOG(LogTemp, Warning,
-				TEXT("Movie Playback Started; Activating LoadingScreenMix and playing LoadingScreenAudioComponent"));
-			UAudioModulationStatics::ActivateBusMix(World, LoadingScreenMix);
-			LoadingScreenAudioComponent = UGameplayStatics::CreateSound2D(World, LoadingScreenSound);
-			LoadingScreenAudioComponent->Play();
-		}
+		const auto GameUserSettings = UBSGameUserSettings::Get();
+		GameUserSettings->SetLoadingScreenMixActivationState(true);
 	});
 	GetMoviePlayer()->OnMoviePlaybackFinished().AddLambda([this]()
 	{
-		const UWorld* World = GetWorld();
-
-		if (LoadingScreenMix && World)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Movie Playback Ended; Deactivating LoadingScreenMix"));
-			UAudioModulationStatics::DeactivateBusMix(World, LoadingScreenMix);
-			LoadingScreenAudioComponent = nullptr;
-		}
+		const auto GameUserSettings = UBSGameUserSettings::Get();
+		GameUserSettings->SetLoadingScreenMixActivationState(false);
 	});
 	GetMoviePlayer()->OnPrepareLoadingScreen().AddUObject(this, &ThisClass::PrepareLoadingScreen);
 
@@ -338,9 +313,4 @@ void UBSGameInstance::OnPlayerSettingsChanged(const FPlayerSettings_User& UserSe
 void UBSGameInstance::OnPlayerSettingsChanged(const FPlayerSettings_CrossHair& CrossHairSettings)
 {
 	OnPlayerSettingsChangedDelegate_CrossHair.Broadcast(CrossHairSettings);
-}
-
-void UBSGameInstance::OnPlayerSettingsChanged(const FPlayerSettings_VideoAndSound& VideoAndSoundSettings)
-{
-	OnPlayerSettingsChangedDelegate_VideoAndSound.Broadcast(VideoAndSoundSettings);
 }

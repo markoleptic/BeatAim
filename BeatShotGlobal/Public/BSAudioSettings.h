@@ -77,4 +77,8 @@ public:
 	/** Submix Processing Chains to achieve low dynamic range audio output */
 	UPROPERTY(config, EditAnywhere, Category = "EffectSettings")
 	TArray<FBSSubmixEffectChainMap> LDRAudioSubmixEffectChain;
+
+	/** The sound object to play during the loading screen. */
+	UPROPERTY(config, EditAnywhere, Category = "MixSettings", meta = (AllowedClasses = "/Script/Audio.SoundBase"))
+	FSoftObjectPath LoadingScreenSound;
 };

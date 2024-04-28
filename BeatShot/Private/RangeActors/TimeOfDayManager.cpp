@@ -5,6 +5,7 @@
 
 #include "BSGameInstance.h"
 #include "BSGameMode.h"
+#include "BSGameUserSettings.h"
 #include "Components/StaticMeshComponent.h"
 #include "RangeActors/Moon.h"
 #include "Components/DirectionalLightComponent.h"
@@ -18,7 +19,6 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "GlobalConstants.h"
 #include "Components/SpotLightComponent.h"
-#include "GameFramework/GameUserSettings.h"
 #include "RangeActors/SpawnAreaSpotLight.h"
 
 using namespace Constants;
@@ -65,16 +65,16 @@ void ATimeOfDayManager::PostInitializeComponents()
 		DayDirectionalLight->GetLightComponent()->SetIntensity(DayDirectionalLightIntensity);
 	}
 
-	bUsingLowGISettings = UGameUserSettings::GetGameUserSettings()->GetGlobalIlluminationQuality() < 2;
+	const auto GameUserSettings = UBSGameUserSettings::Get();
+	HandleGameUserSettingsChanged(GameUserSettings);
+	GameUserSettings->OnSettingsChanged.AddUObject(this, &ATimeOfDayManager::HandleGameUserSettingsChanged);
 
 	if (UBSGameInstance* GI = Cast<UBSGameInstance>(GetGameInstance()))
 	{
 		GI->RegisterPlayerSettingsSubscriber<ATimeOfDayManager, FPlayerSettings_Game>(this,
 			&ATimeOfDayManager::OnPlayerSettingsChanged);
-		GI->RegisterPlayerSettingsSubscriber<ATimeOfDayManager, FPlayerSettings_VideoAndSound>(this,
-			&ATimeOfDayManager::OnPlayerSettingsChanged);
 		GI->SetTimeOfDayManager(this);
-		
+
 		// Initialize the time of day
 		const FPlayerSettings Settings = LoadPlayerSettings();
 		if (Settings.User.bNightModeUnlocked && Settings.Game.bNightModeSelected)
@@ -289,11 +289,10 @@ void ATimeOfDayManager::OnPlayerSettingsChanged(const FPlayerSettings_Game& Game
 	}
 }
 
-void ATimeOfDayManager::OnPlayerSettingsChanged(
-	const FPlayerSettings_VideoAndSound& VideoAndSoundSettings)
+void ATimeOfDayManager::HandleGameUserSettingsChanged(const UBSGameUserSettings* InGameUserSettings)
 {
 	// Adjust SkyLight brightness if using Low or Medium Global Illumination Settings
-	if (UGameUserSettings::GetGameUserSettings()->GetGlobalIlluminationQuality() < 2)
+	if (InGameUserSettings->GetGlobalIlluminationQuality() < 2)
 	{
 		bUsingLowGISettings = true;
 		if (SkyLight)

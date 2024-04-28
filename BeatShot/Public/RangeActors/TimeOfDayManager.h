@@ -8,6 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "TimeOfDayManager.generated.h"
 
+class UBSGameUserSettings;
 class ARectLight;
 class ASpotLight;
 class AVisualizerBase;
@@ -80,7 +81,7 @@ protected:
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_Game& GameSettings) override;
 
 	/** Callback function to respond to NightMode change from WallMenu */
-	virtual void OnPlayerSettingsChanged(const FPlayerSettings_VideoAndSound& VideoAndSoundSettings) override;
+	void HandleGameUserSettingsChanged(const UBSGameUserSettings* InGameUserSettings);
 
 	/** Calls RefreshMaterial function in SkySphere */
 	UFUNCTION(BlueprintImplementableEvent)

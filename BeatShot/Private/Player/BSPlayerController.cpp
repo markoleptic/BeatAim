@@ -7,6 +7,7 @@
 #include "Character/BSCharacterBase.h"
 #include "BSGameInstance.h"
 #include "BSGameMode.h"
+#include "BSGameUserSettings.h"
 #include "FloatingTextActor.h"
 #include "MainMenuGameMode.h"
 #include "BeatShot/BSGameplayTags.h"
@@ -68,24 +69,25 @@ void ABSPlayerController::BeginPlay()
 	ScreenFadeWidgetAnimationDuration = LoadingScreenSettings->ScreenFadeWidgetAnimationDuration;
 
 	// Initialize variables that depend on Player Settings
+	const auto Settings = UBSGameUserSettings::Get();
+	Settings->OnSettingsChanged.AddUObject(this, &ABSPlayerController::HandleGameUserSettingsChanged);
+	HandleGameUserSettingsChanged(Settings);
+
+	// Load and bind to all types even if not used in this class because of GetPlayerSettings()
 	PlayerSettings = LoadPlayerSettings();
-	OnPlayerSettingsChanged(PlayerSettings.VideoAndSound);
+	OnPlayerSettingsChanged(PlayerSettings.AudioAnalyzer);
+	OnPlayerSettingsChanged(PlayerSettings.CrossHair);
 	OnPlayerSettingsChanged(PlayerSettings.Game);
 	OnPlayerSettingsChanged(PlayerSettings.User);
-	OnPlayerSettingsChanged(PlayerSettings.CrossHair);
-	OnPlayerSettingsChanged(PlayerSettings.AudioAnalyzer);
 
 	UBSGameInstance* GI = Cast<UBSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-
-	GI->RegisterPlayerSettingsSubscriber<ABSPlayerController, FPlayerSettings_VideoAndSound>(this,
+	GI->RegisterPlayerSettingsSubscriber<ABSPlayerController, FPlayerSettings_AudioAnalyzer>(this,
+		&ABSPlayerController::OnPlayerSettingsChanged);
+	GI->RegisterPlayerSettingsSubscriber<ABSPlayerController, FPlayerSettings_CrossHair>(this,
 		&ABSPlayerController::OnPlayerSettingsChanged);
 	GI->RegisterPlayerSettingsSubscriber<ABSPlayerController, FPlayerSettings_Game>(this,
 		&ABSPlayerController::OnPlayerSettingsChanged);
 	GI->RegisterPlayerSettingsSubscriber<ABSPlayerController, FPlayerSettings_User>(this,
-		&ABSPlayerController::OnPlayerSettingsChanged);
-	GI->RegisterPlayerSettingsSubscriber<ABSPlayerController, FPlayerSettings_VideoAndSound>(this,
-		&ABSPlayerController::OnPlayerSettingsChanged);
-	GI->RegisterPlayerSettingsSubscriber<ABSPlayerController, FPlayerSettings_AudioAnalyzer>(this,
 		&ABSPlayerController::OnPlayerSettingsChanged);
 
 	if (UGameplayStatics::GetCurrentLevelName(GetWorld()).Contains("MainMenu"))
@@ -163,7 +165,6 @@ void ABSPlayerController::ShowMainMenu()
 	MainMenuWidget->GameModesWidget->OnGameModeStateChanged.AddUObject(GI, &UBSGameInstance::HandleGameModeTransition);
 	MainMenuWidget->OnSteamLoginRequest.BindUObject(this, &ThisClass::InitiateSteamLogin);
 	GI->RegisterPlayerSettingsUpdaters(MainMenuWidget->SettingsMenuWidget->GetGameDelegate(),
-		MainMenuWidget->SettingsMenuWidget->GetVideoAndSoundDelegate(),
 		MainMenuWidget->SettingsMenuWidget->GetCrossHairDelegate(),
 		MainMenuWidget->SettingsMenuWidget->GetAudioAnalyzerDelegate(),
 		MainMenuWidget->SettingsMenuWidget->GetUserDelegate(), MainMenuWidget->GetUserDelegate());
@@ -209,7 +210,6 @@ void ABSPlayerController::ShowPauseMenu()
 	UBSGameInstance* GI = Cast<UBSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
 	GI->RegisterPlayerSettingsUpdaters(PauseMenuWidget->SettingsMenuWidget->GetGameDelegate(),
-		PauseMenuWidget->SettingsMenuWidget->GetVideoAndSoundDelegate(),
 		PauseMenuWidget->SettingsMenuWidget->GetCrossHairDelegate(),
 		PauseMenuWidget->SettingsMenuWidget->GetAudioAnalyzerDelegate(),
 		PauseMenuWidget->SettingsMenuWidget->GetUserDelegate());
@@ -332,7 +332,6 @@ void ABSPlayerController::ShowPostGameMenu()
 		&UBSGameInstance::HandleGameModeTransition);
 
 	GI->RegisterPlayerSettingsUpdaters(PostGameMenuWidget->SettingsMenuWidget->GetGameDelegate(),
-		PostGameMenuWidget->SettingsMenuWidget->GetVideoAndSoundDelegate(),
 		PostGameMenuWidget->SettingsMenuWidget->GetCrossHairDelegate(),
 		PostGameMenuWidget->SettingsMenuWidget->GetAudioAnalyzerDelegate(),
 		PostGameMenuWidget->SettingsMenuWidget->GetUserDelegate());
@@ -672,25 +671,6 @@ void ABSPlayerController::ShowAccuracyText(const float TimeOffset, const FTransf
 	CombatText->FinishSpawning(CombatText->GetTextTransform(Transform, false), false);
 }
 
-void ABSPlayerController::OnPlayerSettingsChanged(const FPlayerSettings_VideoAndSound& NewVideoAndSoundSettings)
-{
-	PlayerSettings.VideoAndSound = NewVideoAndSoundSettings;
-	if (PlayerSettings.VideoAndSound.bShowFPSCounter)
-	{
-		if (!FPSCounterWidget)
-		{
-			ShowFPSCounter();
-		}
-	}
-	else
-	{
-		if (FPSCounterWidget)
-		{
-			HideFPSCounter();
-		}
-	}
-}
-
 void ABSPlayerController::OnPlayerSettingsChanged(const FPlayerSettings_Game& NewGameSettings)
 {
 	PlayerSettings.Game = NewGameSettings;
@@ -709,6 +689,25 @@ void ABSPlayerController::OnPlayerSettingsChanged(const FPlayerSettings_AudioAna
 void ABSPlayerController::OnPlayerSettingsChanged(const FPlayerSettings_CrossHair& NewCrossHairSettings)
 {
 	PlayerSettings.CrossHair = NewCrossHairSettings;
+}
+
+void ABSPlayerController::HandleGameUserSettingsChanged(const UBSGameUserSettings* InGameUserSettings)
+{
+	GameUserSettings = InGameUserSettings;
+	if (GameUserSettings->GetShowFPSCounter())
+	{
+		if (!FPSCounterWidget)
+		{
+			ShowFPSCounter();
+		}
+	}
+	else
+	{
+		if (FPSCounterWidget)
+		{
+			HideFPSCounter();
+		}
+	}
 }
 
 void ABSPlayerController::TryResetAuthTicketHandle(const uint32 Handle)

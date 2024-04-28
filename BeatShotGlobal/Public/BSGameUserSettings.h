@@ -71,6 +71,10 @@ public:
 	 */
 	TMap<FString, uint8> GetSupportedNvidiaSettingModes(ENvidiaSettingType NvidiaSettingType) const;
 
+	float GetPostProcessBiasFromBrightness() const;
+
+	void SetLoadingScreenMixActivationState(bool bEnable);
+
 	UFUNCTION()
 	TArray<FString> GetAvailableAudioDeviceNames() const;
 	UFUNCTION()
@@ -167,6 +171,9 @@ public:
 
 	/** Broadcast when the Audio Output Device has been changed for the local player. */
 	TMulticastDelegate<void(const FString&)> OnAudioOutputDeviceChanged;
+
+	/** Broadcast when the settings are changed. */
+	TMulticastDelegate<void(const UBSGameUserSettings*)> OnSettingsChanged;
 
 private:
 	/** Callback function for when audio devices have been obtained. */
@@ -265,9 +272,16 @@ private:
 	UPROPERTY(Transient)
 	TMap<FName, TObjectPtr<USoundControlBus>> ControlBusMap;
 
-	/** The UserControlBusMix. */
+	/** The User Control Bus Mix. */
 	UPROPERTY(Transient)
 	TObjectPtr<USoundControlBusMix> ControlBusMix = nullptr;
+
+	/** The Loading Screen Control Bus Mix. */
+	UPROPERTY(Transient)
+	TObjectPtr<USoundControlBusMix> LoadingScreenControlBusMix = nullptr;
+
+	UPROPERTY(Transient)
+	UAudioComponent* LoadingScreenAudioComponent = nullptr;
 
 	/** Whether the ControlBusMix (UserControlBusMix) has been loaded. */
 	UPROPERTY(Transient)

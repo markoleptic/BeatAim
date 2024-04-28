@@ -5,6 +5,7 @@
 #include "Visualizers/VisualizerManager.h"
 #include "Character/BSCharacter.h"
 #include "BSGameInstance.h"
+#include "BSGameUserSettings.h"
 #include "AbilitySystem/Abilities/BSGA_AimBot.h"
 #include "Player/BSPlayerController.h"
 #include "Target/TargetManager.h"
@@ -17,17 +18,11 @@
 
 DEFINE_LOG_CATEGORY(LogAudioData);
 
-ABSGameMode::ABSGameMode()
+ABSGameMode::ABSGameMode(): AATracker(nullptr), AAPlayer(nullptr), TrackGunAbilitySet(nullptr), bLastTargetOnSet(false),
+                            bShouldTick(false), Elapsed(0.0), MaxScorePerTarget(0), TimePlayedGameMode(0.0),
+                            GameUserSettings(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = true;
-	bShouldTick = false;
-	Elapsed = 0.f;
-	bLastTargetOnSet = false;
-	TimePlayedGameMode = 0.f;
-	AATracker = nullptr;
-	AAPlayer = nullptr;
-	TrackGunAbilitySet = nullptr;
-	MaxScorePerTarget = 0;
 }
 
 void ABSGameMode::BeginPlay()
@@ -35,12 +30,12 @@ void ABSGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	UBSGameInstance* GI = Cast<UBSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	
-	GI->RegisterPlayerSettingsSubscriber<ABSGameMode, FPlayerSettings_Game>(this, &ABSGameMode::OnPlayerSettingsChanged);
+
+	GI->RegisterPlayerSettingsSubscriber<
+		ABSGameMode, FPlayerSettings_Game>(this, &ABSGameMode::OnPlayerSettingsChanged);
 	GI->RegisterPlayerSettingsSubscriber<ABSGameMode, FPlayerSettings_AudioAnalyzer>(this,
 		&ABSGameMode::OnPlayerSettingsChanged);
-	GI->RegisterPlayerSettingsSubscriber<ABSGameMode, FPlayerSettings_VideoAndSound>(this,
-		&ABSGameMode::OnPlayerSettingsChanged);
+	UBSGameUserSettings::Get()->OnSettingsChanged.AddUObject(this, &ABSGameMode::HandleGameUserSettingsChanged);
 
 	InitializeGameMode(GI->GetBSConfig());
 }
@@ -84,12 +79,13 @@ ACharacter* ABSGameMode::SpawnPlayer(APlayerController* PlayerController)
 		Character->Destroy();
 	}
 	const APlayerStart* ChosenPlayerStart = Cast<APlayerStart>(ChoosePlayerStart(PlayerController));
-	ACharacter* SpawnedCharacter = GetWorld()->SpawnActor<ACharacter>(CharacterClass, ChosenPlayerStart->GetTransform());
+	ACharacter* SpawnedCharacter = GetWorld()->SpawnActor<
+		ACharacter>(CharacterClass, ChosenPlayerStart->GetTransform());
 	PlayerController->Possess(SpawnedCharacter);
 	return SpawnedCharacter;
 }
 
-void ABSGameMode::InitializeGameMode(const TSharedPtr<FBSConfig> InConfig)
+void ABSGameMode::InitializeGameMode(const TSharedPtr<FBSConfig>& InConfig)
 {
 	Elapsed = 0.f;
 	bLastTargetOnSet = false;
@@ -102,12 +98,12 @@ void ABSGameMode::InitializeGameMode(const TSharedPtr<FBSConfig> InConfig)
 		Controller->FadeScreenFromBlack();
 		Controller->ShowCountdown();
 	}
-	
+
 	/* Load settings */
 	const FPlayerSettings PlayerSettings = LoadPlayerSettings();
 	OnPlayerSettingsChanged(PlayerSettings.Game);
-	OnPlayerSettingsChanged(PlayerSettings.VideoAndSound);
 	OnPlayerSettingsChanged(PlayerSettings.AudioAnalyzer);
+	HandleGameUserSettingsChanged(UBSGameUserSettings::Get());
 
 	/* Get config from Game Instance */
 	check(InConfig);
@@ -122,7 +118,7 @@ void ABSGameMode::InitializeGameMode(const TSharedPtr<FBSConfig> InConfig)
 	const FCommonScoreInfo CommonScoreInfo = FindOrAddCommonScoreInfo(BSConfig->DefiningConfig);
 	TargetManager->Init(BSConfig, CommonScoreInfo, PlayerSettings.Game);
 
-	
+
 	// Spawn VisualizerManager if not spawned, initialize it
 	if (!VisualizerManager)
 	{
@@ -222,7 +218,7 @@ void ABSGameMode::EndGameMode(const bool bSaveScores, const ETransitionState Tra
 	TimePlayedGameMode = TimerManager.GetTimerElapsed(GameModeLengthTimer);
 	TimerManager.ClearAllTimersForObject(this);
 	GameModeLengthTimerDelegate.Unbind();
-	
+
 	if (TargetManager)
 	{
 		TargetManager->SetShouldSpawn(false);
@@ -255,7 +251,7 @@ void ABSGameMode::EndGameMode(const bool bSaveScores, const ETransitionState Tra
 		AAPlayer->UnloadPlayerAudio();
 		AAPlayer = nullptr;
 	}
-	
+
 	for (ABSPlayerController* Controller : Controllers)
 	{
 		if (Controller->IsPaused())
@@ -299,7 +295,7 @@ void ABSGameMode::EndGameMode(const bool bSaveScores, const ETransitionState Tra
 			break;
 		}
 	}
-	
+
 	// Handle saving scores before resetting Target Manager
 	HandleScoreSaving(bSaveScores);
 
@@ -344,22 +340,19 @@ void ABSGameMode::StartAAManagerPlayback()
 		else
 		{
 			/* If no AAPlayer, game has started and should use AATracker for audio playback */
-			SetAAManagerVolume(VideoAndSoundSettings.GlobalVolume,
-				VideoAndSoundSettings.MusicVolume, AATracker);
+			SetAAManagerVolume(GameUserSettings->GetOverallVolume(), GameUserSettings->GetMusicVolume(), AATracker);
 		}
 		break;
 	case EAudioFormat::Capture:
 		{
 			AATracker->StartCapture(BSConfig->AudioConfig.bPlaybackAudio, false);
-			SetAAManagerVolume(VideoAndSoundSettings.GlobalVolume,
-				VideoAndSoundSettings.MusicVolume, AATracker);
+			SetAAManagerVolume(GameUserSettings->GetOverallVolume(), GameUserSettings->GetMusicVolume(), AATracker);
 			break;
 		}
 	case EAudioFormat::Loopback:
 		{
 			AATracker->StartLoopback(false);
-			SetAAManagerVolume(VideoAndSoundSettings.GlobalVolume,
-				VideoAndSoundSettings.MusicVolume, AATracker);
+			SetAAManagerVolume(GameUserSettings->GetOverallVolume(), GameUserSettings->GetMusicVolume(), AATracker);
 			break;
 		}
 	default:
@@ -513,8 +506,7 @@ void ABSGameMode::PlayAAPlayer() const
 		return;
 	}
 	AAPlayer->Play();
-	SetAAManagerVolume(VideoAndSoundSettings.GlobalVolume, VideoAndSoundSettings.MusicVolume,
-		AAPlayer);
+	SetAAManagerVolume(GameUserSettings->GetOverallVolume(), GameUserSettings->GetMusicVolume(), AAPlayer);
 	UE_LOG(LogTemp, Display, TEXT("Now Playing AAPlayer %f"), AAPlayer->GetPlaybackVolume());
 }
 
@@ -629,10 +621,10 @@ void ABSGameMode::HandleScoreSaving(const bool bExternalSaveScores)
 		}
 		return;
 	}
-	
+
 	// Get location accuracy from Target Manager
 	const FAccuracyData AccuracyData = TargetManager->GetLocationAccuracy();
-	
+
 	for (auto& CurrentPlayerScore : CurrentPlayerScores)
 	{
 		// Update location accuracy for the current player score
@@ -651,7 +643,7 @@ void ABSGameMode::HandleScoreSaving(const bool bExternalSaveScores)
 		}
 
 		UBSGameInstance* GI = Cast<UBSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-		
+
 		const bool bValidToSave = CurrentPlayerScore.Value.IsValidToSave();
 		if (bValidToSave)
 		{
@@ -675,10 +667,11 @@ void ABSGameMode::HandleScoreSaving(const bool bExternalSaveScores)
 			}
 			else
 			{
-				GI->GetSteamManager()->UpdateStat_NumGamesPlayed(CurrentPlayerScore.Value.DefiningConfig.BaseGameMode, 1);
+				GI->GetSteamManager()->UpdateStat_NumGamesPlayed(CurrentPlayerScore.Value.DefiningConfig.BaseGameMode,
+					1);
 			}
 			#endif // UE_BUILD_SHIPPING
-			
+
 			// Save common score info and completed scores locally
 			CurrentPlayerScore.Key->SaveCommonScoreInfo(BSConfig->DefiningConfig, ScoreInfoInst);
 			GetCompletedPlayerScores(CurrentPlayerScore.Value);
@@ -730,10 +723,10 @@ void ABSGameMode::OnPlayerSettingsChanged(const FPlayerSettings_AudioAnalyzer& N
 	}
 }
 
-void ABSGameMode::OnPlayerSettingsChanged(const FPlayerSettings_VideoAndSound& NewVideoAndSoundSettings)
+void ABSGameMode::HandleGameUserSettingsChanged(const UBSGameUserSettings* InGameUserSettings)
 {
-	VideoAndSoundSettings = NewVideoAndSoundSettings;
-	SetAAManagerVolume(VideoAndSoundSettings.GlobalVolume, VideoAndSoundSettings.MusicVolume);
+	GameUserSettings = InGameUserSettings;
+	SetAAManagerVolume(GameUserSettings->GetOverallVolume(), GameUserSettings->GetMusicVolume());
 }
 
 void ABSGameMode::OnPostTargetDamageEvent(const FTargetDamageEvent& Event)

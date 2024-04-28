@@ -2,9 +2,7 @@
 
 
 #include "RangeActors/RangeLevelScriptActor.h"
-#include "BSGameInstance.h"
-#include "SaveGamePlayerSettings.h"
-#include "Components/StaticMeshComponent.h"
+#include "BSGameUserSettings.h"
 #include "Engine/PostProcessVolume.h"
 
 ARangeLevelScriptActor::ARangeLevelScriptActor()
@@ -19,17 +17,16 @@ void ARangeLevelScriptActor::BeginPlay()
 		return;
 	}
 
-	UBSGameInstance* GI = Cast<UBSGameInstance>(GetGameInstance());
-	GI->RegisterPlayerSettingsSubscriber<ARangeLevelScriptActor, FPlayerSettings_VideoAndSound>(this, &ARangeLevelScriptActor::OnPlayerSettingsChanged);
-	OnPlayerSettingsChanged(LoadPlayerSettings().VideoAndSound);
+	const auto GameUserSettings = UBSGameUserSettings::Get();
+	HandleGameUserSettingsChanged(GameUserSettings);
+	GameUserSettings->OnSettingsChanged.AddUObject(this, &ARangeLevelScriptActor::HandleGameUserSettingsChanged);
 }
 
-void ARangeLevelScriptActor::OnPlayerSettingsChanged(
-	const FPlayerSettings_VideoAndSound& VideoAndSoundSettings)
+void ARangeLevelScriptActor::HandleGameUserSettingsChanged(const UBSGameUserSettings* InGameUserSettings)
 {
 	if (PostProcessVolume)
 	{
 		PostProcessVolume->Settings.bOverride_AutoExposureBias = true;
-		PostProcessVolume->Settings.AutoExposureBias = VideoAndSoundSettings.GetPostProcessBiasFromBrightness();
+		PostProcessVolume->Settings.AutoExposureBias = InGameUserSettings->GetPostProcessBiasFromBrightness();
 	}
 }

@@ -25,7 +25,7 @@ class USERINTERFACE_API USettingsMenuWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	/** Whether or not this instance of SettingsMenuWidget belongs to Pause Menu or not */
+	/** Whether this instance of SettingsMenuWidget belongs to Pause Menu or not */
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "SettingsMenuWidget", meta = (ExposeOnSpawn="true"))
 	bool bIsPauseMenuChild;
 
@@ -42,12 +42,6 @@ public:
 	FOnPlayerSettingsChanged_CrossHair& GetCrossHairDelegate() const
 	{
 		return CrossHair_Widget->GetPublicCrossHairSettingsChangedDelegate();
-	}
-
-	/** Returns the UVideoAndSoundSettings widget's OnPlayerSettingsChangedDelegate_Game, which is broadcast when the widget changes Game Settings */
-	FOnPlayerSettingsChanged_VideoAndSound& GetVideoAndSoundDelegate() const
-	{
-		return VideoAndSound_Widget->GetPublicVideoAndSoundSettingsChangedDelegate();
 	}
 
 	/** Returns the UAASettings widget's OnPlayerSettingsChangedDelegate_AudioAnalyzer, which is broadcast when the widget changes Audio Analyzer Settings */
@@ -67,10 +61,10 @@ protected:
 
 	UFUNCTION()
 	void OnRestartButtonClicked_AudioAnalyzer() const;
-	
+
 	UFUNCTION()
 	void OnCarouselWidgetIndexChanged(UCommonWidgetCarousel* InCarousel, const int32 NewIndex);
-	
+
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UCommonWidgetCarousel* Carousel;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))

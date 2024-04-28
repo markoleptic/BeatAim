@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SaveGamePlayerSettings.h"
 #include "BSPlayerSettingsInterface.h"
 #include "SubmenuWidgets/SettingsWidgets/BSSettingCategoryWidget.h"
 #include "WidgetComponents/Buttons/VideoSettingButton.h"
@@ -39,24 +38,9 @@ class USERINTERFACE_API USettingsMenuWidget_VideoAndSound : public UBSSettingCat
 	/** Populates the settings menu with BSGameUserSettings */
 	void InitializeVideoAndSoundSettings();
 
-	/** Returns the video and sound settings that are currently populated in the menu */
-	FPlayerSettings_VideoAndSound GetVideoAndSoundSettings() const;
-
-	/** Returns OnPlayerSettingsChangedDelegate_VideoAndSound, the delegate that is broadcast when this class saves Video and Sound settings */
-	FOnPlayerSettingsChanged_VideoAndSound& GetPublicVideoAndSoundSettingsChangedDelegate()
-	{
-		return OnPlayerSettingsChangedDelegate_VideoAndSound;
-	}
-
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Classes | PopUp")
 	TSubclassOf<UPopupMessageWidget> PopupMessageClass;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Classes | Sound")
-	USoundClass* GlobalSound;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Classes | Sound")
-	USoundClass* MenuSound;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Classes | Sound")
-	USoundMix* GlobalSoundMix;
 
 	UPROPERTY()
 	UPopupMessageWidget* PopupMessageWidget;

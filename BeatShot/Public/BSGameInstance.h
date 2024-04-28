@@ -91,7 +91,7 @@ protected:
 
 	void InitializeLoadingScreen();
 
-	/** Creates SteamManager object and allows it initialize. Assigns Game Instance and binds to functions. */
+	/** Creates SteamManager object and allows it to initialize. Assigns Game Instance and binds to functions. */
 	void InitializeSteamManager();
 
 	/** Pauses the game and shows the Pause Screen if the overlay is active. */
@@ -101,7 +101,6 @@ protected:
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_AudioAnalyzer& AudioAnalyzerSettings) override;
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_User& UserSettings) override;
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_CrossHair& CrossHairSettings) override;
-	virtual void OnPlayerSettingsChanged(const FPlayerSettings_VideoAndSound& VideoAndSoundSettings) override;
 
 	/** Object that interfaces with Steam API. */
 	UPROPERTY()
@@ -118,15 +117,6 @@ protected:
 	TSharedPtr<FBSConfig> BSConfig;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
-	USoundClass* GlobalSound;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
-	USoundClass* MenuSound;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
-	USoundMix* GlobalSoundMix;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
 	USoundBase* LoadingScreenSound;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Levels")
@@ -137,12 +127,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "LoadingScreen")
 	TObjectPtr<USlateWidgetStyleAsset> LoadingScreenStyle;
-	
-	UPROPERTY(Transient)
-	TObjectPtr<USoundControlBusMix> LoadingScreenMix = nullptr;
-
-	UPROPERTY(Transient)
-	UAudioComponent* LoadingScreenAudioComponent = nullptr;
 
 	/** Whether the Steam Overlay is active. */
 	bool IsSteamOverlayActive = false;
@@ -152,8 +136,6 @@ protected:
 
 	/** Whether the loading screen is the initial one, which changes how the loading screen is rendered. */
 	bool bIsInitialLoadingScreen = true;
-
-
 };
 
 template <typename... T>
@@ -173,10 +155,6 @@ void UBSGameInstance::RegisterPlayerSettingsSubscriber(UserClass* InUserObject,
 	else if constexpr (std::is_same_v<StructType, FPlayerSettings_User>)
 	{
 		OnPlayerSettingsChangedDelegate_User.AddUObject(InUserObject, InFunc);
-	}
-	else if constexpr (std::is_same_v<StructType, FPlayerSettings_VideoAndSound>)
-	{
-		OnPlayerSettingsChangedDelegate_VideoAndSound.AddUObject(InUserObject, InFunc);
 	}
 	else if constexpr (std::is_same_v<StructType, FPlayerSettings_CrossHair>)
 	{
