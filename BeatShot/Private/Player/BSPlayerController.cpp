@@ -14,7 +14,6 @@
 #include "Player/BSPlayerState.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/Pawn.h"
-#include "GameFramework/GameUserSettings.h"
 #include "Kismet/GameplayStatics.h"
 #include "MenuWidgets/MainMenuWidget.h"
 #include "MenuWidgets/PauseMenuWidget.h"
@@ -176,8 +175,7 @@ void ABSPlayerController::ShowMainMenu()
 		GameMode->SetupTargetManager(MainMenuWidget->GameModesWidget);
 	}
 
-	UGameUserSettings::GetGameUserSettings()->SetFrameRateLimit(PlayerSettings.VideoAndSound.FrameRateLimitMenu);
-	UGameUserSettings::GetGameUserSettings()->ApplySettings(false);
+	UBSGameUserSettings::Get()->SetInMenu(true);
 
 	if (!bIsLoggedIn)
 	{
@@ -217,8 +215,7 @@ void ABSPlayerController::ShowPauseMenu()
 	PauseMenuWidget->QuitMenuWidget->OnGameModeStateChanged.AddUObject(GI, &UBSGameInstance::HandleGameModeTransition);
 	PauseMenuWidget->AddToViewport();
 
-	UGameUserSettings::GetGameUserSettings()->SetFrameRateLimit(PlayerSettings.VideoAndSound.FrameRateLimitMenu);
-	UGameUserSettings::GetGameUserSettings()->ApplySettings(false);
+	UBSGameUserSettings::Get()->SetInMenu(true);
 }
 
 void ABSPlayerController::HidePauseMenu()
@@ -227,8 +224,7 @@ void ABSPlayerController::HidePauseMenu()
 	{
 		PauseMenuWidget->RemoveFromParent();
 		PauseMenuWidget = nullptr;
-		UGameUserSettings::GetGameUserSettings()->SetFrameRateLimit(PlayerSettings.VideoAndSound.FrameRateLimitGame);
-		UGameUserSettings::GetGameUserSettings()->ApplySettings(false);
+		UBSGameUserSettings::Get()->SetInMenu(false);
 	}
 }
 
@@ -305,8 +301,7 @@ void ABSPlayerController::ShowCountdown()
 	CountdownWidget->OnCountdownCompleted.BindUObject(GameMode, &ABSGameMode::StartGameMode);
 	CountdownWidget->StartAAManagerPlayback.BindUObject(GameMode, &ABSGameMode::StartAAManagerPlayback);
 	CountdownWidget->AddToViewport();
-	UGameUserSettings::GetGameUserSettings()->SetFrameRateLimit(PlayerSettings.VideoAndSound.FrameRateLimitGame);
-	UGameUserSettings::GetGameUserSettings()->ApplySettings(false);
+	UBSGameUserSettings::Get()->SetInMenu(false);
 
 	BSCharacter->BindLeftClick();
 }
@@ -342,8 +337,8 @@ void ABSPlayerController::ShowPostGameMenu()
 	SetShowMouseCursor(true);
 	SetPlayerEnabledState(false);
 
-	UGameUserSettings::GetGameUserSettings()->SetFrameRateLimit(PlayerSettings.VideoAndSound.FrameRateLimitMenu);
-	UGameUserSettings::GetGameUserSettings()->ApplySettings(false);
+
+	UBSGameUserSettings::Get()->SetInMenu(true);
 }
 
 void ABSPlayerController::OnPostScoresResponseReceived(const FString& StringTableKey)

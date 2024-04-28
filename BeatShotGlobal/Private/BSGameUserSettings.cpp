@@ -32,32 +32,11 @@ ENUM_RANGE_BY_FIRST_AND_LAST(UStreamlineDLSSGMode, UStreamlineDLSSGMode::Off, US
 
 ENUM_RANGE_BY_FIRST_AND_LAST(EWindowMode::Type, EWindowMode::Type::Fullscreen, EWindowMode::Type::WindowedFullscreen);
 
+TMulticastDelegate<void(const UBSGameUserSettings*)> UBSGameUserSettings::OnSettingsChanged = TMulticastDelegate<void(
+	const UBSGameUserSettings*)>();
 
 namespace
 {
-	/** Attempts to load a control bus from a soft object path. */
-	USoundControlBus* TryLoadControlBus(const FSoftObjectPath& Path, TMap<FName, TObjectPtr<USoundControlBus>>& Map,
-		const FName& Key)
-	{
-		if (UObject* ObjPath = Path.TryLoad())
-		{
-			if (USoundControlBus* SoundControlBus = Cast<USoundControlBus>(ObjPath))
-			{
-				Map.Add(Key, SoundControlBus);
-				return SoundControlBus;
-			}
-			else
-			{
-				ensureMsgf(SoundControlBus, TEXT("Control Bus reference missing from Audio Settings."));
-			}
-		}
-		else
-		{
-			ensureMsgf(ObjPath, TEXT("Failed to load Control Bus."));
-		}
-		return nullptr;
-	}
-
 	/** Applies the value of DisplayGamma to the game engine. */
 	void ApplyDisplayGamma(const float DisplayGamma)
 	{
@@ -110,12 +89,43 @@ namespace
 
 		return bShouldEnable;
 	}
+
+	/** Attempts to load a control bus from a soft object path. */
+	USoundControlBus* TryLoadControlBus(const FSoftObjectPath& Path, TMap<FName, TObjectPtr<USoundControlBus>>& Map,
+		const FName& Key)
+	{
+		if (UObject* ObjPath = Path.TryLoad())
+		{
+			if (USoundControlBus* SoundControlBus = Cast<USoundControlBus>(ObjPath))
+			{
+				Map.Add(Key, SoundControlBus);
+				return SoundControlBus;
+			}
+			else
+			{
+				ensureMsgf(SoundControlBus, TEXT("Control Bus reference missing from Audio Settings."));
+			}
+		}
+		else
+		{
+			ensureMsgf(ObjPath, TEXT("Failed to load Control Bus."));
+		}
+		return nullptr;
+	}
 }
 
-UBSGameUserSettings::UBSGameUserSettings()
+UBSGameUserSettings::UBSGameUserSettings() : bInMenu(false)
 {
+	if (!HasAnyFlags(RF_ClassDefaultObject))
+	{
+		if (FSlateApplication::IsInitialized())
+		{
+			OnApplicationActivationStateChangedHandle = FSlateApplication::Get().OnApplicationActivationStateChanged().
+				AddUObject(this, &ThisClass::HandleApplicationActivationStateChanged);
+		}
+		VideoSettingEnumMap = GetDefault<UVideoSettingEnumTagMap>();
+	}
 	SetToBSDefaults();
-	VideoSettingEnumMap = GetDefault<UVideoSettingEnumTagMap>();
 }
 
 UBSGameUserSettings* UBSGameUserSettings::Get()
@@ -123,11 +133,10 @@ UBSGameUserSettings* UBSGameUserSettings::Get()
 	return GEngine ? CastChecked<UBSGameUserSettings>(GEngine->GetGameUserSettings()) : nullptr;
 }
 
-void UBSGameUserSettings::InitIfNecessary()
+void UBSGameUserSettings::Initialize()
 {
 	LoadDLSSSettings();
 	LoadUserControlBusMix();
-
 	if (GEngine)
 	{
 		if (const UWorld* World = GEngine->GetCurrentPlayWorld())
@@ -167,6 +176,7 @@ void UBSGameUserSettings::SetToBSDefaults()
 	AntiAliasingMethod = AAM_TSR;
 	// bSoundControlBusMixLoaded = false;
 	// VideoSettingEnumMap = nullptr;
+	// bInMenu = false;
 	bDLSSInitialized = false;
 }
 
@@ -185,31 +195,6 @@ void UBSGameUserSettings::LoadDLSSSettings()
 	if (!FModuleManager::Get().IsModuleLoaded(FName("DLSS")))
 	{
 		UE_LOG(LogBSGameUserSettings, Warning, TEXT("DLSS not loaded"));
-		return;
-	}
-	if (!FModuleManager::Get().IsModuleLoaded(FName("DLSSBlueprint")))
-	{
-		UE_LOG(LogBSGameUserSettings, Warning, TEXT("DLSSBlueprint not loaded"));
-		return;
-	}
-	if (!FModuleManager::Get().IsModuleLoaded(FName("NISBlueprint")))
-	{
-		UE_LOG(LogBSGameUserSettings, Warning, TEXT("NISBlueprint not loaded"));
-		return;
-	}
-	if (!FModuleManager::Get().IsModuleLoaded(FName("StreamlineCore")))
-	{
-		UE_LOG(LogBSGameUserSettings, Warning, TEXT("StreamlineCore not loaded"));
-		return;
-	}
-	if (!FModuleManager::Get().IsModuleLoaded(FName("StreamlineCore")))
-	{
-		UE_LOG(LogBSGameUserSettings, Warning, TEXT("StreamlineCore not loaded"));
-		return;
-	}
-	if (!FModuleManager::Get().IsModuleLoaded(FName("StreamlineBlueprint")))
-	{
-		UE_LOG(LogBSGameUserSettings, Warning, TEXT("StreamlineBlueprint not loaded"));
 		return;
 	}
 
@@ -378,6 +363,24 @@ void UBSGameUserSettings::SetVolumeForControlBus(const FName& ControlBusKey, con
 	}
 }
 
+void UBSGameUserSettings::UpdateEffectiveFrameRateLimit()
+{
+	if (!IsRunningDedicatedServer())
+	{
+		SetFrameRateLimitCVar(GetEffectiveFrameRateLimit());
+	}
+}
+
+void UBSGameUserSettings::BeginDestroy()
+{
+	if (FSlateApplication::IsInitialized())
+	{
+		FSlateApplication::Get().OnApplicationActivationStateChanged().
+		                         Remove(OnApplicationActivationStateChangedHandle);
+	}
+	Super::BeginDestroy();
+}
+
 void UBSGameUserSettings::SetToDefaults()
 {
 	// Don't reset to default if only GameUserSettings is different version
@@ -394,22 +397,6 @@ void UBSGameUserSettings::LoadSettings(const bool bForceReload)
 	Super::LoadSettings(bForceReload);
 	LoadDLSSSettings();
 	LoadUserControlBusMix();
-
-	if (GEngine)
-	{
-		if (const UWorld* World = GEngine->GetCurrentPlayWorld())
-		{
-			FOnAudioOutputDevicesObtained OnAudioOutputDevicesObtained;
-			OnAudioOutputDevicesObtained.BindDynamic(this, &UBSGameUserSettings::HandleAudioOutputDevicesObtained);
-			UAudioMixerBlueprintLibrary::GetAvailableAudioOutputDevices(World, OnAudioOutputDevicesObtained);
-
-			FOnMainAudioOutputDeviceObtained OnMainAudioOutputDeviceObtained;
-			OnMainAudioOutputDeviceObtained.
-				BindDynamic(this, &UBSGameUserSettings::HandleMainAudioOutputDeviceObtained);
-			UAudioMixerBlueprintLibrary::GetCurrentAudioOutputDeviceName(World, OnMainAudioOutputDeviceObtained);
-		}
-	}
-
 	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Load Settings"));
 }
 
@@ -455,6 +442,26 @@ void UBSGameUserSettings::ApplySettings(bool bForceReload)
 	SetDisplayGamma(GetDisplayGamma());
 	OnSettingsChanged.Broadcast(this);
 	// TODO: Apply more settings
+}
+
+void UBSGameUserSettings::SaveSettings()
+{
+	Super::SaveSettings();
+}
+
+float UBSGameUserSettings::GetEffectiveFrameRateLimit()
+{
+	if (FSlateApplication::IsInitialized() && !FSlateApplication::Get().IsActive())
+	{
+		return FrameRateLimitBackground;
+	}
+
+	if (bInMenu)
+	{
+		return FrameRateLimitMenu;
+	}
+
+	return FrameRateLimitGame;
 }
 
 TMap<FString, uint8> UBSGameUserSettings::GetSupportedNvidiaSettingModes(
@@ -554,15 +561,21 @@ void UBSGameUserSettings::SetLoadingScreenMixActivationState(const bool bEnable)
 			}
 			UAudioModulationStatics::ActivateBusMix(World, LoadingScreenControlBusMix);
 
-			UE_LOG(LogTemp, Warning, TEXT("Movie Playback Started; Activating LoadingScreenMix"));
+			UE_LOG(LogBSGameUserSettings, Warning, TEXT("Movie Playback Started; Activating LoadingScreenMix"));
 		}
 		else
 		{
 			UAudioModulationStatics::DeactivateBusMix(World, LoadingScreenControlBusMix);
 			LoadingScreenAudioComponent = nullptr;
-			UE_LOG(LogTemp, Warning, TEXT("Movie Playback Ended; Deactivating LoadingScreenMix"));
+			UE_LOG(LogBSGameUserSettings, Warning, TEXT("Movie Playback Ended; Deactivating LoadingScreenMix"));
 		}
 	}
+}
+
+void UBSGameUserSettings::SetInMenu(const bool bIsInMenu)
+{
+	bInMenu = bIsInMenu;
+	UpdateEffectiveFrameRateLimit();
 }
 
 TArray<FString> UBSGameUserSettings::GetAvailableAudioDeviceNames() const
@@ -690,24 +703,28 @@ void UBSGameUserSettings::SetOverallVolume(const float InVolume)
 {
 	OverallVolume = InVolume;
 	SetVolumeForControlBus(TEXT("Overall"), OverallVolume);
+	SaveSettings();
 }
 
 void UBSGameUserSettings::SetMenuVolume(const float InVolume)
 {
 	MenuVolume = InVolume;
 	SetVolumeForControlBus(TEXT("Menu"), MenuVolume);
+	SaveSettings();
 }
 
 void UBSGameUserSettings::SetMusicVolume(const float InVolume)
 {
 	MusicVolume = InVolume;
 	SetVolumeForControlBus(TEXT("Music"), MusicVolume);
+	SaveSettings();
 }
 
 void UBSGameUserSettings::SetSoundFXVolume(const float InVolume)
 {
 	SoundFXVolume = InVolume;
 	SetVolumeForControlBus(TEXT("SoundFX"), SoundFXVolume);
+	SaveSettings();
 }
 
 void UBSGameUserSettings::SetAntiAliasingMethod(const uint8 InAntiAliasingMethod)
@@ -724,35 +741,38 @@ void UBSGameUserSettings::SetAntiAliasingMethod(const uint8 InAntiAliasingMethod
 		GConfig->SetString(TEXT("/Script/Engine.RendererSettings"), TEXT("r.AntiAliasingMethod"), *Value, GEngineIni);
 		GConfig->Flush(false, GEngineIni);
 	}
+	SaveSettings();
 }
 
 void UBSGameUserSettings::SetBrightness(const float InBrightness)
 {
-	Brightness = FMath::Max(Constants::MinValue_Brightness, InBrightness);
-	Brightness = FMath::Min(Constants::MaxValue_Brightness, Brightness);
-	// TODO: Broadcast setting changed delegate
+	Brightness = FMath::Clamp(InBrightness, Constants::MinValue_Brightness, Constants::MaxValue_Brightness);
+	SaveSettings();
 }
 
 void UBSGameUserSettings::SetDisplayGamma(const float InGamma)
 {
-	DisplayGamma = FMath::Max(Constants::MinValue_DisplayGamma, InGamma);
-	DisplayGamma = FMath::Min(Constants::MaxValue_DisplayGamma, DisplayGamma);
+	DisplayGamma = FMath::Clamp(InGamma, Constants::MinValue_DisplayGamma, Constants::MaxValue_DisplayGamma);
 	ApplyDisplayGamma(DisplayGamma);
+	SaveSettings();
 }
 
 void UBSGameUserSettings::SetFrameRateLimitMenu(const int32 InFrameRateLimitMenu)
 {
 	FrameRateLimitMenu = InFrameRateLimitMenu;
+	SaveSettings();
 }
 
 void UBSGameUserSettings::SetFrameRateLimitGame(const int32 InFrameRateLimitGame)
 {
 	FrameRateLimitGame = InFrameRateLimitGame;
+	SaveSettings();
 }
 
 void UBSGameUserSettings::SetFrameRateLimitBackground(const int32 InFrameRateLimitBackground)
 {
 	FrameRateLimitBackground = InFrameRateLimitBackground;
+	SaveSettings();
 }
 
 void UBSGameUserSettings::SetResolutionScaleChecked(const float InResolutionScale)
@@ -766,6 +786,7 @@ void UBSGameUserSettings::SetResolutionScaleChecked(const float InResolutionScal
 void UBSGameUserSettings::SetShowFPSCounter(const bool InShowFPSCounter)
 {
 	bShowFPSCounter = InShowFPSCounter;
+	SaveSettings();
 }
 
 void UBSGameUserSettings::SetDLSSEnabledMode(const uint8 InDLSSEnabledMode)
@@ -930,4 +951,9 @@ void UBSGameUserSettings::HandleAudioOutputDevicesObtained(const TArray<FAudioOu
 void UBSGameUserSettings::HandleMainAudioOutputDeviceObtained(const FString& CurrentDevice)
 {
 	AudioOutputDeviceId = CurrentDevice;
+}
+
+void UBSGameUserSettings::HandleApplicationActivationStateChanged(bool bIsActive)
+{
+	UpdateEffectiveFrameRateLimit();
 }

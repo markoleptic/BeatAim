@@ -21,7 +21,7 @@ class USoundControlBus;
 DECLARE_LOG_CATEGORY_EXTERN(LogBSGameUserSettings, Log, All);
 
 /** Video and Sound Settings that are saved to GameUserSettings.ini */
-UCLASS(config=GameUserSettings, configdonotcheckdefaults)
+UCLASS()
 class BEATSHOTGLOBAL_API UBSGameUserSettings : public UGameUserSettings
 {
 	GENERATED_BODY()
@@ -32,7 +32,7 @@ public:
 	/** @return the game local machine settings (resolution, windowing mode, scalability settings, etc...) */
 	static UBSGameUserSettings* Get();
 
-	void InitIfNecessary();
+	void Initialize();
 
 private:
 	/** Resets all BeatShot Video and Sound settings to default values. */
@@ -56,14 +56,17 @@ private:
 	 */
 	void SetVolumeForControlBus(const FName& ControlBusKey, float InVolume);
 
+	void UpdateEffectiveFrameRateLimit();
+
 public:
-	//~UGameUserSettings interface
+	virtual void BeginDestroy() override;
 	virtual void SetToDefaults() override;
 	virtual void LoadSettings(bool bForceReload) override;
 	virtual void ValidateSettings() override;
 	virtual void ResetToCurrentSettings() override;
 	virtual void ApplySettings(bool bForceReload) override;
-	//~End of UGameUserSettings interface
+	virtual void SaveSettings() override;
+	virtual float GetEffectiveFrameRateLimit() override;
 
 	/** Queries the supported setting type and creates a map based on the results.
 	 *  @param NvidiaSettingType the Nvidia setting type to query for
@@ -74,6 +77,8 @@ public:
 	float GetPostProcessBiasFromBrightness() const;
 
 	void SetLoadingScreenMixActivationState(bool bEnable);
+
+	void SetInMenu(bool bIsInMenu);
 
 	UFUNCTION()
 	TArray<FString> GetAvailableAudioDeviceNames() const;
@@ -173,7 +178,7 @@ public:
 	TMulticastDelegate<void(const FString&)> OnAudioOutputDeviceChanged;
 
 	/** Broadcast when the settings are changed. */
-	TMulticastDelegate<void(const UBSGameUserSettings*)> OnSettingsChanged;
+	static TMulticastDelegate<void(const UBSGameUserSettings*)> OnSettingsChanged;
 
 private:
 	/** Callback function for when audio devices have been obtained. */
@@ -183,6 +188,10 @@ private:
 	/** Callback function for when the main audio device has been obtained. */
 	UFUNCTION()
 	void HandleMainAudioOutputDeviceObtained(const FString& CurrentDevice);
+
+	/** Callback function for when the slate application activation state is changed. */
+	UFUNCTION()
+	void HandleApplicationActivationStateChanged(bool bIsActive);
 
 	/** Current BSGameUserSettings version. */
 	UPROPERTY(Config)
@@ -291,6 +300,9 @@ private:
 	UPROPERTY(Transient)
 	bool bDLSSInitialized;
 
+	/** Whether to use FrameRateLimitMenu as the effective frame rate. */
+	bool bInMenu;
+
 	/** Audio Device names. */
 	UPROPERTY(Transient)
 	TArray<FString> AudioDeviceNames;
@@ -298,4 +310,7 @@ private:
 	/** Enum to string map storage for Nvidia settings. */
 	UPROPERTY(Transient)
 	const UVideoSettingEnumTagMap* VideoSettingEnumMap;
+
+	/** Delegate bound to FSlateApplication OnApplicationActivationStateChanged.  */
+	FDelegateHandle OnApplicationActivationStateChangedHandle;
 };

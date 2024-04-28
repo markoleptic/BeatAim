@@ -27,8 +27,3 @@ void USaveGamePlayerSettings::SavePlayerSettings(const FPlayerSettings_CrossHair
 {
 	PlayerSettings.CrossHair = InCrossHairSettings;
 }
-
-void USaveGamePlayerSettings::SavePlayerSettings(const FPlayerSettings_VideoAndSound& InVideoAndSoundSettings)
-{
-	PlayerSettings.VideoAndSound = InVideoAndSoundSettings;
-}

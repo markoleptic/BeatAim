@@ -181,8 +181,7 @@ void USettingsMenuWidget_VideoAndSound::NativeConstruct()
 	AntiAliasingMethodMap.Add("Temporal Anti-Aliasing (TAA)", AAM_TemporalAA);
 	AntiAliasingMethodMap.Add("Temporal Super-Resolution (TSR)", AAM_TSR);
 
-	UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
-	GameUserSettings->InitIfNecessary();
+	const UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 
 	DLSSEnabledModeMap = GameUserSettings->GetSupportedNvidiaSettingModes(ENvidiaSettingType::DLSSEnabledMode);
 	DLSSModeMap = GameUserSettings->GetSupportedNvidiaSettingModes(ENvidiaSettingType::DLSSMode);
@@ -268,7 +267,6 @@ void USettingsMenuWidget_VideoAndSound::InitializeVideoAndSoundSettings()
 	CheckBoxOption_HDREnabled->CheckBox->SetIsEnabled(bSupportsHDR);
 	SliderTextBoxOption_HDRNits->SetSliderAndTextBoxEnabledStates(bSupportsHDR && bHDREnabled);
 
-	// TODO: Change to gamma or implement new gamma widget
 	SliderTextBoxOption_Brightness->SetValue(GameUserSettings->GetBrightness());
 	SliderTextBoxOption_DisplayGamma->SetValue(GameUserSettings->GetDisplayGamma());
 

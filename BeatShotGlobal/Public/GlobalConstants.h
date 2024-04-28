@@ -107,7 +107,7 @@ namespace Constants
 	inline constexpr int32 DefaultFrameRateLimitGame = 0.f;
 	inline constexpr int32 DefaultFrameRateLimitBackground = 30.f;
 	inline constexpr float DefaultBrightness = 50.f;
-	inline constexpr float DefaultDisplayGamma = 50.f;
+	inline constexpr float DefaultDisplayGamma = 2.2f;
 
 	inline constexpr float DefaultBandLimitThreshold = 2.1f;
 	inline constexpr int32 DefaultNumBandChannels = 10;

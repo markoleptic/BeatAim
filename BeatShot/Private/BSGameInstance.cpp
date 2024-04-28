@@ -18,6 +18,7 @@ void UBSGameInstance::Init()
 {
 	Super::Init();
 	UE_LOG(LogTemp, Display, TEXT("UBSGameInstance::Init"));
+	UBSGameUserSettings::Get()->Initialize();
 	InitializeLoadingScreen();
 	InitializeSteamManager();
 }

@@ -508,9 +508,6 @@ public:
 	/** Saves CrossHair specific settings, preserving all other settings */
 	void SavePlayerSettings(const FPlayerSettings_CrossHair& InCrossHairSettings);
 
-	/** Saves VideoAndSound settings, preserving all other settings */
-	void SavePlayerSettings(const FPlayerSettings_VideoAndSound& InVideoAndSoundSettings);
-
 private:
 	UPROPERTY()
 	FPlayerSettings PlayerSettings;
