@@ -15,6 +15,8 @@
 #include "StreamlineLibraryDLSSG.h"
 #include "StreamlineLibraryReflex.h"
 
+DEFINE_LOG_CATEGORY(LogBSGameUserSettings);
+
 ENUM_RANGE_BY_FIRST_AND_LAST(UDLSSSupport, UDLSSSupport::Supported,
 	UDLSSSupport::NotSupportedIncompatibleAPICaptureToolActive);
 
@@ -46,6 +48,10 @@ namespace
 			{
 				ensureMsgf(SoundControlBus, TEXT("Control Bus reference missing from Audio Settings."));
 			}
+		}
+		else
+		{
+			ensureMsgf(ObjPath, TEXT("Failed to load Control Bus."));
 		}
 		return nullptr;
 	}
@@ -96,15 +102,8 @@ namespace
 
 UBSGameUserSettings::UBSGameUserSettings()
 {
-	SetBSSettingsToDefaults();
+	SetToBSDefaults();
 	VideoSettingEnumMap = GetDefault<UVideoSettingEnumTagMap>();
-	InitDLSSSettings();
-}
-
-void UBSGameUserSettings::PostLoad()
-{
-	Super::PostLoad();
-	InitDLSSSettings();
 }
 
 UBSGameUserSettings* UBSGameUserSettings::Get()
@@ -112,75 +111,28 @@ UBSGameUserSettings* UBSGameUserSettings::Get()
 	return GEngine ? CastChecked<UBSGameUserSettings>(GEngine->GetGameUserSettings()) : nullptr;
 }
 
-void UBSGameUserSettings::BeginDestroy()
+void UBSGameUserSettings::InitIfNecessary()
 {
-	Super::BeginDestroy();
-}
+	LoadDLSSSettings();
+	LoadUserControlBusMix();
 
-void UBSGameUserSettings::SetToDefaults()
-{
-	Super::SetToDefaults();
-}
-
-TMap<FString, uint8> UBSGameUserSettings::GetSupportedNvidiaSettingModes(
-	const ENvidiaSettingType NvidiaSettingType) const
-{
-	TMap<FString, uint8> Out;
-	switch (NvidiaSettingType)
+	if (GEngine)
 	{
-	case ENvidiaSettingType::DLSSEnabledMode:
+		if (const UWorld* World = GEngine->GetCurrentPlayWorld())
 		{
-			TArray<EDLSSEnabledMode> Modes = IsDLSSSupported()
-				? TArray{EDLSSEnabledMode::On, EDLSSEnabledMode::Off}
-				: TArray{EDLSSEnabledMode::Off};
-			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
+			FOnAudioOutputDevicesObtained OnAudioOutputDevicesObtained;
+			OnAudioOutputDevicesObtained.BindDynamic(this, &UBSGameUserSettings::HandleAudioOutputDevicesObtained);
+			UAudioMixerBlueprintLibrary::GetAvailableAudioOutputDevices(World, OnAudioOutputDevicesObtained);
+
+			FOnMainAudioOutputDeviceObtained OnMainAudioOutputDeviceObtained;
+			OnMainAudioOutputDeviceObtained.
+				BindDynamic(this, &UBSGameUserSettings::HandleMainAudioOutputDeviceObtained);
+			UAudioMixerBlueprintLibrary::GetCurrentAudioOutputDeviceName(World, OnMainAudioOutputDeviceObtained);
 		}
-		break;
-	case ENvidiaSettingType::FrameGenerationEnabledMode:
-		{
-			TArray<UStreamlineDLSSGMode> Modes = UStreamlineLibraryDLSSG::GetSupportedDLSSGModes();
-			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
-		}
-		break;
-	case ENvidiaSettingType::DLSSMode:
-		{
-			TArray<UDLSSMode> Modes = UDLSSLibrary::GetSupportedDLSSModes();
-			Modes.AddUnique(UDLSSMode::Auto);
-			Modes.AddUnique(UDLSSMode::Off);
-			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
-		}
-		break;
-	case ENvidiaSettingType::NISEnabledMode:
-		{
-			TArray<ENISEnabledMode> Modes = IsNISSupported()
-				? TArray{ENISEnabledMode::On, ENISEnabledMode::Off}
-				: TArray{ENISEnabledMode::Off};
-			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
-		}
-		break;
-	case ENvidiaSettingType::NISMode:
-		{
-			TArray<UNISMode> Modes = UNISLibrary::GetSupportedNISModes();
-			Modes.Remove(UNISMode::Custom);
-			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
-		}
-		break;
-	case ENvidiaSettingType::StreamlineReflexMode:
-		{
-			TArray<UStreamlineReflexMode> Modes = TArray{UStreamlineReflexMode::Disabled};
-			if (UStreamlineLibraryReflex::IsReflexSupported())
-			{
-				Modes.Add(UStreamlineReflexMode::Enabled);
-				Modes.Add(UStreamlineReflexMode::EnabledPlusBoost);
-			}
-			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
-		}
-		break;
 	}
-	return Out;
 }
 
-void UBSGameUserSettings::SetBSSettingsToDefaults()
+void UBSGameUserSettings::SetToBSDefaults()
 {
 	OverallVolume = Constants::DefaultGlobalVolume;
 	MenuVolume = Constants::DefaultMenuVolume;
@@ -198,47 +150,59 @@ void UBSGameUserSettings::SetBSSettingsToDefaults()
 	DLSSMode = UDLSSMode::Auto;
 	NISMode = UNISMode::Off;
 	StreamlineReflexMode = UStreamlineReflexMode::Enabled;
-	bSoundControlBusMixLoaded = false;
+	AntiAliasingMethod = AAM_TSR;
+	// bSoundControlBusMixLoaded = false;
+	// VideoSettingEnumMap = nullptr;
+	bDLSSInitialized = false;
 }
 
-void UBSGameUserSettings::InitDLSSSettings()
+bool UBSGameUserSettings::IsBSVersionValid() const
+{
+	return Version == Constants::BSGameUserSettingsVersion;
+}
+
+void UBSGameUserSettings::UpdateBSVersion()
+{
+	BSVersion = Constants::BSGameUserSettingsVersion;
+}
+
+void UBSGameUserSettings::LoadDLSSSettings()
 {
 	if (!FModuleManager::Get().IsModuleLoaded(FName("DLSS")))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("DLSS not loaded"));
+		UE_LOG(LogBSGameUserSettings, Warning, TEXT("DLSS not loaded"));
 		return;
 	}
 	if (!FModuleManager::Get().IsModuleLoaded(FName("DLSSBlueprint")))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("DLSSBlueprint not loaded"));
+		UE_LOG(LogBSGameUserSettings, Warning, TEXT("DLSSBlueprint not loaded"));
 		return;
 	}
 	if (!FModuleManager::Get().IsModuleLoaded(FName("NISBlueprint")))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NISBlueprint not loaded"));
+		UE_LOG(LogBSGameUserSettings, Warning, TEXT("NISBlueprint not loaded"));
 		return;
 	}
 	if (!FModuleManager::Get().IsModuleLoaded(FName("StreamlineCore")))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("StreamlineCore not loaded"));
+		UE_LOG(LogBSGameUserSettings, Warning, TEXT("StreamlineCore not loaded"));
 		return;
 	}
 	if (!FModuleManager::Get().IsModuleLoaded(FName("StreamlineCore")))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("StreamlineCore not loaded"));
+		UE_LOG(LogBSGameUserSettings, Warning, TEXT("StreamlineCore not loaded"));
 		return;
 	}
 	if (!FModuleManager::Get().IsModuleLoaded(FName("StreamlineBlueprint")))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("StreamlineBlueprint not loaded"));
+		UE_LOG(LogBSGameUserSettings, Warning, TEXT("StreamlineBlueprint not loaded"));
 		return;
 	}
-	// DLSS
-	bool bDisableDLSS = true;
-	bDLSSSupported = UDLSSLibrary::IsDLSSSupported();
-	bNISSupported = UNISLibrary::IsNISSupported();
 
-	if (bDLSSSupported)
+	bool bDisableDLSS = true;
+
+	// DLSS
+	if (UDLSSLibrary::IsDLSSSupported())
 	{
 		UDLSSMode LocalDLSSMode = DLSSMode;
 
@@ -279,15 +243,14 @@ void UBSGameUserSettings::InitDLSSSettings()
 	}
 
 	// NIS
-	if (bNISSupported && UNISLibrary::IsNISModeSupported(NISMode) && DLSSEnabledMode == EDLSSEnabledMode::Off)
+	if (UNISLibrary::IsNISSupported() && UNISLibrary::IsNISModeSupported(NISMode) && DLSSEnabledMode ==
+		EDLSSEnabledMode::Off)
 	{
-		// TODO: Sometimes this causes an exception when called early?
 		UNISLibrary::SetNISMode(NISMode);
 		UNISLibrary::SetNISSharpness(NISSharpness);
 	}
 	else
 	{
-		// TODO: Sometimes this causes an exception when called early?
 		UNISLibrary::SetNISMode(UNISMode::Off);
 		NISMode = UNISMode::Off;
 	}
@@ -303,72 +266,17 @@ void UBSGameUserSettings::InitDLSSSettings()
 		StreamlineReflexMode = UStreamlineReflexMode::Disabled;
 	}
 
+	UE_LOG(LogBSGameUserSettings, Warning, TEXT("DLSS Initialized"));
 	bDLSSInitialized = true;
-}
-
-void UBSGameUserSettings::LoadSettings(const bool bForceReload)
-{
-	Super::LoadSettings(bForceReload);
-	UE_LOG(LogTemp, Warning, TEXT("UBSGameUserSettings::LoadSettings"));
-}
-
-void UBSGameUserSettings::ConfirmVideoMode()
-{
-	Super::ConfirmVideoMode();
-}
-
-float UBSGameUserSettings::GetEffectiveFrameRateLimit()
-{
-	return Super::GetEffectiveFrameRateLimit();
-}
-
-void UBSGameUserSettings::ResetToCurrentSettings()
-{
-	Super::ResetToCurrentSettings();
-}
-
-void UBSGameUserSettings::ApplyNonResolutionSettings()
-{
-	Super::ApplyNonResolutionSettings();
-
-	LoadUserControlBusMix();
-}
-
-int32 UBSGameUserSettings::GetOverallScalabilityLevel() const
-{
-	return Super::GetOverallScalabilityLevel();
-}
-
-void UBSGameUserSettings::SetOverallScalabilityLevel(const int32 Value)
-{
-	Super::SetOverallScalabilityLevel(Value);
-}
-
-bool UBSGameUserSettings::IsVersionValid()
-{
-	return Super::IsVersionValid();
-}
-
-void UBSGameUserSettings::UpdateVersion()
-{
-	Super::UpdateVersion();
-}
-
-void UBSGameUserSettings::ValidateSettings()
-{
-	Super::ValidateSettings();
-}
-
-void UBSGameUserSettings::ApplyDisplayGamma()
-{
-	if (GEngine)
-	{
-		GEngine->DisplayGamma = DisplayGamma;
-	}
 }
 
 void UBSGameUserSettings::LoadUserControlBusMix()
 {
+	if (bSoundControlBusMixLoaded)
+	{
+		return;
+	}
+
 	if (GEngine)
 	{
 		if (const UWorld* World = GEngine->GetCurrentPlayWorld())
@@ -392,7 +300,7 @@ void UBSGameUserSettings::LoadUserControlBusMix()
 					{
 						ControlBusMix = SoundControlBusMix;
 
-						UAudioModulationStatics::ActivateBusMix(World, ControlBusMix);
+						UAudioModulationStatics::ActivateBusMix(World, SoundControlBusMix);
 
 						const FSoundControlBusMixStage OverallControlBusMixStage =
 							UAudioModulationStatics::CreateBusMixStage(World, OverallControlBus, OverallVolume / 100.0);
@@ -409,29 +317,24 @@ void UBSGameUserSettings::LoadUserControlBusMix()
 						ControlBusMixStageArray.Add(MusicControlBusMixStage);
 						ControlBusMixStageArray.Add(SoundFXControlBusMixStage);
 
-						UAudioModulationStatics::UpdateMix(World, ControlBusMix, ControlBusMixStageArray);
+						// TODO Fix UpdateMix not working
+
+						UAudioModulationStatics::UpdateMix(World, SoundControlBusMix, ControlBusMixStageArray);
 
 						bSoundControlBusMixLoaded = true;
 					}
 					else
 					{
-						ensureMsgf(SoundControlBusMix,
-							TEXT("User Settings Control Bus Mix reference missing from Lyra Audio Settings."));
+						UE_LOG(LogBSGameUserSettings, Warning, TEXT("User Settings Control Bus Mix reference missing"));
 					}
+				}
+				else
+				{
+					ensureMsgf(ObjPath, TEXT("Failed to load Control Bus Mix."));
 				}
 			}
 		}
 	}
-}
-
-bool UBSGameUserSettings::IsDLSSSupported() const
-{
-	return bDLSSSupported;
-}
-
-bool UBSGameUserSettings::IsNISSupported() const
-{
-	return bNISSupported;
 }
 
 void UBSGameUserSettings::SetVolumeForControlBus(const FName& ControlBusKey, const float InVolume)
@@ -466,6 +369,145 @@ void UBSGameUserSettings::SetVolumeForControlBus(const FName& ControlBusKey, con
 	}
 }
 
+void UBSGameUserSettings::SetToDefaults()
+{
+	// Don't reset to default if only GameUserSettings is different version
+	if (IsVersionValid())
+	{
+		SetToBSDefaults();
+	}
+	Super::SetToDefaults();
+	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Set to Defaults"));
+}
+
+void UBSGameUserSettings::LoadSettings(const bool bForceReload)
+{
+	Super::LoadSettings(bForceReload);
+	LoadDLSSSettings();
+	LoadUserControlBusMix();
+
+	if (GEngine)
+	{
+		if (const UWorld* World = GEngine->GetCurrentPlayWorld())
+		{
+			FOnAudioOutputDevicesObtained OnAudioOutputDevicesObtained;
+			OnAudioOutputDevicesObtained.BindDynamic(this, &UBSGameUserSettings::HandleAudioOutputDevicesObtained);
+			UAudioMixerBlueprintLibrary::GetAvailableAudioOutputDevices(World, OnAudioOutputDevicesObtained);
+
+			FOnMainAudioOutputDeviceObtained OnMainAudioOutputDeviceObtained;
+			OnMainAudioOutputDeviceObtained.
+				BindDynamic(this, &UBSGameUserSettings::HandleMainAudioOutputDeviceObtained);
+			UAudioMixerBlueprintLibrary::GetCurrentAudioOutputDeviceName(World, OnMainAudioOutputDeviceObtained);
+		}
+	}
+
+	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Load Settings"));
+}
+
+void UBSGameUserSettings::ValidateSettings()
+{
+	const bool bGameUserSettingsValid = IsVersionValid();
+	const bool bBSGameUserSettingsValid = IsBSVersionValid();
+
+	// If GameUserSettings is invalid, ini file will be deleted and reloaded
+	if (bGameUserSettingsValid && !bBSGameUserSettingsValid)
+	{
+		// First try loading the settings, if they haven't been loaded before.
+		LoadSettings(true);
+
+		// If it still an old version, delete the user settings file and reload defaults.
+		if (!IsVersionValid())
+		{
+			SetToBSDefaults();
+			IFileManager::Get().Delete(*GGameUserSettingsIni);
+			LoadSettings(true);
+		}
+		UpdateBSVersion();
+	}
+
+	DisplayGamma = FMath::Max(DisplayGamma, 0.0);
+	DisplayGamma = FMath::Min(DisplayGamma, 4.4);
+
+	Super::ValidateSettings();
+	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Validate Settings"));
+}
+
+void UBSGameUserSettings::ResetToCurrentSettings()
+{
+	Super::ResetToCurrentSettings();
+}
+
+void UBSGameUserSettings::ApplySettings(bool bForceReload)
+{
+	UE_LOG(LogBSGameUserSettings, Warning, TEXT("ApplySettings"));
+	Super::ApplySettings(bForceReload);
+	SetAntiAliasingMethod(GetAntiAliasingMethod());
+	// TODO: Apply more settings
+}
+
+TMap<FString, uint8> UBSGameUserSettings::GetSupportedNvidiaSettingModes(
+	const ENvidiaSettingType NvidiaSettingType) const
+{
+	TMap<FString, uint8> Out;
+	switch (NvidiaSettingType)
+	{
+	case ENvidiaSettingType::DLSSEnabledMode:
+		{
+			TArray<EDLSSEnabledMode> Modes = UDLSSLibrary::IsDLSSSupported()
+				? TArray{EDLSSEnabledMode::On, EDLSSEnabledMode::Off}
+				: TArray{EDLSSEnabledMode::Off};
+			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
+		}
+		break;
+	case ENvidiaSettingType::FrameGenerationEnabledMode:
+		{
+			TArray<UStreamlineDLSSGMode> Modes = UStreamlineLibraryDLSSG::GetSupportedDLSSGModes();
+			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
+		}
+		break;
+	case ENvidiaSettingType::DLSSMode:
+		{
+			TArray<UDLSSMode> Modes = UDLSSLibrary::GetSupportedDLSSModes();
+			Modes.AddUnique(UDLSSMode::Auto);
+			Modes.AddUnique(UDLSSMode::Off);
+			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
+		}
+		break;
+	case ENvidiaSettingType::NISEnabledMode:
+		{
+			TArray<ENISEnabledMode> Modes = UNISLibrary::IsNISSupported()
+				? TArray{ENISEnabledMode::On, ENISEnabledMode::Off}
+				: TArray{ENISEnabledMode::Off};
+			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
+		}
+		break;
+	case ENvidiaSettingType::NISMode:
+		{
+			TArray<UNISMode> Modes = UNISLibrary::GetSupportedNISModes();
+			Modes.Remove(UNISMode::Custom);
+			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
+		}
+		break;
+	case ENvidiaSettingType::StreamlineReflexMode:
+		{
+			TArray<UStreamlineReflexMode> Modes = TArray{UStreamlineReflexMode::Disabled};
+			if (UStreamlineLibraryReflex::IsReflexSupported())
+			{
+				Modes.Add(UStreamlineReflexMode::Enabled);
+				Modes.Add(UStreamlineReflexMode::EnabledPlusBoost);
+			}
+			Out = VideoSettingEnumMap->GetNvidiaSettingModes(Modes);
+		}
+		break;
+	}
+	return Out;
+}
+
+TArray<FString> UBSGameUserSettings::GetAvailableAudioDeviceNames() const
+{
+	return AudioDeviceNames;
+}
+
 float UBSGameUserSettings::GetDLSSSharpness() const
 {
 	return DLSSSharpness;
@@ -496,34 +538,34 @@ int32 UBSGameUserSettings::GetFrameRateLimitBackground() const
 	return FrameRateLimitBackground;
 }
 
-EDLSSEnabledMode UBSGameUserSettings::GetDLSSEnabledMode() const
+uint8 UBSGameUserSettings::GetDLSSEnabledMode() const
 {
-	return DLSSEnabledMode;
+	return static_cast<uint8>(DLSSEnabledMode);
 }
 
-ENISEnabledMode UBSGameUserSettings::GetNISEnabledMode() const
+uint8 UBSGameUserSettings::GetNISEnabledMode() const
 {
-	return NISEnabledMode;
+	return static_cast<uint8>(NISEnabledMode);
 }
 
-UStreamlineDLSSGMode UBSGameUserSettings::GetFrameGenerationEnabledMode() const
+uint8 UBSGameUserSettings::GetFrameGenerationEnabledMode() const
 {
-	return FrameGenerationEnabledMode;
+	return static_cast<uint8>(FrameGenerationEnabledMode);
 }
 
-UDLSSMode UBSGameUserSettings::GetDLSSMode() const
+uint8 UBSGameUserSettings::GetDLSSMode() const
 {
-	return DLSSMode;
+	return static_cast<uint8>(DLSSMode);
 }
 
-UNISMode UBSGameUserSettings::GetNISMode() const
+uint8 UBSGameUserSettings::GetNISMode() const
 {
-	return NISMode;
+	return static_cast<uint8>(NISMode);
 }
 
-UStreamlineReflexMode UBSGameUserSettings::GetStreamlineReflexMode() const
+uint8 UBSGameUserSettings::GetStreamlineReflexMode() const
 {
-	return StreamlineReflexMode;
+	return static_cast<uint8>(StreamlineReflexMode);
 }
 
 float UBSGameUserSettings::GetOverallVolume() const
@@ -551,9 +593,19 @@ FString UBSGameUserSettings::GetAudioOutputDeviceId() const
 	return AudioOutputDeviceId;
 }
 
-TEnumAsByte<EAntiAliasingMethod> UBSGameUserSettings::GetAntiAliasingMethod() const
+uint8 UBSGameUserSettings::GetAntiAliasingMethod() const
 {
-	return AntiAliasingMethod;
+	return AntiAliasingMethod.GetIntValue();
+}
+
+bool UBSGameUserSettings::IsDLSSEnabled()
+{
+	return UDLSSLibrary::IsDLSSEnabled();
+}
+
+bool UBSGameUserSettings::IsNISEnabled() const
+{
+	return NISEnabledMode == ENISEnabledMode::On;
 }
 
 float UBSGameUserSettings::GetDisplayGamma() const
@@ -581,26 +633,16 @@ void UBSGameUserSettings::SetFrameRateLimitBackground(const int32 InFrameRateLim
 	FrameRateLimitBackground = InFrameRateLimitBackground;
 }
 
-void UBSGameUserSettings::SetDLSSEnabledMode(const EDLSSEnabledMode InDLSSEnabledMode)
+void UBSGameUserSettings::SetDLSSEnabledMode(const uint8 InDLSSEnabledMode)
 {
-	if (!bDLSSInitialized)
-	{
-		InitDLSSSettings();
-	}
-
-	DLSSEnabledMode = InDLSSEnabledMode;
+	DLSSEnabledMode = static_cast<EDLSSEnabledMode>(InDLSSEnabledMode);
 }
 
-void UBSGameUserSettings::SetNISEnabledMode(const ENISEnabledMode InNISEnabledMode)
+void UBSGameUserSettings::SetNISEnabledMode(const uint8 InNISEnabledMode)
 {
-	if (!bDLSSInitialized)
-	{
-		InitDLSSSettings();
-	}
-
 	if (UNISLibrary::IsNISSupported() && DLSSEnabledMode == EDLSSEnabledMode::Off)
 	{
-		NISEnabledMode = InNISEnabledMode;
+		NISEnabledMode = static_cast<ENISEnabledMode>(InNISEnabledMode);
 	}
 	else
 	{
@@ -608,17 +650,14 @@ void UBSGameUserSettings::SetNISEnabledMode(const ENISEnabledMode InNISEnabledMo
 	}
 }
 
-void UBSGameUserSettings::SetFrameGenerationEnabledMode(const UStreamlineDLSSGMode InFrameGenerationEnabledMode)
+void UBSGameUserSettings::SetFrameGenerationEnabledMode(const uint8 InFrameGenerationEnabledMode)
 {
-	if (!bDLSSInitialized)
-	{
-		InitDLSSSettings();
-	}
+	const auto Mode = static_cast<UStreamlineDLSSGMode>(InFrameGenerationEnabledMode);
 	if (DLSSMode != UDLSSMode::Off && UStreamlineLibraryDLSSG::IsDLSSGSupported() &&
-		UStreamlineLibraryDLSSG::IsDLSSGModeSupported(InFrameGenerationEnabledMode))
+		UStreamlineLibraryDLSSG::IsDLSSGModeSupported(Mode))
 	{
-		UStreamlineLibraryDLSSG::SetDLSSGMode(InFrameGenerationEnabledMode);
-		FrameGenerationEnabledMode = InFrameGenerationEnabledMode;
+		UStreamlineLibraryDLSSG::SetDLSSGMode(Mode);
+		FrameGenerationEnabledMode = Mode;
 	}
 	else
 	{
@@ -626,14 +665,9 @@ void UBSGameUserSettings::SetFrameGenerationEnabledMode(const UStreamlineDLSSGMo
 	}
 }
 
-void UBSGameUserSettings::SetDLSSMode(const UDLSSMode InDLSSMode)
+void UBSGameUserSettings::SetDLSSMode(const uint8 InDLSSMode)
 {
-	if (!bDLSSInitialized)
-	{
-		InitDLSSSettings();
-	}
-
-	UDLSSMode LocalDLSSMode = InDLSSMode;
+	auto LocalDLSSMode = static_cast<UDLSSMode>(InDLSSMode);
 	EDLSSEnabledMode LocalDLSSEnabledMode = DLSSEnabledMode;
 	UStreamlineDLSSGMode LocalFrameGenerationEnabledMode = FrameGenerationEnabledMode;
 	ENISEnabledMode LocalNISEnabledMode = NISEnabledMode;
@@ -677,10 +711,10 @@ void UBSGameUserSettings::SetDLSSMode(const UDLSSMode InDLSSMode)
 		DLSSMode = UDLSSMode::Off;
 	}
 
-	SetFrameGenerationEnabledMode(LocalFrameGenerationEnabledMode);
-	SetNISEnabledMode(LocalNISEnabledMode);
-	SetNISMode(LocalNISMode);
-	SetStreamlineReflexMode(LocalReflexMode);
+	SetFrameGenerationEnabledMode(static_cast<uint8>(LocalFrameGenerationEnabledMode));
+	SetNISEnabledMode(static_cast<uint8>(LocalNISEnabledMode));
+	SetNISMode(static_cast<uint8>(LocalNISMode));
+	SetStreamlineReflexMode(static_cast<uint8>(LocalReflexMode));
 	SetDLSSSharpness(DLSSSharpness);
 	SetNISSharpness(NISSharpness);
 
@@ -698,20 +732,18 @@ void UBSGameUserSettings::SetDLSSMode(const UDLSSMode InDLSSMode)
 	{
 		SetResolutionScaleValueEx(100.f);
 	}
+
+	// TODO: Maybe apply resolution settings?
 }
 
-void UBSGameUserSettings::SetNISMode(const UNISMode InNISMode)
+void UBSGameUserSettings::SetNISMode(const uint8 InNISMode)
 {
-	if (!bDLSSInitialized)
-	{
-		InitDLSSSettings();
-	}
-
+	const auto Mode = static_cast<UNISMode>(InNISMode);
 	if (UNISLibrary::IsNISSupported() && DLSSEnabledMode == EDLSSEnabledMode::Off && UNISLibrary::IsNISModeSupported(
-		InNISMode))
+		Mode))
 	{
-		UNISLibrary::SetNISMode(InNISMode);
-		NISMode = InNISMode;
+		UNISLibrary::SetNISMode(Mode);
+		NISMode = Mode;
 	}
 	else
 	{
@@ -719,17 +751,13 @@ void UBSGameUserSettings::SetNISMode(const UNISMode InNISMode)
 	}
 }
 
-void UBSGameUserSettings::SetStreamlineReflexMode(const UStreamlineReflexMode InStreamlineReflexMode)
+void UBSGameUserSettings::SetStreamlineReflexMode(const uint8 InStreamlineReflexMode)
 {
-	if (!bDLSSInitialized)
-	{
-		InitDLSSSettings();
-	}
-
+	const auto Mode = static_cast<UStreamlineReflexMode>(InStreamlineReflexMode);
 	if (UStreamlineLibraryReflex::IsReflexSupported())
 	{
-		UStreamlineLibraryReflex::SetReflexMode(InStreamlineReflexMode);
-		StreamlineReflexMode = InStreamlineReflexMode;
+		UStreamlineLibraryReflex::SetReflexMode(Mode);
+		StreamlineReflexMode = Mode;
 	}
 	else
 	{
@@ -764,12 +792,15 @@ void UBSGameUserSettings::SetSoundFXVolume(const float InVolume)
 void UBSGameUserSettings::SetAudioOutputDeviceId(const FString& InAudioOutputDeviceId)
 {
 	AudioOutputDeviceId = InAudioOutputDeviceId;
+	OnAudioOutputDeviceChanged.Broadcast(AudioOutputDeviceId);
 }
 
 void UBSGameUserSettings::SetDisplayGamma(const float InGamma)
 {
 	// TODO: Fix this or revert to using old brightness
-	DisplayGamma = FMath::GetMappedRangeValueClamped(FVector2d(0.0, 100.0), FVector2d(0.0, 4.4), InGamma);
+	DisplayGamma = FMath::GetMappedRangeValueClamped(
+		FVector2d(Constants::MinValue_Brightness, Constants::MaxValue_Brightness),
+		FVector2d(Constants::MinValue_DisplayGamma, Constants::MaxValue_DisplayGamma), InGamma);
 	ApplyDisplayGamma();
 }
 
@@ -791,8 +822,9 @@ void UBSGameUserSettings::SetNISSharpness(const float InNISSharpness)
 	}
 }
 
-void UBSGameUserSettings::SetAntiAliasingMethod(const TEnumAsByte<EAntiAliasingMethod> InAntiAliasingMethod)
+void UBSGameUserSettings::SetAntiAliasingMethod(const uint8 InAntiAliasingMethod)
 {
+	AntiAliasingMethod = TEnumAsByte<EAntiAliasingMethod>(InAntiAliasingMethod);
 	if (IConsoleVariable* CVarAntiAliasingMethod = IConsoleManager::Get().FindConsoleVariable(
 		TEXT("r.AntiAliasingMethod")))
 	{
@@ -811,5 +843,27 @@ void UBSGameUserSettings::SetResolutionScaleChecked(const float InResolutionScal
 	if (!UDLSSLibrary::IsDLSSEnabled() && NISEnabledMode != ENISEnabledMode::On)
 	{
 		SetResolutionScaleValueEx(InResolutionScale * 100.f);
+	}
+}
+
+void UBSGameUserSettings::HandleAudioOutputDevicesObtained(const TArray<FAudioOutputDeviceInfo>& AvailableDevices)
+{
+	AudioDeviceNames.Empty();
+	for (auto& Device : AvailableDevices)
+	{
+		AudioDeviceNames.Add(Device.Name);
+	}
+}
+
+void UBSGameUserSettings::HandleMainAudioOutputDeviceObtained(const FString& CurrentDevice)
+{
+	AudioOutputDeviceId = CurrentDevice;
+}
+
+void UBSGameUserSettings::ApplyDisplayGamma() const
+{
+	if (GEngine)
+	{
+		GEngine->DisplayGamma = DisplayGamma;
 	}
 }

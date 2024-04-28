@@ -5,6 +5,7 @@
 namespace Constants
 {
 	inline constexpr int32 CustomGameModeVersion = 1;
+	inline constexpr int32 BSGameUserSettingsVersion = 1;
 
 	/** Min Value allowed for a BandFrequency channel */
 	inline constexpr float MinValue_BandFrequency = 0.f;
@@ -476,6 +477,9 @@ namespace Constants
 	inline constexpr float MinValue_Brightness = 0.f;
 	inline constexpr float MaxValue_Brightness = 100.f;
 	inline constexpr float SnapSize_Brightness = 1.f;
+
+	inline constexpr float MinValue_DisplayGamma = 0.5f;
+	inline constexpr float MaxValue_DisplayGamma = 3.9f;
 
 	inline constexpr float MinValue_DynamicStartThreshold = 0.f;
 	inline constexpr float MaxValue_DynamicStartThreshold = 100.f;

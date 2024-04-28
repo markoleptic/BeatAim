@@ -111,8 +111,8 @@ void UBSGameInstance::SetBSConfig(const FBSConfig& InConfig)
 
 void UBSGameInstance::InitializeLoadingScreen()
 {
-	auto Settings = UBSGameUserSettings::Get();
-	Settings->LoadUserControlBusMix();
+	//auto Settings = UBSGameUserSettings::Get();
+	//Settings->LoadUserControlBusMix();
 	const auto AudioSettings = GetDefault<UBSAudioSettings>();
 	if (UObject* ObjPath = AudioSettings->LoadingScreenControlBusMix.TryLoad())
 	{

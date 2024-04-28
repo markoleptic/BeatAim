@@ -86,6 +86,8 @@ protected:
 	USliderTextBoxOptionWidget* SliderTextBoxOption_MenuSound;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	USliderTextBoxOptionWidget* SliderTextBoxOption_MusicSound;
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UComboBoxOptionWidget* ComboBoxOption_OutputAudioDevice;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UComboBoxOptionWidget* ComboBoxOption_WindowMode;
@@ -192,6 +194,8 @@ private:
 	void OnSelectionChanged_Reflex(const TArray<FString>& SelectedOptions, ESelectInfo::Type SelectionType);
 	UFUNCTION()
 	void OnSelectionChanged_AntiAliasingMethod(const TArray<FString>& SelectedOptions, ESelectInfo::Type SelectionType);
+	UFUNCTION()
+	void OnSelectionChanged_OutputAudioDevice(const TArray<FString>& SelectedOptions, ESelectInfo::Type SelectionType);
 
 	UFUNCTION()
 	void OnCheckStateChanged_VSyncEnabled(const bool bIsChecked);
@@ -210,35 +214,17 @@ private:
 	UFUNCTION()
 	void RevertVideoSettingsTimerCallback();
 
-	/** Clears and repopulates the ComboBox_Resolution based on the resolutions from GetSupportedFullscreenResolutions or GetConvenientWindowedResolutions */
+	/** Clears and repopulates the ComboBox_Resolution based on the resolutions from GetSupportedFullscreenResolutions
+	 *  or GetConvenientWindowedResolutions. */
 	void PopulateResolutionComboBox();
 
-	// TODO: Fix
-	/*/** Sets enabled/disabled states for any NVIDIA DLSS related settings #1#
-	void HandleDLSSEnabledChanged(const EDLSSEnabledMode DLSSEnabledMode);
+	/** Updates the widgets for any Nvidia related settings. */
+	void UpdateNvidiaSettings();
 
-	/** Forces certain DLSS/NIS settings depending on if DLSS is enabled, and changes those selected options. Only called when a user changes the DLSS Enabled Mode selection #1#
-	void HandleDLSSDependencies(const EDLSSEnabledMode DLSSEnabledMode);
+	/** Sets enabled/disabled states for any Nvidia related settings. */
+	void HandleDLSSEnabledChanged(bool bDLSSEnabled, bool bNISEnabled);
 
-	/** Returns the selected DLSS enabled mode #1#
-	EDLSSEnabledMode GetSelectedDLSSEnabledMode() const;
-
-	/** Returns the selected Frame Generation mode #1#
-	UStreamlineDLSSGMode GetSelectedFrameGenerationMode() const;
-
-	/** Returns the selected DLSS mode (Super Resolution) #1#
-	UDLSSMode GetSelectedDLSSMode() const;
-
-	/** Returns the selected NIS enabled mode #1#
-	ENISEnabledMode GetSelectedNISEnabledMode() const;
-
-	/** Returns the selected NIS mode #1#
-	UNISMode GetSelectedNISMode() const;
-
-	/** Returns the selected reflex mode #1#
-	UStreamlineReflexMode GetSelectedReflexMode() const;
-
-	FString GetComboBoxEntryTooltipStringTableKey_DLSS_FrameGeneration(const FString& EnumString);
+	/*FString GetComboBoxEntryTooltipStringTableKey_DLSS_FrameGeneration(const FString& EnumString);
 	FString GetComboBoxEntryTooltipStringTableKey_DLSS_SuperResolution(const FString& EnumString);
 	FString GetComboBoxEntryTooltipStringTableKey_Reflex(const FString& EnumString);*/
 

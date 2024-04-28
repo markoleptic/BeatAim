@@ -11,19 +11,20 @@ public class BeatShot : ModuleRules
 		bEnableExceptions = true;
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 		PrecompileForTargets = PrecompileTargetsType.Any;
-		
+
 		PublicDependencyModuleNames.AddRange(new[]
 		{
 			"Core", "CoreUObject", "Engine", "InputCore", "Niagara", "EnhancedInput", "UserInterface", "UMG",
 			"BeatShotGlobal", "OnlineSubsystem", "OnlineSubsystemUtils",
 			"Steamworks", "GameplayAbilities", "GameplayTags", "GameplayTasks", "NetCore", "PhysicsCore",
 			"ModularGameplay", "Text3D", "DLSSBlueprint", "NISBlueprint",
-			"StreamlineBlueprint", "Slate", "SlateCore", "MoviePlayer", "NumCpp", "Synthesis"
+			"StreamlineBlueprint", "Slate", "SlateCore", "MoviePlayer", "NumCpp", "Synthesis", "AudioMixer"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
-			"ParallelcubeAudioAnalyzer", "ParallelcubeTaglib", "EnhancedInput", "MoviePlayer", "DeveloperSettings", "AudioModulation"
+			"ParallelcubeAudioAnalyzer", "ParallelcubeTaglib", "EnhancedInput", "MoviePlayer", "DeveloperSettings",
+			"AudioModulation"
 		});
 
 		PublicIncludePaths.AddRange(new[]

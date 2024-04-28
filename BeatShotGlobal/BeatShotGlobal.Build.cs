@@ -11,7 +11,7 @@ public class BeatShotGlobal : ModuleRules
 		{
 			"Core", "CoreUObject", "InputCore", "Engine", "HTTP", "Json", "JsonUtilities",
 			"DLSSBlueprint", "NISBlueprint", "StreamlineBlueprint", "GameplayTags", "UMG", "EnhancedInput",
-			"PhysicsCore", "Slate", "SlateCore"
+			"PhysicsCore", "Slate", "SlateCore", "AudioMixer"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]

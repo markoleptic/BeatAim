@@ -28,7 +28,9 @@ struct FEnumTagPair
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	FGameplayTagContainer Tags;
 
-	FEnumTagPair() = default;
+	FEnumTagPair(): Index(MAX_uint8)
+	{
+	}
 
 	FEnumTagPair(const FString& InEnumValue, const uint8 InIndex) : DisplayName(InEnumValue), Index(InIndex)
 	{
