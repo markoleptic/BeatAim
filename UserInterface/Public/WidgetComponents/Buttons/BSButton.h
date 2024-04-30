@@ -32,7 +32,7 @@ public:
 	/** Called when another linked BSButton is clicked, reverses the OnPressed animation to restore it to pre-animated state */
 	virtual void SetInActive();
 
-	/** Manually "click" this button */
+	/** Sets bIsClicked to true and sets all other buttons as inactive. Plays animation, but broadcasts no delegates. */
 	virtual void SetActive();
 
 	/** Create functions like this with additional parameters to store info about the button being pressed. Remember to call SetHasSetDefaults in any child implementations */

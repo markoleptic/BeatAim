@@ -76,6 +76,7 @@ void UPostGameMenuWidget::ShowAudioFormatSelect()
 void UPostGameMenuWidget::SetScoresWidgetVisibility()
 {
 	ScoresWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
 	MenuButton_Scores->SetActive();
 	MenuSwitcher->SetActiveWidget(MenuButton_Scores->GetBox());
 }

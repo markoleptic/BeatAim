@@ -51,6 +51,7 @@ void UMainMenuWidget::NativeConstruct()
 
 	WebBrowserOverlayPatchNotes->InitScoreBrowser(EScoreBrowserType::PatchNotes);
 	ScoresWidget->InitScoreBrowser(EScoreBrowserType::MainMenuScores);
+
 	MenuButton_PatchNotes->SetActive();
 	MainMenuSwitcher->SetActiveWidget(MenuButton_PatchNotes->GetBox());
 }

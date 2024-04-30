@@ -81,6 +81,7 @@ void UPauseMenuWidget::OnButtonClicked_RestartCurrentMode()
 {
 	QuitMenuWidget->SetVisibility(ESlateVisibility::Visible);
 	QuitMenuWidget->PlayFadeInRestartMenu();
+
 	MenuButton_RestartCurrentMode->SetActive();
 	PauseMenuSwitcher->SetActiveWidget(MenuButton_RestartCurrentMode);
 }

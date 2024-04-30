@@ -74,7 +74,14 @@ void UBSButton::SetInActive()
 
 void UBSButton::SetActive()
 {
-	OnPressed_Button();
+	bIsClicked = true;
+	PlayAnim_OnPressed();
+	UBSButton* Head = GetNext();
+	while (Head && Head != this)
+	{
+		Head->SetInActive();
+		Head = Head->GetNext();
+	}
 }
 
 void UBSButton::SetDefaults(const uint8 InEnum, UBSButton* NextButton)
