@@ -133,23 +133,19 @@ UBSGameUserSettings* UBSGameUserSettings::Get()
 	return GEngine ? CastChecked<UBSGameUserSettings>(GEngine->GetGameUserSettings()) : nullptr;
 }
 
-void UBSGameUserSettings::Initialize()
+void UBSGameUserSettings::Initialize(const UWorld* World)
 {
-	LoadDLSSSettings();
-	LoadUserControlBusMix();
-	if (GEngine)
+	if (World && (World->WorldType == EWorldType::Game || World->WorldType == EWorldType::PIE))
 	{
-		if (const UWorld* World = GEngine->GetCurrentPlayWorld())
-		{
-			FOnAudioOutputDevicesObtained OnAudioOutputDevicesObtained;
-			OnAudioOutputDevicesObtained.BindDynamic(this, &UBSGameUserSettings::HandleAudioOutputDevicesObtained);
-			UAudioMixerBlueprintLibrary::GetAvailableAudioOutputDevices(World, OnAudioOutputDevicesObtained);
+		LoadDLSSSettings();
+		LoadUserControlBusMix(World);
+		FOnAudioOutputDevicesObtained OnAudioOutputDevicesObtained;
+		OnAudioOutputDevicesObtained.BindDynamic(this, &UBSGameUserSettings::HandleAudioOutputDevicesObtained);
+		UAudioMixerBlueprintLibrary::GetAvailableAudioOutputDevices(World, OnAudioOutputDevicesObtained);
 
-			FOnMainAudioOutputDeviceObtained OnMainAudioOutputDeviceObtained;
-			OnMainAudioOutputDeviceObtained.
-				BindDynamic(this, &UBSGameUserSettings::HandleMainAudioOutputDeviceObtained);
-			UAudioMixerBlueprintLibrary::GetCurrentAudioOutputDeviceName(World, OnMainAudioOutputDeviceObtained);
-		}
+		FOnMainAudioOutputDeviceObtained OnMainAudioOutputDeviceObtained;
+		OnMainAudioOutputDeviceObtained.BindDynamic(this, &UBSGameUserSettings::HandleMainAudioOutputDeviceObtained);
+		UAudioMixerBlueprintLibrary::GetCurrentAudioOutputDeviceName(World, OnMainAudioOutputDeviceObtained);
 	}
 }
 
@@ -182,7 +178,7 @@ void UBSGameUserSettings::SetToBSDefaults()
 
 bool UBSGameUserSettings::IsBSVersionValid() const
 {
-	return Version == Constants::BSGameUserSettingsVersion;
+	return BSVersion == Constants::BSGameUserSettingsVersion;
 }
 
 void UBSGameUserSettings::UpdateBSVersion()
@@ -269,75 +265,67 @@ void UBSGameUserSettings::LoadDLSSSettings()
 	bDLSSInitialized = true;
 }
 
-void UBSGameUserSettings::LoadUserControlBusMix()
+void UBSGameUserSettings::LoadUserControlBusMix(const UWorld* World)
 {
-	if (GEngine)
+	if (World && (World->WorldType == EWorldType::Game || World->WorldType == EWorldType::PIE))
 	{
-		if (const UWorld* World = GEngine->GetCurrentPlayWorld())
+		const UBSAudioSettings* BSAudioSettings = GetDefault<UBSAudioSettings>();
+
+		ControlBusMap.Empty();
+
+		USoundControlBus* OverallControlBus = TryLoadControlBus(BSAudioSettings->OverallVolumeControlBus, ControlBusMap,
+			TEXT("Overall"));
+		USoundControlBus* MenuControlBus = TryLoadControlBus(BSAudioSettings->MenuVolumeControlBus, ControlBusMap,
+			TEXT("Menu"));
+		USoundControlBus* MusicControlBus = TryLoadControlBus(BSAudioSettings->MusicVolumeControlBus, ControlBusMap,
+			TEXT("Music"));
+		USoundControlBus* SoundFXControlBus = TryLoadControlBus(BSAudioSettings->SoundFXVolumeControlBus, ControlBusMap,
+			TEXT("SoundFX"));
+
+		if (UObject* ObjPath = BSAudioSettings->UserSettingsControlBusMix.TryLoad())
 		{
-			if (const UBSAudioSettings* BSAudioSettings = GetDefault<UBSAudioSettings>())
+			if (USoundControlBusMix* SoundControlBusMix = Cast<USoundControlBusMix>(ObjPath))
 			{
-				ControlBusMap.Empty();
+				ControlBusMix = SoundControlBusMix;
+				UAudioModulationStatics::ActivateBusMix(World, SoundControlBusMix);
 
-				USoundControlBus* OverallControlBus = TryLoadControlBus(BSAudioSettings->OverallVolumeControlBus,
-					ControlBusMap, TEXT("Overall"));
-				USoundControlBus* MenuControlBus = TryLoadControlBus(BSAudioSettings->MenuVolumeControlBus,
-					ControlBusMap, TEXT("Menu"));
-				USoundControlBus* MusicControlBus = TryLoadControlBus(BSAudioSettings->MusicVolumeControlBus,
-					ControlBusMap, TEXT("Music"));
-				USoundControlBus* SoundFXControlBus = TryLoadControlBus(BSAudioSettings->SoundFXVolumeControlBus,
-					ControlBusMap, TEXT("SoundFX"));
+				const FSoundControlBusMixStage OverallControlBusMixStage = UAudioModulationStatics::CreateBusMixStage(
+					World, OverallControlBus, OverallVolume / 100.0);
+				const FSoundControlBusMixStage MenuControlBusMixStage = UAudioModulationStatics::CreateBusMixStage(
+					World, MenuControlBus, MenuVolume / 100.0);
+				const FSoundControlBusMixStage MusicControlBusMixStage = UAudioModulationStatics::CreateBusMixStage(
+					World, MusicControlBus, MusicVolume / 100.0);
+				const FSoundControlBusMixStage SoundFXControlBusMixStage = UAudioModulationStatics::CreateBusMixStage(
+					World, SoundFXControlBus, SoundFXVolume / 100.0);
 
-				if (UObject* ObjPath = BSAudioSettings->UserSettingsControlBusMix.TryLoad())
-				{
-					if (USoundControlBusMix* SoundControlBusMix = Cast<USoundControlBusMix>(ObjPath))
-					{
-						ControlBusMix = SoundControlBusMix;
+				TArray<FSoundControlBusMixStage> ControlBusMixStageArray;
+				ControlBusMixStageArray.Add(OverallControlBusMixStage);
+				ControlBusMixStageArray.Add(MenuControlBusMixStage);
+				ControlBusMixStageArray.Add(MusicControlBusMixStage);
+				ControlBusMixStageArray.Add(SoundFXControlBusMixStage);
 
-						UAudioModulationStatics::ActivateBusMix(World, SoundControlBusMix);
+				UAudioModulationStatics::UpdateMix(World, SoundControlBusMix, ControlBusMixStageArray);
 
-						const FSoundControlBusMixStage OverallControlBusMixStage =
-							UAudioModulationStatics::CreateBusMixStage(World, OverallControlBus, OverallVolume / 100.0);
-						const FSoundControlBusMixStage MenuControlBusMixStage =
-							UAudioModulationStatics::CreateBusMixStage(World, MenuControlBus, MenuVolume / 100.0);
-						const FSoundControlBusMixStage MusicControlBusMixStage =
-							UAudioModulationStatics::CreateBusMixStage(World, MusicControlBus, MusicVolume / 100.0);
-						const FSoundControlBusMixStage SoundFXControlBusMixStage =
-							UAudioModulationStatics::CreateBusMixStage(World, SoundFXControlBus, SoundFXVolume / 100.0);
-
-						TArray<FSoundControlBusMixStage> ControlBusMixStageArray;
-						ControlBusMixStageArray.Add(OverallControlBusMixStage);
-						ControlBusMixStageArray.Add(MenuControlBusMixStage);
-						ControlBusMixStageArray.Add(MusicControlBusMixStage);
-						ControlBusMixStageArray.Add(SoundFXControlBusMixStage);
-
-						// TODO Fix UpdateMix not working
-
-						UAudioModulationStatics::UpdateMix(World, SoundControlBusMix, ControlBusMixStageArray);
-
-						bSoundControlBusMixLoaded = true;
-					}
-					else
-					{
-						UE_LOG(LogBSGameUserSettings, Warning, TEXT("User Settings Control Bus Mix reference missing"));
-					}
-				}
-				else
-				{
-					ensureMsgf(ObjPath, TEXT("Failed to load Control Bus Mix."));
-				}
+				bSoundControlBusMixLoaded = true;
+			}
+			else
+			{
+				UE_LOG(LogBSGameUserSettings, Warning, TEXT("User Settings Control Bus Mix reference missing."));
 			}
 		}
+		else
+		{
+			ensureMsgf(ObjPath, TEXT("Failed to load Control Bus Mix."));
+		}
+	}
+	else
+	{
+		ensureMsgf(World, TEXT("Failed to load current player world"));
 	}
 }
 
 void UBSGameUserSettings::SetVolumeForControlBus(const FName& ControlBusKey, const float InVolume)
 {
-	if (!bSoundControlBusMixLoaded)
-	{
-		LoadUserControlBusMix();
-	}
-
 	TObjectPtr<USoundControlBus> ControlBus = ControlBusMap.FindRef(ControlBusKey);
 
 	if (GEngine && ControlBus && bSoundControlBusMixLoaded)
@@ -383,20 +371,13 @@ void UBSGameUserSettings::BeginDestroy()
 
 void UBSGameUserSettings::SetToDefaults()
 {
-	// Don't reset to default if only GameUserSettings is different version
-	if (IsVersionValid())
-	{
-		SetToBSDefaults();
-	}
 	Super::SetToDefaults();
-	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Set to Defaults"));
+	SetToBSDefaults();
 }
 
 void UBSGameUserSettings::LoadSettings(const bool bForceReload)
 {
 	Super::LoadSettings(bForceReload);
-	LoadDLSSSettings();
-	LoadUserControlBusMix();
 	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Load Settings"));
 }
 
@@ -423,6 +404,7 @@ void UBSGameUserSettings::ValidateSettings()
 
 	DisplayGamma = FMath::Clamp(DisplayGamma, Constants::MinValue_DisplayGamma, Constants::MaxValue_DisplayGamma);
 	Brightness = FMath::Clamp(Brightness, Constants::MinValue_Brightness, Constants::MaxValue_Brightness);
+	// TODO: More validation
 
 	Super::ValidateSettings();
 	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Validate Settings"));
@@ -435,13 +417,17 @@ void UBSGameUserSettings::ResetToCurrentSettings()
 
 void UBSGameUserSettings::ApplySettings(bool bForceReload)
 {
-	UE_LOG(LogBSGameUserSettings, Warning, TEXT("ApplySettings"));
 	Super::ApplySettings(bForceReload);
+
 	SetAntiAliasingMethod(GetAntiAliasingMethod());
 	SetBrightness(GetBrightness());
 	SetDisplayGamma(GetDisplayGamma());
+
 	OnSettingsChanged.Broadcast(this);
+
 	// TODO: Apply more settings
+
+	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Apply Settings"));
 }
 
 void UBSGameUserSettings::SaveSettings()
@@ -703,28 +689,24 @@ void UBSGameUserSettings::SetOverallVolume(const float InVolume)
 {
 	OverallVolume = InVolume;
 	SetVolumeForControlBus(TEXT("Overall"), OverallVolume);
-	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetMenuVolume(const float InVolume)
 {
 	MenuVolume = InVolume;
 	SetVolumeForControlBus(TEXT("Menu"), MenuVolume);
-	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetMusicVolume(const float InVolume)
 {
 	MusicVolume = InVolume;
 	SetVolumeForControlBus(TEXT("Music"), MusicVolume);
-	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetSoundFXVolume(const float InVolume)
 {
 	SoundFXVolume = InVolume;
 	SetVolumeForControlBus(TEXT("SoundFX"), SoundFXVolume);
-	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetAntiAliasingMethod(const uint8 InAntiAliasingMethod)
@@ -741,38 +723,32 @@ void UBSGameUserSettings::SetAntiAliasingMethod(const uint8 InAntiAliasingMethod
 		GConfig->SetString(TEXT("/Script/Engine.RendererSettings"), TEXT("r.AntiAliasingMethod"), *Value, GEngineIni);
 		GConfig->Flush(false, GEngineIni);
 	}
-	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetBrightness(const float InBrightness)
 {
 	Brightness = FMath::Clamp(InBrightness, Constants::MinValue_Brightness, Constants::MaxValue_Brightness);
-	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetDisplayGamma(const float InGamma)
 {
 	DisplayGamma = FMath::Clamp(InGamma, Constants::MinValue_DisplayGamma, Constants::MaxValue_DisplayGamma);
 	ApplyDisplayGamma(DisplayGamma);
-	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetFrameRateLimitMenu(const int32 InFrameRateLimitMenu)
 {
 	FrameRateLimitMenu = InFrameRateLimitMenu;
-	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetFrameRateLimitGame(const int32 InFrameRateLimitGame)
 {
 	FrameRateLimitGame = InFrameRateLimitGame;
-	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetFrameRateLimitBackground(const int32 InFrameRateLimitBackground)
 {
 	FrameRateLimitBackground = InFrameRateLimitBackground;
-	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetResolutionScaleChecked(const float InResolutionScale)
@@ -786,7 +762,6 @@ void UBSGameUserSettings::SetResolutionScaleChecked(const float InResolutionScal
 void UBSGameUserSettings::SetShowFPSCounter(const bool InShowFPSCounter)
 {
 	bShowFPSCounter = InShowFPSCounter;
-	SaveSettings();
 }
 
 void UBSGameUserSettings::SetDLSSEnabledMode(const uint8 InDLSSEnabledMode)
@@ -880,16 +855,20 @@ void UBSGameUserSettings::SetDLSSMode(const uint8 InDLSSMode)
 		if (IsVSyncEnabled())
 		{
 			SetVSyncEnabled(false);
-			// TODO: Apply Resolution Settings or non resolution settings?
+			ApplyNonResolutionSettings();
 		}
 	}
 
 	if (DLSSEnabledMode == EDLSSEnabledMode::On || NISEnabledMode == ENISEnabledMode::On)
 	{
-		SetResolutionScaleValueEx(100.f);
+		if (ScalabilityQuality.ResolutionQuality != 100.f)
+		{
+			// TODO: Might need prompt user?
+			SetResolutionScaleValueEx(100.f);
+			ApplyResolutionSettings(false);
+			ConfirmVideoMode();
+		}
 	}
-
-	// TODO: Maybe apply resolution settings?
 }
 
 void UBSGameUserSettings::SetNISMode(const uint8 InNISMode)

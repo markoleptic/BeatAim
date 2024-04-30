@@ -29,7 +29,11 @@ class BEATSHOT_API UBSGameInstance : public UGameInstance, public IBSPlayerSetti
 	#if WITH_EDITOR
 	virtual FGameInstancePIEResult PostCreateGameModeForPIE(const FGameInstancePIEParameters& Params,
 		AGameModeBase* GameMode) override;
+	virtual FGameInstancePIEResult StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer,
+		const FGameInstancePIEParameters& Params) override;
 	#endif WITH_EDITOR
+
+	void OnPreLoadMapWithContext(const FWorldContext& InWorldContext, const FString& MapName);
 
 	/** Called after a level has been loaded */
 	void OnPostLoadMapWithWorld(UWorld* World);

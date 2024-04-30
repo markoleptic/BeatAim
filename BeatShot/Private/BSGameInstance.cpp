@@ -17,8 +17,11 @@
 void UBSGameInstance::Init()
 {
 	Super::Init();
+
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &ThisClass::OnPostLoadMapWithWorld);
+	FCoreUObjectDelegates::PreLoadMapWithContext.AddUObject(this, &ThisClass::OnPreLoadMapWithContext);
+
 	UE_LOG(LogTemp, Display, TEXT("UBSGameInstance::Init"));
-	UBSGameUserSettings::Get()->Initialize();
 	InitializeLoadingScreen();
 	InitializeSteamManager();
 }
@@ -27,11 +30,22 @@ void UBSGameInstance::Init()
 FGameInstancePIEResult UBSGameInstance::PostCreateGameModeForPIE(const FGameInstancePIEParameters& Params,
 	AGameModeBase* GameMode)
 {
+	UBSGameUserSettings::Get()->Initialize(WorldContext->World());
 	const FBSConfig LocalConfig = FBSConfig();
 	SetBSConfig(LocalConfig);
 	return Super::PostCreateGameModeForPIE(Params, GameMode);
 }
+
+FGameInstancePIEResult UBSGameInstance::StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer,
+	const FGameInstancePIEParameters& Params)
+{
+	return Super::StartPlayInEditorGameInstance(LocalPlayer, Params);
+}
 #endif WITH_EDITOR
+
+void UBSGameInstance::OnPreLoadMapWithContext(const FWorldContext& InWorldContext, const FString& /*MapName*/)
+{
+}
 
 void UBSGameInstance::OnPostLoadMapWithWorld(UWorld* World)
 {
@@ -125,8 +139,6 @@ void UBSGameInstance::InitializeLoadingScreen()
 	#if WITH_EDITOR
 	OnLoadingScreenFadeOutComplete();
 	#endif
-
-	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &ThisClass::OnPostLoadMapWithWorld);
 }
 
 void UBSGameInstance::HandleGameModeTransition(const FGameModeTransitionState& NewGameModeTransitionState)

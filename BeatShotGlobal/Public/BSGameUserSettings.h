@@ -32,7 +32,7 @@ public:
 	/** @return the game local machine settings (resolution, windowing mode, scalability settings, etc...) */
 	static UBSGameUserSettings* Get();
 
-	void Initialize();
+	void Initialize(const UWorld* World);
 
 private:
 	/** Resets all BeatShot Video and Sound settings to default values. */
@@ -44,11 +44,11 @@ private:
 	/** Updates the version to the current version. */
 	void UpdateBSVersion();
 
-	/** Initializes DLSS and NIS settings. */
+	/** Initializes and validates DLSS and NIS settings. */
 	void LoadDLSSSettings();
 
 	/** Initializes Audio Control Buses and UserMix. */
-	void LoadUserControlBusMix();
+	void LoadUserControlBusMix(const UWorld* World);
 
 	/** Sets the volume for the specified control bus.
 	 *  @param ControlBusKey the name of the control bus
