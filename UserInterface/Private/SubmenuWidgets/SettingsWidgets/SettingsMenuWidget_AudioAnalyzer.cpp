@@ -22,9 +22,9 @@ void USettingsMenuWidget_AudioAnalyzer::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	Button_Reset->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	Button_Save->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	Button_SaveAndRestart->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_Reset->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_Save->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_SaveAndRestart->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 
 	Button_Reset->SetDefaults(static_cast<uint8>(ESettingButtonType::Reset));
 	Button_Save->SetDefaults(static_cast<uint8>(ESettingButtonType::Save));
@@ -292,15 +292,12 @@ void USettingsMenuWidget_AudioAnalyzer::ShowBandLimitErrorMessage()
 	if (Buttons[0])
 	{
 		Buttons[0]->SetButtonText(GetWidgetTextFromKey("ASW_SongPathErrorButton"));
-		Buttons[0]->OnBSButtonButtonPressed_NoParams.AddDynamic(this,
-			&USettingsMenuWidget_AudioAnalyzer::HideSongPathErrorMessage);
+		Buttons[0]->OnBSButtonPressed.AddLambda([this](const UBSButton* /*Button*/)
+		{
+			PopupMessageWidget->FadeOut();
+		});
 	}
 
 	PopupMessageWidget->AddToViewport();
 	PopupMessageWidget->FadeIn();
-}
-
-void USettingsMenuWidget_AudioAnalyzer::HideSongPathErrorMessage()
-{
-	PopupMessageWidget->FadeOut();
 }

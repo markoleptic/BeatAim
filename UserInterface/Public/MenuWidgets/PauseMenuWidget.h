@@ -85,8 +85,9 @@ private:
 
 	UFUNCTION()
 	void SetQuitMenuButtonsInActive();
-	UFUNCTION()
+
 	void OnButtonClicked_BSButton(const UBSButton* Button);
+
 	UFUNCTION()
 	void OnButtonClicked_RestartCurrentMode();
 };

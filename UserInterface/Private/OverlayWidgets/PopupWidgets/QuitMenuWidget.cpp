@@ -14,21 +14,21 @@ void UQuitMenuWidget::NativeConstruct()
 	if (bIsPostGameMenuChild)
 	{
 		bShouldSaveScores = false;
-		Button_QuitMainMenu->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-		Button_QuitDesktop->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-		Button_QuitBack->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
+		Button_QuitMainMenu->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+		Button_QuitDesktop->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+		Button_QuitBack->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 	}
 	else
 	{
-		Button_QuitMainMenu->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-		Button_QuitDesktop->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-		Button_QuitBack->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-		Button_QuitAndSave->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-		Button_QuitWithoutSave->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-		Button_SaveBack->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-		Button_RestartAndSave->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-		Button_RestartWithoutSave->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-		Button_RestartBack->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
+		Button_QuitMainMenu->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+		Button_QuitDesktop->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+		Button_QuitBack->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+		Button_QuitAndSave->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+		Button_QuitWithoutSave->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+		Button_SaveBack->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+		Button_RestartAndSave->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+		Button_RestartWithoutSave->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+		Button_RestartBack->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 	}
 }
 

@@ -92,8 +92,9 @@ protected:
 
 	UFUNCTION()
 	void SetScoresWidgetVisibility();
-	UFUNCTION()
+
 	void OnButtonClicked_BSButton(const UBSButton* Button);
+
 	UFUNCTION()
 	void SetQuitMenuButtonsInActive();
 };

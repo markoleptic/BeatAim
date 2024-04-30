@@ -22,7 +22,8 @@ class UBSButton;
 
 /** Settings category widget holding CrossHair settings */
 UCLASS()
-class USERINTERFACE_API USettingsMenuWidget_CrossHair : public UBSSettingCategoryWidget, public IBSPlayerSettingsInterface
+class USERINTERFACE_API USettingsMenuWidget_CrossHair : public UBSSettingCategoryWidget,
+                                                        public IBSPlayerSettingsInterface
 {
 	GENERATED_BODY()
 
@@ -88,7 +89,7 @@ private:
 	void OnButtonClicked_Revert();
 	UFUNCTION()
 	void OnButtonClicked_Save();
-	UFUNCTION()
+
 	void OnButtonClicked_BSButton(const UBSButton* Button);
 
 	/** Fills out all CrossHair Settings given PlayerSettings */

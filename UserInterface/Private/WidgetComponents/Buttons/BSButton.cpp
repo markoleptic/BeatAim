@@ -108,26 +108,11 @@ void UBSButton::SetWrapTextAt(const int32 InWrapTextAt)
 void UBSButton::OnPressed_Button()
 {
 	bIsClicked = true;
-	if (OnBSButtonPressed.IsBound())
-	{
-		OnBSButtonPressed.Broadcast(this);
-	}
-	if (OnBSButtonButtonPressed_NoParams.IsBound())
-	{
-		OnBSButtonButtonPressed_NoParams.Broadcast();
-	}
-	if (OnBSButtonButtonPressed_NonDynamic.IsBound())
-	{
-		OnBSButtonButtonPressed_NonDynamic.Broadcast();
-	}
+	OnBSButtonPressed.Broadcast(this);
 	PlayAnim_OnPressed();
 	UBSButton* Head = GetNext();
-	while (Head != this)
+	while (Head && Head != this)
 	{
-		if (!Head)
-		{
-			return;
-		}
 		Head->SetInActive();
 		Head = Head->GetNext();
 	}

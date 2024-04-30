@@ -56,8 +56,8 @@ protected:
 	UWidgetAnimation* FadeOutResponse;
 
 private:
-	UFUNCTION()
 	void OnButtonClicked_BSButton(const UBSButton* Button);
+
 	UFUNCTION()
 	void OnTextCommitted_Title(const FText& NewTitle, ETextCommit::Type CommitType);
 	UFUNCTION()

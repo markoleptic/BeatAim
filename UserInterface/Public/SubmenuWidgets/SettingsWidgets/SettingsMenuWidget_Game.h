@@ -117,7 +117,6 @@ protected:
 
 	void OnSliderTextBoxValueChanged(USliderTextBoxOptionWidget* Widget, const float Value);
 
-	UFUNCTION()
 	void OnButtonClicked_BSButton(const UBSButton* Button);
 
 	void OnButtonClicked_Save();

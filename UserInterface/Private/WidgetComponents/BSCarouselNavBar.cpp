@@ -12,7 +12,7 @@
 void UBSCarouselNavBar::SetLinkedCarousel(UCommonWidgetCarousel* CommonCarousel)
 {
 	if (LinkedCarousel) LinkedCarousel->OnCurrentPageIndexChanged.RemoveAll(this);
-	
+
 	LinkedCarousel = CommonCarousel;
 
 	if (LinkedCarousel)
@@ -26,10 +26,10 @@ void UBSCarouselNavBar::SetLinkedCarousel(UCommonWidgetCarousel* CommonCarousel)
 void UBSCarouselNavBar::UpdateNotifications(const int32 Index, const int32 NumCautions, const int32 NumWarnings)
 {
 	if (!Buttons.IsValidIndex(Index)) return;
-	
+
 	UNotificationButtonCombo* Button = Cast<UNotificationButtonCombo>(Buttons[Index]);
 	if (!Button) return;
-	
+
 	Button->SetNumWarnings(NumWarnings);
 	Button->SetNumCautions(NumCautions);
 }
@@ -75,34 +75,31 @@ void UBSCarouselNavBar::RebuildButtons()
 	{
 		Style = IBSWidgetInterface::GetStyleCDO(StyleClass);
 	}
-	
+
 	if (!Style) return;
 
 	MyContainer->ClearChildren();
-	
+
 	const int32 NumPages = LinkedCarousel->GetChildrenCount();
 	const int32 NumButtonStyles = Style->ButtonStyles.Num();
-	
+
 	check(NumPages == NumButtonStyles);
 	if (NumPages <= 0) return;
-	
+
 	for (int32 CurPage = 0; CurPage < NumPages; CurPage++)
 	{
 		UBSButton* ButtonUserWidget = Cast<UBSButton>(CreateWidget(GetOwningPlayer(), Style->ButtonWidgetType));
 		if (!ButtonUserWidget) continue;
-		
+
 		auto [Text, Padding, HAlign, VAlign, bFillWidth, FillWidth] = Style->ButtonStyles[CurPage];
 
 		Buttons.Add(ButtonUserWidget);
 		TSharedRef<SWidget> ButtonSWidget = ButtonUserWidget->TakeWidget();
-		
+
 		ButtonUserWidget->SetButtonText(Text);
 
-		MyContainer->AddSlot()
-			.HAlign(HAlign).VAlign(VAlign)
-			.Padding(Padding)
-			[ButtonSWidget];
-		
+		MyContainer->AddSlot().HAlign(HAlign).VAlign(VAlign).Padding(Padding)[ButtonSWidget];
+
 		if (bFillWidth)
 		{
 			MyContainer->GetSlot(CurPage).SetFillWidth(FillWidth);
@@ -112,22 +109,22 @@ void UBSCarouselNavBar::RebuildButtons()
 			MyContainer->GetSlot(CurPage).SetAutoWidth();
 		}
 	}
-	
-	
+
+
 	for (int32 CurPage = 0; CurPage < LinkedCarousel->GetChildrenCount(); CurPage++)
 	{
 		const int32 NextPage = CurPage + 1;
-		
+
 		// Bind button clicking to function, link buttons together to deactivate when not clicked
 		if (Buttons.IsValidIndex(CurPage))
 		{
-			Buttons[CurPage]->OnBSButtonPressed.AddDynamic(this, &UBSCarouselNavBar::HandleButtonClicked);
-			
+			Buttons[CurPage]->OnBSButtonPressed.AddUObject(this, &UBSCarouselNavBar::HandleButtonClicked);
+
 			if (Buttons.IsValidIndex(NextPage)) Buttons[CurPage]->SetDefaults(CurPage, Buttons[NextPage]);
-			
+
 			UNotificationButtonCombo* Button = Cast<UNotificationButtonCombo>(Buttons[CurPage]);
 			if (!Button) continue;
-			
+
 			// Default to 0 warnings and cautions
 			Button->SetNumCautions(0);
 			Button->SetNumWarnings(0);

@@ -109,8 +109,8 @@ protected:
 
 	static void LaunchRegisterURL() { UKismetSystemLibrary::LaunchURL("https://beatshot.gg/register"); }
 
-	UFUNCTION()
 	void OnButtonClicked_BSButton(const UBSButton* Button);
+
 	UFUNCTION()
 	void LoginButtonClicked();
 

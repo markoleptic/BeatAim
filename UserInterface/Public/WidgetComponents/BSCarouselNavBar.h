@@ -22,7 +22,7 @@ public:
 
 	UPROPERTY()
 	const UCarouselNavButtonStyle* Style;
-	
+
 	/**
 	 * Establishes the Widget Carousel instance that this Nav Bar should interact with
 	 * @param CommonCarousel The carousel that this nav bar should be associated with and manipulate
@@ -40,7 +40,6 @@ protected:
 	UFUNCTION()
 	void HandlePageChanged(UCommonWidgetCarousel* CommonCarousel, int32 PageIndex);
 
-	UFUNCTION()
 	void HandleButtonClicked(const UBSButton* AssociatedButton);
 
 	// UWidget interface

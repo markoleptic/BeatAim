@@ -17,12 +17,12 @@ void UFeedbackWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	Button_SubmitFeedback->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	Button_Back->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	Button_Okay->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_SubmitFeedback->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_Back->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_Okay->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 
-	Button_BugReport->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	Button_Feedback->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_BugReport->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_Feedback->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 	Button_BugReport->SetDefaults(0, Button_Feedback);
 	Button_Feedback->SetDefaults(1, Button_BugReport);
 
@@ -57,20 +57,20 @@ void UFeedbackWidget::OnButtonClicked_BSButton(const UBSButton* Button)
 		{
 			if (Response->bConnectedSuccessfully && Response->HttpStatus <= 300)
 			{
-				TextBlock_FeedbackResponseTitle->SetText(FText::FromStringTable("/Game/StringTables/ST_Widgets.ST_Widgets",
-					"FeedbackResponseSuccessTitle"));
-				TextBlock_FeedbackResponseInfo->SetText(FText::FromStringTable("/Game/StringTables/ST_Widgets.ST_Widgets",
-					"FeedbackResponseSuccessInfo"));
+				TextBlock_FeedbackResponseTitle->SetText(
+					FText::FromStringTable("/Game/StringTables/ST_Widgets.ST_Widgets", "FeedbackResponseSuccessTitle"));
+				TextBlock_FeedbackResponseInfo->SetText(
+					FText::FromStringTable("/Game/StringTables/ST_Widgets.ST_Widgets", "FeedbackResponseSuccessInfo"));
 				Value_Title->SetText(FText::GetEmpty());
 				Value_Content->SetText(FText::GetEmpty());
 				Button_SubmitFeedback->SetIsEnabled(false);
 			}
 			else
 			{
-				TextBlock_FeedbackResponseTitle->SetText(FText::FromStringTable("/Game/StringTables/ST_Widgets.ST_Widgets",
-					"FeedbackResponseFailureTitle"));
-				TextBlock_FeedbackResponseInfo->SetText(FText::FromStringTable("/Game/StringTables/ST_Widgets.ST_Widgets",
-					"FeedbackResponseFailureInfo"));
+				TextBlock_FeedbackResponseTitle->SetText(
+					FText::FromStringTable("/Game/StringTables/ST_Widgets.ST_Widgets", "FeedbackResponseFailureTitle"));
+				TextBlock_FeedbackResponseInfo->SetText(
+					FText::FromStringTable("/Game/StringTables/ST_Widgets.ST_Widgets", "FeedbackResponseFailureInfo"));
 			}
 			PlayFadeInResponse();
 		});
@@ -84,7 +84,7 @@ void UFeedbackWidget::OnButtonClicked_BSButton(const UBSButton* Button)
 			UnbindFromAnimationFinished(FadeOutResponse, FadeOutResponseDelegate);
 			FadeOutResponseDelegate.Unbind();
 		}
-		
+
 		if (Value_Title->GetText().IsEmpty() && Value_Content->GetText().IsEmpty())
 		{
 			FadeOutResponseDelegate.BindDynamic(this, &ThisClass::SetCollapsedAndUnbindDelegates);
@@ -94,7 +94,7 @@ void UFeedbackWidget::OnButtonClicked_BSButton(const UBSButton* Button)
 			FadeOutResponseDelegate.BindDynamic(this, &ThisClass::PlayFadeIn);
 		}
 		BindToAnimationFinished(FadeOutResponse, FadeOutResponseDelegate);
-		
+
 		PlayFadeOutResponse();
 	}
 	else if (Button == Button_Back)

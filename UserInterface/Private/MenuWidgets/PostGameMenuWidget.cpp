@@ -22,12 +22,12 @@ void UPostGameMenuWidget::NativeConstruct()
 	MenuButton_FAQ->SetDefaults(Box_FAQ, MenuButton_Quit);
 	MenuButton_Quit->SetDefaults(nullptr, MenuButton_Scores);
 
-	MenuButton_Scores->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	MenuButton_PlayAgain->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	MenuButton_GameModes->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	MenuButton_Settings->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	MenuButton_FAQ->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	MenuButton_Quit->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
+	MenuButton_Scores->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	MenuButton_PlayAgain->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	MenuButton_GameModes->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	MenuButton_Settings->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	MenuButton_FAQ->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	MenuButton_Quit->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 
 	QuitMenuWidget->OnExitQuitMenu.BindDynamic(this, &ThisClass::UPostGameMenuWidget::SetQuitMenuButtonsInActive);
 	FadeInWidgetDelegate.BindDynamic(this, &UPostGameMenuWidget::SetScoresWidgetVisibility);
@@ -84,13 +84,13 @@ void UPostGameMenuWidget::OnButtonClicked_BSButton(const UBSButton* Button)
 {
 	const UMenuButton* MenuButton = Cast<UMenuButton>(Button);
 	if (!MenuButton) return;
-	
+
 	// Always stop the game mode preview if game modes widget is not visible
 	if (MenuButton != MenuButton_GameModes)
 	{
 		GameModesWidget->StopGameModePreview();
 	}
-	
+
 	if (Button == MenuButton_Quit)
 	{
 		QuitMenuWidget->SetVisibility(ESlateVisibility::Visible);

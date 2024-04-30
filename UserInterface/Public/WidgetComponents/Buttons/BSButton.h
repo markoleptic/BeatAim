@@ -12,12 +12,7 @@ class UImage;
 class UButton;
 class UMaterialInstanceDynamic;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBSButtonButtonPressed, const UBSButton*, BSButton);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBSButtonButtonPressed_NoParams);
-
-DECLARE_MULTICAST_DELEGATE(FOnBSButtonButtonPressed_NonDynamic);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPressedAnimFinished);
+DECLARE_MULTICAST_DELEGATE(FOnPressedAnimFinished);
 
 /** The base button used for BeatShot user interface. \n \n \b- Supports mutually exclusive buttons being "active" at once using pointers to other buttons and the SetActive and SetInActive functions, but can also
  *  be used for buttons not mutually exclusive if RestoreClickedButtonState is set to true. \n \b- ImageMaterial is expected to be a material instance with parameters that change the material when pressed or
@@ -59,16 +54,10 @@ public:
 	void SetWrapTextAt(const int32 InWrapTextAt);
 
 	/** Broadcast when the button is pressed */
-	FOnBSButtonButtonPressed OnBSButtonPressed;
-
-	/** Broadcast when the button is pressed */
-	FOnBSButtonButtonPressed_NoParams OnBSButtonButtonPressed_NoParams;
-
-	/** Broadcast when the button is pressed */
-	FOnBSButtonButtonPressed_NonDynamic OnBSButtonButtonPressed_NonDynamic;
+	TMulticastDelegate<void(const UBSButton*)> OnBSButtonPressed;
 
 	/** Broadcast when the pressed animation is finished */
-	FOnPressedAnimFinished OnPressedAnimFinished;
+	TMulticastDelegate<void()> OnPressedAnimFinished;
 
 protected:
 	/** Sets the value of bHasSetDefaults */
@@ -93,7 +82,7 @@ protected:
 	/** Name of the Pressed scalar material parameter for the ImageMaterial */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BSButton|Widgets|Image")
 	FName PressedScalarParameterName = "Pressed";
-	
+
 	/** Dynamic material instance of the ImageMaterial */
 	UPROPERTY(BlueprintReadOnly, Category = "BSButton|Widgets|Image")
 	UMaterialInstanceDynamic* DynamicImageMaterial;

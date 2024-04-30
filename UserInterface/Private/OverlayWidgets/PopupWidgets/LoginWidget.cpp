@@ -12,17 +12,17 @@ void ULoginWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	Button_RetrySteamLogin->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	Button_FromSteam_ToLegacyLogin->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	Button_NoSteamLogin->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_RetrySteamLogin->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_FromSteam_ToLegacyLogin->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_NoSteamLogin->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 
-	Button_Login->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	Button_NoLogin->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	Button_Register->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	Button_FromLogin_ToSteam->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_Login->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_NoLogin->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_Register->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_FromLogin_ToSteam->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 
-	Button_NoLoginCancel->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	Button_NoLoginConfirm->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_NoLoginCancel->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_NoLoginConfirm->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 
 	Value_UsernameEmail->OnTextChanged.AddDynamic(this, &ULoginWidget::ClearErrorText);
 	Value_Password->OnTextChanged.AddDynamic(this, &ULoginWidget::ClearErrorText);

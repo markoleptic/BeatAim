@@ -28,9 +28,9 @@ void USettingsMenuWidget_Input::NativeConstruct()
 	MenuOption_NewSensitivityCsgo->OnSliderTextBoxValueChanged.
 	                               AddUObject(this, &ThisClass::OnSliderTextBoxValueChanged);
 
-	Button_Reset->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	Button_Revert->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	Button_Save->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_Reset->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_Revert->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_Save->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 
 	Button_Reset->SetDefaults(static_cast<uint8>(ESettingButtonType::Reset));
 	Button_Revert->SetDefaults(static_cast<uint8>(ESettingButtonType::Revert));

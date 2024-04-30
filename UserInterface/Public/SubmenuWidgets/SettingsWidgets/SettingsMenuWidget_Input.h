@@ -81,14 +81,16 @@ protected:
 
 	void OnSliderTextBoxValueChanged(USliderTextBoxOptionWidget* Widget, const float Value);
 
-	UFUNCTION()
 	void OnButtonClicked_BSButton(const UBSButton* Button);
+
 	void OnButtonClicked_Save();
+
 	void OnButtonClicked_Reset();
+
 	void OnButtonClicked_Revert();
 
 	float Sensitivity;
-	
+
 	TMap<FName, FKeyMappingRow> InitialPlayerMappingRows;
 	UPROPERTY()
 	TMap<FName, UInputMappingWidget*> InputMappingWidgetMap;

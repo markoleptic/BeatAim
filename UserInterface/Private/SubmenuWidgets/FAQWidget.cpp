@@ -14,9 +14,9 @@ void UFAQWidget::NativeConstruct()
 	MenuButton_Scoring->SetDefaults(Box_Scoring, MenuButton_AudioAnalyzer);
 	MenuButton_AudioAnalyzer->SetDefaults(Box_AudioAnalyzer, MenuButton_GameModes);
 
-	MenuButton_GameModes->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	MenuButton_Scoring->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	MenuButton_AudioAnalyzer->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
+	MenuButton_GameModes->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	MenuButton_Scoring->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	MenuButton_AudioAnalyzer->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 
 	MenuButton_GameModes->SetActive();
 }

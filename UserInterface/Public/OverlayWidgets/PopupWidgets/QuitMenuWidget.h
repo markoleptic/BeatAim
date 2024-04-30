@@ -104,7 +104,6 @@ protected:
 	FWidgetAnimationDynamicEvent FadeOutWidgetDelegate;
 
 private:
-	UFUNCTION()
 	void OnButtonClicked_BSButton(const UBSButton* Button);
 
 	/** Fades in the MenuOverlay */

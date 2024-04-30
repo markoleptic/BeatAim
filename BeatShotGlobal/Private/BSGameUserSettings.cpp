@@ -703,28 +703,28 @@ void UBSGameUserSettings::SetOverallVolume(const float InVolume)
 {
 	OverallVolume = InVolume;
 	SetVolumeForControlBus(TEXT("Overall"), OverallVolume);
-	SaveSettings();
+	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetMenuVolume(const float InVolume)
 {
 	MenuVolume = InVolume;
 	SetVolumeForControlBus(TEXT("Menu"), MenuVolume);
-	SaveSettings();
+	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetMusicVolume(const float InVolume)
 {
 	MusicVolume = InVolume;
 	SetVolumeForControlBus(TEXT("Music"), MusicVolume);
-	SaveSettings();
+	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetSoundFXVolume(const float InVolume)
 {
 	SoundFXVolume = InVolume;
 	SetVolumeForControlBus(TEXT("SoundFX"), SoundFXVolume);
-	SaveSettings();
+	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetAntiAliasingMethod(const uint8 InAntiAliasingMethod)
@@ -741,38 +741,38 @@ void UBSGameUserSettings::SetAntiAliasingMethod(const uint8 InAntiAliasingMethod
 		GConfig->SetString(TEXT("/Script/Engine.RendererSettings"), TEXT("r.AntiAliasingMethod"), *Value, GEngineIni);
 		GConfig->Flush(false, GEngineIni);
 	}
-	SaveSettings();
+	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetBrightness(const float InBrightness)
 {
 	Brightness = FMath::Clamp(InBrightness, Constants::MinValue_Brightness, Constants::MaxValue_Brightness);
-	SaveSettings();
+	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetDisplayGamma(const float InGamma)
 {
 	DisplayGamma = FMath::Clamp(InGamma, Constants::MinValue_DisplayGamma, Constants::MaxValue_DisplayGamma);
 	ApplyDisplayGamma(DisplayGamma);
-	SaveSettings();
+	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetFrameRateLimitMenu(const int32 InFrameRateLimitMenu)
 {
 	FrameRateLimitMenu = InFrameRateLimitMenu;
-	SaveSettings();
+	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetFrameRateLimitGame(const int32 InFrameRateLimitGame)
 {
 	FrameRateLimitGame = InFrameRateLimitGame;
-	SaveSettings();
+	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetFrameRateLimitBackground(const int32 InFrameRateLimitBackground)
 {
 	FrameRateLimitBackground = InFrameRateLimitBackground;
-	SaveSettings();
+	//SaveSettings();
 }
 
 void UBSGameUserSettings::SetResolutionScaleChecked(const float InResolutionScale)

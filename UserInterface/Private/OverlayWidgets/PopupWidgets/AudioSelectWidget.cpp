@@ -20,6 +20,7 @@
 #define MAX_FILENAME_STR 65536 // This buffer has to be big enough to contain the names of all the selected files as well as the null characters between them and the null character at the end
 
 
+
 UTooltipWidget* UAudioSelectWidget::ConstructTooltipWidget()
 {
 	return CreateWidget<UTooltipWidget>(this, TooltipWidgetClass);
@@ -39,18 +40,18 @@ void UAudioSelectWidget::NativeConstruct()
 	NumberFormattingOptions.MinimumIntegralDigits = 2;
 	NumberFormattingOptions.MaximumIntegralDigits = 2;
 
-	Button_Back->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonPressed_BSButton);
+	Button_Back->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonPressed_BSButton);
 
 	Button_Start->SetIsEnabled(false);
 	Button_LoadFile->SetIsEnabled(false);
 	Button_CaptureAudio->SetDefaults(static_cast<uint8>(EAudioFormat::Capture), Button_AudioFromFile);
 	Button_AudioFromFile->SetDefaults(static_cast<uint8>(EAudioFormat::File), Button_CaptureAudio);
-	Button_LoadFile->OnPressedAnimFinished.AddDynamic(this, &ThisClass::OnButtonClicked_LoadFile);
+	Button_LoadFile->OnPressedAnimFinished.AddUObject(this, &ThisClass::OnButtonClicked_LoadFile);
 
-	Button_Start->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonPressed_BSButton);
-	Button_LoadFile->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonPressed_BSButton);
-	Button_AudioFromFile->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonPressed_BSButton);
-	Button_CaptureAudio->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonPressed_BSButton);
+	Button_Start->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonPressed_BSButton);
+	Button_LoadFile->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonPressed_BSButton);
+	Button_AudioFromFile->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonPressed_BSButton);
+	Button_CaptureAudio->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonPressed_BSButton);
 
 	Value_SongTitle->OnTextCommitted.AddUniqueDynamic(this, &UAudioSelectWidget::OnValueChanged_SongTitle);
 	Value_Seconds->OnTextCommitted.AddUniqueDynamic(this, &UAudioSelectWidget::OnValueChanged_Seconds);
@@ -330,6 +331,8 @@ bool UAudioSelectWidget::FileDialogShared(bool bSave, const void* ParentWindowHa
 	const FString& DefaultPath, const FString& DefaultFile, const FString& FileTypes, uint32 Flags,
 	TArray<FString>& OutFilenames, int32& OutFilterIndex)
 {
+	bool bSuccess;
+
 	#if PLATFORM_WINDOWS
 	WCHAR Filename[MAX_FILENAME_STR];
 	FCString::Strcpy(Filename, MAX_FILENAME_STR, *(DefaultFile.Replace(TEXT("/"), TEXT("\\"))));
@@ -412,7 +415,6 @@ bool UAudioSelectWidget::FileDialogShared(bool bSave, const void* ParentWindowHa
 		ofn.Flags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 	}
 
-	bool bSuccess;
 	if (bSave)
 	{
 		bSuccess = !!::GetSaveFileName(&ofn);
@@ -461,11 +463,9 @@ bool UAudioSelectWidget::FileDialogShared(bool bSave, const void* ParentWindowHa
 			//UE_LOG(LogDesktopPlatform, Warning, TEXT("Error reading results of file dialog. Error: 0x%04X"), Error);
 		}
 	}
-
-	return bSuccess;
 	#endif
 
-	return false;
+	return bSuccess;
 }
 
 void UAudioSelectWidget::ShowSongPathErrorMessage()
@@ -473,17 +473,18 @@ void UAudioSelectWidget::ShowSongPathErrorMessage()
 	PopupMessageWidget = CreateWidget<UPopupMessageWidget>(GetWorld(), PopupMessageClass);
 	TArray<UBSButton*> Buttons = PopupMessageWidget->InitPopup(GetWidgetTextFromKey("ASW_SongPathErrorTitle"),
 		GetWidgetTextFromKey("ASW_SongPathErrorMessage"), 1);
-	if (Buttons[0])
+	if (!Buttons.IsEmpty())
 	{
 		Buttons[0]->SetButtonText(GetWidgetTextFromKey("ASW_SongPathErrorButton"));
-		Buttons[0]->OnBSButtonButtonPressed_NoParams.AddDynamic(this, &UAudioSelectWidget::HideSongPathErrorMessage);
+		Buttons[0]->OnBSButtonPressed.AddLambda([this](const UBSButton* /*Button*/)
+		{
+			if (PopupMessageWidget)
+			{
+				PopupMessageWidget->FadeOut();
+				FadeOut();
+			}
+		});
 	}
 	PopupMessageWidget->AddToViewport();
 	PopupMessageWidget->FadeIn();
-}
-
-void UAudioSelectWidget::HideSongPathErrorMessage()
-{
-	PopupMessageWidget->FadeOut();
-	FadeOut();
 }

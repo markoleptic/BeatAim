@@ -156,8 +156,8 @@ void USettingsMenuWidget_VideoAndSound::NativeConstruct()
 	EditableTextBoxOption_FPSLimitMenu->EditableTextBox->SetJustification(ETextJustify::Type::Center);
 	EditableTextBoxOption_FPSLimitBackground->EditableTextBox->SetJustification(ETextJustify::Type::Center);
 
-	Button_Reset->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnBSButtonPressed_SaveReset);
-	Button_Save->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnBSButtonPressed_SaveReset);
+	Button_Reset->OnBSButtonPressed.AddUObject(this, &ThisClass::OnBSButtonPressed_SaveReset);
+	Button_Save->OnBSButtonPressed.AddUObject(this, &ThisClass::OnBSButtonPressed_SaveReset);
 
 	Button_Reset->SetDefaults(static_cast<uint8>(ESettingButtonType::Reset));
 	Button_Save->SetDefaults(static_cast<uint8>(ESettingButtonType::Save));
@@ -774,13 +774,13 @@ void USettingsMenuWidget_VideoAndSound::ShowConfirmVideoSettingsMessage()
 		if (Buttons[0])
 		{
 			Buttons[0]->SetButtonText(GetWidgetTextFromKey("ConfirmVideoSettingsPopupButton2"));
-			Buttons[0]->OnBSButtonButtonPressed_NoParams.AddDynamic(this,
+			Buttons[0]->OnBSButtonPressed.AddUObject(this,
 				&USettingsMenuWidget_VideoAndSound::OnButtonPressed_CancelVideoSettings);
 		}
 		if (Buttons[1])
 		{
 			Buttons[1]->SetButtonText(GetWidgetTextFromKey("ConfirmVideoSettingsPopupButton1"));
-			Buttons[1]->OnBSButtonButtonPressed_NoParams.AddDynamic(this,
+			Buttons[1]->OnBSButtonPressed.AddUObject(this,
 				&USettingsMenuWidget_VideoAndSound::OnButtonPressed_ConfirmVideoSettings);
 		}
 		GetWorld()->GetTimerManager().SetTimer(RevertVideoSettingsTimer_UpdateSecond, this,
@@ -791,7 +791,7 @@ void USettingsMenuWidget_VideoAndSound::ShowConfirmVideoSettingsMessage()
 	PopupMessageWidget->FadeIn();
 }
 
-void USettingsMenuWidget_VideoAndSound::OnButtonPressed_ConfirmVideoSettings()
+void USettingsMenuWidget_VideoAndSound::OnButtonPressed_ConfirmVideoSettings(const UBSButton* /*Button*/)
 {
 	GetWorld()->GetTimerManager().ClearTimer(RevertVideoSettingsTimer_UpdateSecond);
 	GetWorld()->GetTimerManager().ClearTimer(RevertVideoSettingsTimer);
@@ -814,7 +814,7 @@ void USettingsMenuWidget_VideoAndSound::OnButtonPressed_ConfirmVideoSettings()
 	SavedTextWidget->PlayFadeInFadeOut();
 }
 
-void USettingsMenuWidget_VideoAndSound::OnButtonPressed_CancelVideoSettings()
+void USettingsMenuWidget_VideoAndSound::OnButtonPressed_CancelVideoSettings(const UBSButton* /*Button*/)
 {
 	GetWorld()->GetTimerManager().ClearTimer(RevertVideoSettingsTimer_UpdateSecond);
 	GetWorld()->GetTimerManager().ClearTimer(RevertVideoSettingsTimer);
@@ -855,7 +855,7 @@ void USettingsMenuWidget_VideoAndSound::RevertVideoSettingsTimerCallback()
 	const float Elapsed = GetWorld()->GetTimerManager().GetTimerElapsed(RevertVideoSettingsTimer);
 	if (Elapsed >= VideoSettingsTimeoutLength || Elapsed == -1.f)
 	{
-		OnButtonPressed_CancelVideoSettings();
+		OnButtonPressed_CancelVideoSettings(nullptr);
 		return;
 	}
 	TArray<FString> Out;

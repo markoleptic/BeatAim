@@ -139,12 +139,11 @@ private:
 	void ShowConfirmVideoSettingsMessage();
 
 	/** Stops the RevertVideoSettingsTimer and applies the video settings and closes the ConfirmVideoSettingsMessage */
-	UFUNCTION()
-	void OnButtonPressed_ConfirmVideoSettings();
+	void OnButtonPressed_ConfirmVideoSettings(const UBSButton* Button);
 
 	/** Reverts the video settings and closes the ConfirmVideoSettingsMessage */
 	UFUNCTION()
-	void OnButtonPressed_CancelVideoSettings();
+	void OnButtonPressed_CancelVideoSettings(const UBSButton* Button);
 
 	/** Saves the Video and Sound Settings */
 	UFUNCTION()

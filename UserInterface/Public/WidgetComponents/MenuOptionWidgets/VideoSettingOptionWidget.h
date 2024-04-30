@@ -24,7 +24,6 @@ public:
 	virtual void SetStyling() override;
 
 	/** Changes video settings quality depending on input button */
-	UFUNCTION()
 	void OnBSButtonPressed_VideoQuality(const UBSButton* Button);
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))

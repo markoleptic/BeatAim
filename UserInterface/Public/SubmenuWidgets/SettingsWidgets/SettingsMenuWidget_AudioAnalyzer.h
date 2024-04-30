@@ -20,7 +20,8 @@ DECLARE_DELEGATE(FOnRestartButtonClicked);
 
 /** Settings category widget holding AudioAnalyzer settings */
 UCLASS()
-class USERINTERFACE_API USettingsMenuWidget_AudioAnalyzer : public UBSSettingCategoryWidget, public IBSPlayerSettingsInterface
+class USERINTERFACE_API USettingsMenuWidget_AudioAnalyzer : public UBSSettingCategoryWidget,
+                                                            public IBSPlayerSettingsInterface
 {
 	GENERATED_BODY()
 
@@ -89,7 +90,7 @@ protected:
 
 	UFUNCTION()
 	void OnSelectionChanged_NumBandChannels(const TArray<FString>& SelectedOptions, ESelectInfo::Type SelectionType);
-	UFUNCTION()
+
 	void OnButtonClicked_BSButton(const UBSButton* Button);
 
 	/** Update values in Settings Menu to match AASettings */
@@ -105,8 +106,4 @@ protected:
 
 	/** Adds a popup message to the viewport displaying the error */
 	void ShowBandLimitErrorMessage();
-
-	/** Hides the error message */
-	UFUNCTION()
-	void HideSongPathErrorMessage();
 };

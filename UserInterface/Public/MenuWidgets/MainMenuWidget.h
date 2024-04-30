@@ -39,7 +39,8 @@ DECLARE_DELEGATE(FOnSteamLoginRequest);
 
 /** Widget that is the entry point into the game, holding most other widgets that aren't MenuWidgets */
 UCLASS()
-class USERINTERFACE_API UMainMenuWidget : public UUserWidget, public IBSPlayerSettingsInterface, public IHttpRequestInterface
+class USERINTERFACE_API UMainMenuWidget : public UUserWidget, public IBSPlayerSettingsInterface,
+                                          public IHttpRequestInterface
 {
 	GENERATED_BODY()
 
@@ -126,9 +127,7 @@ protected:
 	UTextBlock* TextBlock_Username;
 
 private:
-	UFUNCTION()
 	void OnMenuButtonClicked_BSButton(const UBSButton* Button);
-	UFUNCTION()
 	void OnButtonClicked_BSButton(const UBSButton* Button);
 	UFUNCTION()
 	void OnButtonClicked_Login(const FLoginPayload LoginPayload);

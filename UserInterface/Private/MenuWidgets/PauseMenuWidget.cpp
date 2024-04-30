@@ -20,11 +20,11 @@ void UPauseMenuWidget::NativeConstruct()
 	MenuButton_RestartCurrentMode->SetDefaults(Box_PauseScreen, MenuButton_Quit);
 	MenuButton_Quit->SetDefaults(Box_PauseScreen, MenuButton_Resume);
 
-	MenuButton_Resume->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	MenuButton_Settings->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	MenuButton_FAQ->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	MenuButton_RestartCurrentMode->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	MenuButton_Quit->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
+	MenuButton_Resume->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	MenuButton_Settings->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	MenuButton_FAQ->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	MenuButton_RestartCurrentMode->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	MenuButton_Quit->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 
 	QuitMenuWidget->OnExitQuitMenu.BindUFunction(this, "SetQuitMenuButtonsInActive");
 	SettingsMenuWidget->OnRestartButtonClicked.BindUFunction(this, "OnButtonClicked_RestartCurrentMode");

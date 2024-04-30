@@ -19,7 +19,7 @@ void UMainMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	Button_Login_Register->SetVisibility(ESlateVisibility::Collapsed);
-	
+
 	SetStyles();
 
 	ScoresWidget->OnURLChangedResult.AddUObject(this, &UMainMenuWidget::OnURLChangedResult_ScoresWidget);
@@ -30,8 +30,8 @@ void UMainMenuWidget::NativeConstruct()
 	FeedbackWidget->OnExitAnimationCompletedDelegate.AddUObject(this, &ThisClass::OnWidgetExitAnimationCompleted,
 		Button_Feedback);
 
-	LoginWidget->Button_RetrySteamLogin->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
-	Button_Login_Register->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnButtonClicked_BSButton);
+	LoginWidget->Button_RetrySteamLogin->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
+	Button_Login_Register->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 
 	MenuButton_PatchNotes->SetDefaults(Box_PatchNotes, MenuButton_GameModes);
 	MenuButton_GameModes->SetDefaults(Box_GameModes, MenuButton_Scores);
@@ -40,15 +40,15 @@ void UMainMenuWidget::NativeConstruct()
 	MenuButton_FAQ->SetDefaults(Box_FAQ, Button_Feedback);
 	Button_Feedback->SetDefaults(nullptr, MenuButton_Quit);
 	MenuButton_Quit->SetDefaults(Box_PatchNotes, MenuButton_PatchNotes);
-	
-	MenuButton_PatchNotes->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnMenuButtonClicked_BSButton);
-	MenuButton_GameModes->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnMenuButtonClicked_BSButton);
-	MenuButton_Scores->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnMenuButtonClicked_BSButton);
-	MenuButton_Settings->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnMenuButtonClicked_BSButton);
-	MenuButton_FAQ->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnMenuButtonClicked_BSButton);
-	Button_Feedback->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnMenuButtonClicked_BSButton);
-	MenuButton_Quit->OnBSButtonPressed.AddDynamic(this, &ThisClass::OnMenuButtonClicked_BSButton);
-	
+
+	MenuButton_PatchNotes->OnBSButtonPressed.AddUObject(this, &ThisClass::OnMenuButtonClicked_BSButton);
+	MenuButton_GameModes->OnBSButtonPressed.AddUObject(this, &ThisClass::OnMenuButtonClicked_BSButton);
+	MenuButton_Scores->OnBSButtonPressed.AddUObject(this, &ThisClass::OnMenuButtonClicked_BSButton);
+	MenuButton_Settings->OnBSButtonPressed.AddUObject(this, &ThisClass::OnMenuButtonClicked_BSButton);
+	MenuButton_FAQ->OnBSButtonPressed.AddUObject(this, &ThisClass::OnMenuButtonClicked_BSButton);
+	Button_Feedback->OnBSButtonPressed.AddUObject(this, &ThisClass::OnMenuButtonClicked_BSButton);
+	MenuButton_Quit->OnBSButtonPressed.AddUObject(this, &ThisClass::OnMenuButtonClicked_BSButton);
+
 	WebBrowserOverlayPatchNotes->InitScoreBrowser(EScoreBrowserType::PatchNotes);
 	ScoresWidget->InitScoreBrowser(EScoreBrowserType::MainMenuScores);
 	MenuButton_PatchNotes->SetActive();
@@ -225,37 +225,36 @@ void UMainMenuWidget::OnButtonClicked_Login(const FLoginPayload LoginPayload)
 	CurrentLoginMethod = ELoginMethod::Legacy;
 	TSharedPtr<FLoginResponse> LoginResponse(new FLoginResponse);
 	LoginResponse->OnHttpResponseReceived.BindLambda([this, LoginResponse, LoginPayload]
+	{
+		if (LoginResponse->HttpStatus != 200)
 		{
-			if (LoginResponse->HttpStatus != 200)
+			if (LoginResponse->HttpStatus == 401)
 			{
-				if (LoginResponse->HttpStatus  == 401)
-				{
-					LoginWidget->ShowLoginScreen("Login_InvalidCredentialsText");
-				}
-				else if (LoginResponse->HttpStatus == 408 || LoginResponse->HttpStatus == 504)
-				{
-					LoginWidget->ShowLoginScreen("Login_TimeOutErrorText");
-				}
-				else
-				{
-					LoginWidget->ShowLoginScreen("Login_LoginErrorText");
-				}
-				UpdateLoginState(false);
+				LoginWidget->ShowLoginScreen("Login_InvalidCredentialsText");
+			}
+			else if (LoginResponse->HttpStatus == 408 || LoginResponse->HttpStatus == 504)
+			{
+				LoginWidget->ShowLoginScreen("Login_TimeOutErrorText");
 			}
 			else
 			{
-				FPlayerSettings_User PlayerSettingsToSave = LoadPlayerSettings().User;
-				PlayerSettingsToSave.UserID = LoginResponse->UserID;
-				PlayerSettingsToSave.DisplayName = LoginResponse->DisplayName;
-				PlayerSettingsToSave.RefreshCookie = LoginResponse->RefreshToken;
-				SavePlayerSettings(PlayerSettingsToSave);
-				TextBlock_SignInState->SetText(
-					IBSWidgetInterface::GetWidgetTextFromKey("SignInState_LoggingWebBrowser"));
-
-				// Callback function for this is OnURLChangedResult_ScoresWidget
-				ScoresWidget->LoginUserBrowser(LoginPayload, PlayerSettingsToSave.UserID);
+				LoginWidget->ShowLoginScreen("Login_LoginErrorText");
 			}
-		});
+			UpdateLoginState(false);
+		}
+		else
+		{
+			FPlayerSettings_User PlayerSettingsToSave = LoadPlayerSettings().User;
+			PlayerSettingsToSave.UserID = LoginResponse->UserID;
+			PlayerSettingsToSave.DisplayName = LoginResponse->DisplayName;
+			PlayerSettingsToSave.RefreshCookie = LoginResponse->RefreshToken;
+			SavePlayerSettings(PlayerSettingsToSave);
+			TextBlock_SignInState->SetText(IBSWidgetInterface::GetWidgetTextFromKey("SignInState_LoggingWebBrowser"));
+
+			// Callback function for this is OnURLChangedResult_ScoresWidget
+			ScoresWidget->LoginUserBrowser(LoginPayload, PlayerSettingsToSave.UserID);
+		}
+	});
 	TextBlock_SignInState->SetText(IBSWidgetInterface::GetWidgetTextFromKey("SignInState_SendingRequest"));
 	LoginUser(LoginPayload, LoginResponse);
 }

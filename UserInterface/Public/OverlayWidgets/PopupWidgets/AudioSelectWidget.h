@@ -141,10 +141,6 @@ private:
 		const FString& DefaultPath, const FString& DefaultFile, const FString& FileTypes, uint32 Flags,
 		TArray<FString>& OutFilenames, int32& OutFilterIndex);
 
-	/** Hides the error message */
-	UFUNCTION()
-	void HideSongPathErrorMessage();
-
 	void PopulateSongOptionComboBox();
 
 	FWidgetAnimationDynamicEvent FadeOutDelegate;
