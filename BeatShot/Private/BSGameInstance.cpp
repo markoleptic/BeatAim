@@ -3,6 +3,8 @@
 
 #include "BSGameInstance.h"
 
+#include "AudioModulationStatics.h"
+#include "BSAudioSettings.h"
 #include "BSGameMode.h"
 #include "BSGameUserSettings.h"
 #include "Player/BSPlayerController.h"
@@ -45,6 +47,9 @@ FGameInstancePIEResult UBSGameInstance::StartPlayInEditorGameInstance(ULocalPlay
 
 void UBSGameInstance::OnPreLoadMapWithContext(const FWorldContext& InWorldContext, const FString& /*MapName*/)
 {
+	#if !WITH_EDITOR
+	UBSGameUserSettings::Get()->Initialize(InWorldContext.World());
+	#endif
 }
 
 void UBSGameInstance::OnPostLoadMapWithWorld(UWorld* World)
@@ -102,7 +107,59 @@ void UBSGameInstance::PrepareLoadingScreen()
 		UE_LOG(LogTemp, Warning, TEXT("LoadingScreenWidget is null"));
 	}
 	Attributes.WidgetLoadingScreen = LoadingScreenWidget;
+	//GetMoviePlayer()->SetIsPlayOnBlockingEnabled(true);
 	GetMoviePlayer()->SetupLoadingScreen(Attributes);
+}
+
+void UBSGameInstance::SetLoadingScreenMixActivationState(const bool bEnable)
+{
+	if (!LoadingScreenControlBusMix)
+	{
+		const UBSAudioSettings* AudioSettings = GetDefault<UBSAudioSettings>();
+		if (UObject* ObjPath = AudioSettings->LoadingScreenControlBusMix.TryLoad())
+		{
+			if (USoundControlBusMix* SoundControlBusMix = Cast<USoundControlBusMix>(ObjPath))
+			{
+				LoadingScreenControlBusMix = SoundControlBusMix;
+			}
+		}
+	}
+	if (!LoadingScreenControlBusMix)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("LoadingScreenControlBusMix failed to load"));
+		return;
+	}
+
+	if (const UWorld* World = GetWorld())
+	{
+		if (bEnable)
+		{
+			const UBSAudioSettings* AudioSettings = GetDefault<UBSAudioSettings>();
+			if (UObject* ObjPath = AudioSettings->LoadingScreenSound.TryLoad())
+			{
+				if (USoundBase* SoundBase = Cast<USoundBase>(ObjPath))
+				{
+					LoadingScreenAudioComponent = UGameplayStatics::CreateSound2D(World, SoundBase);
+					LoadingScreenAudioComponent->SetFloatParameter(FName("FadeInDuration"), 0.2f);
+					LoadingScreenAudioComponent->SetFloatParameter(FName("FadeOutDuration"), 0.2f);
+					LoadingScreenAudioComponent->Play();
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Failed to load LoadingScreenSound"));
+			}
+			UAudioModulationStatics::ActivateBusMix(World, LoadingScreenControlBusMix);
+
+			UE_LOG(LogTemp, Warning, TEXT("Movie Playback Started; Activating LoadingScreenMix"));
+		}
+		else
+		{
+			//UAudioModulationStatics::DeactivateBusMix(World, LoadingScreenControlBusMix);
+			LoadingScreenAudioComponent->SetTriggerParameter(FName("Stop"));
+			UE_LOG(LogTemp, Warning, TEXT("Movie Playback Ended; Deactivating LoadingScreenMix"));
+		}
+	}
 }
 
 void UBSGameInstance::OnStart()
@@ -126,13 +183,13 @@ void UBSGameInstance::InitializeLoadingScreen()
 {
 	GetMoviePlayer()->OnMoviePlaybackStarted().AddLambda([this]()
 	{
-		const auto GameUserSettings = UBSGameUserSettings::Get();
-		GameUserSettings->SetLoadingScreenMixActivationState(true);
+		UE_LOG(LogTemp, Display, TEXT("OnMoviePlayBackStarted"));
+		SetLoadingScreenMixActivationState(true);
 	});
 	GetMoviePlayer()->OnMoviePlaybackFinished().AddLambda([this]()
 	{
-		const auto GameUserSettings = UBSGameUserSettings::Get();
-		GameUserSettings->SetLoadingScreenMixActivationState(false);
+		UE_LOG(LogTemp, Display, TEXT("OnMoviePlayBackFinished"));
+		SetLoadingScreenMixActivationState(false);
 	});
 	GetMoviePlayer()->OnPrepareLoadingScreen().AddUObject(this, &ThisClass::PrepareLoadingScreen);
 

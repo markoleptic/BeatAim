@@ -209,9 +209,9 @@ private:
 	/** Sets enabled/disabled states for any Nvidia related settings. */
 	void HandleDLSSEnabledChanged(bool bDLSSEnabled, bool bNISEnabled);
 
-	/*FString GetComboBoxEntryTooltipStringTableKey_DLSS_FrameGeneration(const FString& EnumString);
+	FString GetComboBoxEntryTooltipStringTableKey_DLSS_FrameGeneration(const FString& EnumString);
 	FString GetComboBoxEntryTooltipStringTableKey_DLSS_SuperResolution(const FString& EnumString);
-	FString GetComboBoxEntryTooltipStringTableKey_Reflex(const FString& EnumString);*/
+	FString GetComboBoxEntryTooltipStringTableKey_Reflex(const FString& EnumString);
 
 	/** Holds the last confirmed resolution */
 	FIntPoint LastConfirmedResolution;

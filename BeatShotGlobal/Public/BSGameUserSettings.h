@@ -20,7 +20,7 @@ class USoundControlBus;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogBSGameUserSettings, Log, All);
 
-/** Video and Sound Settings that are saved to GameUserSettings.ini */
+/** Video and Sound Settings that are saved to GameUserSettings.ini. */
 UCLASS()
 class BEATSHOTGLOBAL_API UBSGameUserSettings : public UGameUserSettings
 {
@@ -32,6 +32,7 @@ public:
 	/** @return the game local machine settings (resolution, windowing mode, scalability settings, etc...) */
 	static UBSGameUserSettings* Get();
 
+	/** Performs initialization of DLSS settings and the user control box mix. Binds to Slate application delegates. */
 	void Initialize(const UWorld* World);
 
 private:
@@ -56,7 +57,11 @@ private:
 	 */
 	void SetVolumeForControlBus(const FName& ControlBusKey, float InVolume);
 
+	/** Updates the effective frame rate limit. */
 	void UpdateEffectiveFrameRateLimit();
+
+	/** Updates and applies all Nvidia settings based on the DLSSEnabledMode. */
+	void UpdateNvidiaSettings();
 
 public:
 	virtual void BeginDestroy() override;
@@ -64,6 +69,7 @@ public:
 	virtual void LoadSettings(bool bForceReload) override;
 	virtual void ValidateSettings() override;
 	virtual void ResetToCurrentSettings() override;
+	virtual void ApplyNonResolutionSettings() override;
 	virtual void ApplySettings(bool bForceReload) override;
 	virtual void SaveSettings() override;
 	virtual float GetEffectiveFrameRateLimit() override;
@@ -74,104 +80,129 @@ public:
 	 */
 	TMap<FString, uint8> GetSupportedNvidiaSettingModes(ENvidiaSettingType NvidiaSettingType) const;
 
+	/** @return an interpolated post process bias based on Brightness. */
 	float GetPostProcessBiasFromBrightness() const;
 
-	void SetLoadingScreenMixActivationState(bool bEnable);
-
+	/** Updates the effective frame rate limit based on if in a menu screen.
+	 *  @param bIsInMenu whether the local player is in a menu screen or not
+	 */
 	void SetInMenu(bool bIsInMenu);
 
-	UFUNCTION()
 	TArray<FString> GetAvailableAudioDeviceNames() const;
-	UFUNCTION()
 	FString GetAudioOutputDeviceId() const;
-	UFUNCTION()
 	float GetOverallVolume() const;
-	UFUNCTION()
 	float GetMenuVolume() const;
-	UFUNCTION()
 	float GetMusicVolume() const;
-	UFUNCTION()
 	float GetSoundFXVolume() const;
-
-	UFUNCTION()
 	uint8 GetAntiAliasingMethod() const;
-	UFUNCTION()
 	float GetBrightness() const;
-	UFUNCTION()
 	float GetDisplayGamma() const;
-	UFUNCTION()
 	int32 GetFrameRateLimitGame() const;
-	UFUNCTION()
 	int32 GetFrameRateLimitMenu() const;
-	UFUNCTION()
 	int32 GetFrameRateLimitBackground() const;
-	UFUNCTION()
 	bool GetShowFPSCounter() const;
 
-	UFUNCTION()
 	uint8 GetDLSSEnabledMode() const;
-	UFUNCTION()
 	uint8 GetNISEnabledMode() const;
-	UFUNCTION()
 	uint8 GetFrameGenerationEnabledMode() const;
-	UFUNCTION()
 	uint8 GetDLSSMode() const;
-	UFUNCTION()
 	uint8 GetNISMode() const;
-	UFUNCTION()
 	uint8 GetStreamlineReflexMode() const;
-	UFUNCTION()
+
 	float GetDLSSSharpness() const;
-	UFUNCTION()
 	float GetNISSharpness() const;
-	UFUNCTION()
 	static bool IsDLSSEnabled();
-	UFUNCTION()
 	bool IsNISEnabled() const;
 
-	UFUNCTION()
+	/** Sets the value of AudioOutputDeviceId and broadcasts it to the local player to change.\n
+	 *  Changes not automatically saved. */
 	void SetAudioOutputDeviceId(const FString& InAudioOutputDeviceId);
-	UFUNCTION()
+
+	/** Sets the value of OverallVolume and the corresponding control bus.\n
+	 *  Changes not automatically saved. */
 	void SetOverallVolume(float InVolume);
-	UFUNCTION()
+
+	/** Sets the value of MenuVolume and the corresponding control bus.\n
+	 *  Changes not automatically saved. */
 	void SetMenuVolume(float InVolume);
-	UFUNCTION()
+
+	/** Sets the value of MusicVolume and the corresponding control bus.\n
+	 *  Changes not automatically saved. */
 	void SetMusicVolume(float InVolume);
-	UFUNCTION()
+
+	/** Sets the value of SoundFXVolume and the corresponding control bus.\n
+     *  Changes not automatically saved. */
 	void SetSoundFXVolume(float InVolume);
 
-	UFUNCTION()
+	/** Sets the value of AntiAliasingMethod.\n
+	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
+	 *  Changes not automatically saved. */
 	void SetAntiAliasingMethod(uint8 InAntiAliasingMethod);
-	UFUNCTION()
+
+	/** Sets the value of Brightness.\n
+	 *  Changes not applied until calling ApplySettings or SaveSettings.\n
+	 *  Changes not automatically saved. */
 	void SetBrightness(float InBrightness);
-	UFUNCTION()
+
+	/** Sets the value of DisplayGamma and applies it.\n
+	 *  Changes not automatically saved. */
 	void SetDisplayGamma(float InGamma);
-	UFUNCTION()
+
+	/** Sets the value of FrameRateLimitMenu.\n
+	 *  Changes not automatically saved. */
 	void SetFrameRateLimitMenu(int32 InFrameRateLimitMenu);
-	UFUNCTION()
+
+	/** Sets the value of FrameRateLimitGame.\n
+	 *  Changes not automatically saved. */
 	void SetFrameRateLimitGame(int32 InFrameRateLimitGame);
-	UFUNCTION()
+
+	/** Sets the value of FrameRateLimitBackground.\n
+	 *  Changes not automatically saved. */
 	void SetFrameRateLimitBackground(int32 InFrameRateLimitBackground);
-	UFUNCTION()
+
+	/** Sets the resolution scale if DLSS and NIS are disabled.\n
+	 * 	Changes not applied until calling ApplySettings or ApplyResolutionSettings.\n
+	 *  Changes not automatically saved. */
 	void SetResolutionScaleChecked(float InResolutionScale);
-	UFUNCTION()
+
+	/** Sets the value of bShowFPSCounter. \n
+	 * 	Changes not applied until calling ApplySettings or SaveSettings.\n
+	 *  Changes not automatically saved. */
 	void SetShowFPSCounter(bool InShowFPSCounter);
 
-	UFUNCTION()
+	/** Sets the value of DLSSEnabledMode. Disables NIS if it is currently enabled. Updates all Nvidia settings
+	 *  based on the value of DLSSEnabledMode. \n
+	 *  Changes not automatically saved. */
 	void SetDLSSEnabledMode(uint8 InDLSSEnabledMode);
-	UFUNCTION()
+
+	/** Sets the value of NISEnabledMode. Disables DLSS if it is currently enabled. Updates and applies all Nvidia
+	 *  settings based on the value of DLSSEnabledMode. \n
+	 *  Changes not automatically saved. */
 	void SetNISEnabledMode(uint8 InNISEnabledMode);
-	UFUNCTION()
+
+	/** Sets the value of FrameGenerationEnabledMode and applies it.\n
+	 *  Changes not automatically saved. */
 	void SetFrameGenerationEnabledMode(uint8 InFrameGenerationEnabledMode);
-	UFUNCTION()
+
+	/** Sets the value of DLSSMode and applies it, if NIS is disabled. Updates and applies all Nvidia settings
+	 *  based on the value of DLSSEnabledMode.\n
+	 *  Changes not automatically saved. */
 	void SetDLSSMode(uint8 InDLSSMode);
-	UFUNCTION()
+
+	/** Sets the value of NIS and applies it, if DLSSMode is off.\n
+	 *  Changes not automatically saved. */
 	void SetNISMode(uint8 InNISMode);
-	UFUNCTION()
+
+	/** Sets the value of StreamlineReflexMode and applies it.\n
+	 *  Changes not automatically saved. */
 	void SetStreamlineReflexMode(uint8 InStreamlineReflexMode);
-	UFUNCTION()
+
+	/** Sets the value of DLSSSharpness and applies it if DLSS is enabled and NIS is disabled.\n
+	 *  Changes not automatically saved. */
 	void SetDLSSSharpness(float InDLSSSharpness);
-	UFUNCTION()
+
+	/** Sets the value of NISharpness and applies it if DLSS is disabled and NIS is enabled.\n
+     *  Changes not automatically saved. */
 	void SetNISSharpness(float InNISSharpness);
 
 	/** Broadcast when the Audio Output Device has been changed for the local player. */
@@ -285,13 +316,6 @@ private:
 	UPROPERTY(Transient)
 	TObjectPtr<USoundControlBusMix> ControlBusMix = nullptr;
 
-	/** The Loading Screen Control Bus Mix. */
-	UPROPERTY(Transient)
-	TObjectPtr<USoundControlBusMix> LoadingScreenControlBusMix = nullptr;
-
-	UPROPERTY(Transient)
-	UAudioComponent* LoadingScreenAudioComponent = nullptr;
-
 	/** Whether the ControlBusMix (UserControlBusMix) has been loaded. */
 	UPROPERTY(Transient)
 	bool bSoundControlBusMixLoaded;
@@ -301,9 +325,10 @@ private:
 	bool bDLSSInitialized;
 
 	/** Whether to use FrameRateLimitMenu as the effective frame rate. */
+	UPROPERTY(Transient)
 	bool bInMenu;
 
-	/** Audio Device names. */
+	/** Audio Device names obtained from AudioMixerBlueprintLibrary. */
 	UPROPERTY(Transient)
 	TArray<FString> AudioDeviceNames;
 
@@ -311,6 +336,6 @@ private:
 	UPROPERTY(Transient)
 	const UVideoSettingEnumTagMap* VideoSettingEnumMap;
 
-	/** Delegate bound to FSlateApplication OnApplicationActivationStateChanged.  */
+	/** Delegate bound to FSlateApplication OnApplicationActivationStateChanged. */
 	FDelegateHandle OnApplicationActivationStateChangedHandle;
 };

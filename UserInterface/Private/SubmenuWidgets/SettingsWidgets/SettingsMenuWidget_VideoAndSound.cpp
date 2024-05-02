@@ -68,24 +68,6 @@ void USettingsMenuWidget_VideoAndSound::NativeConstruct()
 	VideoSettingOptionWidget_VEQ->OnVideoSettingQualityButtonPressed.AddUObject(this,
 		&ThisClass::OnVideoSettingOptionWidget_ButtonPressed);
 
-	SliderTextBoxOption_GlobalSound->OnSliderTextBoxValueChanged.AddUObject(this,
-		&ThisClass::OnSliderTextBoxValueChanged);
-	SliderTextBoxOption_MenuSound->OnSliderTextBoxValueChanged.
-	                               AddUObject(this, &ThisClass::OnSliderTextBoxValueChanged);
-	SliderTextBoxOption_MusicSound->OnSliderTextBoxValueChanged.AddUObject(this,
-		&ThisClass::OnSliderTextBoxValueChanged);
-	SliderTextBoxOption_DLSS_Sharpness->OnSliderTextBoxValueChanged.AddUObject(this,
-		&ThisClass::OnSliderTextBoxValueChanged);
-	SliderTextBoxOption_NIS_Sharpness->OnSliderTextBoxValueChanged.AddUObject(this,
-		&ThisClass::OnSliderTextBoxValueChanged);
-	SliderTextBoxOption_ResolutionScale->OnSliderTextBoxValueChanged.AddUObject(this,
-		&ThisClass::OnSliderTextBoxValueChanged);
-	SliderTextBoxOption_HDRNits->OnSliderTextBoxValueChanged.AddUObject(this, &ThisClass::OnSliderTextBoxValueChanged);
-	SliderTextBoxOption_Brightness->OnSliderTextBoxValueChanged.AddUObject(this,
-		&ThisClass::OnSliderTextBoxValueChanged);
-	SliderTextBoxOption_DisplayGamma->OnSliderTextBoxValueChanged.AddUObject(this,
-		&ThisClass::OnSliderTextBoxValueChanged);
-
 	ComboBoxOption_WindowMode->ComboBox->OnSelectionChanged.AddDynamic(this, &ThisClass::OnSelectionChanged_WindowMode);
 	ComboBoxOption_Resolution->ComboBox->OnSelectionChanged.AddDynamic(this, &ThisClass::OnSelectionChanged_Resolution);
 	ComboBoxOption_DLSS->ComboBox->OnSelectionChanged.AddDynamic(this, &ThisClass::OnSelectionChanged_DLSS_EnabledMode);
@@ -139,6 +121,13 @@ void USettingsMenuWidget_VideoAndSound::NativeConstruct()
 		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
 	ComboBoxOption_OutputAudioDevice->ComboBox->OnSelectionChanged_GenerateWidgetForMultiSelection.BindDynamic(this,
 		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
+
+	ComboBoxOption_DLSS_FrameGeneration->GetComboBoxEntryTooltipStringTableKey.BindUObject(this,
+		&ThisClass::GetComboBoxEntryTooltipStringTableKey_DLSS_FrameGeneration);
+	ComboBoxOption_Reflex->GetComboBoxEntryTooltipStringTableKey.BindUObject(this,
+		&ThisClass::GetComboBoxEntryTooltipStringTableKey_Reflex);
+	ComboBoxOption_DLSS_SuperResolution->GetComboBoxEntryTooltipStringTableKey.BindUObject(this,
+		&USettingsMenuWidget_VideoAndSound::GetComboBoxEntryTooltipStringTableKey_DLSS_SuperResolution);
 
 	CheckBoxOption_HDREnabled->CheckBox->OnCheckStateChanged.AddDynamic(this,
 		&ThisClass::OnCheckStateChanged_HDREnabled);
@@ -206,6 +195,24 @@ void USettingsMenuWidget_VideoAndSound::NativeConstruct()
 
 	UpdateBrushColors();
 	InitializeVideoAndSoundSettings();
+
+	SliderTextBoxOption_GlobalSound->OnSliderTextBoxValueChanged.AddUObject(this,
+		&ThisClass::OnSliderTextBoxValueChanged);
+	SliderTextBoxOption_MenuSound->OnSliderTextBoxValueChanged.
+	                               AddUObject(this, &ThisClass::OnSliderTextBoxValueChanged);
+	SliderTextBoxOption_MusicSound->OnSliderTextBoxValueChanged.AddUObject(this,
+		&ThisClass::OnSliderTextBoxValueChanged);
+	SliderTextBoxOption_DLSS_Sharpness->OnSliderTextBoxValueChanged.AddUObject(this,
+		&ThisClass::OnSliderTextBoxValueChanged);
+	SliderTextBoxOption_NIS_Sharpness->OnSliderTextBoxValueChanged.AddUObject(this,
+		&ThisClass::OnSliderTextBoxValueChanged);
+	SliderTextBoxOption_ResolutionScale->OnSliderTextBoxValueChanged.AddUObject(this,
+		&ThisClass::OnSliderTextBoxValueChanged);
+	SliderTextBoxOption_HDRNits->OnSliderTextBoxValueChanged.AddUObject(this, &ThisClass::OnSliderTextBoxValueChanged);
+	SliderTextBoxOption_Brightness->OnSliderTextBoxValueChanged.AddUObject(this,
+		&ThisClass::OnSliderTextBoxValueChanged);
+	SliderTextBoxOption_DisplayGamma->OnSliderTextBoxValueChanged.AddUObject(this,
+		&ThisClass::OnSliderTextBoxValueChanged);
 }
 
 void USettingsMenuWidget_VideoAndSound::InitializeVideoAndSoundSettings()
@@ -348,8 +355,13 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_DLSS_EnabledMode(cons
 	{
 		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 		GameUserSettings->SetDLSSEnabledMode(*Found);
+		GameUserSettings->SaveSettings();
 		HandleDLSSEnabledChanged(GameUserSettings->IsDLSSEnabled(), GameUserSettings->IsNISEnabled());
 		UpdateNvidiaSettings();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to find DLSS Enabled Mode"));
 	}
 }
 
@@ -365,6 +377,11 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_FrameGeneration(const
 	{
 		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 		GameUserSettings->SetFrameGenerationEnabledMode(*Found);
+		GameUserSettings->SaveSettings();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to find Frame Generation Enabled Mode"));
 	}
 }
 
@@ -380,6 +397,13 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_SuperResolution(const
 	{
 		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 		GameUserSettings->SetDLSSMode(*Found);
+		GameUserSettings->SaveSettings();
+		HandleDLSSEnabledChanged(GameUserSettings->IsDLSSEnabled(), GameUserSettings->IsNISEnabled());
+		UpdateNvidiaSettings();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to find DLSS Mode"));
 	}
 }
 
@@ -395,8 +419,13 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_NIS_EnabledMode(const
 	{
 		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 		GameUserSettings->SetNISEnabledMode(*Found);
+		GameUserSettings->SaveSettings();
 		HandleDLSSEnabledChanged(GameUserSettings->IsDLSSEnabled(), GameUserSettings->IsNISEnabled());
 		UpdateNvidiaSettings();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to find NIS Enabled Mode"));
 	}
 }
 
@@ -412,6 +441,13 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_NIS_Mode(const TArray
 	{
 		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 		GameUserSettings->SetNISMode(*Found);
+		GameUserSettings->SaveSettings();
+		HandleDLSSEnabledChanged(GameUserSettings->IsDLSSEnabled(), GameUserSettings->IsNISEnabled());
+		UpdateNvidiaSettings();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to find NIS Mode"));
 	}
 }
 
@@ -428,6 +464,10 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_Reflex(const TArray<F
 		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 		GameUserSettings->SetStreamlineReflexMode(*Found);
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to find Reflex Mode"));
+	}
 }
 
 void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_AntiAliasingMethod(const TArray<FString>& SelectedOptions,
@@ -443,6 +483,10 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_AntiAliasingMethod(co
 		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 		GameUserSettings->SetAntiAliasingMethod(TEnumAsByte<EAntiAliasingMethod>(*Found));
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to find AntiAliasingMethod"));
+	}
 }
 
 void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_OutputAudioDevice(const TArray<FString>& SelectedOptions,
@@ -455,6 +499,7 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_OutputAudioDevice(con
 
 	UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 	GameUserSettings->SetAudioOutputDeviceId(SelectedOptions[0]);
+	GameUserSettings->SaveSettings();
 }
 
 void USettingsMenuWidget_VideoAndSound::OnSliderTextBoxValueChanged(USliderTextBoxOptionWidget* Widget,
@@ -876,23 +921,74 @@ void USettingsMenuWidget_VideoAndSound::RevertVideoSettingsTimerCallback()
 	}
 }
 
-/*// TODO: Fix
 FString USettingsMenuWidget_VideoAndSound::GetComboBoxEntryTooltipStringTableKey_DLSS_FrameGeneration(
-const FString& EnumString)
+	const FString& EnumString)
 {
-	const UStreamlineDLSSGMode EnumValue = GetEnumFromString<UStreamlineDLSSGMode>(EnumString);
-	return GetStringTableKeyNameFromEnum(EnumValue);
+	if (EnumString.Contains("Off"))
+	{
+		return GetTooltipTextFromKey("StreamlineDLSSGMode_Off").ToString();
+	}
+	if (EnumString.Contains("On"))
+	{
+		return GetTooltipTextFromKey("StreamlineDLSSGMode_On").ToString();
+	}
+	return FString();
 }
 
 FString USettingsMenuWidget_VideoAndSound::GetComboBoxEntryTooltipStringTableKey_DLSS_SuperResolution(
-const FString& EnumString)
+	const FString& EnumString)
 {
-	const UDLSSMode EnumValue = GetEnumFromString<UDLSSMode>(EnumString);
-	return GetStringTableKeyNameFromEnum(EnumValue);
+	if (EnumString.Contains("Off"))
+	{
+		return GetTooltipTextFromKey("DLSSMode_Off").ToString();
+	}
+	if (EnumString.Contains("Ultra"))
+	{
+		if (EnumString.Contains("Quality"))
+		{
+			return GetTooltipTextFromKey("DLSSMode_UltraQuality").ToString();
+		}
+		if (EnumString.Contains("Performance"))
+		{
+			return GetTooltipTextFromKey("DLSSMode_UltraPerformance").ToString();
+		}
+	}
+	if (EnumString.Contains("Quality"))
+	{
+		return GetTooltipTextFromKey("DLSSMode_Quality").ToString();
+	}
+	if (EnumString.Contains("Balanced"))
+	{
+		return GetTooltipTextFromKey("DLSSMode_Balanced").ToString();
+	}
+	if (EnumString.Contains("Performance"))
+	{
+		return GetTooltipTextFromKey("DLSSMode_Performance").ToString();
+	}
+	if (EnumString.Contains("Auto"))
+	{
+		return GetTooltipTextFromKey("DLSSMode_Auto").ToString();
+	}
+	if (EnumString.Contains("DLAA"))
+	{
+		return GetTooltipTextFromKey("DLSSMode_DLAA").ToString();
+	}
+	return FString();
 }
 
 FString USettingsMenuWidget_VideoAndSound::GetComboBoxEntryTooltipStringTableKey_Reflex(const FString& EnumString)
 {
-	const UStreamlineReflexMode EnumValue = GetEnumFromString<UStreamlineReflexMode>(EnumString);
-	return GetStringTableKeyNameFromEnum(EnumValue);
-} */
+	if (EnumString.Contains("Disabled"))
+	{
+		return GetTooltipTextFromKey("StreamlineReflexMode_Disabled").ToString();
+	}
+	if (EnumString.Contains("Enabled"))
+	{
+		if (EnumString.Contains("Boost"))
+		{
+			return GetTooltipTextFromKey("StreamlineReflexMode_EnabledPlusBoost").ToString();
+		}
+		return GetTooltipTextFromKey("StreamlineReflexMode_Enabled").ToString();
+	}
+	return FString();
+}

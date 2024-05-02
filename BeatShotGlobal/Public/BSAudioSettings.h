@@ -79,6 +79,6 @@ public:
 	TArray<FBSSubmixEffectChainMap> LDRAudioSubmixEffectChain;
 
 	/** The sound object to play during the loading screen. */
-	UPROPERTY(config, EditAnywhere, Category = "MixSettings", meta = (AllowedClasses = "/Script/Audio.SoundBase"))
+	UPROPERTY(config, EditAnywhere, Category = "MixSettings", meta = (AllowedClasses = "/Script/Engine.SoundBase"))
 	FSoftObjectPath LoadingScreenSound;
 };

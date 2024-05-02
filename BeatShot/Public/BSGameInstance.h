@@ -140,6 +140,15 @@ protected:
 
 	/** Whether the loading screen is the initial one, which changes how the loading screen is rendered. */
 	bool bIsInitialLoadingScreen = true;
+
+	/** The Loading Screen Control Bus Mix. */
+	UPROPERTY(Transient)
+	TObjectPtr<USoundControlBusMix> LoadingScreenControlBusMix = nullptr;
+
+	UPROPERTY(Transient)
+	UAudioComponent* LoadingScreenAudioComponent = nullptr;
+
+	void SetLoadingScreenMixActivationState(bool bEnable);
 };
 
 template <typename... T>

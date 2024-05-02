@@ -14,7 +14,6 @@
 #include "NISLibrary.h"
 #include "StreamlineLibraryDLSSG.h"
 #include "StreamlineLibraryReflex.h"
-#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogBSGameUserSettings);
 
@@ -37,6 +36,23 @@ TMulticastDelegate<void(const UBSGameUserSettings*)> UBSGameUserSettings::OnSett
 
 namespace
 {
+	/** Applies the value of AntiAliasingMethod to the global GEngine ini. */
+	void ApplyAntiAliasingMethod(const TEnumAsByte<EAntiAliasingMethod> AntiAliasingMethod)
+	{
+		if (IConsoleVariable* CVarAntiAliasingMethod = IConsoleManager::Get().FindConsoleVariable(
+			TEXT("r.AntiAliasingMethod")))
+		{
+			CVarAntiAliasingMethod->Set(AntiAliasingMethod, ECVF_SetByGameOverride);
+		}
+		if (GConfig)
+		{
+			const FString Value = FString::FromInt(AntiAliasingMethod);
+			GConfig->SetString(TEXT("/Script/Engine.RendererSettings"), TEXT("r.AntiAliasingMethod"), *Value,
+				GEngineIni);
+			GConfig->Flush(false, GEngineIni);
+		}
+	}
+
 	/** Applies the value of DisplayGamma to the game engine. */
 	void ApplyDisplayGamma(const float DisplayGamma)
 	{
@@ -359,6 +375,93 @@ void UBSGameUserSettings::UpdateEffectiveFrameRateLimit()
 	}
 }
 
+void UBSGameUserSettings::UpdateNvidiaSettings()
+{
+	EDLSSEnabledMode LocalDLSSEnabledMode = DLSSEnabledMode;
+	UDLSSMode LocalDLSSMode = DLSSMode;
+	UStreamlineDLSSGMode LocalFrameGenerationEnabledMode = FrameGenerationEnabledMode;
+	ENISEnabledMode LocalNISEnabledMode = NISEnabledMode;
+	UNISMode LocalNISMode = NISMode;
+	UStreamlineReflexMode LocalReflexMode = StreamlineReflexMode;
+
+	if (LocalDLSSEnabledMode == EDLSSEnabledMode::On)
+	{
+		// Force disable NIS
+		LocalNISEnabledMode = ENISEnabledMode::Off;
+		// Force NIS off
+		LocalNISMode = UNISMode::Off;
+		// Force Reflex enabled
+		LocalReflexMode = UStreamlineReflexMode::Enabled;
+		// Enable Frame Generation if supported
+		if (LocalFrameGenerationEnabledMode == UStreamlineDLSSGMode::Off && UStreamlineLibraryDLSSG::IsDLSSGSupported()
+			&& UStreamlineLibraryDLSSG::IsDLSSGModeSupported(UStreamlineDLSSGMode::On))
+		{
+			LocalFrameGenerationEnabledMode = UStreamlineDLSSGMode::On;
+		}
+		// Default DLSSMode to Auto if supported
+		if (LocalDLSSMode == UDLSSMode::Off && UDLSSLibrary::IsDLSSSupported())
+		{
+			LocalDLSSMode = UDLSSMode::Auto;
+		}
+	}
+	else
+	{
+		// Force disable Frame Generation
+		LocalFrameGenerationEnabledMode = UStreamlineDLSSGMode::Off;
+		// Force disable Super Resolution
+		LocalDLSSMode = UDLSSMode::Off;
+	}
+
+	if (ApplyDLSSMode(LocalDLSSMode, GetScreenResolution()))
+	{
+		DLSSMode = LocalDLSSMode;
+	}
+	else
+	{
+		DLSSMode = UDLSSMode::Off;
+	}
+
+	SetFrameGenerationEnabledMode(static_cast<uint8>(LocalFrameGenerationEnabledMode));
+	SetNISEnabledMode(static_cast<uint8>(LocalNISEnabledMode));
+	SetNISMode(static_cast<uint8>(LocalNISMode));
+	SetStreamlineReflexMode(static_cast<uint8>(LocalReflexMode));
+	SetDLSSSharpness(DLSSSharpness);
+	SetNISSharpness(NISSharpness);
+
+	// V-Sync
+	if (DLSSEnabledMode == EDLSSEnabledMode::On)
+	{
+		if (IsVSyncEnabled())
+		{
+			SetVSyncEnabled(false);
+			//ApplyNonResolutionSettings();
+		}
+	}
+
+	if (DLSSEnabledMode == EDLSSEnabledMode::On || NISEnabledMode == ENISEnabledMode::On)
+	{
+		if (ScalabilityQuality.ResolutionQuality != 100.f)
+		{
+			// TODO: Might need prompt user?
+			SetResolutionScaleValueEx(100.f);
+			//ApplyResolutionSettings(false);
+			//ConfirmVideoMode();
+		}
+	}
+
+	UE_LOG(LogBSGameUserSettings, Display, TEXT("Updated the following Nvidia Settings:"));
+	UE_LOG(LogBSGameUserSettings, Display, TEXT("DLSSEnabledMode: %s"),
+		*VideoSettingEnumMap->GetStringFromEnumTagPair(DLSSEnabledMode));
+	UE_LOG(LogBSGameUserSettings, Display, TEXT("NISEnabledMode: %s"),
+		*VideoSettingEnumMap->GetStringFromEnumTagPair(NISEnabledMode));
+	UE_LOG(LogBSGameUserSettings, Display, TEXT("DLSSMode: %s"),
+		*VideoSettingEnumMap->GetStringFromEnumTagPair(DLSSMode));
+	UE_LOG(LogBSGameUserSettings, Display, TEXT("FrameGenerationEnabledMode: %s"),
+		*VideoSettingEnumMap->GetStringFromEnumTagPair(FrameGenerationEnabledMode));
+	UE_LOG(LogBSGameUserSettings, Display, TEXT("ReflexMode: %s"),
+		*VideoSettingEnumMap->GetStringFromEnumTagPair(StreamlineReflexMode));
+}
+
 void UBSGameUserSettings::BeginDestroy()
 {
 	if (FSlateApplication::IsInitialized())
@@ -404,7 +507,6 @@ void UBSGameUserSettings::ValidateSettings()
 
 	DisplayGamma = FMath::Clamp(DisplayGamma, Constants::MinValue_DisplayGamma, Constants::MaxValue_DisplayGamma);
 	Brightness = FMath::Clamp(Brightness, Constants::MinValue_Brightness, Constants::MaxValue_Brightness);
-	// TODO: More validation
 
 	Super::ValidateSettings();
 	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Validate Settings"));
@@ -415,24 +517,29 @@ void UBSGameUserSettings::ResetToCurrentSettings()
 	Super::ResetToCurrentSettings();
 }
 
+void UBSGameUserSettings::ApplyNonResolutionSettings()
+{
+	Super::ApplyNonResolutionSettings();
+
+	// Apply any settings that aren't instantly applied
+	ApplyAntiAliasingMethod(AntiAliasingMethod);
+	ApplyDisplayGamma(DisplayGamma);
+	if (bDLSSInitialized)
+	{
+		SetDLSSEnabledMode(static_cast<uint8>(DLSSEnabledMode));
+	}
+}
+
 void UBSGameUserSettings::ApplySettings(bool bForceReload)
 {
 	Super::ApplySettings(bForceReload);
-
-	SetAntiAliasingMethod(GetAntiAliasingMethod());
-	SetBrightness(GetBrightness());
-	SetDisplayGamma(GetDisplayGamma());
-
-	OnSettingsChanged.Broadcast(this);
-
-	// TODO: Apply more settings
-
 	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Apply Settings"));
 }
 
 void UBSGameUserSettings::SaveSettings()
 {
 	Super::SaveSettings();
+	OnSettingsChanged.Broadcast(this);
 }
 
 float UBSGameUserSettings::GetEffectiveFrameRateLimit()
@@ -512,50 +619,6 @@ float UBSGameUserSettings::GetPostProcessBiasFromBrightness() const
 {
 	return FMath::GetMappedRangeValueClamped(FVector2D(Constants::MinValue_Brightness, Constants::MaxValue_Brightness),
 		FVector2D(Constants::MinValue_ExposureCompensation, Constants::MaxValue_ExposureCompensation), Brightness);
-}
-
-void UBSGameUserSettings::SetLoadingScreenMixActivationState(const bool bEnable)
-{
-	if (!LoadingScreenControlBusMix)
-	{
-		const UBSAudioSettings* AudioSettings = GetDefault<UBSAudioSettings>();
-		if (UObject* ObjPath = AudioSettings->LoadingScreenControlBusMix.TryLoad())
-		{
-			if (USoundControlBusMix* SoundControlBusMix = Cast<USoundControlBusMix>(ObjPath))
-			{
-				LoadingScreenControlBusMix = SoundControlBusMix;
-			}
-		}
-	}
-	if (!LoadingScreenControlBusMix)
-	{
-		return;
-	}
-
-	if (const UWorld* World = GetWorld())
-	{
-		if (bEnable)
-		{
-			const UBSAudioSettings* AudioSettings = GetDefault<UBSAudioSettings>();
-			if (UObject* ObjPath = AudioSettings->LoadingScreenSound.TryLoad())
-			{
-				if (USoundBase* SoundBase = Cast<USoundBase>(ObjPath))
-				{
-					LoadingScreenAudioComponent = UGameplayStatics::CreateSound2D(World, SoundBase);
-					LoadingScreenAudioComponent->Play();
-				}
-			}
-			UAudioModulationStatics::ActivateBusMix(World, LoadingScreenControlBusMix);
-
-			UE_LOG(LogBSGameUserSettings, Warning, TEXT("Movie Playback Started; Activating LoadingScreenMix"));
-		}
-		else
-		{
-			UAudioModulationStatics::DeactivateBusMix(World, LoadingScreenControlBusMix);
-			LoadingScreenAudioComponent = nullptr;
-			UE_LOG(LogBSGameUserSettings, Warning, TEXT("Movie Playback Ended; Deactivating LoadingScreenMix"));
-		}
-	}
 }
 
 void UBSGameUserSettings::SetInMenu(const bool bIsInMenu)
@@ -712,17 +775,6 @@ void UBSGameUserSettings::SetSoundFXVolume(const float InVolume)
 void UBSGameUserSettings::SetAntiAliasingMethod(const uint8 InAntiAliasingMethod)
 {
 	AntiAliasingMethod = TEnumAsByte<EAntiAliasingMethod>(InAntiAliasingMethod);
-	if (IConsoleVariable* CVarAntiAliasingMethod = IConsoleManager::Get().FindConsoleVariable(
-		TEXT("r.AntiAliasingMethod")))
-	{
-		CVarAntiAliasingMethod->Set(InAntiAliasingMethod, ECVF_SetByGameOverride);
-	}
-	if (GConfig)
-	{
-		const FString Value = FString::FromInt(InAntiAliasingMethod);
-		GConfig->SetString(TEXT("/Script/Engine.RendererSettings"), TEXT("r.AntiAliasingMethod"), *Value, GEngineIni);
-		GConfig->Flush(false, GEngineIni);
-	}
 }
 
 void UBSGameUserSettings::SetBrightness(const float InBrightness)
@@ -753,7 +805,7 @@ void UBSGameUserSettings::SetFrameRateLimitBackground(const int32 InFrameRateLim
 
 void UBSGameUserSettings::SetResolutionScaleChecked(const float InResolutionScale)
 {
-	if (!UDLSSLibrary::IsDLSSEnabled() && NISEnabledMode != ENISEnabledMode::On)
+	if (DLSSEnabledMode != EDLSSEnabledMode::On && NISEnabledMode != ENISEnabledMode::On)
 	{
 		SetResolutionScaleValueEx(InResolutionScale * 100.f);
 	}
@@ -766,24 +818,46 @@ void UBSGameUserSettings::SetShowFPSCounter(const bool InShowFPSCounter)
 
 void UBSGameUserSettings::SetDLSSEnabledMode(const uint8 InDLSSEnabledMode)
 {
+	if (DLSSEnabledMode == static_cast<EDLSSEnabledMode>(InDLSSEnabledMode))
+	{
+		return;
+	}
+	if (NISEnabledMode == ENISEnabledMode::On)
+	{
+		SetNISEnabledMode(static_cast<uint8>(ENISEnabledMode::Off));
+	}
 	DLSSEnabledMode = static_cast<EDLSSEnabledMode>(InDLSSEnabledMode);
+	UpdateNvidiaSettings();
 }
 
 void UBSGameUserSettings::SetNISEnabledMode(const uint8 InNISEnabledMode)
 {
-	if (UNISLibrary::IsNISSupported() && DLSSEnabledMode == EDLSSEnabledMode::Off)
+	if (NISEnabledMode == static_cast<ENISEnabledMode>(InNISEnabledMode))
 	{
+		return;
+	}
+	if (UNISLibrary::IsNISSupported())
+	{
+		if (DLSSEnabledMode == EDLSSEnabledMode::On)
+		{
+			SetDLSSEnabledMode(static_cast<uint8>(EDLSSEnabledMode::Off));
+		}
 		NISEnabledMode = static_cast<ENISEnabledMode>(InNISEnabledMode);
 	}
 	else
 	{
 		NISEnabledMode = ENISEnabledMode::Off;
 	}
+	UpdateNvidiaSettings();
 }
 
 void UBSGameUserSettings::SetFrameGenerationEnabledMode(const uint8 InFrameGenerationEnabledMode)
 {
 	const auto Mode = static_cast<UStreamlineDLSSGMode>(InFrameGenerationEnabledMode);
+	if (FrameGenerationEnabledMode == Mode)
+	{
+		return;
+	}
 	if (DLSSMode != UDLSSMode::Off && UStreamlineLibraryDLSSG::IsDLSSGSupported() &&
 		UStreamlineLibraryDLSSG::IsDLSSGModeSupported(Mode))
 	{
@@ -798,87 +872,40 @@ void UBSGameUserSettings::SetFrameGenerationEnabledMode(const uint8 InFrameGener
 
 void UBSGameUserSettings::SetDLSSMode(const uint8 InDLSSMode)
 {
-	auto LocalDLSSMode = static_cast<UDLSSMode>(InDLSSMode);
-	EDLSSEnabledMode LocalDLSSEnabledMode = DLSSEnabledMode;
-	UStreamlineDLSSGMode LocalFrameGenerationEnabledMode = FrameGenerationEnabledMode;
-	ENISEnabledMode LocalNISEnabledMode = NISEnabledMode;
-	UNISMode LocalNISMode = NISMode;
-	UStreamlineReflexMode LocalReflexMode = StreamlineReflexMode;
-
-	if (LocalDLSSEnabledMode == EDLSSEnabledMode::On)
+	const auto Mode = static_cast<UDLSSMode>(InDLSSMode);
+	if (DLSSMode == Mode)
 	{
-		// Force disable NIS
-		LocalNISEnabledMode = ENISEnabledMode::Off;
-		// Force NIS off
-		LocalNISMode = UNISMode::Off;
-		// Force Reflex enabled
-		LocalReflexMode = UStreamlineReflexMode::Enabled;
-		// Enable Frame Generation if supported
-		if (LocalFrameGenerationEnabledMode == UStreamlineDLSSGMode::Off && UStreamlineLibraryDLSSG::IsDLSSGSupported()
-			&& UStreamlineLibraryDLSSG::IsDLSSGModeSupported(UStreamlineDLSSGMode::On))
-		{
-			LocalFrameGenerationEnabledMode = UStreamlineDLSSGMode::On;
-		}
-		// Enable Super Resolution if supported
-		if (LocalDLSSMode == UDLSSMode::Off && UDLSSLibrary::IsDLSSSupported())
-		{
-			LocalDLSSMode = UDLSSMode::Auto;
-		}
+		return;
 	}
-	else
+	if (NISEnabledMode == ENISEnabledMode::Off)
 	{
-		// Force disable Frame Generation
-		LocalFrameGenerationEnabledMode = UStreamlineDLSSGMode::Off;
-		// Force disable Super Resolution
-		LocalDLSSMode = UDLSSMode::Off;
-	}
-
-	if (ApplyDLSSMode(LocalDLSSMode, GetScreenResolution()))
-	{
-		DLSSMode = LocalDLSSMode;
+		DLSSMode = Mode;
 	}
 	else
 	{
 		DLSSMode = UDLSSMode::Off;
 	}
-
-	SetFrameGenerationEnabledMode(static_cast<uint8>(LocalFrameGenerationEnabledMode));
-	SetNISEnabledMode(static_cast<uint8>(LocalNISEnabledMode));
-	SetNISMode(static_cast<uint8>(LocalNISMode));
-	SetStreamlineReflexMode(static_cast<uint8>(LocalReflexMode));
-	SetDLSSSharpness(DLSSSharpness);
-	SetNISSharpness(NISSharpness);
-
-	// V-Sync
-	if (DLSSEnabledMode == EDLSSEnabledMode::On)
-	{
-		if (IsVSyncEnabled())
-		{
-			SetVSyncEnabled(false);
-			ApplyNonResolutionSettings();
-		}
-	}
-
-	if (DLSSEnabledMode == EDLSSEnabledMode::On || NISEnabledMode == ENISEnabledMode::On)
-	{
-		if (ScalabilityQuality.ResolutionQuality != 100.f)
-		{
-			// TODO: Might need prompt user?
-			SetResolutionScaleValueEx(100.f);
-			ApplyResolutionSettings(false);
-			ConfirmVideoMode();
-		}
-	}
+	UpdateNvidiaSettings();
 }
 
 void UBSGameUserSettings::SetNISMode(const uint8 InNISMode)
 {
 	const auto Mode = static_cast<UNISMode>(InNISMode);
-	if (UNISLibrary::IsNISSupported() && DLSSEnabledMode == EDLSSEnabledMode::Off && UNISLibrary::IsNISModeSupported(
-		Mode))
+	if (NISMode == Mode)
 	{
-		UNISLibrary::SetNISMode(Mode);
-		NISMode = Mode;
+		return;
+	}
+	if (UNISLibrary::IsNISSupported() && UNISLibrary::IsNISModeSupported(Mode))
+	{
+		if (DLSSEnabledMode == EDLSSEnabledMode::Off)
+		{
+			NISMode = Mode;
+			UNISLibrary::SetNISMode(Mode);
+		}
+		else
+		{
+			NISMode = UNISMode::Off;
+		}
 	}
 	else
 	{
@@ -889,10 +916,14 @@ void UBSGameUserSettings::SetNISMode(const uint8 InNISMode)
 void UBSGameUserSettings::SetStreamlineReflexMode(const uint8 InStreamlineReflexMode)
 {
 	const auto Mode = static_cast<UStreamlineReflexMode>(InStreamlineReflexMode);
+	if (StreamlineReflexMode == Mode)
+	{
+		return;
+	}
 	if (UStreamlineLibraryReflex::IsReflexSupported())
 	{
-		UStreamlineLibraryReflex::SetReflexMode(Mode);
 		StreamlineReflexMode = Mode;
+		UStreamlineLibraryReflex::SetReflexMode(Mode);
 	}
 	else
 	{
@@ -903,7 +934,7 @@ void UBSGameUserSettings::SetStreamlineReflexMode(const uint8 InStreamlineReflex
 void UBSGameUserSettings::SetDLSSSharpness(const float InDLSSSharpness)
 {
 	DLSSSharpness = InDLSSSharpness;
-	if (UDLSSLibrary::IsDLSSEnabled())
+	if (DLSSEnabledMode == EDLSSEnabledMode::On && NISEnabledMode == ENISEnabledMode::Off)
 	{
 		UDLSSLibrary::SetDLSSSharpness(DLSSSharpness);
 	}
@@ -912,7 +943,7 @@ void UBSGameUserSettings::SetDLSSSharpness(const float InDLSSSharpness)
 void UBSGameUserSettings::SetNISSharpness(const float InNISSharpness)
 {
 	NISSharpness = InNISSharpness;
-	if (!UDLSSLibrary::IsDLSSEnabled() && NISEnabledMode == ENISEnabledMode::On)
+	if (DLSSEnabledMode == EDLSSEnabledMode::Off && NISEnabledMode == ENISEnabledMode::On)
 	{
 		UNISLibrary::SetNISSharpness(NISSharpness);
 	}
@@ -929,6 +960,7 @@ void UBSGameUserSettings::HandleAudioOutputDevicesObtained(const TArray<FAudioOu
 
 void UBSGameUserSettings::HandleMainAudioOutputDeviceObtained(const FString& CurrentDevice)
 {
+	UE_LOG(LogBSGameUserSettings, Display, TEXT("MainAudioDeviceObtained: %s"), *AudioOutputDeviceId);
 	AudioOutputDeviceId = CurrentDevice;
 }
 

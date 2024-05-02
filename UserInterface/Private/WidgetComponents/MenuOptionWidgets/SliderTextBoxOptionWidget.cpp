@@ -39,7 +39,6 @@ void USliderTextBoxOptionWidget::OnTextCommitted_EditableTextBox(const FText& Te
 {
 	const float ClampedValue = IBSWidgetInterface::OnEditableTextBoxChanged(Text, EditableTextBox, Slider, GridSnapSize,
 		Slider->GetMinValue(), Slider->GetMaxValue());
-	OnSliderTextBoxValueChanged.Broadcast(this, ClampedValue);
 }
 
 void USliderTextBoxOptionWidget::SetValues(const float Min, const float Max, const float SnapSize)
