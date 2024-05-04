@@ -48,16 +48,7 @@ public:
 	/** Called when the GameModesWidget contains at least one breaking game mode option, or none. */
 	void OnGameModeBreakingChange(const bool bIsGameModeBreakingChange);
 
-	/** Fades in the main menu music over FadeInDuration. */
-	void FadeInMainMenuMusic(const float FadeInDuration);
-
-	/** Fades out the main menu music over FadeOutDuration. */
-	void FadeOutMainMenuMusic(const float FadeOutDuration);
-
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	UAudioComponent* MainMenuMusicComp;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Classes")
 	TSubclassOf<ATargetManagerPreview> TargetManagerClass;
 
@@ -67,7 +58,7 @@ protected:
 
 	/** Pointer to the game mode config, shared between GameModesWidget and TargetManager. */
 	TSharedPtr<FBSConfig> BSConfig;
-	
+
 	/** Game settings to pass to the TargetManager. */
 	FPlayerSettings_Game PlayerSettings_Game;
 

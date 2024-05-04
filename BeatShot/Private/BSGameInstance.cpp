@@ -3,8 +3,6 @@
 
 #include "BSGameInstance.h"
 
-#include "AudioModulationStatics.h"
-#include "BSAudioSettings.h"
 #include "BSGameMode.h"
 #include "BSGameUserSettings.h"
 #include "Player/BSPlayerController.h"
@@ -15,17 +13,29 @@
 #include "SaveGamePlayerSettings.h"
 #include "OverlayWidgets/LoadingScreenWidgets/SLoadingScreenWidget.h"
 #include "BSLoadingScreenSettings.h"
+#include "MetasoundGeneratorHandle.h"
+#include "MetasoundOutputSubsystem.h"
 
 void UBSGameInstance::Init()
 {
 	Super::Init();
 
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &ThisClass::OnPostLoadMapWithWorld);
+	#if !WITH_EDITOR
 	FCoreUObjectDelegates::PreLoadMapWithContext.AddUObject(this, &ThisClass::OnPreLoadMapWithContext);
+	#endif
+
+	GetMoviePlayer()->OnPrepareLoadingScreen().AddUObject(this, &ThisClass::PrepareLoadingScreen);
+
+	SteamManager = NewObject<USteamManager>(this);
+	SteamManager->AssignGameInstance(this);
+	SteamManager->InitializeSteamManager();
+
+	#if WITH_EDITOR
+	OnLoadingScreenFadeOutComplete();
+	#endif
 
 	UE_LOG(LogTemp, Display, TEXT("UBSGameInstance::Init"));
-	InitializeLoadingScreen();
-	InitializeSteamManager();
 }
 
 #if WITH_EDITOR
@@ -33,6 +43,7 @@ FGameInstancePIEResult UBSGameInstance::PostCreateGameModeForPIE(const FGameInst
 	AGameModeBase* GameMode)
 {
 	UBSGameUserSettings::Get()->Initialize(WorldContext->World());
+	InitializeAudioComponent(WorldContext->World());
 	const FBSConfig LocalConfig = FBSConfig();
 	SetBSConfig(LocalConfig);
 	return Super::PostCreateGameModeForPIE(Params, GameMode);
@@ -43,14 +54,14 @@ FGameInstancePIEResult UBSGameInstance::StartPlayInEditorGameInstance(ULocalPlay
 {
 	return Super::StartPlayInEditorGameInstance(LocalPlayer, Params);
 }
-#endif WITH_EDITOR
 
+#else
 void UBSGameInstance::OnPreLoadMapWithContext(const FWorldContext& InWorldContext, const FString& /*MapName*/)
 {
-	#if !WITH_EDITOR
 	UBSGameUserSettings::Get()->Initialize(InWorldContext.World());
-	#endif
+	InitializeAudioComponent(InWorldContext.World());
 }
+#endif WITH_EDITOR
 
 void UBSGameInstance::OnPostLoadMapWithWorld(UWorld* World)
 {
@@ -59,6 +70,10 @@ void UBSGameInstance::OnPostLoadMapWithWorld(UWorld* World)
 	{
 		LoadingScreenWidget->SetLoadingScreenState(ELoadingScreenState::FadingOut);
 	}
+
+	const float FadeTarget = World->GetMapName().Equals(MainMenuLevelName.ToString()) ? 1.f : 0.f;
+	const float FadeDuration = bIsInitialLoadingScreen ? 2.f : 0.75f;
+	SetLoadingScreenAudioComponentState(FadeTarget, FadeDuration);
 }
 
 void UBSGameInstance::OnLoadingScreenFadeOutComplete()
@@ -107,59 +122,8 @@ void UBSGameInstance::PrepareLoadingScreen()
 		UE_LOG(LogTemp, Warning, TEXT("LoadingScreenWidget is null"));
 	}
 	Attributes.WidgetLoadingScreen = LoadingScreenWidget;
-	//GetMoviePlayer()->SetIsPlayOnBlockingEnabled(true);
+	GetMoviePlayer()->SetIsPlayOnBlockingEnabled(true);
 	GetMoviePlayer()->SetupLoadingScreen(Attributes);
-}
-
-void UBSGameInstance::SetLoadingScreenMixActivationState(const bool bEnable)
-{
-	if (!LoadingScreenControlBusMix)
-	{
-		const UBSAudioSettings* AudioSettings = GetDefault<UBSAudioSettings>();
-		if (UObject* ObjPath = AudioSettings->LoadingScreenControlBusMix.TryLoad())
-		{
-			if (USoundControlBusMix* SoundControlBusMix = Cast<USoundControlBusMix>(ObjPath))
-			{
-				LoadingScreenControlBusMix = SoundControlBusMix;
-			}
-		}
-	}
-	if (!LoadingScreenControlBusMix)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("LoadingScreenControlBusMix failed to load"));
-		return;
-	}
-
-	if (const UWorld* World = GetWorld())
-	{
-		if (bEnable)
-		{
-			const UBSAudioSettings* AudioSettings = GetDefault<UBSAudioSettings>();
-			if (UObject* ObjPath = AudioSettings->LoadingScreenSound.TryLoad())
-			{
-				if (USoundBase* SoundBase = Cast<USoundBase>(ObjPath))
-				{
-					LoadingScreenAudioComponent = UGameplayStatics::CreateSound2D(World, SoundBase);
-					LoadingScreenAudioComponent->SetFloatParameter(FName("FadeInDuration"), 0.2f);
-					LoadingScreenAudioComponent->SetFloatParameter(FName("FadeOutDuration"), 0.2f);
-					LoadingScreenAudioComponent->Play();
-				}
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Failed to load LoadingScreenSound"));
-			}
-			UAudioModulationStatics::ActivateBusMix(World, LoadingScreenControlBusMix);
-
-			UE_LOG(LogTemp, Warning, TEXT("Movie Playback Started; Activating LoadingScreenMix"));
-		}
-		else
-		{
-			//UAudioModulationStatics::DeactivateBusMix(World, LoadingScreenControlBusMix);
-			LoadingScreenAudioComponent->SetTriggerParameter(FName("Stop"));
-			UE_LOG(LogTemp, Warning, TEXT("Movie Playback Ended; Deactivating LoadingScreenMix"));
-		}
-	}
 }
 
 void UBSGameInstance::OnStart()
@@ -179,25 +143,6 @@ void UBSGameInstance::SetBSConfig(const FBSConfig& InConfig)
 	}
 }
 
-void UBSGameInstance::InitializeLoadingScreen()
-{
-	GetMoviePlayer()->OnMoviePlaybackStarted().AddLambda([this]()
-	{
-		UE_LOG(LogTemp, Display, TEXT("OnMoviePlayBackStarted"));
-		SetLoadingScreenMixActivationState(true);
-	});
-	GetMoviePlayer()->OnMoviePlaybackFinished().AddLambda([this]()
-	{
-		UE_LOG(LogTemp, Display, TEXT("OnMoviePlayBackFinished"));
-		SetLoadingScreenMixActivationState(false);
-	});
-	GetMoviePlayer()->OnPrepareLoadingScreen().AddUObject(this, &ThisClass::PrepareLoadingScreen);
-
-	#if WITH_EDITOR
-	OnLoadingScreenFadeOutComplete();
-	#endif
-}
-
 void UBSGameInstance::HandleGameModeTransition(const FGameModeTransitionState& NewGameModeTransitionState)
 {
 	switch (NewGameModeTransitionState.TransitionState)
@@ -212,13 +157,17 @@ void UBSGameInstance::HandleGameModeTransition(const FGameModeTransitionState& N
 					UGameplayStatics::OpenLevel(GetWorld(), RangeLevelName);
 				});
 				PC->FadeScreenToBlack();
+				SetLoadingScreenAudioComponentState(0.75f, 0.25f);
 			}
 		}
 		break;
 	case ETransitionState::QuitToMainMenu:
 		{
-			// Nothing else to do here
 			EndBSGameMode(NewGameModeTransitionState);
+			if (!WorldContext->World()->GetMapName().Equals(RangeLevelName.ToString()))
+			{
+				SetLoadingScreenAudioComponentState(0.75f, 0.25f);
+			}
 		}
 		break;
 	case ETransitionState::StartFromPostGameMenu:
@@ -265,11 +214,39 @@ void UBSGameInstance::EndBSGameMode(const FGameModeTransitionState& NewGameModeT
 	}
 }
 
-void UBSGameInstance::InitializeSteamManager()
+void UBSGameInstance::InitializeAudioComponent(const UWorld* World)
 {
-	SteamManager = NewObject<USteamManager>(this);
-	SteamManager->AssignGameInstance(this);
-	SteamManager->InitializeSteamManager();
+	if (LoadingScreenAudioComponent) return;
+	if (LoadingScreenSound)
+	{
+		LoadingScreenAudioComponent = UGameplayStatics::CreateSound2D(World, LoadingScreenSound, 1, 1, 0, nullptr, true,
+			false);
+		if (UMetaSoundOutputSubsystem* Subsystem = World->GetSubsystem<UMetaSoundOutputSubsystem>())
+		{
+			FOnMetasoundOutputValueChanged OnOutputValueChanged;
+			OnOutputValueChanged.BindDynamic(this, &UBSGameInstance::HandleMetasoundOutputValueChanged);
+			Subsystem->WatchOutput(LoadingScreenAudioComponent.Get(), FName("OnFadeCompleted"), OnOutputValueChanged);
+		}
+	}
+}
+
+void UBSGameInstance::SetLoadingScreenAudioComponentState(const float FadeTarget, const float FadeDuration)
+{
+	if (LoadingScreenAudioComponent)
+	{
+		LoadingScreenAudioComponent->SetFloatParameter(FName("FadeTarget"), FadeTarget);
+		LoadingScreenAudioComponent->SetFloatParameter(FName("FadeDuration"), FadeDuration);
+		UE_LOG(LogTemp, Display, TEXT("FadeTarget: %.2f FadeDuration: %.2f"), FadeTarget, FadeDuration);
+		if (!LoadingScreenAudioComponent->IsPlaying())
+		{
+			LoadingScreenAudioComponent->Play();
+		}
+		LoadingScreenAudioComponent->SetTriggerParameter(FName("Fade"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT("Null LoadingScreenAudioComponent"));
+	}
 }
 
 void UBSGameInstance::SavePlayerScoresToDatabase(ABSPlayerController* PC, const bool bWasValidToSave)
@@ -383,4 +360,9 @@ void UBSGameInstance::OnPlayerSettingsChanged(const FPlayerSettings_User& UserSe
 void UBSGameInstance::OnPlayerSettingsChanged(const FPlayerSettings_CrossHair& CrossHairSettings)
 {
 	OnPlayerSettingsChangedDelegate_CrossHair.Broadcast(CrossHairSettings);
+}
+
+void UBSGameInstance::HandleMetasoundOutputValueChanged(FName OutputName, const FMetaSoundOutput& Output)
+{
+	UE_LOG(LogTemp, Display, TEXT("Metasound Output Value Changed"));
 }

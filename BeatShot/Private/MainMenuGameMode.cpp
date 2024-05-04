@@ -12,9 +12,6 @@
 
 AMainMenuGameMode::AMainMenuGameMode()
 {
-	MainMenuMusicComp = CreateDefaultSubobject<UAudioComponent>(TEXT("MainMenuMusicComp"));
-	MainMenuMusicComp->SetAutoActivate(false);
-	SetRootComponent(MainMenuMusicComp);
 }
 
 void AMainMenuGameMode::BeginPlay()
@@ -76,7 +73,7 @@ void AMainMenuGameMode::StartSimulation()
 	TargetManager->Init(BSConfig, FCommonScoreInfo(), PlayerSettings_Game);
 	TargetManager->SetSimulatePlayerDestroyingTargets(true);
 	TargetManager->SetShouldSpawn(true);
-	
+
 	// Start timers
 	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
 	TimerManager.SetTimer(SimulationTimer, this, &ThisClass::FinishSimulation, SimulationTimerDuration, false);
@@ -98,7 +95,7 @@ void AMainMenuGameMode::FinishSimulation()
 	{
 		TargetManager->Clear();
 	}
-	
+
 	// Clear Timers
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 }
@@ -119,14 +116,4 @@ void AMainMenuGameMode::OnGameModeBreakingChange(const bool bIsGameModeBreakingC
 	{
 		FinishSimulation();
 	}
-}
-
-void AMainMenuGameMode::FadeInMainMenuMusic(const float FadeInDuration)
-{
-	MainMenuMusicComp->Play();
-}
-
-void AMainMenuGameMode::FadeOutMainMenuMusic(const float FadeOutDuration)
-{
-	MainMenuMusicComp->SetTriggerParameter(FName("Stop"));
 }

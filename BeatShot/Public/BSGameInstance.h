@@ -9,6 +9,7 @@
 #include "Engine/GameInstance.h"
 #include "BSGameInstance.generated.h"
 
+struct FMetaSoundOutput;
 class ULoadingScreenWidgetStyle;
 class USoundControlBus;
 class USoundControlBusMix;
@@ -31,9 +32,9 @@ class BEATSHOT_API UBSGameInstance : public UGameInstance, public IBSPlayerSetti
 		AGameModeBase* GameMode) override;
 	virtual FGameInstancePIEResult StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer,
 		const FGameInstancePIEParameters& Params) override;
-	#endif WITH_EDITOR
-
+	#else
 	void OnPreLoadMapWithContext(const FWorldContext& InWorldContext, const FString& MapName);
+	#endif WITH_EDITOR
 
 	/** Called after a level has been loaded */
 	void OnPostLoadMapWithWorld(UWorld* World);
@@ -93,10 +94,9 @@ public:
 protected:
 	void SetBSConfig(const FBSConfig& InConfig);
 
-	void InitializeLoadingScreen();
+	void InitializeAudioComponent(const UWorld* World);
 
-	/** Creates SteamManager object and allows it to initialize. Assigns Game Instance and binds to functions. */
-	void InitializeSteamManager();
+	void SetLoadingScreenAudioComponentState(float FadeTarget, float FadeDuration);
 
 	/** Pauses the game and shows the Pause Screen if the overlay is active. */
 	void OnSteamOverlayIsActive(bool bIsOverlayActive) const;
@@ -105,6 +105,9 @@ protected:
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_AudioAnalyzer& AudioAnalyzerSettings) override;
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_User& UserSettings) override;
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_CrossHair& CrossHairSettings) override;
+
+	UFUNCTION()
+	void HandleMetasoundOutputValueChanged(FName OutputName, const FMetaSoundOutput& Output);
 
 	/** Object that interfaces with Steam API. */
 	UPROPERTY()
@@ -142,13 +145,11 @@ protected:
 	bool bIsInitialLoadingScreen = true;
 
 	/** The Loading Screen Control Bus Mix. */
-	UPROPERTY(Transient)
+	UPROPERTY()
 	TObjectPtr<USoundControlBusMix> LoadingScreenControlBusMix = nullptr;
 
-	UPROPERTY(Transient)
-	UAudioComponent* LoadingScreenAudioComponent = nullptr;
-
-	void SetLoadingScreenMixActivationState(bool bEnable);
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> LoadingScreenAudioComponent = nullptr;
 };
 
 template <typename... T>

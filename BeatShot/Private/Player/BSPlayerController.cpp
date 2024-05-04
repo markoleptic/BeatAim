@@ -553,13 +553,6 @@ void ABSPlayerController::FadeScreenToBlack()
 	{
 		CreateScreenFadeWidget(0.f);
 	}
-	if (!GetWorld()->GetMapName().Contains("Range"))
-	{
-		if (AMainMenuGameMode* MainMenuGameMode = Cast<AMainMenuGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
-		{
-			MainMenuGameMode->FadeOutMainMenuMusic(ScreenFadeWidgetAnimationDuration);
-		}
-	}
 	ScreenFadeWidget->FadeToBlack(ScreenFadeWidgetAnimationDuration);
 }
 
@@ -569,13 +562,6 @@ void ABSPlayerController::FadeScreenFromBlack()
 	if (!ScreenFadeWidget)
 	{
 		CreateScreenFadeWidget(1.f);
-	}
-	if (GetWorld()->GetMapName().Contains("MainMenu"))
-	{
-		if (AMainMenuGameMode* MainMenuGameMode = Cast<AMainMenuGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
-		{
-			MainMenuGameMode->FadeInMainMenuMusic(2.f);
-		}
 	}
 	ScreenFadeWidget->FadeFromBlack(ScreenFadeWidgetAnimationDuration);
 }
