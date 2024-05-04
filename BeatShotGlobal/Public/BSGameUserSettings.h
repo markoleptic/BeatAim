@@ -60,8 +60,11 @@ private:
 	/** Updates the effective frame rate limit. */
 	void UpdateEffectiveFrameRateLimit();
 
-	/** Updates and applies all Nvidia settings based on the DLSSEnabledMode. */
-	void UpdateNvidiaSettings();
+	/** Validates all Nvidia settings. */
+	void ValidateNvidiaSettings();
+
+	/** Applies all Nvidia settings. ValidateNvidiaSettings should be called before this. */
+	void ApplyNvidiaSettings();
 
 public:
 	virtual void BeginDestroy() override;
@@ -111,7 +114,7 @@ public:
 
 	float GetDLSSSharpness() const;
 	float GetNISSharpness() const;
-	static bool IsDLSSEnabled();
+	bool IsDLSSEnabled() const;
 	bool IsNISEnabled() const;
 
 	/** Sets the value of AudioOutputDeviceId and broadcasts it to the local player to change.\n
@@ -165,44 +168,49 @@ public:
 	 *  Changes not automatically saved. */
 	void SetResolutionScaleChecked(float InResolutionScale);
 
-	/** Sets the value of bShowFPSCounter. \n
+	/** Sets the value of bShowFPSCounter.\n
 	 * 	Changes not applied until calling ApplySettings or SaveSettings.\n
 	 *  Changes not automatically saved. */
 	void SetShowFPSCounter(bool InShowFPSCounter);
 
-	/** Sets the value of DLSSEnabledMode. Disables NIS if it is currently enabled. Updates all Nvidia settings
-	 *  based on the value of DLSSEnabledMode. \n
+	/** Sets the value of DLSSEnabledMode.\n
+	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
 	void SetDLSSEnabledMode(uint8 InDLSSEnabledMode);
 
-	/** Sets the value of NISEnabledMode. Disables DLSS if it is currently enabled. Updates and applies all Nvidia
-	 *  settings based on the value of DLSSEnabledMode. \n
+	/** Sets the value of NISEnabledMode.\n
+	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
 	void SetNISEnabledMode(uint8 InNISEnabledMode);
 
-	/** Sets the value of FrameGenerationEnabledMode and applies it.\n
+	/** Sets the value of FrameGenerationEnabledMode.\n
+	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
 	void SetFrameGenerationEnabledMode(uint8 InFrameGenerationEnabledMode);
 
-	/** Sets the value of DLSSMode and applies it, if NIS is disabled. Updates and applies all Nvidia settings
-	 *  based on the value of DLSSEnabledMode.\n
+	/** Sets the value of DLSSMode.\n
+	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
 	void SetDLSSMode(uint8 InDLSSMode);
 
-	/** Sets the value of NIS and applies it, if DLSSMode is off.\n
+	/** Sets the value of NISMode.\n
+	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
 	void SetNISMode(uint8 InNISMode);
 
-	/** Sets the value of StreamlineReflexMode and applies it.\n
+	/** Sets the value of StreamlineReflexMode.\n
+	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
 	void SetStreamlineReflexMode(uint8 InStreamlineReflexMode);
 
-	/** Sets the value of DLSSSharpness and applies it if DLSS is enabled and NIS is disabled.\n
+	/** Sets the value of DLSSSharpness.\n
+	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
 	void SetDLSSSharpness(float InDLSSSharpness);
 
-	/** Sets the value of NISharpness and applies it if DLSS is disabled and NIS is enabled.\n
-     *  Changes not automatically saved. */
+	/** Sets the value of NISharpness.\n
+	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
+	 *  Changes not automatically saved. */
 	void SetNISSharpness(float InNISSharpness);
 
 	/** Broadcast when the Audio Output Device has been changed for the local player. */

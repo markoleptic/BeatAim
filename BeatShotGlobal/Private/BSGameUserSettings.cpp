@@ -375,91 +375,122 @@ void UBSGameUserSettings::UpdateEffectiveFrameRateLimit()
 	}
 }
 
-void UBSGameUserSettings::UpdateNvidiaSettings()
+void UBSGameUserSettings::ValidateNvidiaSettings()
 {
-	EDLSSEnabledMode LocalDLSSEnabledMode = DLSSEnabledMode;
-	UDLSSMode LocalDLSSMode = DLSSMode;
-	UStreamlineDLSSGMode LocalFrameGenerationEnabledMode = FrameGenerationEnabledMode;
-	ENISEnabledMode LocalNISEnabledMode = NISEnabledMode;
-	UNISMode LocalNISMode = NISMode;
-	UStreamlineReflexMode LocalReflexMode = StreamlineReflexMode;
-
-	if (LocalDLSSEnabledMode == EDLSSEnabledMode::On)
+	// DLSSEnabledMode and DLSSMode
+	if (DLSSEnabledMode == EDLSSEnabledMode::On)
 	{
-		// Force disable NIS
-		LocalNISEnabledMode = ENISEnabledMode::Off;
-		// Force NIS off
-		LocalNISMode = UNISMode::Off;
-		// Force Reflex enabled
-		LocalReflexMode = UStreamlineReflexMode::Enabled;
-		// Enable Frame Generation if supported
-		if (LocalFrameGenerationEnabledMode == UStreamlineDLSSGMode::Off && UStreamlineLibraryDLSSG::IsDLSSGSupported()
-			&& UStreamlineLibraryDLSSG::IsDLSSGModeSupported(UStreamlineDLSSGMode::On))
+		if (UDLSSLibrary::IsDLSSSupported())
 		{
-			LocalFrameGenerationEnabledMode = UStreamlineDLSSGMode::On;
+			if (DLSSMode == UDLSSMode::Off)
+			{
+				DLSSMode = UDLSSMode::Auto;
+			}
+			if (!UDLSSLibrary::IsDLSSModeSupported(DLSSMode) && DLSSMode != UDLSSMode::Auto)
+			{
+				DLSSMode = UDLSSMode::Off;
+			}
+			if (UStreamlineLibraryReflex::IsReflexSupported())
+			{
+				StreamlineReflexMode = UStreamlineReflexMode::Enabled;
+			}
+			if (UStreamlineLibraryDLSSG::IsDLSSGSupported() && UStreamlineLibraryDLSSG::IsDLSSGModeSupported(
+				FrameGenerationEnabledMode))
+			{
+				FrameGenerationEnabledMode = UStreamlineDLSSGMode::On;
+			}
 		}
-		// Default DLSSMode to Auto if supported
-		if (LocalDLSSMode == UDLSSMode::Off && UDLSSLibrary::IsDLSSSupported())
+		else
 		{
-			LocalDLSSMode = UDLSSMode::Auto;
+			DLSSEnabledMode = EDLSSEnabledMode::Off;
+			DLSSMode = UDLSSMode::Off;
 		}
-	}
-	else
-	{
-		// Force disable Frame Generation
-		LocalFrameGenerationEnabledMode = UStreamlineDLSSGMode::Off;
-		// Force disable Super Resolution
-		LocalDLSSMode = UDLSSMode::Off;
-	}
-
-	if (ApplyDLSSMode(LocalDLSSMode, GetScreenResolution()))
-	{
-		DLSSMode = LocalDLSSMode;
 	}
 	else
 	{
 		DLSSMode = UDLSSMode::Off;
+		FrameGenerationEnabledMode = UStreamlineDLSSGMode::Off;
 	}
 
-	SetFrameGenerationEnabledMode(static_cast<uint8>(LocalFrameGenerationEnabledMode));
-	SetNISEnabledMode(static_cast<uint8>(LocalNISEnabledMode));
-	SetNISMode(static_cast<uint8>(LocalNISMode));
-	SetStreamlineReflexMode(static_cast<uint8>(LocalReflexMode));
-	SetDLSSSharpness(DLSSSharpness);
-	SetNISSharpness(NISSharpness);
+	// NISEnabledMode and NISMode
+	if (NISEnabledMode == ENISEnabledMode::On)
+	{
+		if (!UNISLibrary::IsNISModeSupported(NISMode))
+		{
+			NISMode = UNISMode::Off;
+		}
+	}
+	else
+	{
+		NISMode = UNISMode::Off;
+	}
 
-	// V-Sync
+	// Frame Generation
+	if (!UStreamlineLibraryDLSSG::IsDLSSGSupported() || !UStreamlineLibraryDLSSG::IsDLSSGModeSupported(
+		FrameGenerationEnabledMode))
+	{
+		FrameGenerationEnabledMode = UStreamlineDLSSGMode::Off;
+	}
+
+	// Reflex
+	if (!UStreamlineLibraryReflex::IsReflexSupported())
+	{
+		StreamlineReflexMode = UStreamlineReflexMode::Disabled;
+	}
+
+	if (DLSSEnabledMode == EDLSSEnabledMode::On && NISEnabledMode == ENISEnabledMode::On)
+	{
+		NISEnabledMode = ENISEnabledMode::Off;
+		NISMode = UNISMode::Off;
+	}
+}
+
+void UBSGameUserSettings::ApplyNvidiaSettings()
+{
+	if (!bDLSSInitialized)
+	{
+		return;
+	}
+
+	ApplyDLSSMode(DLSSMode, GetScreenResolution());
+
+	if (UNISLibrary::IsNISSupported() && UNISLibrary::IsNISModeSupported(NISMode))
+	{
+		UNISLibrary::SetNISMode(NISMode);
+	}
+	if (UStreamlineLibraryDLSSG::IsDLSSGSupported() && UStreamlineLibraryDLSSG::IsDLSSGModeSupported(
+		FrameGenerationEnabledMode))
+	{
+		UStreamlineLibraryDLSSG::SetDLSSGMode(FrameGenerationEnabledMode);
+	}
+	if (UStreamlineLibraryReflex::IsReflexSupported())
+	{
+		UStreamlineLibraryReflex::SetReflexMode(StreamlineReflexMode);
+	}
+	if (DLSSEnabledMode == EDLSSEnabledMode::On && NISEnabledMode == ENISEnabledMode::Off)
+	{
+		UDLSSLibrary::SetDLSSSharpness(DLSSSharpness);
+	}
+	if (DLSSEnabledMode == EDLSSEnabledMode::Off && NISEnabledMode == ENISEnabledMode::On)
+	{
+		UNISLibrary::SetNISSharpness(NISSharpness);
+	}
 	if (DLSSEnabledMode == EDLSSEnabledMode::On)
 	{
 		if (IsVSyncEnabled())
 		{
 			SetVSyncEnabled(false);
-			//ApplyNonResolutionSettings();
+			static auto CVar = IConsoleManager::Get().FindConsoleVariable(TEXT("r.VSync"));
+			CVar->Set(IsVSyncEnabled(), ECVF_SetByGameSetting);
 		}
 	}
-
 	if (DLSSEnabledMode == EDLSSEnabledMode::On || NISEnabledMode == ENISEnabledMode::On)
 	{
 		if (ScalabilityQuality.ResolutionQuality != 100.f)
 		{
-			// TODO: Might need prompt user?
 			SetResolutionScaleValueEx(100.f);
-			//ApplyResolutionSettings(false);
-			//ConfirmVideoMode();
 		}
 	}
-
-	UE_LOG(LogBSGameUserSettings, Display, TEXT("Updated the following Nvidia Settings:"));
-	UE_LOG(LogBSGameUserSettings, Display, TEXT("DLSSEnabledMode: %s"),
-		*VideoSettingEnumMap->GetStringFromEnumTagPair(DLSSEnabledMode));
-	UE_LOG(LogBSGameUserSettings, Display, TEXT("NISEnabledMode: %s"),
-		*VideoSettingEnumMap->GetStringFromEnumTagPair(NISEnabledMode));
-	UE_LOG(LogBSGameUserSettings, Display, TEXT("DLSSMode: %s"),
-		*VideoSettingEnumMap->GetStringFromEnumTagPair(DLSSMode));
-	UE_LOG(LogBSGameUserSettings, Display, TEXT("FrameGenerationEnabledMode: %s"),
-		*VideoSettingEnumMap->GetStringFromEnumTagPair(FrameGenerationEnabledMode));
-	UE_LOG(LogBSGameUserSettings, Display, TEXT("ReflexMode: %s"),
-		*VideoSettingEnumMap->GetStringFromEnumTagPair(StreamlineReflexMode));
 }
 
 void UBSGameUserSettings::BeginDestroy()
@@ -475,13 +506,13 @@ void UBSGameUserSettings::BeginDestroy()
 void UBSGameUserSettings::SetToDefaults()
 {
 	Super::SetToDefaults();
+	SetVSyncEnabled(false);
 	SetToBSDefaults();
 }
 
 void UBSGameUserSettings::LoadSettings(const bool bForceReload)
 {
 	Super::LoadSettings(bForceReload);
-	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Load Settings"));
 }
 
 void UBSGameUserSettings::ValidateSettings()
@@ -508,7 +539,10 @@ void UBSGameUserSettings::ValidateSettings()
 	DisplayGamma = FMath::Clamp(DisplayGamma, Constants::MinValue_DisplayGamma, Constants::MaxValue_DisplayGamma);
 	Brightness = FMath::Clamp(Brightness, Constants::MinValue_Brightness, Constants::MaxValue_Brightness);
 
+	ValidateNvidiaSettings();
+
 	Super::ValidateSettings();
+
 	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Validate Settings"));
 }
 
@@ -520,20 +554,14 @@ void UBSGameUserSettings::ResetToCurrentSettings()
 void UBSGameUserSettings::ApplyNonResolutionSettings()
 {
 	Super::ApplyNonResolutionSettings();
-
-	// Apply any settings that aren't instantly applied
 	ApplyAntiAliasingMethod(AntiAliasingMethod);
 	ApplyDisplayGamma(DisplayGamma);
-	if (bDLSSInitialized)
-	{
-		SetDLSSEnabledMode(static_cast<uint8>(DLSSEnabledMode));
-	}
+	ApplyNvidiaSettings();
 }
 
 void UBSGameUserSettings::ApplySettings(bool bForceReload)
 {
 	Super::ApplySettings(bForceReload);
-	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Apply Settings"));
 }
 
 void UBSGameUserSettings::SaveSettings()
@@ -732,9 +760,9 @@ float UBSGameUserSettings::GetNISSharpness() const
 	return NISSharpness;
 }
 
-bool UBSGameUserSettings::IsDLSSEnabled()
+bool UBSGameUserSettings::IsDLSSEnabled() const
 {
-	return UDLSSLibrary::IsDLSSEnabled();
+	return DLSSEnabledMode == EDLSSEnabledMode::On;
 }
 
 bool UBSGameUserSettings::IsNISEnabled() const
@@ -818,135 +846,50 @@ void UBSGameUserSettings::SetShowFPSCounter(const bool InShowFPSCounter)
 
 void UBSGameUserSettings::SetDLSSEnabledMode(const uint8 InDLSSEnabledMode)
 {
-	if (DLSSEnabledMode == static_cast<EDLSSEnabledMode>(InDLSSEnabledMode))
-	{
-		return;
-	}
+	DLSSEnabledMode = static_cast<EDLSSEnabledMode>(InDLSSEnabledMode);
 	if (NISEnabledMode == ENISEnabledMode::On)
 	{
-		SetNISEnabledMode(static_cast<uint8>(ENISEnabledMode::Off));
+		NISEnabledMode = ENISEnabledMode::Off;
 	}
-	DLSSEnabledMode = static_cast<EDLSSEnabledMode>(InDLSSEnabledMode);
-	UpdateNvidiaSettings();
 }
 
 void UBSGameUserSettings::SetNISEnabledMode(const uint8 InNISEnabledMode)
 {
-	if (NISEnabledMode == static_cast<ENISEnabledMode>(InNISEnabledMode))
+	NISEnabledMode = static_cast<ENISEnabledMode>(InNISEnabledMode);
+	if (DLSSEnabledMode == EDLSSEnabledMode::On)
 	{
-		return;
+		DLSSEnabledMode = EDLSSEnabledMode::Off;
 	}
-	if (UNISLibrary::IsNISSupported())
-	{
-		if (DLSSEnabledMode == EDLSSEnabledMode::On)
-		{
-			SetDLSSEnabledMode(static_cast<uint8>(EDLSSEnabledMode::Off));
-		}
-		NISEnabledMode = static_cast<ENISEnabledMode>(InNISEnabledMode);
-	}
-	else
-	{
-		NISEnabledMode = ENISEnabledMode::Off;
-	}
-	UpdateNvidiaSettings();
 }
 
 void UBSGameUserSettings::SetFrameGenerationEnabledMode(const uint8 InFrameGenerationEnabledMode)
 {
-	const auto Mode = static_cast<UStreamlineDLSSGMode>(InFrameGenerationEnabledMode);
-	if (FrameGenerationEnabledMode == Mode)
-	{
-		return;
-	}
-	if (DLSSMode != UDLSSMode::Off && UStreamlineLibraryDLSSG::IsDLSSGSupported() &&
-		UStreamlineLibraryDLSSG::IsDLSSGModeSupported(Mode))
-	{
-		UStreamlineLibraryDLSSG::SetDLSSGMode(Mode);
-		FrameGenerationEnabledMode = Mode;
-	}
-	else
-	{
-		FrameGenerationEnabledMode = UStreamlineDLSSGMode::Off;
-	}
+	FrameGenerationEnabledMode = static_cast<UStreamlineDLSSGMode>(InFrameGenerationEnabledMode);
 }
 
 void UBSGameUserSettings::SetDLSSMode(const uint8 InDLSSMode)
 {
-	const auto Mode = static_cast<UDLSSMode>(InDLSSMode);
-	if (DLSSMode == Mode)
-	{
-		return;
-	}
-	if (NISEnabledMode == ENISEnabledMode::Off)
-	{
-		DLSSMode = Mode;
-	}
-	else
-	{
-		DLSSMode = UDLSSMode::Off;
-	}
-	UpdateNvidiaSettings();
+	DLSSMode = static_cast<UDLSSMode>(InDLSSMode);
 }
 
 void UBSGameUserSettings::SetNISMode(const uint8 InNISMode)
 {
-	const auto Mode = static_cast<UNISMode>(InNISMode);
-	if (NISMode == Mode)
-	{
-		return;
-	}
-	if (UNISLibrary::IsNISSupported() && UNISLibrary::IsNISModeSupported(Mode))
-	{
-		if (DLSSEnabledMode == EDLSSEnabledMode::Off)
-		{
-			NISMode = Mode;
-			UNISLibrary::SetNISMode(Mode);
-		}
-		else
-		{
-			NISMode = UNISMode::Off;
-		}
-	}
-	else
-	{
-		NISMode = UNISMode::Off;
-	}
+	NISMode = static_cast<UNISMode>(InNISMode);
 }
 
 void UBSGameUserSettings::SetStreamlineReflexMode(const uint8 InStreamlineReflexMode)
 {
-	const auto Mode = static_cast<UStreamlineReflexMode>(InStreamlineReflexMode);
-	if (StreamlineReflexMode == Mode)
-	{
-		return;
-	}
-	if (UStreamlineLibraryReflex::IsReflexSupported())
-	{
-		StreamlineReflexMode = Mode;
-		UStreamlineLibraryReflex::SetReflexMode(Mode);
-	}
-	else
-	{
-		StreamlineReflexMode = UStreamlineReflexMode::Disabled;
-	}
+	StreamlineReflexMode = static_cast<UStreamlineReflexMode>(InStreamlineReflexMode);
 }
 
 void UBSGameUserSettings::SetDLSSSharpness(const float InDLSSSharpness)
 {
 	DLSSSharpness = InDLSSSharpness;
-	if (DLSSEnabledMode == EDLSSEnabledMode::On && NISEnabledMode == ENISEnabledMode::Off)
-	{
-		UDLSSLibrary::SetDLSSSharpness(DLSSSharpness);
-	}
 }
 
 void UBSGameUserSettings::SetNISSharpness(const float InNISSharpness)
 {
 	NISSharpness = InNISSharpness;
-	if (DLSSEnabledMode == EDLSSEnabledMode::Off && NISEnabledMode == ENISEnabledMode::On)
-	{
-		UNISLibrary::SetNISSharpness(NISSharpness);
-	}
 }
 
 void UBSGameUserSettings::HandleAudioOutputDevicesObtained(const TArray<FAudioOutputDeviceInfo>& AvailableDevices)

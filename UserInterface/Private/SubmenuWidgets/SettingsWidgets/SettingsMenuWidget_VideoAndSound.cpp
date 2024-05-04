@@ -41,6 +41,7 @@ void USettingsMenuWidget_VideoAndSound::NativeConstruct()
 	SliderTextBoxOption_GlobalSound->SetValues(MinValue_Volume, MaxValue_Volume, SnapSize_Volume);
 	SliderTextBoxOption_MenuSound->SetValues(MinValue_Volume, MaxValue_Volume, SnapSize_Volume);
 	SliderTextBoxOption_MusicSound->SetValues(MinValue_Volume, MaxValue_Volume, SnapSize_Volume);
+	SliderTextBoxOption_SoundFX->SetValues(MinValue_Volume, MaxValue_Volume, SnapSize_Volume);
 	SliderTextBoxOption_DLSS_Sharpness->SetValues(MinValue_DLSSSharpness, MaxValue_DLSSSharpness,
 		SnapSize_DLSSSharpness);
 	SliderTextBoxOption_NIS_Sharpness->SetValues(MinValue_NISSharpness, MaxValue_NISSharpness, SnapSize_NISSharpness);
@@ -112,16 +113,6 @@ void USettingsMenuWidget_VideoAndSound::NativeConstruct()
 	Button_Reset->SetDefaults(static_cast<uint8>(ESettingButtonType::Reset));
 	Button_Save->SetDefaults(static_cast<uint8>(ESettingButtonType::Save));
 
-	TArray<FString> Options;
-
-	auto AddSettingOptions = [](const TMap<FString, uint8>& InMap, TArray<FString>& InOptions,
-		UComboBoxOptionWidget* ComboBoxOptionWidget)
-	{
-		InMap.GetKeys(InOptions);
-		ComboBoxOptionWidget->SortAndAddOptions(InOptions);
-		InOptions.Empty();
-	};
-
 	WindowModeMap.Add("Fullscreen", EWindowMode::Type::Fullscreen);
 	WindowModeMap.Add("Windowed Fullscreen", EWindowMode::Type::WindowedFullscreen);
 	WindowModeMap.Add("Windowed", EWindowMode::Type::Windowed);
@@ -141,6 +132,16 @@ void USettingsMenuWidget_VideoAndSound::NativeConstruct()
 		ENvidiaSettingType::FrameGenerationEnabledMode);
 	StreamlineReflexModeMap = GameUserSettings->
 		GetSupportedNvidiaSettingModes(ENvidiaSettingType::StreamlineReflexMode);
+
+	TArray<FString> Options;
+
+	auto AddSettingOptions = [](const TMap<FString, uint8>& InMap, TArray<FString>& InOptions,
+		UComboBoxOptionWidget* ComboBoxOptionWidget)
+	{
+		InMap.GetKeys(InOptions);
+		ComboBoxOptionWidget->SortAndAddOptions(InOptions);
+		InOptions.Empty();
+	};
 
 	AddSettingOptions(AntiAliasingMethodMap, Options, ComboBoxOption_AntiAliasingMethod);
 	AddSettingOptions(WindowModeMap, Options, ComboBoxOption_WindowMode);
@@ -163,6 +164,7 @@ void USettingsMenuWidget_VideoAndSound::NativeConstruct()
 	                               AddUObject(this, &ThisClass::OnSliderTextBoxValueChanged);
 	SliderTextBoxOption_MusicSound->OnSliderTextBoxValueChanged.AddUObject(this,
 		&ThisClass::OnSliderTextBoxValueChanged);
+	SliderTextBoxOption_SoundFX->OnSliderTextBoxValueChanged.AddUObject(this, &ThisClass::OnSliderTextBoxValueChanged);
 	SliderTextBoxOption_DLSS_Sharpness->OnSliderTextBoxValueChanged.AddUObject(this,
 		&ThisClass::OnSliderTextBoxValueChanged);
 	SliderTextBoxOption_NIS_Sharpness->OnSliderTextBoxValueChanged.AddUObject(this,
@@ -186,12 +188,13 @@ void USettingsMenuWidget_VideoAndSound::InitializeVideoAndSoundSettings()
 
 	GameUserSettings->GetResolutionScaleInformationEx(CurrentScaleNormalized, CurrentScale, MinScale, MaxScale);
 	SliderTextBoxOption_ResolutionScale->SetValues(MinScale / 100.f, MaxScale / 100.f, 0.001f);
+	SliderTextBoxOption_ResolutionScale->SetValue(CurrentScale / 100.f);
 	SliderTextBoxOption_GlobalSound->SetValue(GameUserSettings->GetOverallVolume());
 	SliderTextBoxOption_MenuSound->SetValue(GameUserSettings->GetMenuVolume());
 	SliderTextBoxOption_MusicSound->SetValue(GameUserSettings->GetMusicVolume());
+	SliderTextBoxOption_SoundFX->SetValue(GameUserSettings->GetSoundFXVolume());
 	SliderTextBoxOption_DLSS_Sharpness->SetValue(GameUserSettings->GetDLSSSharpness());
 	SliderTextBoxOption_NIS_Sharpness->SetValue(GameUserSettings->GetNISSharpness());
-	SliderTextBoxOption_ResolutionScale->SetValue(CurrentScale / 100.f);
 
 	ComboBoxOption_OutputAudioDevice->ComboBox->SetSelectedOption(GameUserSettings->GetAudioOutputDeviceId());
 
@@ -316,7 +319,7 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_DLSS_EnabledMode(cons
 	{
 		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 		GameUserSettings->SetDLSSEnabledMode(*Found);
-		GameUserSettings->SaveSettings();
+		GameUserSettings->ApplySettings(false);
 		HandleDLSSEnabledChanged(GameUserSettings->IsDLSSEnabled(), GameUserSettings->IsNISEnabled());
 		UpdateNvidiaSettings();
 	}
@@ -338,7 +341,7 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_FrameGeneration(const
 	{
 		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 		GameUserSettings->SetFrameGenerationEnabledMode(*Found);
-		GameUserSettings->SaveSettings();
+		GameUserSettings->ApplySettings(false);
 	}
 	else
 	{
@@ -358,7 +361,7 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_SuperResolution(const
 	{
 		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 		GameUserSettings->SetDLSSMode(*Found);
-		GameUserSettings->SaveSettings();
+		GameUserSettings->ApplySettings(false);
 		HandleDLSSEnabledChanged(GameUserSettings->IsDLSSEnabled(), GameUserSettings->IsNISEnabled());
 		UpdateNvidiaSettings();
 	}
@@ -380,7 +383,7 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_NIS_EnabledMode(const
 	{
 		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 		GameUserSettings->SetNISEnabledMode(*Found);
-		GameUserSettings->SaveSettings();
+		GameUserSettings->ApplySettings(false);
 		HandleDLSSEnabledChanged(GameUserSettings->IsDLSSEnabled(), GameUserSettings->IsNISEnabled());
 		UpdateNvidiaSettings();
 	}
@@ -402,7 +405,7 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_NIS_Mode(const TArray
 	{
 		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 		GameUserSettings->SetNISMode(*Found);
-		GameUserSettings->SaveSettings();
+		GameUserSettings->ApplySettings(false);
 		HandleDLSSEnabledChanged(GameUserSettings->IsDLSSEnabled(), GameUserSettings->IsNISEnabled());
 		UpdateNvidiaSettings();
 	}
@@ -424,6 +427,7 @@ void USettingsMenuWidget_VideoAndSound::OnSelectionChanged_Reflex(const TArray<F
 	{
 		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 		GameUserSettings->SetStreamlineReflexMode(*Found);
+		GameUserSettings->ApplySettings(false);
 	}
 	else
 	{
@@ -494,6 +498,10 @@ void USettingsMenuWidget_VideoAndSound::OnSliderTextBoxValueChanged(USliderTextB
 	else if (Widget == SliderTextBoxOption_MusicSound)
 	{
 		GameUserSettings->SetMusicVolume(Value);
+	}
+	else if (Widget == SliderTextBoxOption_SoundFX)
+	{
+		GameUserSettings->SetSoundFXVolume(Value);
 	}
 	else if (Widget == SliderTextBoxOption_DLSS_Sharpness)
 	{
@@ -633,11 +641,9 @@ void USettingsMenuWidget_VideoAndSound::HandleDLSSEnabledChanged(const bool bDLS
 		// Enable Settings that require DLSS to be on
 		ComboBoxOption_DLSS_FrameGeneration->ComboBox->SetIsEnabled(true);
 		ComboBoxOption_DLSS_SuperResolution->ComboBox->SetIsEnabled(true);
-
 		SliderTextBoxOption_DLSS_Sharpness->SetSliderAndTextBoxEnabledStates(true);
 
 		// Disable Settings that require DLSS to be off, or are forced to be on
-		ComboBoxOption_NIS->ComboBox->SetIsEnabled(false);
 		ComboBoxOption_NIS_Mode->ComboBox->SetIsEnabled(false);
 		ComboBoxOption_Reflex->ComboBox->SetIsEnabled(false);
 
@@ -655,12 +661,11 @@ void USettingsMenuWidget_VideoAndSound::HandleDLSSEnabledChanged(const bool bDLS
 		// Disable Settings that require DLSS to be on
 		ComboBoxOption_DLSS_FrameGeneration->ComboBox->SetIsEnabled(false);
 		ComboBoxOption_DLSS_SuperResolution->ComboBox->SetIsEnabled(false);
-
-		SliderTextBoxOption_DLSS_Sharpness->SetValue(0.f);
 		SliderTextBoxOption_DLSS_Sharpness->SetSliderAndTextBoxEnabledStates(false);
+		SliderTextBoxOption_DLSS_Sharpness->SetValue(0.f);
 
 		// Enable Settings that are don't require DLSS to be on
-		ComboBoxOption_NIS->ComboBox->SetIsEnabled(true);
+		ComboBoxOption_NIS_Mode->ComboBox->SetIsEnabled(false);
 		ComboBoxOption_Reflex->ComboBox->SetIsEnabled(true);
 
 		// Enable Resolution Scale if NIS is off

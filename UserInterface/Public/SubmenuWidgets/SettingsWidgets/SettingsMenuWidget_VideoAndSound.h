@@ -73,6 +73,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	USliderTextBoxOptionWidget* SliderTextBoxOption_MusicSound;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	USliderTextBoxOptionWidget* SliderTextBoxOption_SoundFX;
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UComboBoxOptionWidget* ComboBoxOption_OutputAudioDevice;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
