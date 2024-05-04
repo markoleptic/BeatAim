@@ -55,7 +55,7 @@ public:
 	static void SetSliderAndEditableTextBoxValues(const float NewValue, UEditableTextBox* TextBoxToChange,
 		USlider* SliderToChange, const float GridSnapSize, const float Min, const float Max);
 
-	/** Override this function and then call SetTooltipWidget */
+	/** Override this function and then call SetupTooltip */
 	virtual UTooltipWidget* ConstructTooltipWidget() = 0;
 
 	/** Returns TooltipWidget */

@@ -13,9 +13,9 @@
 void UComboBoxOptionWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	ComboBox->OnGenerateWidgetEventDelegate.BindDynamic(this, &ThisClass::OnGenerateWidgetEvent);
+	ComboBox->OnGenerateWidgetEventDelegate.BindDynamic(this, &UComboBoxOptionWidget::OnGenerateWidgetEvent);
 	ComboBox->OnSelectionChanged_GenerateWidgetForMultiSelection.BindDynamic(this,
-		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
+		&IBSWidgetInterface::OnSelectionChanged_GenerateMultiSelectionItem);
 	ComboBox->SetSelectionMode(SelectionMode);
 	ComboBox->SetCanSelectNone(bCanSelectNone);
 	ComboBox->SetCloseComboBoxOnSelectionChanged(bCloseComboBoxOnSelectionChanged);
@@ -48,12 +48,6 @@ UWidget* UComboBoxOptionWidget::OnGenerateWidgetEvent(const UBSComboBoxString* C
 	}
 
 	return AddGameModeCategoryTagWidgets(ComboBoxEntry);
-}
-
-UWidget* UComboBoxOptionWidget::OnSelectionChanged_GenerateMultiSelectionItem(const UBSComboBoxString* ComboBoxString,
-	const TArray<FString>& SelectedOptions)
-{
-	return IBSWidgetInterface::OnSelectionChanged_GenerateMultiSelectionItem(ComboBoxString, SelectedOptions);
 }
 
 FString UComboBoxOptionWidget::GetStringTableKeyFromComboBox(const UBSComboBoxString* ComboBoxString,

@@ -36,10 +36,6 @@ void USettingsMenuWidget_AudioAnalyzer::NativeConstruct()
 
 	ComboBoxOption_NumBandChannels->ComboBox->OnSelectionChanged.AddDynamic(this,
 		&ThisClass::OnSelectionChanged_NumBandChannels);
-	ComboBoxOption_NumBandChannels->ComboBox->OnGenerateWidgetEventDelegate.BindDynamic(this,
-		&ThisClass::OnGenerateWidgetEvent);
-	ComboBoxOption_NumBandChannels->ComboBox->OnSelectionChanged_GenerateWidgetForMultiSelection.BindDynamic(this,
-		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
 
 	SavedTextWidget->SetSavedText(GetWidgetTextFromKey("SM_Saved_AudioAnalyzer"));
 

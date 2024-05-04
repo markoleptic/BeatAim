@@ -83,45 +83,6 @@ void USettingsMenuWidget_VideoAndSound::NativeConstruct()
 	ComboBoxOption_OutputAudioDevice->ComboBox->OnSelectionChanged.AddDynamic(this,
 		&ThisClass::OnSelectionChanged_OutputAudioDevice);
 
-	ComboBoxOption_WindowMode->ComboBox->OnGenerateWidgetEventDelegate.BindDynamic(this,
-		&ThisClass::OnGenerateWidgetEvent);
-	ComboBoxOption_Resolution->ComboBox->OnGenerateWidgetEventDelegate.BindDynamic(this,
-		&ThisClass::OnGenerateWidgetEvent);
-	ComboBoxOption_DLSS->ComboBox->OnGenerateWidgetEventDelegate.BindDynamic(this, &ThisClass::OnGenerateWidgetEvent);
-	ComboBoxOption_DLSS_FrameGeneration->ComboBox->OnGenerateWidgetEventDelegate.BindDynamic(this,
-		&ThisClass::OnGenerateWidgetEvent);
-	ComboBoxOption_DLSS_SuperResolution->ComboBox->OnGenerateWidgetEventDelegate.BindDynamic(this,
-		&ThisClass::OnGenerateWidgetEvent);
-	ComboBoxOption_NIS->ComboBox->OnGenerateWidgetEventDelegate.BindDynamic(this, &ThisClass::OnGenerateWidgetEvent);
-	ComboBoxOption_NIS_Mode->ComboBox->OnGenerateWidgetEventDelegate.BindDynamic(this,
-		&ThisClass::OnGenerateWidgetEvent);
-	ComboBoxOption_Reflex->ComboBox->OnGenerateWidgetEventDelegate.BindDynamic(this, &ThisClass::OnGenerateWidgetEvent);
-	ComboBoxOption_AntiAliasingMethod->ComboBox->OnGenerateWidgetEventDelegate.BindDynamic(this,
-		&ThisClass::OnGenerateWidgetEvent);
-	ComboBoxOption_OutputAudioDevice->ComboBox->OnGenerateWidgetEventDelegate.BindDynamic(this,
-		&ThisClass::OnGenerateWidgetEvent);
-
-	ComboBoxOption_WindowMode->ComboBox->OnSelectionChanged_GenerateWidgetForMultiSelection.BindDynamic(this,
-		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
-	ComboBoxOption_Resolution->ComboBox->OnSelectionChanged_GenerateWidgetForMultiSelection.BindDynamic(this,
-		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
-	ComboBoxOption_DLSS->ComboBox->OnSelectionChanged_GenerateWidgetForMultiSelection.BindDynamic(this,
-		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
-	ComboBoxOption_DLSS_FrameGeneration->ComboBox->OnSelectionChanged_GenerateWidgetForMultiSelection.BindDynamic(this,
-		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
-	ComboBoxOption_DLSS_SuperResolution->ComboBox->OnSelectionChanged_GenerateWidgetForMultiSelection.BindDynamic(this,
-		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
-	ComboBoxOption_NIS->ComboBox->OnSelectionChanged_GenerateWidgetForMultiSelection.BindDynamic(this,
-		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
-	ComboBoxOption_NIS_Mode->ComboBox->OnSelectionChanged_GenerateWidgetForMultiSelection.BindDynamic(this,
-		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
-	ComboBoxOption_Reflex->ComboBox->OnSelectionChanged_GenerateWidgetForMultiSelection.BindDynamic(this,
-		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
-	ComboBoxOption_AntiAliasingMethod->ComboBox->OnSelectionChanged_GenerateWidgetForMultiSelection.BindDynamic(this,
-		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
-	ComboBoxOption_OutputAudioDevice->ComboBox->OnSelectionChanged_GenerateWidgetForMultiSelection.BindDynamic(this,
-		&ThisClass::OnSelectionChanged_GenerateMultiSelectionItem);
-
 	ComboBoxOption_DLSS_FrameGeneration->GetComboBoxEntryTooltipStringTableKey.BindUObject(this,
 		&ThisClass::GetComboBoxEntryTooltipStringTableKey_DLSS_FrameGeneration);
 	ComboBoxOption_Reflex->GetComboBoxEntryTooltipStringTableKey.BindUObject(this,
@@ -926,11 +887,11 @@ FString USettingsMenuWidget_VideoAndSound::GetComboBoxEntryTooltipStringTableKey
 {
 	if (EnumString.Contains("Off"))
 	{
-		return GetTooltipTextFromKey("StreamlineDLSSGMode_Off").ToString();
+		return "StreamlineDLSSGMode_Off";
 	}
 	if (EnumString.Contains("On"))
 	{
-		return GetTooltipTextFromKey("StreamlineDLSSGMode_On").ToString();
+		return "StreamlineDLSSGMode_On";
 	}
 	return FString();
 }
@@ -940,38 +901,38 @@ FString USettingsMenuWidget_VideoAndSound::GetComboBoxEntryTooltipStringTableKey
 {
 	if (EnumString.Contains("Off"))
 	{
-		return GetTooltipTextFromKey("DLSSMode_Off").ToString();
+		return "DLSSMode_Off";
 	}
 	if (EnumString.Contains("Ultra"))
 	{
 		if (EnumString.Contains("Quality"))
 		{
-			return GetTooltipTextFromKey("DLSSMode_UltraQuality").ToString();
+			return "DLSSMode_UltraQuality";
 		}
 		if (EnumString.Contains("Performance"))
 		{
-			return GetTooltipTextFromKey("DLSSMode_UltraPerformance").ToString();
+			return "DLSSMode_UltraPerformance";
 		}
 	}
 	if (EnumString.Contains("Quality"))
 	{
-		return GetTooltipTextFromKey("DLSSMode_Quality").ToString();
+		return "DLSSMode_Quality";
 	}
 	if (EnumString.Contains("Balanced"))
 	{
-		return GetTooltipTextFromKey("DLSSMode_Balanced").ToString();
+		return "DLSSMode_Balanced";
 	}
 	if (EnumString.Contains("Performance"))
 	{
-		return GetTooltipTextFromKey("DLSSMode_Performance").ToString();
+		return "DLSSMode_Performance";
 	}
 	if (EnumString.Contains("Auto"))
 	{
-		return GetTooltipTextFromKey("DLSSMode_Auto").ToString();
+		return "DLSSMode_Auto";
 	}
 	if (EnumString.Contains("DLAA"))
 	{
-		return GetTooltipTextFromKey("DLSSMode_DLAA").ToString();
+		return "DLSSMode_DLAA";
 	}
 	return FString();
 }
@@ -980,15 +941,15 @@ FString USettingsMenuWidget_VideoAndSound::GetComboBoxEntryTooltipStringTableKey
 {
 	if (EnumString.Contains("Disabled"))
 	{
-		return GetTooltipTextFromKey("StreamlineReflexMode_Disabled").ToString();
+		return "StreamlineReflexMode_Disabled";
 	}
 	if (EnumString.Contains("Enabled"))
 	{
 		if (EnumString.Contains("Boost"))
 		{
-			return GetTooltipTextFromKey("StreamlineReflexMode_EnabledPlusBoost").ToString();
+			return "StreamlineReflexMode_EnabledPlusBoost";
 		}
-		return GetTooltipTextFromKey("StreamlineReflexMode_Enabled").ToString();
+		return "StreamlineReflexMode_Enabled";
 	}
 	return FString();
 }

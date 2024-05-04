@@ -24,8 +24,6 @@ void UCGMWC_Base::NativeConstruct()
 	{
 		if (UMenuOptionWidget* MenuOption = Cast<UMenuOptionWidget>(Widget))
 		{
-			if (MenuOption->ShouldShowTooltip() && !MenuOption->GetTooltipImageText().IsEmpty()) SetupTooltip(
-				MenuOption->GetTooltipImage(), MenuOption->GetTooltipImageText());
 			MenuOptionWidgets.Add(MenuOption);
 
 			AddGameModeCategoryTagWidgets(MenuOption);
@@ -168,8 +166,8 @@ bool UCGMWC_Base::UpdateValuesIfDifferent(const UConstantMinMaxMenuOptionWidget*
 	bool bDifferent = Widget->IsInConstantMode() != bIsChecked;
 	if (bDifferent) Widget->SetConstantMode(bIsChecked);
 
-	const bool bMinDifferent = !FMath::IsNearlyEqual(Widget->GetMinSliderValue(false), Min) || !
-		FMath::IsNearlyEqual(Widget->GetMinEditableTextBoxValue(false), Min);
+	const bool bMinDifferent = !FMath::IsNearlyEqual(Widget->GetMinSliderValue(false), Min) || !FMath::IsNearlyEqual(
+		Widget->GetMinEditableTextBoxValue(false), Min);
 	if (bMinDifferent) Widget->SetValue_Min(Min);
 	bDifferent = bMinDifferent || bDifferent;
 
@@ -272,7 +270,7 @@ void UCGMWC_Base::SetSubMenuOptionEnabledStateAndAddTooltip(UMenuOptionWidget* W
 {
 	UWidget* SubWidget = Widget->SetSubMenuOptionEnabledState(SubWidgetClass, State);
 	if (!SubWidget) return;
-	
+
 	if (State == EMenuOptionEnabledState::DependentMissing && !Key.IsEmpty())
 	{
 		UTooltipWidget* TooltipWidget = ConstructTooltipWidget();
@@ -327,7 +325,8 @@ float UCGMWC_Base::GetMaxAllowedHorizontalSpacing() const
 	// Total = (NumHorizontalGridTargets - 1) * (GridSpacing.X + MaxTargetDiameter);
 	// Total / (NumHorizontalGridTargets - 1) = GridSpacing.X + MaxTargetDiameter;
 	// Total / (NumHorizontalGridTargets - 1) - MaxTargetDiameter = GridSpacing.X;
-	return Constants::MaxValue_HorizontalSpread / (BSConfig->GridConfig.NumHorizontalGridTargets - 1) - GetMaxTargetDiameter();
+	return Constants::MaxValue_HorizontalSpread / (BSConfig->GridConfig.NumHorizontalGridTargets - 1) -
+		GetMaxTargetDiameter();
 }
 
 float UCGMWC_Base::GetMaxAllowedVerticalSpacing() const
@@ -336,7 +335,8 @@ float UCGMWC_Base::GetMaxAllowedVerticalSpacing() const
 	// Total = (NumVerticalGridTargets - 1) * (GridSpacing.Y + MaxTargetDiameter);
 	// Total / (NumVerticalGridTargets - 1) = GridSpacing.Y + MaxTargetDiameter;
 	// Total / (NumVerticalGridTargets - 1) - MaxTargetDiameter = GridSpacing.Y;
-	return Constants::MaxValue_VerticalSpread / (BSConfig->GridConfig.NumVerticalGridTargets - 1) - GetMaxTargetDiameter();
+	return Constants::MaxValue_VerticalSpread / (BSConfig->GridConfig.NumVerticalGridTargets - 1) -
+		GetMaxTargetDiameter();
 }
 
 float UCGMWC_Base::GetMaxAllowedTargetScale() const
@@ -347,10 +347,12 @@ float UCGMWC_Base::GetMaxAllowedTargetScale() const
 	// (Total - (GridSpacing.X * (NumHorizontalGridTargets - 1))) / ((NumHorizontalGridTargets - 1) * SphereTargetDiameter) = Scale;
 	// Scale = (Total - (GridSpacing.X * (NumHorizontalGridTargets - 1))) / ((NumHorizontalGridTargets - 1) * SphereTargetDiameter)
 
-	const float Horizontal = (Constants::MaxValue_HorizontalSpread - (BSConfig->GridConfig.GridSpacing.X * (BSConfig->GridConfig.
-		NumHorizontalGridTargets - 1))) / ((BSConfig->GridConfig.NumHorizontalGridTargets - 1) * Constants::SphereTargetDiameter);
+	const float Horizontal = (Constants::MaxValue_HorizontalSpread - (BSConfig->GridConfig.GridSpacing.X * (BSConfig->
+		GridConfig.NumHorizontalGridTargets - 1))) / ((BSConfig->GridConfig.NumHorizontalGridTargets - 1) *
+		Constants::SphereTargetDiameter);
 
-	const float Vertical = (Constants::MaxValue_VerticalSpread - (BSConfig->GridConfig.GridSpacing.Y * (BSConfig->GridConfig.
-		NumVerticalGridTargets - 1))) / ((BSConfig->GridConfig.NumVerticalGridTargets - 1) * Constants::SphereTargetDiameter);
+	const float Vertical = (Constants::MaxValue_VerticalSpread - (BSConfig->GridConfig.GridSpacing.Y * (BSConfig->
+		GridConfig.NumVerticalGridTargets - 1))) / ((BSConfig->GridConfig.NumVerticalGridTargets - 1) *
+		Constants::SphereTargetDiameter);
 	return FMath::Min(Horizontal, Vertical);
 }

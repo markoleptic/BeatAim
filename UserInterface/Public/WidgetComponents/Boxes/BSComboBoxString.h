@@ -141,7 +141,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="ComboBox")
 	void SetCanSelectNone(const bool bCan);
-	
+
 	/** Adds a new option to the combo box */
 	UFUNCTION(BlueprintCallable, Category="ComboBox")
 	void AddOption(const FString& Option);
@@ -256,10 +256,10 @@ public:
 protected:
 	UBSComboBoxString();
 
-	//~ Begin ITooltip Interface
+	//~ Begin IBSWidgetInterface
 	virtual UTooltipWidget* ConstructTooltipWidget() override;
 	virtual UTooltipWidget* GetTooltipWidget() const override;
-	//~ End ITooltip Interface
+	//~ End IBSWidgetInterface
 
 	/** Refresh ComboBoxContent with the correct widget/data when the selected option changes */
 	void UpdateOrGenerateWidget(TSharedPtr<FString> Item);

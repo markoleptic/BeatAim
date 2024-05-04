@@ -52,8 +52,6 @@ protected:
 	virtual UTooltipWidget* IBSWidgetInterface::ConstructTooltipWidget() override { return nullptr; }
 	virtual UBSComboBoxEntry* ConstructComboBoxEntryWidget() override;
 	virtual UWidget* OnGenerateWidgetEvent(const UBSComboBoxString* ComboBoxString, FString Method) override;
-	virtual UWidget* OnSelectionChanged_GenerateMultiSelectionItem(const UBSComboBoxString* ComboBoxString,
-		const TArray<FString>& SelectedOptions) override;
 	virtual FString
 	GetStringTableKeyFromComboBox(const UBSComboBoxString* ComboBoxString, const FString& EnumString) override;
 

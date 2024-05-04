@@ -20,15 +20,14 @@ void UBSSettingCategoryWidget::InitSettingCategoryWidget()
 	AddContainer(MainContainer);
 	WidgetTree->ForEachWidget([&](UWidget* Widget)
 	{
-		if (auto Component = Cast<UMenuOptionWidget>(Widget))
+		if (const auto MenuOption = Cast<UMenuOptionWidget>(Widget))
 		{
-			if (!Component->ShouldShowTooltip())
+			if (MenuOption->ShouldShowTooltip())
 			{
-				return;
-			}
-			if (UTooltipImage* TooltipImage = Component->GetTooltipImage())
-			{
-				SetupTooltip(TooltipImage, Component->GetTooltipImageText());
+				if (UTooltipImage* TooltipImage = MenuOption->GetTooltipImage())
+				{
+					SetupTooltip(TooltipImage, MenuOption->GetTooltipImageText());
+				}
 			}
 		}
 	});
