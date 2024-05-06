@@ -199,7 +199,9 @@ bool UBSGameUserSettings::IsBSVersionValid() const
 
 void UBSGameUserSettings::UpdateBSVersion()
 {
+	const int32 LastVersion = BSVersion;
 	BSVersion = Constants::BSGameUserSettingsVersion;
+	UE_LOG(LogBSGameUserSettings, Display, TEXT("Updated UBSGameUserSettings from %d to %d"), LastVersion, BSVersion);
 }
 
 void UBSGameUserSettings::LoadDLSSSettings()
@@ -903,7 +905,6 @@ void UBSGameUserSettings::HandleAudioOutputDevicesObtained(const TArray<FAudioOu
 
 void UBSGameUserSettings::HandleMainAudioOutputDeviceObtained(const FString& CurrentDevice)
 {
-	UE_LOG(LogBSGameUserSettings, Display, TEXT("MainAudioDeviceObtained: %s"), *AudioOutputDeviceId);
 	AudioOutputDeviceId = CurrentDevice;
 }
 

@@ -12,6 +12,10 @@
 #include "Target/Target.h"
 #include "BSGameMode.generated.h"
 
+enum class ERuntimeImportStatus : uint8;
+class UImportedSoundWave;
+class URuntimeAudioImporterLibrary;
+class UMediaSoundComponent;
 class UBSGameUserSettings;
 class ABSGun;
 struct FBSGrantedAbilitySet;
@@ -37,19 +41,22 @@ class BEATSHOT_API ABSGameMode : public AGameMode, public IBSPlayerSettingsInter
 {
 	GENERATED_BODY()
 
+public:
 	ABSGameMode();
 
+protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void PostLoad() override;
 	virtual void Logout(AController* Exiting) override;
 	ACharacter* SpawnPlayer(APlayerController* PlayerController);
+	void HandleAudioImporterResult(URuntimeAudioImporterLibrary* Importer, UImportedSoundWave* SoundWave,
+		ERuntimeImportStatus Status);
 
 	UPROPERTY()
 	TArray<ABSPlayerController*> Controllers;
 
-protected:
 	/* The TargetManager class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Spawnable Classes")
 	TSubclassOf<ATargetManager> TargetManagerClass;
@@ -81,6 +88,12 @@ protected:
 	/** The ability set that contains the TrackGun ability for tracking damage type game modes */
 	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Abilities")
 	UBSAbilitySet* TrackGunAbilitySet;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UAudioComponent> AudioComponent;
+
+	UPROPERTY()
+	URuntimeAudioImporterLibrary* AudioImporter;
 
 	/** Granted data about the TrackGun ability */
 	FBSGrantedAbilitySet TrackGunAbilityGrantedHandles;

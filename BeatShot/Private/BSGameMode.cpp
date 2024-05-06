@@ -6,6 +6,9 @@
 #include "Character/BSCharacter.h"
 #include "BSGameInstance.h"
 #include "BSGameUserSettings.h"
+#include "MediaPlayer.h"
+#include "MediaSoundComponent.h"
+#include "RuntimeAudioImporterLibrary.h"
 #include "AbilitySystem/Abilities/BSGA_AimBot.h"
 #include "Player/BSPlayerController.h"
 #include "Target/TargetManager.h"
@@ -23,11 +26,15 @@ ABSGameMode::ABSGameMode(): AATracker(nullptr), AAPlayer(nullptr), TrackGunAbili
                             GameUserSettings(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = true;
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>("Audio Component");
 }
 
 void ABSGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	AudioImporter = URuntimeAudioImporterLibrary::CreateRuntimeAudioImporter();
+	AudioImporter->OnResultNative.AddUObject(this, &ABSGameMode::HandleAudioImporterResult);
 
 	UBSGameInstance* GI = Cast<UBSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
@@ -83,6 +90,15 @@ ACharacter* ABSGameMode::SpawnPlayer(APlayerController* PlayerController)
 		ACharacter>(CharacterClass, ChosenPlayerStart->GetTransform());
 	PlayerController->Possess(SpawnedCharacter);
 	return SpawnedCharacter;
+}
+
+void ABSGameMode::HandleAudioImporterResult(URuntimeAudioImporterLibrary* Importer, UImportedSoundWave* SoundWave,
+	ERuntimeImportStatus Status)
+{
+	if (Status == ERuntimeImportStatus::SuccessfulImport)
+	{
+		AudioComponent->SetSound(SoundWave);
+	}
 }
 
 void ABSGameMode::InitializeGameMode(const TSharedPtr<FBSConfig>& InConfig)
@@ -422,6 +438,7 @@ bool ABSGameMode::InitializeAudioManagers()
 			OnAAManagerError();
 			return false;
 		}
+		AudioImporter->ImportAudioFromFile(BSConfig->AudioConfig.SongPath, ERuntimeAudioFormat::Auto);
 		break;
 	case EAudioFormat::Capture:
 		AATracker->SetDefaultDevicesCapturerAudio(*BSConfig->AudioConfig.InAudioDevice,
@@ -455,7 +472,7 @@ bool ABSGameMode::InitializeAudioManagers()
 	//AATracker->InitPitchTrackingConfig(EAA_ChannelSelectionMode::All_in_one, -1, 0.02, 0.19);
 	SetAAManagerVolume(0, 0, AATracker);
 
-	/* AAPlayer will only be used if AudioFormat is File and PlayerDelay > 0.01f */
+	// AAPlayer will only be used if AudioFormat is File and PlayerDelay > 0.01f
 	if (BSConfig->AudioConfig.PlayerDelay < 0.01f)
 	{
 		AAPlayer = nullptr;

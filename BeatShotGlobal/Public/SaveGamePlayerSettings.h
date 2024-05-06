@@ -154,7 +154,7 @@ struct FPlayerSettings_Game
 	}
 };
 
-/** Video and sound settings */
+/** DEPRECATED Video and sound settings */
 USTRUCT(BlueprintType)
 struct FPlayerSettings_VideoAndSound
 {
@@ -230,7 +230,7 @@ struct FPlayerSettings_VideoAndSound
 		NISMode = UNISMode::Off;
 		NISSharpness = 0.f;
 		StreamlineReflexMode = UStreamlineReflexMode::Enabled;
-		Brightness = 50.f;
+		Brightness = Constants::DefaultBrightness;
 	}
 
 	float GetPostProcessBiasFromBrightness() const
@@ -469,11 +469,6 @@ struct FPlayerSettings
 	void ResetGameSettings()
 	{
 		Game.ResetToDefault();
-	}
-
-	void ResetVideoAndSoundSettings()
-	{
-		VideoAndSound = FPlayerSettings_VideoAndSound();
 	}
 
 	void ResetCrossHair()

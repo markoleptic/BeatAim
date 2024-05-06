@@ -7,6 +7,7 @@
 #include "GameFramework/GameUserSettings.h"
 #include "BSGameUserSettings.generated.h"
 
+struct FPlayerSettings_VideoAndSound;
 class UVideoSettingEnumTagMap;
 enum class ENvidiaSettingType : uint8;
 enum class UStreamlineReflexMode : uint8;
@@ -234,7 +235,7 @@ private:
 
 	/** Current BSGameUserSettings version. */
 	UPROPERTY(Config)
-	uint32 BSVersion;
+	int32 BSVersion;
 
 	/** Output audio device. */
 	UPROPERTY(Config)

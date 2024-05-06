@@ -18,7 +18,8 @@ public class BeatShot : ModuleRules
 			"BeatShotGlobal", "OnlineSubsystem", "OnlineSubsystemUtils",
 			"Steamworks", "GameplayAbilities", "GameplayTags", "GameplayTasks", "NetCore", "PhysicsCore",
 			"ModularGameplay", "Text3D", "DLSSBlueprint", "NISBlueprint",
-			"StreamlineBlueprint", "Slate", "SlateCore", "MoviePlayer", "NumCpp", "Synthesis", "AudioMixer"
+			"StreamlineBlueprint", "Slate", "SlateCore", "MoviePlayer", "NumCpp", "Synthesis", "AudioMixer",
+			"RuntimeAudioImporter"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]
