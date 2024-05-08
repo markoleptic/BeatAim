@@ -12,6 +12,8 @@
 #include "Target/Target.h"
 #include "BSGameMode.generated.h"
 
+struct FRuntimeAudioInputDeviceInfo;
+class UCapturableSoundWave;
 enum class ERuntimeImportStatus : uint8;
 class UImportedSoundWave;
 class URuntimeAudioImporterLibrary;
@@ -53,6 +55,8 @@ protected:
 	ACharacter* SpawnPlayer(APlayerController* PlayerController);
 	void HandleAudioImporterResult(URuntimeAudioImporterLibrary* Importer, UImportedSoundWave* SoundWave,
 		ERuntimeImportStatus Status);
+	void HandleGetAvailableAudioInputDevices(const TArray<FRuntimeAudioInputDeviceInfo>& DeviceInfo);
+
 
 	UPROPERTY()
 	TArray<ABSPlayerController*> Controllers;
@@ -94,6 +98,9 @@ protected:
 
 	UPROPERTY()
 	URuntimeAudioImporterLibrary* AudioImporter;
+
+	UPROPERTY()
+	UCapturableSoundWave* AudioCapturer;
 
 	/** Granted data about the TrackGun ability */
 	FBSGrantedAbilitySet TrackGunAbilityGrantedHandles;

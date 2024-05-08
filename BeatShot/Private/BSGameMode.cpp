@@ -6,7 +6,6 @@
 #include "Character/BSCharacter.h"
 #include "BSGameInstance.h"
 #include "BSGameUserSettings.h"
-#include "MediaPlayer.h"
 #include "MediaSoundComponent.h"
 #include "RuntimeAudioImporterLibrary.h"
 #include "AbilitySystem/Abilities/BSGA_AimBot.h"
@@ -17,24 +16,23 @@
 #include "AbilitySystem/Globals/BSAttributeSetBase.h"
 #include "Equipment/BSGun.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sound/CapturableSoundWave.h"
 #include "System/SteamManager.h"
 
 DEFINE_LOG_CATEGORY(LogAudioData);
 
-ABSGameMode::ABSGameMode(): AATracker(nullptr), AAPlayer(nullptr), TrackGunAbilitySet(nullptr), bLastTargetOnSet(false),
-                            bShouldTick(false), Elapsed(0.0), MaxScorePerTarget(0), TimePlayedGameMode(0.0),
-                            GameUserSettings(nullptr)
+ABSGameMode::ABSGameMode(): AATracker(nullptr), AAPlayer(nullptr), TrackGunAbilitySet(nullptr), AudioImporter(nullptr),
+                            AudioCapturer(nullptr), bLastTargetOnSet(false), bShouldTick(false), Elapsed(0),
+                            MaxScorePerTarget(0), TimePlayedGameMode(0), GameUserSettings(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	AudioComponent = CreateDefaultSubobject<UAudioComponent>("Audio Component");
+	RootComponent = AudioComponent;
 }
 
 void ABSGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
-	AudioImporter = URuntimeAudioImporterLibrary::CreateRuntimeAudioImporter();
-	AudioImporter->OnResultNative.AddUObject(this, &ABSGameMode::HandleAudioImporterResult);
 
 	UBSGameInstance* GI = Cast<UBSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
@@ -98,6 +96,21 @@ void ABSGameMode::HandleAudioImporterResult(URuntimeAudioImporterLibrary* Import
 	if (Status == ERuntimeImportStatus::SuccessfulImport)
 	{
 		AudioComponent->SetSound(SoundWave);
+	}
+}
+
+void ABSGameMode::HandleGetAvailableAudioInputDevices(const TArray<FRuntimeAudioInputDeviceInfo>& DeviceInfo)
+{
+	for (int i = 0; i < DeviceInfo.Num(); i++)
+	{
+		if (DeviceInfo[i].DeviceName.Equals(BSConfig->AudioConfig.InAudioDevice, ESearchCase::IgnoreCase))
+		{
+			if (AudioCapturer->StartCapture(i))
+			{
+				AudioComponent->SetSound(AudioCapturer);
+			}
+			break;
+		}
 	}
 }
 
@@ -230,6 +243,7 @@ void ABSGameMode::BindGameModeDelegates()
 
 void ABSGameMode::EndGameMode(const bool bSaveScores, const ETransitionState TransitionState)
 {
+	bShouldTick = false;
 	FTimerManager& TimerManager = GetWorldTimerManager();
 	TimePlayedGameMode = TimerManager.GetTimerElapsed(GameModeLengthTimer);
 	TimerManager.ClearAllTimersForObject(this);
@@ -267,6 +281,18 @@ void ABSGameMode::EndGameMode(const bool bSaveScores, const ETransitionState Tra
 		AAPlayer->UnloadPlayerAudio();
 		AAPlayer = nullptr;
 	}
+
+	if (AudioImporter)
+	{
+		AudioImporter = nullptr;
+	}
+	if (AudioCapturer)
+	{
+		AudioCapturer->StopCapture();
+		AudioCapturer = nullptr;
+	}
+	AudioComponent->Stop();
+	AudioComponent->SetSound(nullptr);
 
 	for (ABSPlayerController* Controller : Controllers)
 	{
@@ -356,13 +382,15 @@ void ABSGameMode::StartAAManagerPlayback()
 		else
 		{
 			/* If no AAPlayer, game has started and should use AATracker for audio playback */
-			SetAAManagerVolume(GameUserSettings->GetOverallVolume(), GameUserSettings->GetMusicVolume(), AATracker);
+			AudioComponent->Play();
+			//SetAAManagerVolume(GameUserSettings->GetOverallVolume(), GameUserSettings->GetMusicVolume(), AATracker);
 		}
 		break;
 	case EAudioFormat::Capture:
 		{
-			AATracker->StartCapture(BSConfig->AudioConfig.bPlaybackAudio, false);
-			SetAAManagerVolume(GameUserSettings->GetOverallVolume(), GameUserSettings->GetMusicVolume(), AATracker);
+			AATracker->StartCapture(false, false);
+			AudioComponent->Play();
+			//SetAAManagerVolume(GameUserSettings->GetOverallVolume(), GameUserSettings->GetMusicVolume(), AATracker);
 			break;
 		}
 	case EAudioFormat::Loopback:
@@ -399,7 +427,7 @@ void ABSGameMode::PauseAAManager(const bool ShouldPause)
 		}
 		else
 		{
-			AATracker->StartCapture(BSConfig->AudioConfig.bPlaybackAudio, false);
+			AATracker->StartCapture(false, false);
 		}
 		break;
 	case EAudioFormat::Loopback:
@@ -438,26 +466,41 @@ bool ABSGameMode::InitializeAudioManagers()
 			OnAAManagerError();
 			return false;
 		}
+		if (!AudioImporter)
+		{
+			AudioImporter = URuntimeAudioImporterLibrary::CreateRuntimeAudioImporter();
+			AudioImporter->OnResultNative.AddUObject(this, &ABSGameMode::HandleAudioImporterResult);
+		}
 		AudioImporter->ImportAudioFromFile(BSConfig->AudioConfig.SongPath, ERuntimeAudioFormat::Auto);
 		break;
 	case EAudioFormat::Capture:
-		AATracker->SetDefaultDevicesCapturerAudio(*BSConfig->AudioConfig.InAudioDevice,
-			*BSConfig->AudioConfig.OutAudioDevice);
-		if (!AATracker->InitCapturerAudioEx(48000, EAA_AudioDepth::B_16, EAA_AudioFormat::Signed_Int, 1.f,
-			BSConfig->AudioConfig.bPlaybackAudio))
 		{
-			OnAAManagerError();
-			return false;
+			AATracker->SetDefaultDevicesCapturerAudio(*BSConfig->AudioConfig.InAudioDevice,
+				*BSConfig->AudioConfig.OutAudioDevice);
+			if (!AATracker->InitCapturerAudioEx(48000, EAA_AudioDepth::B_16, EAA_AudioFormat::Signed_Int, 1.f, false))
+			{
+				OnAAManagerError();
+				return false;
+			}
+			if (!AudioCapturer)
+			{
+				AudioCapturer = UCapturableSoundWave::CreateCapturableSoundWave();
+			}
+			FOnGetAvailableAudioInputDevicesResultNative Result;
+			Result.BindUObject(this, &ABSGameMode::HandleGetAvailableAudioInputDevices);
+			AudioCapturer->GetAvailableAudioInputDevices(Result);
+			break;
 		}
-		break;
 	case EAudioFormat::Loopback:
-		AATracker->SetDefaultDevicesCapturerAudio(*BSConfig->AudioConfig.InAudioDevice,
-			*BSConfig->AudioConfig.OutAudioDevice);
-		AATracker->SetDefaultDeviceLoopbackAudio(*BSConfig->AudioConfig.OutAudioDevice);
-		if (!AATracker->InitLoopbackAudio())
 		{
-			OnAAManagerError();
-			return false;
+			AATracker->SetDefaultDevicesCapturerAudio(*BSConfig->AudioConfig.InAudioDevice,
+				*BSConfig->AudioConfig.OutAudioDevice);
+			AATracker->SetDefaultDeviceLoopbackAudio(*BSConfig->AudioConfig.OutAudioDevice);
+			if (!AATracker->InitLoopbackAudio())
+			{
+				OnAAManagerError();
+				return false;
+			}
 		}
 		break;
 	default:
@@ -518,13 +561,28 @@ void ABSGameMode::OnTick_AudioAnalyzers(const float DeltaSeconds)
 
 void ABSGameMode::PlayAAPlayer() const
 {
-	if (!AAPlayer)
+	if (AudioComponent->GetSound())
+	{
+		if (BSConfig->AudioConfig.AudioFormat == EAudioFormat::Capture || BSConfig->AudioConfig.AudioFormat ==
+			EAudioFormat::Loopback)
+		{
+			if (BSConfig->AudioConfig.bPlaybackAudio)
+			{
+				AudioComponent->Play();
+			}
+		}
+		else
+		{
+			AudioComponent->Play();
+		}
+	}
+	/*if (!AAPlayer)
 	{
 		return;
 	}
 	AAPlayer->Play();
 	SetAAManagerVolume(GameUserSettings->GetOverallVolume(), GameUserSettings->GetMusicVolume(), AAPlayer);
-	UE_LOG(LogTemp, Display, TEXT("Now Playing AAPlayer %f"), AAPlayer->GetPlaybackVolume());
+	UE_LOG(LogTemp, Display, TEXT("Now Playing AAPlayer %f"), AAPlayer->GetPlaybackVolume());*/
 }
 
 void ABSGameMode::SetAAManagerVolume(const float GlobalVolume, const float MusicVolume,
@@ -743,7 +801,7 @@ void ABSGameMode::OnPlayerSettingsChanged(const FPlayerSettings_AudioAnalyzer& N
 void ABSGameMode::HandleGameUserSettingsChanged(const UBSGameUserSettings* InGameUserSettings)
 {
 	GameUserSettings = InGameUserSettings;
-	SetAAManagerVolume(GameUserSettings->GetOverallVolume(), GameUserSettings->GetMusicVolume());
+	//SetAAManagerVolume(GameUserSettings->GetOverallVolume(), GameUserSettings->GetMusicVolume());
 }
 
 void ABSGameMode::OnPostTargetDamageEvent(const FTargetDamageEvent& Event)
