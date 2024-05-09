@@ -19,13 +19,13 @@ public class BeatShot : ModuleRules
 			"Steamworks", "GameplayAbilities", "GameplayTags", "GameplayTasks", "NetCore", "PhysicsCore",
 			"ModularGameplay", "Text3D", "DLSSBlueprint", "NISBlueprint",
 			"StreamlineBlueprint", "Slate", "SlateCore", "MoviePlayer", "NumCpp", "Synthesis", "AudioMixer",
-			"RuntimeAudioImporter"
+			"RuntimeAudioImporter", "MetasoundEngine", "MetasoundFrontend"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
 			"ParallelcubeAudioAnalyzer", "ParallelcubeTaglib", "EnhancedInput", "MoviePlayer", "DeveloperSettings",
-			"AudioModulation", "MetasoundEngine"
+			"AudioModulation"
 		});
 
 		PublicIncludePaths.AddRange(new[]

@@ -17,9 +17,7 @@ class UBSPlayerScoreInterface : public UInterface
 	GENERATED_BODY()
 };
 
-/**
- * 
- */
+/** Allows interfacing with Player Scores. */
 class BEATSHOTGLOBAL_API IBSPlayerScoreInterface
 {
 	GENERATED_BODY()
@@ -53,4 +51,3 @@ public:
 	/** Resets the QTable for a DefiningConfig CommonScoreInfo pair and saves to slot. Returns the number of successful resets */
 	static int32 ResetQTable(const FBS_DefiningConfig& DefiningConfig);
 };
-

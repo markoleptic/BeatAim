@@ -89,7 +89,7 @@ void ABSPlayerController::BeginPlay()
 	GI->RegisterPlayerSettingsSubscriber<ABSPlayerController, FPlayerSettings_User>(this,
 		&ABSPlayerController::OnPlayerSettingsChanged);
 
-	if (UGameplayStatics::GetCurrentLevelName(GetWorld()).Contains("MainMenu"))
+	if (UGameplayStatics::GetCurrentLevelName(GetWorld()).Equals(GI->GetMainMenuLevelName().ToString()))
 	{
 		ShowMainMenu();
 		#if WITH_EDITOR
@@ -131,7 +131,9 @@ ABSCharacterBase* ABSPlayerController::GetBSCharacter() const
 
 void ABSPlayerController::SetPlayerEnabledState(const bool bPlayerEnabled)
 {
-	if (GetWorld()->GetMapName().Contains("Range"))
+	const UWorld* World = GetWorld();
+	const UBSGameInstance* GI = Cast<UBSGameInstance>(UGameplayStatics::GetGameInstance(World));
+	if (UGameplayStatics::GetCurrentLevelName(World).Equals(GI->GetMainMenuLevelName().ToString()))
 	{
 		if (bPlayerEnabled)
 		{

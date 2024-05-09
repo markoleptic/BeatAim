@@ -26,7 +26,7 @@ void UHitTimingWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 	Tick_Transition_Timeline.TickTimeline(InDeltaTime);
 }
 
-void UHitTimingWidget::Init(const FText MinTickValue, const FText MaxTickValue)
+void UHitTimingWidget::Init(const FText& MinTickValue, const FText& MaxTickValue)
 {
 	Tick_Min->SetText(MinTickValue);
 	Tick_Max->SetText(MaxTickValue);
@@ -48,7 +48,7 @@ void UHitTimingWidget::UpdateHitTiming(const float TimeOffsetNormalized, const f
 	}
 }
 
-FText UHitTimingWidget::MakeCurrentTickText(const float TimeOffsetRaw) const
+FText UHitTimingWidget::MakeCurrentTickText(const float TimeOffsetRaw)
 {
 	const FString Offset = FString::FromInt(static_cast<int32>(TimeOffsetRaw * 100.f)) + "ms";
 	return FText::FromString(Offset);

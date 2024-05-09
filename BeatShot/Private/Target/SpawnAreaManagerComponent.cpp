@@ -233,7 +233,7 @@ void USpawnAreaManagerComponent::InitializeSpawnAreas()
 		for (float Y = MinY; Y < MaxY; Y += SpawnAreaDimensions.Y)
 		{
 			const FVector Loc(Origin.X, Y, Z);
-			const FSetElementId ID = SpawnAreas.Emplace(NewObject<USpawnArea>());
+			const FSetElementId ID = SpawnAreas.Emplace(NewObject<USpawnArea>(this));
 
 			SpawnAreas[ID]->Init(Index, Loc);
 			AreaKeyMap.Add(FAreaKey(Loc, SpawnAreaDimensions), SpawnAreas[ID]);
@@ -335,8 +335,8 @@ void USpawnAreaManagerComponent::HandleTargetDamageEvent(const FTargetDamageEven
 			// Total Tracking Damage Possible is done on tick in UpdateTotalTrackingDamagePossible
 
 			// Only increment total tracking damage if damage came from player
-			if (!DamageEvent.bDamagedSelf && DamageEvent.DamageDelta > 0.f) SpawnAreaByLoc->
-				IncrementTotalTrackingDamage();
+			if (!DamageEvent.bDamagedSelf && DamageEvent.DamageDelta > 0.f)
+				SpawnAreaByLoc->IncrementTotalTrackingDamage();
 		}
 		break;
 	case ETargetDamageType::Hit:
@@ -909,20 +909,20 @@ TSet<FTargetSpawnParams> USpawnAreaManagerComponent::GetTargetSpawnParams(const 
 	{
 		// Start with all SpawnAreas within the current box bounds
 		ValidSpawnAreas = CachedExtrema;
-		
+
 		USpawnArea* PreviousSpawnArea = GetMostRecentSpawnArea();
 
 		// Only consider Managed Targets to be invalid if runtime
 		TSet<USpawnArea*> InvalidSpawnAreas = ShouldConsiderManagedAsInvalid()
 			? GetManagedActivatedOrRecentSpawnAreas()
 			: GetActivatedOrRecentSpawnAreas();
-		
+
 		if (RequestMovingTargetLocations.IsBound())
 		{
 			FMovingTargetLocations MovingTargetLocations;
 			TSet<USpawnArea*> TempMoved;
 			RequestMovingTargetLocations.Execute(MovingTargetLocations);
-			
+
 			for (const TPair<FGuid, FVector>& Pair : MovingTargetLocations.Map)
 			{
 				USpawnArea* FoundByLocation = GetSpawnArea(Pair.Value);
@@ -932,7 +932,7 @@ TSet<FTargetSpawnParams> USpawnAreaManagerComponent::GetTargetSpawnParams(const 
 				check(FoundByGuid);
 
 				if (!FoundByGuid || !FoundByLocation) continue;
-				
+
 				// If target has moved from its original location, don't make overlapping vertices at original
 				if (FoundByLocation->GetIndex() != FoundByGuid->GetIndex())
 				{
@@ -944,18 +944,18 @@ TSet<FTargetSpawnParams> USpawnAreaManagerComponent::GetTargetSpawnParams(const 
 			// Add back original Spawn Areas that may have been removed due to moving targets
 			ValidSpawnAreas = ValidSpawnAreas.Difference(TempMoved);
 		}
-		
+
 		TSet<USpawnArea*> ChosenSpawnAreas;
-		
+
 		// Main loop for choosing Spawn Areas
 		for (int i = 0; i < NumToSpawn; i++)
 		{
 			TSet<USpawnArea*> ValidSpawnAreasCopy = ValidSpawnAreas;
-			
+
 			// Remove any overlap caused by any managed/activated Spawn Areas or any already chosen Spawn Areas.
 			// Done at every iteration in case current scale > Spawn Area's scale being compared
 			RemoveOverlappingSpawnAreas(ValidSpawnAreasCopy, InvalidSpawnAreas, Scales[i]);
-			
+
 			// If multiple are spawning with different scales, one further along might be able to fit
 			if (ValidSpawnAreasCopy.IsEmpty()) continue;
 
@@ -1322,7 +1322,7 @@ void USpawnAreaManagerComponent::RemoveOverlappingSpawnAreas(TSet<USpawnArea*>& 
 {
 	// TODO: This is terribly expensive if going from small target scale to large target scale
 	TSet<FVector> Invalid;
-	
+
 	for (USpawnArea* SpawnArea : InvalidSpawnAreas)
 	{
 		// Choose larger of target scale to be spawned and existing spawned target scale

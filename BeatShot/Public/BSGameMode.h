@@ -3,33 +3,32 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BSPlayerScoreInterface.h"
 #include "BSPlayerSettingsInterface.h"
-#include "HttpRequestInterface.h"
+#include "SaveGamePlayerScore.h"
 #include "SaveGamePlayerSettings.h"
 #include "AbilitySystem/Globals/BSAbilitySet.h"
 #include "GameFramework/GameMode.h"
-#include "Target/Target.h"
 #include "BSGameMode.generated.h"
 
-struct FRuntimeAudioInputDeviceInfo;
-class UCapturableSoundWave;
 enum class ERuntimeImportStatus : uint8;
+class UCapturableSoundWave;
 class UImportedSoundWave;
 class URuntimeAudioImporterLibrary;
 class UMediaSoundComponent;
 class UBSGameUserSettings;
 class ABSGun;
-struct FBSGrantedAbilitySet;
 class UBSAbilitySet;
 class AVisualizerManager;
 class AFloatingTextActor;
 class ATargetManager;
-class ATarget;
 class ABSPlayerController;
 class UAudioAnalyzerManager;
+struct FPlayerScore;
+struct FRuntimeAudioInputDeviceInfo;
+struct FBSGrantedAbilitySet;
+struct FTargetDamageEvent;
 
-DECLARE_LOG_CATEGORY_EXTERN(LogAudioData, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogBSGameMode, Log, All);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnAAManagerSecondPassed, const float PlaybackTime);
 
@@ -38,8 +37,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnAAManagerSecondPassed, const float Playba
  *  TargetManager and VisualizerManager, and monitoring the AudioAnalyzer on tick. It also manages abilities used for
  *  specific BeatShot game modes and saves scores locally before asking Game Instance to save to database */
 UCLASS()
-class BEATSHOT_API ABSGameMode : public AGameMode, public IBSPlayerSettingsInterface, public IHttpRequestInterface,
-                                 public IBSPlayerScoreInterface
+class BEATSHOT_API ABSGameMode : public AGameMode, public IBSPlayerSettingsInterface
 {
 	GENERATED_BODY()
 
@@ -56,7 +54,6 @@ protected:
 	void HandleAudioImporterResult(URuntimeAudioImporterLibrary* Importer, UImportedSoundWave* SoundWave,
 		ERuntimeImportStatus Status);
 	void HandleGetAvailableAudioInputDevices(const TArray<FRuntimeAudioInputDeviceInfo>& DeviceInfo);
-
 
 	UPROPERTY()
 	TArray<ABSPlayerController*> Controllers;
@@ -131,20 +128,17 @@ public:
 	/** Binds to the gun's OnShotFired delegate */
 	void RegisterGun(ABSGun* InGun);
 
-	virtual void OnPlayerSettingsChanged(const FPlayerSettings_Game& NewGameSettings) override;
-	virtual void OnPlayerSettingsChanged(const FPlayerSettings_AudioAnalyzer& NewAudioAnalyzerSettings) override;
-	void HandleGameUserSettingsChanged(const UBSGameUserSettings* InGameUserSettings);
-
 	/** Delegate that is executed every second to update the progress into song on PlayerHUD.
 	 *  PlayerHUD binds to it, while DefaultGameMode (this) executes it */
 	FOnAAManagerSecondPassed OnSecondPassed;
 
+protected:
+	virtual void OnPlayerSettingsChanged(const FPlayerSettings_Game& NewGameSettings) override;
+	virtual void OnPlayerSettingsChanged(const FPlayerSettings_AudioAnalyzer& NewAudioAnalyzerSettings) override;
+
 private:
 	/** Starts all DefaultGameMode timers */
 	void StartGameModeTimers();
-
-	/** Binds all delegates associated with DefaultGameMode */
-	void BindGameModeDelegates();
 
 	/** Function to tell TargetManager to spawn a new target */
 	void SpawnNewTarget(bool bNewTargetState);
@@ -155,33 +149,21 @@ private:
 	/** Retrieves all AudioAnalyzer data on tick */
 	void OnTick_AudioAnalyzers(const float DeltaSeconds);
 
-	/** play AAPlayer, used as callback function to set delay from AATracker */
-	UFUNCTION()
-	void PlayAAPlayer() const;
-
-	/** Change volume of given AAManager, or if none provided change Player/Tracker volume */
-	void SetAAManagerVolume(float GlobalVolume, float MusicVolume, UAudioAnalyzerManager* AAManager = nullptr) const;
-
-	void OnAAManagerError()
-	{
-		bShouldTick = false;
-		UE_LOG(LogTemp, Warning, TEXT("Init Player Error"));
-	}
-
 	void GoToMainMenu();
 
 	/** Loads matching player scores into CurrentPlayerScore and calculates the MaxScorePerTarget */
 	void LoadMatchingPlayerScores();
 
 	/** Saves player scores to slot and calls SaveScoresToDatabase() if bShouldSavePlayerScores is true and
-	 *  GetCompletedPlayerScores() returns a valid score object. Otherwise Broadcasts OnPostScoresResponse with "None" */
+	 *  GetCompletedPlayerScores() returns a valid score object, otherwise broadcasts OnPostScoresResponse with
+	 *  "None" */
 	void HandleScoreSaving(const bool bExternalSaveScores);
 
 	/** Returns the current player scores, checking for NaNs and updating the time */
-	void GetCompletedPlayerScores(FPlayerScore& InScore);
+	void FinalizePlayerScore(FPlayerScore& InScore) const;
 
 	/** Function bound to TargetManager's PostTargetDamageEvent delegate */
-	void OnPostTargetDamageEvent(const FTargetDamageEvent& Event);
+	void HandlePostTargetDamageEvent(const FTargetDamageEvent& Event);
 
 	/** Function bound to DefaultGameMode's OnTargetActivated delegate to keep track of number of targets spawned.
 	 *  Executed by TargetManager */
@@ -195,16 +177,16 @@ private:
 
 	/** Called by UpdatePlayerScores to update the streak */
 	void UpdateStreak(ABSPlayerController* Controller, FPlayerScore& InScore, int32 Streak,
-		const FTransform& Transform);
+		const FTransform& Transform) const;
 
 	/** Not currently used */
 	void UpdateTimeOffset(const float TimeOffset, const FTransform& Transform);
 
 	/** Callback function for OnSecondPassedTimer, executes OnSecondPassed */
 	UFUNCTION()
-	void OnSecondPassedCallback() const;
+	void HandleSecondPassed() const;
 
-	static float FloatDivide(const float Num, const float Denom);
+	static float FloatDivide(const float Numerator, const float Denominator);
 
 	/** Returns the score based on the time the target was alive for */
 	float GetScoreFromTimeAlive(const float InTimeAlive) const;
@@ -220,7 +202,7 @@ private:
 	 *  target was alive for */
 	float GetNormalizedHitTimingError(const float InTimeAlive) const;
 
-	/** Honestly idk what this does, but it was used in the AudioAnalyzer example so I'm sticking with it >.> */
+	/** Honestly IDK what this does, but it was used in the AudioAnalyzer example, so I'm sticking with it >.> */
 	bool bLastTargetOnSet;
 
 	/** Whether to run tick functions */
@@ -247,10 +229,6 @@ private:
 	UPROPERTY()
 	FPlayerSettings_AudioAnalyzer AASettings;
 
-	/* Locally stored VideoAndSoundSettings since they must be accessed frequently */
-	UPROPERTY()
-	const UBSGameUserSettings* GameUserSettings;
-
 	/** Timer that spans the length of the song */
 	UPROPERTY()
 	FTimerHandle GameModeLengthTimer;
@@ -268,7 +246,7 @@ private:
 	UPROPERTY()
 	FTimerHandle GoToMainMenuTimer;
 
-	/** The threshold to activate night mode if not yet unlocked */
+	/** The threshold to activate night mode if not yet unlocked. */
 	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|General")
 	int32 StreakThreshold = 50;
 

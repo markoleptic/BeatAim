@@ -25,7 +25,7 @@ class USERINTERFACE_API UPlayerHUD : public UUserWidget, public IBSPlayerSetting
 public:
 	virtual void NativeConstruct() override;
 
-	void Init(const TSharedPtr<FBSConfig> InConfig);
+	void Init(const TSharedPtr<FBSConfig>& InConfig);
 
 	FOnPlayerSettingsChanged_Game& GetGameDelegate() { return OnPlayerSettingsChangedDelegate_Game; }
 
@@ -33,8 +33,8 @@ public:
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_Game& GameSettings) override;
 
 	/** Takes in a PlayerScore struct and updates all elements of the PlayerHUD */
-	UFUNCTION()
-	void UpdateAllElements(const FPlayerScore& Scores, const float NormError, const float Error);
+	void UpdateAllElements(const FPlayerScore& Scores, const float TimeOffsetNormalized = -1.f,
+		const float Error = -1.f);
 
 	/** Callback function for OnSecondPassed to update the current song progress. Called every second by DefaultGameMode */
 	UFUNCTION()
@@ -56,12 +56,12 @@ public:
 	UTextBlock* TextBlock_SongTitle;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* TextBlock_GameModeName;
-	
+
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* TextBlock_CurrentScore;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* TextBlock_HighScore;
-	
+
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* TextBlock_TargetsHit;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))

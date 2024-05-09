@@ -342,7 +342,7 @@ void UBSGameUserSettings::LoadUserControlBusMix(const UWorld* World)
 	}
 }
 
-void UBSGameUserSettings::SetVolumeForControlBus(const FName& ControlBusKey, const float InVolume)
+void UBSGameUserSettings::SetVolumeForControlBus(const FName& ControlBusKey, const float InVolume) const
 {
 	TObjectPtr<USoundControlBus> ControlBus = ControlBusMap.FindRef(ControlBusKey);
 
@@ -350,21 +350,22 @@ void UBSGameUserSettings::SetVolumeForControlBus(const FName& ControlBusKey, con
 	{
 		if (const UWorld* AudioWorld = GEngine->GetCurrentPlayWorld())
 		{
-			ensureMsgf(ControlBusMix, TEXT("Control Bus Mix failed to load."));
+			if (ensureMsgf(ControlBusMix, TEXT("Control Bus Mix failed to load.")))
+			{
+				// Create and set the Control Bus Mix Stage Parameters
+				FSoundControlBusMixStage UpdatedControlBusMixStage;
+				UpdatedControlBusMixStage.Bus = ControlBus;
+				UpdatedControlBusMixStage.Value.TargetValue = InVolume / 100.0;
+				UpdatedControlBusMixStage.Value.AttackTime = 0.01f;
+				UpdatedControlBusMixStage.Value.ReleaseTime = 0.01f;
 
-			// Create and set the Control Bus Mix Stage Parameters
-			FSoundControlBusMixStage UpdatedControlBusMixStage;
-			UpdatedControlBusMixStage.Bus = ControlBus;
-			UpdatedControlBusMixStage.Value.TargetValue = InVolume / 100.0;
-			UpdatedControlBusMixStage.Value.AttackTime = 0.01f;
-			UpdatedControlBusMixStage.Value.ReleaseTime = 0.01f;
+				// Add the Control Bus Mix Stage to an Array as the UpdateMix function requires
+				TArray<FSoundControlBusMixStage> UpdatedMixStageArray;
+				UpdatedMixStageArray.Add(UpdatedControlBusMixStage);
 
-			// Add the Control Bus Mix Stage to an Array as the UpdateMix function requires
-			TArray<FSoundControlBusMixStage> UpdatedMixStageArray;
-			UpdatedMixStageArray.Add(UpdatedControlBusMixStage);
-
-			// Modify the matching bus Mix Stage parameters on the User Control Bus Mix
-			UAudioModulationStatics::UpdateMix(AudioWorld, ControlBusMix, UpdatedMixStageArray);
+				// Modify the matching bus Mix Stage parameters on the User Control Bus Mix
+				UAudioModulationStatics::UpdateMix(AudioWorld, ControlBusMix, UpdatedMixStageArray);
+			}
 		}
 	}
 }

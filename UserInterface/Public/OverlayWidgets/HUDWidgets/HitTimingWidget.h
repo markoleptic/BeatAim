@@ -16,15 +16,15 @@ class USERINTERFACE_API UHitTimingWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void UpdateHitTiming(const float TimeOffsetNormalized, const float TimeOffsetRaw);
+	void UpdateHitTiming(float TimeOffsetNormalized = -1.f, float TimeOffsetRaw = -1.f);
 
-	void Init(const FText MinTickValue, const FText MaxTickValue);
+	void Init(const FText& MinTickValue, const FText& MaxTickValue);
 
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
-	FText MakeCurrentTickText(const float TimeOffsetRaw) const;
+	static FText MakeCurrentTickText(const float TimeOffsetRaw);
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UImage* Image_LogoTick;

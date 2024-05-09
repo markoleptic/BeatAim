@@ -3,13 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BSSettingTypes.h"
-#include "DLSSLibrary.h"
 #include "GlobalConstants.h"
-#include "NISLibrary.h"
 #include "InputCoreTypes.h"
-#include "StreamlineLibraryDLSSG.h"
-#include "StreamlineLibraryReflex.h"
 #include "GameFramework/SaveGame.h"
 #include "UserSettings/EnhancedInputUserSettings.h"
 #include "SaveGamePlayerSettings.generated.h"
@@ -151,100 +146,6 @@ struct FPlayerSettings_Game
 		bShowCharacterMesh = true;
 		bShowWeaponMesh = true;
 		bShowHitTimingWidget = true;
-	}
-};
-
-/** DEPRECATED Video and sound settings */
-USTRUCT(BlueprintType)
-struct FPlayerSettings_VideoAndSound
-{
-	GENERATED_USTRUCT_BODY()
-
-	// GlobalVolume, which also affects Menu and Music volume
-	UPROPERTY(BlueprintReadOnly)
-	float GlobalVolume;
-
-	// Volume of the Main Menu Music
-	UPROPERTY(BlueprintReadOnly)
-	float MenuVolume;
-
-	// Volume of the AudioAnalyzer Tracker
-	UPROPERTY(BlueprintReadOnly)
-	float MusicVolume;
-
-	UPROPERTY(BlueprintReadOnly)
-	int32 FrameRateLimitMenu;
-
-	UPROPERTY(BlueprintReadOnly)
-	int32 FrameRateLimitGame;
-
-	UPROPERTY(BlueprintReadOnly)
-	bool bShowFPSCounter;
-
-	// DLSS On/Off
-	UPROPERTY(BlueprintReadOnly)
-	EDLSSEnabledMode DLSSEnabledMode;
-
-	// NIS On/Off
-	UPROPERTY(BlueprintReadOnly)
-	ENISEnabledMode NISEnabledMode;
-
-	// Frame Generation
-	UPROPERTY(BlueprintReadOnly)
-	UStreamlineDLSSGMode FrameGenerationEnabledMode;
-
-	// Super Resolution Mode
-	UPROPERTY(BlueprintReadOnly)
-	UDLSSMode DLSSMode;
-
-	// NIS Mode
-	UPROPERTY(BlueprintReadOnly)
-	UNISMode NISMode;
-
-	// Reflex Mode
-	UPROPERTY(BlueprintReadOnly)
-	UStreamlineReflexMode StreamlineReflexMode;
-
-	UPROPERTY(BlueprintReadOnly)
-	float DLSSSharpness;
-
-	UPROPERTY(BlueprintReadOnly)
-	float NISSharpness;
-
-	UPROPERTY(BlueprintReadOnly)
-	float Brightness;
-
-	FPlayerSettings_VideoAndSound()
-	{
-		GlobalVolume = Constants::DefaultGlobalVolume;
-		MenuVolume = Constants::DefaultMenuVolume;
-		MusicVolume = Constants::DefaultMusicVolume;
-		FrameRateLimitMenu = Constants::DefaultFrameRateLimitMenu;
-		FrameRateLimitGame = Constants::DefaultFrameRateLimitGame;
-		bShowFPSCounter = false;
-		DLSSEnabledMode = EDLSSEnabledMode::On;
-		FrameGenerationEnabledMode = UStreamlineDLSSGMode::On;
-		DLSSMode = UDLSSMode::Auto;
-		DLSSSharpness = 0.f;
-		NISEnabledMode = ENISEnabledMode::Off;
-		NISMode = UNISMode::Off;
-		NISSharpness = 0.f;
-		StreamlineReflexMode = UStreamlineReflexMode::Enabled;
-		Brightness = Constants::DefaultBrightness;
-	}
-
-	float GetPostProcessBiasFromBrightness() const
-	{
-		return FMath::GetMappedRangeValueClamped(
-			FVector2D(Constants::MinValue_Brightness, Constants::MaxValue_Brightness),
-			FVector2D(Constants::MinValue_ExposureCompensation, Constants::MaxValue_ExposureCompensation), Brightness);
-	}
-
-	static float GetBrightnessFromPostProcessBias(const float InBias)
-	{
-		return FMath::GetMappedRangeValueClamped(
-			FVector2D(Constants::MinValue_ExposureCompensation, Constants::MaxValue_ExposureCompensation),
-			FVector2D(Constants::MinValue_Brightness, Constants::MaxValue_Brightness), InBias);
 	}
 };
 
@@ -449,9 +350,6 @@ struct FPlayerSettings
 	FPlayerSettings_Game Game;
 
 	UPROPERTY(BlueprintReadOnly)
-	FPlayerSettings_VideoAndSound VideoAndSound;
-
-	UPROPERTY(BlueprintReadOnly)
 	FPlayerSettings_CrossHair CrossHair;
 
 	UPROPERTY(BlueprintReadOnly)
@@ -461,7 +359,6 @@ struct FPlayerSettings
 	{
 		User = FPlayerSettings_User();
 		Game = FPlayerSettings_Game();
-		VideoAndSound = FPlayerSettings_VideoAndSound();
 		CrossHair = FPlayerSettings_CrossHair();
 		AudioAnalyzer = FPlayerSettings_AudioAnalyzer();
 	}

@@ -56,7 +56,7 @@ private:
 	 *  @param ControlBusKey the name of the control bus
 	 *  @param InVolume the value of the volume, a value between 0 and 100.0
 	 */
-	void SetVolumeForControlBus(const FName& ControlBusKey, float InVolume);
+	void SetVolumeForControlBus(const FName& ControlBusKey, float InVolume) const;
 
 	/** Updates the effective frame rate limit. */
 	void UpdateEffectiveFrameRateLimit();

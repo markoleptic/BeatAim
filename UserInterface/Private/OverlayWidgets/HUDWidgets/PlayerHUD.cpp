@@ -20,7 +20,7 @@ void UPlayerHUD::NativeConstruct()
 	TextBlock_SongTimeElapsed->SetText(FText::FromString(UKismetStringLibrary::TimeSecondsToString(0).LeftChop(3)));
 }
 
-void UPlayerHUD::Init(const TSharedPtr<FBSConfig> InConfig)
+void UPlayerHUD::Init(const TSharedPtr<FBSConfig>& InConfig)
 {
 	Config = InConfig;
 	switch (InConfig->TargetConfig.TargetDamageType)
@@ -41,7 +41,8 @@ void UPlayerHUD::Init(const TSharedPtr<FBSConfig> InConfig)
 		{
 			const int32 Min = -static_cast<int32>(InConfig->TargetConfig.SpawnBeatDelay * 100.f);
 			const FString MinTick = FString::FromInt(Min) + "ms";
-			const int32 Max = (InConfig->TargetConfig.TargetMaxLifeSpan - InConfig->TargetConfig.SpawnBeatDelay) * 100.f;
+			const int32 Max = (InConfig->TargetConfig.TargetMaxLifeSpan - InConfig->TargetConfig.SpawnBeatDelay) *
+				100.f;
 			const FString MaxTick = FString::FromInt(Max) + "ms";
 			HitTimingWidget->Init(FText::FromString(MinTick), FText::FromString(MaxTick));
 		}
@@ -50,7 +51,8 @@ void UPlayerHUD::Init(const TSharedPtr<FBSConfig> InConfig)
 			Box_TrackingAccuracy->SetVisibility(ESlateVisibility::Collapsed);
 			const int32 Min = -static_cast<int32>(InConfig->TargetConfig.SpawnBeatDelay * 100.f);
 			const FString MinTick = FString::FromInt(Min) + "ms";
-			const int32 Max = (InConfig->TargetConfig.TargetMaxLifeSpan - InConfig->TargetConfig.SpawnBeatDelay) * 100.f;
+			const int32 Max = (InConfig->TargetConfig.TargetMaxLifeSpan - InConfig->TargetConfig.SpawnBeatDelay) *
+				100.f;
 			const FString MaxTick = FString::FromInt(Max) + "ms";
 			HitTimingWidget->Init(FText::FromString(MinTick), FText::FromString(MaxTick));
 		}
@@ -78,8 +80,8 @@ void UPlayerHUD::Init(const TSharedPtr<FBSConfig> InConfig)
 
 void UPlayerHUD::OnPlayerSettingsChanged(const FPlayerSettings_Game& GameSettings)
 {
-	if (GameSettings.bShowHitTimingWidget && (Config->TargetConfig.TargetDamageType == ETargetDamageType::Hit ||
-		Config->TargetConfig.TargetDamageType == ETargetDamageType::Combined))
+	if (GameSettings.bShowHitTimingWidget && (Config->TargetConfig.TargetDamageType == ETargetDamageType::Hit || Config
+		->TargetConfig.TargetDamageType == ETargetDamageType::Combined))
 	{
 		if (!HitTimingWidget->GetIsEnabled())
 		{
@@ -98,14 +100,14 @@ void UPlayerHUD::OnPlayerSettingsChanged(const FPlayerSettings_Game& GameSetting
 	}
 }
 
-void UPlayerHUD::UpdateAllElements(const FPlayerScore& Scores, const float NormError, const float Error)
+void UPlayerHUD::UpdateAllElements(const FPlayerScore& Scores, const float TimeOffsetNormalized, const float Error)
 {
 	const float Score = round(Scores.Score);
 	const float HighScore = round(Scores.HighScore);
-	
+
 	TextBlock_CurrentScore->SetText(FText::AsNumber(Score));
 	TextBlock_HighScore->SetText(FText::AsNumber(HighScore < Score ? Score : HighScore));
-	
+
 	switch (Config->TargetConfig.TargetDamageType)
 	{
 	case ETargetDamageType::Tracking:
@@ -162,9 +164,9 @@ void UPlayerHUD::UpdateAllElements(const FPlayerScore& Scores, const float NormE
 	case ETargetDamageType::Self:
 		break;
 	}
-	if (HitTimingWidget->GetIsEnabled())
+	if (HitTimingWidget->GetIsEnabled() && TimeOffsetNormalized > 0.f)
 	{
-		HitTimingWidget->UpdateHitTiming(NormError, Error);
+		HitTimingWidget->UpdateHitTiming(TimeOffsetNormalized, Error);
 	}
 }
 

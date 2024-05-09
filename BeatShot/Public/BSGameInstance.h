@@ -28,8 +28,10 @@ class BEATSHOT_API UBSGameInstance : public UGameInstance, public IBSPlayerSetti
 	virtual void Init() override;
 
 	#if WITH_EDITOR
+	/** Called as soon as the game mode is spawned, prior to creating the local players. */
 	virtual FGameInstancePIEResult PostCreateGameModeForPIE(const FGameInstancePIEParameters& Params,
 		AGameModeBase* GameMode) override;
+	/** Called to actually start the game when doing Play/Simulate In Editor. */
 	virtual FGameInstancePIEResult StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer,
 		const FGameInstancePIEParameters& Params) override;
 	#else
@@ -67,14 +69,14 @@ public:
 	/** Returns the name of the MainMenuLevel. */
 	FName GetMainMenuLevelName() const { return MainMenuLevelName; }
 
-	/** Returns the name of the MainMenuLevel. */
+	/** Returns the name of the RangeLevelName. */
 	FName GetRangeLevelName() const { return RangeLevelName; }
 
 	/** Sets the actor that manages the time of day in the Range level. */
 	void SetTimeOfDayManager(const TObjectPtr<ATimeOfDayManager> InManager) { TimeOfDayManager = InManager; }
 
 	/** Handles saving scores to database, called by BSGameMode. */
-	void SavePlayerScoresToDatabase(ABSPlayerController* PC, const bool bWasValidToSave);
+	void SavePlayerScoresToDatabase(ABSPlayerController* PC, const bool bWasValidToSave) const;
 
 	/** A function pair that can be called externally, executes OnSteamOverlayIsActive(). */
 	void OnSteamOverlayIsOn();
@@ -107,7 +109,10 @@ protected:
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_CrossHair& CrossHairSettings) override;
 
 	UFUNCTION()
-	void HandleMetasoundOutputValueChanged(FName OutputName, const FMetaSoundOutput& Output);
+	void HandleFadeCompleted(FName OutputName, const FMetaSoundOutput& Output);
+
+	UFUNCTION()
+	void HandlePlaybackTimeChanged(FName OutputName, const FMetaSoundOutput& Output);
 
 	/** Object that interfaces with Steam API. */
 	UPROPERTY()
@@ -150,6 +155,8 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UAudioComponent> LoadingScreenAudioComponent = nullptr;
+
+	float LastPlaybackPosition = -1.f;
 };
 
 template <typename... T>
