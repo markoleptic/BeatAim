@@ -6,6 +6,7 @@
 #include "BSPlayerScoreInterface.h"
 #include "BSPlayerSettingsInterface.h"
 #include "HttpRequestInterface.h"
+#include "MetasoundGeneratorHandle.h"
 #include "Engine/GameInstance.h"
 #include "BSGameInstance.generated.h"
 
@@ -157,6 +158,8 @@ protected:
 	TObjectPtr<UAudioComponent> LoadingScreenAudioComponent = nullptr;
 
 	float LastPlaybackPosition = -1.f;
+	FOnMetasoundOutputValueChanged OnFadeCompleted;
+	FOnMetasoundOutputValueChanged PlaybackTime;
 };
 
 template <typename... T>

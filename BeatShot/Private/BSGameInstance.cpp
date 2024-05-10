@@ -31,7 +31,8 @@ void UBSGameInstance::Init()
 	SteamManager = NewObject<USteamManager>(this);
 	SteamManager->AssignGameInstance(this);
 	SteamManager->InitializeSteamManager();
-
+	OnFadeCompleted.BindDynamic(this, &UBSGameInstance::HandleFadeCompleted);
+	PlaybackTime.BindDynamic(this, &UBSGameInstance::HandlePlaybackTimeChanged);
 	UE_LOG(LogTemp, Display, TEXT("UBSGameInstance::Init"));
 }
 
@@ -43,7 +44,6 @@ FGameInstancePIEResult UBSGameInstance::PostCreateGameModeForPIE(const FGameInst
 	UBSGameUserSettings::Get()->Initialize(WorldContext->World());
 	InitializeAudioComponent(WorldContext->World());
 	SetBSConfig(FBSConfig());
-	OnLoadingScreenFadeOutComplete();
 	return Result;
 }
 
@@ -55,6 +55,7 @@ FGameInstancePIEResult UBSGameInstance::StartPlayInEditorGameInstance(ULocalPlay
 	const float FadeTarget = MapName.Equals(MainMenuLevelName.ToString()) ? 1.f : 0.f;
 	const float FadeDuration = bIsInitialLoadingScreen ? 2.f : 0.75f;
 	SetLoadingScreenAudioComponentState(FadeTarget, FadeDuration);
+	OnLoadingScreenFadeOutComplete();
 	return Result;
 }
 
@@ -222,14 +223,6 @@ void UBSGameInstance::InitializeAudioComponent(const UWorld* World)
 	{
 		LoadingScreenAudioComponent = UGameplayStatics::CreateSound2D(World, LoadingScreenSound, 1, 1, 0, nullptr, true,
 			true);
-		if (UMetaSoundOutputSubsystem* Subsystem = World->GetSubsystem<UMetaSoundOutputSubsystem>())
-		{
-			FOnMetasoundOutputValueChanged OnFadeCompleted, PlaybackTime;
-			OnFadeCompleted.BindDynamic(this, &UBSGameInstance::HandleFadeCompleted);
-			Subsystem->WatchOutput(LoadingScreenAudioComponent.Get(), FName("OnFadeCompleted"), OnFadeCompleted);
-			PlaybackTime.BindDynamic(this, &UBSGameInstance::HandlePlaybackTimeChanged);
-			Subsystem->WatchOutput(LoadingScreenAudioComponent.Get(), FName("PlaybackTime"), PlaybackTime);
-		}
 	}
 }
 
@@ -243,20 +236,29 @@ void UBSGameInstance::SetLoadingScreenAudioComponentState(const float FadeTarget
 	{
 		LoadingScreenAudioComponent->SetFloatParameter(FName("FadeTarget"), FadeTarget);
 		LoadingScreenAudioComponent->SetFloatParameter(FName("FadeDuration"), FadeDuration);
-		UE_LOG(LogTemp, Display, TEXT("FadeTarget: %.2f FadeDuration: %.2f"), FadeTarget, FadeDuration);
+
 		if (!LoadingScreenAudioComponent->IsPlaying())
 		{
 			if (LastPlaybackPosition > 0.f)
 			{
 				LoadingScreenAudioComponent->SetFloatParameter(FName("StartTime"), LastPlaybackPosition);
+				LastPlaybackPosition = -1.f;
 			}
 			LoadingScreenAudioComponent->Play();
 		}
-		LoadingScreenAudioComponent->SetTriggerParameter(FName("Fade"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Display, TEXT("Null LoadingScreenAudioComponent"));
+		else
+		{
+			LoadingScreenAudioComponent->SetTriggerParameter(FName("Fade"));
+		}
+		if (UMetaSoundOutputSubsystem* Subsystem = GetWorld()->GetSubsystem<UMetaSoundOutputSubsystem>())
+		{
+			if (!Subsystem->IsTickable())
+			{
+				Subsystem->WatchOutput(LoadingScreenAudioComponent.Get(), FName("PlaybackTime"), PlaybackTime);
+				Subsystem->WatchOutput(LoadingScreenAudioComponent.Get(), FName("OnFadeCompleted"), OnFadeCompleted);
+			}
+		}
+		UE_LOG(LogTemp, Warning, TEXT("FadeTarget: %.2f FadeDuration: %.2f"), FadeTarget, FadeDuration);
 	}
 }
 
@@ -377,10 +379,12 @@ void UBSGameInstance::HandleFadeCompleted(FName OutputName, const FMetaSoundOutp
 {
 	if (float FadeTarget; Output.Get(FadeTarget))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("HandleFadeCompleted: %f"), FadeTarget);
 		if (FadeTarget <= 0.f)
 		{
 			if (LoadingScreenAudioComponent)
 			{
+				UE_LOG(LogTemp, Warning, TEXT("Stopping AudioComponent"));
 				LoadingScreenAudioComponent->Stop();
 			}
 		}
@@ -391,9 +395,10 @@ void UBSGameInstance::HandlePlaybackTimeChanged(FName OutputName, const FMetaSou
 {
 	if (float PlaybackPosition; Output.Get(PlaybackPosition))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("HandlePlaybackTimeChanged: %f"), PlaybackPosition);
 		if (!LoadingScreenAudioComponent->IsPlaying())
 		{
-			UE_LOG(LogTemp, Display, TEXT("Playbackpos: %f"), PlaybackPosition);
+			UE_LOG(LogTemp, Warning, TEXT("Setting LastPlaybackPosition"));
 			LastPlaybackPosition = PlaybackPosition;
 		}
 		else

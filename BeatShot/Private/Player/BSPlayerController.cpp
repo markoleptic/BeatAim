@@ -92,9 +92,6 @@ void ABSPlayerController::BeginPlay()
 	if (UGameplayStatics::GetCurrentLevelName(GetWorld()).Equals(GI->GetMainMenuLevelName().ToString()))
 	{
 		ShowMainMenu();
-		#if WITH_EDITOR
-		FadeScreenFromBlack();
-		#endif
 	}
 }
 
