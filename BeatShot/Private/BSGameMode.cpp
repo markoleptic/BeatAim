@@ -259,24 +259,24 @@ void ABSGameMode::EndGameMode(const bool bSaveScores, const ETransitionState Tra
 	{
 		AATracker->UnloadCapturerAudio();
 		AATracker->UnloadPlayerAudio();
-		AATracker = nullptr;
+		AATracker->MarkAsGarbage();
 	}
 
 	if (AAPlayer)
 	{
 		AAPlayer->UnloadCapturerAudio();
 		AAPlayer->UnloadPlayerAudio();
-		AAPlayer = nullptr;
+		AAPlayer->MarkAsGarbage();
 	}
 
 	if (AudioImporter)
 	{
-		AudioImporter = nullptr;
+		AudioImporter->MarkAsGarbage();
 	}
 	if (AudioCapturer)
 	{
 		AudioCapturer->StopCapture();
-		AudioCapturer = nullptr;
+		AudioCapturer->MarkAsGarbage();
 	}
 	AudioComponent->Stop();
 	AudioComponent->SetSound(nullptr);
@@ -329,6 +329,8 @@ void ABSGameMode::EndGameMode(const bool bSaveScores, const ETransitionState Tra
 	HandleScoreSaving(bSaveScores);
 
 	TargetManager->Clear();
+
+	CollectGarbage(GARBAGE_COLLECTION_KEEPFLAGS);
 
 	if (TransitionState == ETransitionState::QuitToMainMenu && !Controllers.IsEmpty())
 	{
@@ -630,27 +632,18 @@ void ABSGameMode::HandleScoreSaving(const bool bExternalSaveScores)
 		{
 			// Update Steam Stat for Game Mode
 			#if UE_BUILD_SHIPPING
-			if (TimePlayedGameMode > MinStatRequirement_Duration_NumGamesPlayed)
+			if (TimePlayedGameMode > Constants::MinStatRequirement_Duration_NumGamesPlayed)
 			{
-				if (CurrentPlayerScore.Value.DefiningConfig.GameModeType == EGameModeType::Custom)
-				{
-					GI->GetSteamManager()->UpdateStat_NumGamesPlayed(EBaseGameMode::None, 1);
-				}
-				else
-				{
-					GI->GetSteamManager()->UpdateStat_NumGamesPlayed(CurrentPlayerScore.Value.DefiningConfig.BaseGameMode, 1);
-				}
+				GI->GetSteamManager()->UpdateStat_NumGamesPlayed(
+					CurrentPlayerScore.Value.DefiningConfig.GameModeType == EGameModeType::Custom
+					? EBaseGameMode::None
+					: CurrentPlayerScore.Value.DefiningConfig.BaseGameMode, 1);
 			}
 			#else // !UE_BUILD_SHIPPING
-			if (CurrentPlayerScore.Value.DefiningConfig.GameModeType == EGameModeType::Custom)
-			{
-				GI->GetSteamManager()->UpdateStat_NumGamesPlayed(EBaseGameMode::None, 1);
-			}
-			else
-			{
-				GI->GetSteamManager()->UpdateStat_NumGamesPlayed(CurrentPlayerScore.Value.DefiningConfig.BaseGameMode,
-					1);
-			}
+			GI->GetSteamManager()->UpdateStat_NumGamesPlayed(
+				CurrentPlayerScore.Value.DefiningConfig.GameModeType == EGameModeType::Custom
+				? EBaseGameMode::None
+				: CurrentPlayerScore.Value.DefiningConfig.BaseGameMode, 1);
 			#endif // UE_BUILD_SHIPPING
 
 			// Save common score info and completed scores locally

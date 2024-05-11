@@ -80,11 +80,11 @@ protected:
 
 	/** The spawned AATracker object */
 	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Spawned Objects")
-	UAudioAnalyzerManager* AATracker;
+	TObjectPtr<UAudioAnalyzerManager> AATracker;
 
 	/** The spawned AAPlayer object */
 	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Spawned Objects")
-	UAudioAnalyzerManager* AAPlayer;
+	TObjectPtr<UAudioAnalyzerManager> AAPlayer;
 
 	/** The ability set that contains the TrackGun ability for tracking damage type game modes */
 	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Abilities")
@@ -94,10 +94,10 @@ protected:
 	TObjectPtr<UAudioComponent> AudioComponent;
 
 	UPROPERTY()
-	URuntimeAudioImporterLibrary* AudioImporter;
+	TObjectPtr<URuntimeAudioImporterLibrary> AudioImporter;
 
 	UPROPERTY()
-	UCapturableSoundWave* AudioCapturer;
+	TObjectPtr<UCapturableSoundWave> AudioCapturer;
 
 	/** Granted data about the TrackGun ability */
 	FBSGrantedAbilitySet TrackGunAbilityGrantedHandles;

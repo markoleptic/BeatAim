@@ -65,6 +65,8 @@ void UAudioSelectWidget::NativeConstruct()
 		&UAudioSelectWidget::OnCheckStateChanged_PlaybackAudio);
 
 	SetupTooltip(QMark_PlaybackAudio, GetTooltipTextFromKey("PlaybackAudio"));
+	SetupTooltip(QMark_Input, GetTooltipTextFromKey("AF_InputAudioDevice"));
+	SetupTooltip(QMark_Output, GetTooltipTextFromKey("AF_OutputAudioDevice"));
 
 	UAudioAnalyzerManager* Manager = NewObject<UAudioAnalyzerManager>(this);
 	TArray<FString> OutAudioDeviceList;
@@ -80,7 +82,27 @@ void UAudioSelectWidget::NativeConstruct()
 	{
 		ComboBox_InAudioDevices->AddOption(AudioDevice);
 	}
-	PopulateSongOptionComboBox();
+
+	for (const FPlayerScore& SavedScoreObj : LoadPlayerScores())
+	{
+		SongDurationMap.Add(SavedScoreObj.SongTitle, SavedScoreObj.SongLength);
+	}
+
+	TArray<FString> Songs;
+	for (const auto& [Key, Value] : SongDurationMap)
+	{
+		Songs.Add(Key);
+	}
+	Songs.Sort();
+
+	ComboBox_SongTitle->AddOption("");
+	ComboBox_SongTitle->SetSelectedOption("");
+
+	for (const FString& Song : Songs)
+	{
+		ComboBox_SongTitle->AddOption(Song);
+	}
+
 	Box_AudioDevice->SetVisibility(ESlateVisibility::Collapsed);
 	Box_SongTitleLength->SetVisibility(ESlateVisibility::Collapsed);
 	OnValueChanged_Seconds(FText::AsNumber(0), ETextCommit::Type::Default);
@@ -151,7 +173,6 @@ void UAudioSelectWidget::OnButtonClicked_CaptureAudio()
 {
 	AudioConfig.AudioFormat = EAudioFormat::Capture;
 
-	Button_Start->SetIsEnabled(false);
 	Button_LoadFile->SetIsEnabled(false);
 
 	ComboBox_InAudioDevices->ClearSelection();
@@ -163,10 +184,22 @@ void UAudioSelectWidget::OnButtonClicked_CaptureAudio()
 	const FPlayerSettings_AudioAnalyzer PlayerSettings = LoadPlayerSettings().AudioAnalyzer;
 	ComboBox_InAudioDevices->SetSelectedOption(PlayerSettings.LastSelectedInputAudioDevice);
 	ComboBox_OutAudioDevices->SetSelectedOption(PlayerSettings.LastSelectedOutputAudioDevice);
+
+	const bool bAudioDeviceSelectionValid = ComboBox_OutAudioDevices->GetSelectedIndex() != -1 &&
+		ComboBox_InAudioDevices->GetSelectedIndex() != -1;
+	const bool bSongSelectionValid = !ComboBox_SongTitle->GetSelectedOption().IsEmpty() || !Value_SongTitle->GetText().
+		IsEmptyOrWhitespace();
+
+	Button_Start->SetIsEnabled(bAudioDeviceSelectionValid && bSongSelectionValid);
 }
 
 void UAudioSelectWidget::OnButtonClicked_Start()
 {
+	if (ComboBox_SongTitle->GetSelectedOption().IsEmpty() && Value_SongTitle->GetText().IsEmptyOrWhitespace())
+	{
+		Button_Start->SetIsEnabled(false);
+		return;
+	}
 	FPlayerSettings_AudioAnalyzer PlayerSettings = LoadPlayerSettings().AudioAnalyzer;
 	if (!ComboBox_InAudioDevices->GetSelectedOption().IsEmpty())
 	{
@@ -188,14 +221,6 @@ void UAudioSelectWidget::OnButtonClicked_LoadFile()
 	TArray<FString> FileNames;
 	const bool bSuccess = OpenFileDialog(FileNames);
 
-	/*if (bWasInFullScreenMode)
-	{
-		UGameUserSettings* GameUserSettings = UGameUserSettings::GetGameUserSettings();
-		GameUserSettings->SetFullscreenMode(EWindowMode::Fullscreen);
-		GameUserSettings->ApplySettings(false);
-		bWasInFullScreenMode = false;
-	}*/
-
 	if (!bSuccess || FileNames.IsEmpty() || FileNames[0].IsEmpty())
 	{
 		ShowSongPathErrorMessage();
@@ -207,32 +232,26 @@ void UAudioSelectWidget::OnButtonClicked_LoadFile()
 	if (!Manager->InitPlayerAudio(AudioConfig.SongPath))
 	{
 		ShowSongPathErrorMessage();
-		UE_LOG(LogTemp, Display, TEXT("Init Tracker Error"));
 		return;
 	}
-	/* set Song length and song title in BSConfig if using song file */
+	// set Song length and song title in BSConfig if using song file
 	FString Filename, Extension, MetaType, Title, Artist, Album, Year, Genre;
 	Manager->GetMetadata(Filename, Extension, MetaType, Title, Artist, Album, Year, Genre);
+
 	if (Title.IsEmpty())
 	{
-		if (ComboBox_SongTitle->FindOptionIndex(Filename) == -1)
-		{
-			ComboBox_SongTitle->AddOption(Filename);
-		}
-		ComboBox_SongTitle->SetSelectedOption(Filename);
-		Value_SongTitle->SetText(FText::FromString(Filename));
-		AudioConfig.SongTitle = Filename;
+		ShowSongPathErrorMessage();
+		return;
 	}
-	else
+
+	if (ComboBox_SongTitle->FindOptionIndex(Filename) == -1)
 	{
-		if (ComboBox_SongTitle->FindOptionIndex(Title) == -1)
-		{
-			ComboBox_SongTitle->AddOption(Title);
-		}
-		ComboBox_SongTitle->SetSelectedOption(Title);
-		Value_SongTitle->SetText(FText::FromString(Title));
-		AudioConfig.SongTitle = Title;
+		ComboBox_SongTitle->AddOption(Filename);
 	}
+	ComboBox_SongTitle->SetSelectedOption(Filename);
+	Value_SongTitle->SetText(FText::FromString(Filename));
+	AudioConfig.SongTitle = Filename;
+
 	AudioConfig.SongLength = Manager->GetTotalDuration();
 	Box_SongTitleLength->SetVisibility(ESlateVisibility::Visible);
 	Box_SongTitle->SetVisibility(ESlateVisibility::Visible);
@@ -242,30 +261,35 @@ void UAudioSelectWidget::OnButtonClicked_LoadFile()
 
 void UAudioSelectWidget::OnValueChanged_SongTitle(const FText& NewSongTitle, ETextCommit::Type CommitType)
 {
-	if (NewSongTitle.IsEmptyOrWhitespace())
-	{
-		AudioConfig.SongTitle = "";
-	}
-	else
+	const bool bSongTitleTextEmpty = NewSongTitle.IsEmptyOrWhitespace();
+	const bool bComboBoxEmpty = ComboBox_SongTitle->GetSelectedOption().IsEmpty();
+
+	if (!bSongTitleTextEmpty)
 	{
 		AudioConfig.SongTitle = NewSongTitle.ToString();
+		if (CommitType != ESelectInfo::Type::Direct && !bComboBoxEmpty)
+		{
+			ComboBox_SongTitle->SetSelectedOption("");
+		}
 	}
+
+	Button_Start->SetIsEnabled(!bSongTitleTextEmpty || !bComboBoxEmpty);
 }
 
 void UAudioSelectWidget::OnValueChanged_Minutes(const FText& NewMinutes, ETextCommit::Type CommitType)
 {
-	const int32 ClampedValue = FMath::Clamp(FCString::Atoi(*NewMinutes.ToString()), 0, 99);
-	Value_Minutes->SetText(FText::AsNumber(ClampedValue, &NumberFormattingOptions));
-	AudioConfig.SongLength = ClampedValue * 60 + FMath::Clamp(FCString::Atoi(*Value_Seconds->GetText().ToString()), 0,
+	const int32 ClampedMinutes = FMath::Clamp(FCString::Atoi(*NewMinutes.ToString()), 0, 99);
+	Value_Minutes->SetText(FText::AsNumber(ClampedMinutes, &NumberFormattingOptions));
+	AudioConfig.SongLength = ClampedMinutes * 60 + FMath::Clamp(FCString::Atoi(*Value_Seconds->GetText().ToString()), 0,
 		60);
 }
 
 void UAudioSelectWidget::OnValueChanged_Seconds(const FText& NewSeconds, ETextCommit::Type CommitType)
 {
-	const int32 ClampedValue = FMath::Clamp(FCString::Atoi(*NewSeconds.ToString()), 0, 60);
-	Value_Seconds->SetText(FText::AsNumber(ClampedValue, &NumberFormattingOptions));
+	const int32 ClampedSeconds = FMath::Clamp(FCString::Atoi(*NewSeconds.ToString()), 0, 60);
+	Value_Seconds->SetText(FText::AsNumber(ClampedSeconds, &NumberFormattingOptions));
 	AudioConfig.SongLength = FMath::Clamp(FCString::Atoi(*Value_Minutes->GetText().ToString()), 0, 99) * 60 +
-		ClampedValue;
+		ClampedSeconds;
 }
 
 void UAudioSelectWidget::OnSelectionChanged_InAudioDevice(const FString SelectedInAudioDevice,
@@ -277,7 +301,6 @@ void UAudioSelectWidget::OnSelectionChanged_InAudioDevice(const FString Selected
 		Box_SongTitleLength->SetVisibility(ESlateVisibility::Visible);
 		Box_SongTitle->SetVisibility(ESlateVisibility::Visible);
 		Box_SongLength->SetVisibility(ESlateVisibility::Visible);
-		Button_Start->SetIsEnabled(true);
 	}
 }
 
@@ -290,30 +313,40 @@ void UAudioSelectWidget::OnSelectionChanged_OutAudioDevice(const FString Selecte
 		Box_SongTitleLength->SetVisibility(ESlateVisibility::Visible);
 		Box_SongTitle->SetVisibility(ESlateVisibility::Visible);
 		Box_SongLength->SetVisibility(ESlateVisibility::Visible);
-		Button_Start->SetIsEnabled(true);
 	}
 }
 
-void UAudioSelectWidget::OnSelectionChanged_SongTitle(const FString SelectedSongTitle,
-	const ESelectInfo::Type SelectionType)
+void UAudioSelectWidget::OnSelectionChanged_SongTitle(const FString NewSongTitle, const ESelectInfo::Type SelectionType)
 {
-	AudioConfig.SongTitle = SelectedSongTitle;
+	if (const float* SongLength = SongDurationMap.Find(NewSongTitle))
+	{
+		AudioConfig.SongLength = *SongLength;
+		const int32 Minutes = AudioConfig.SongLength / 60;
+		const int32 Seconds = AudioConfig.SongLength - (Minutes * 60);
+		const int32 ClampedMinutes = FMath::Clamp(Minutes, 0, 60);
+		const int32 ClampedSeconds = FMath::Clamp(Seconds, 0, 60);
+		Value_Minutes->SetText(FText::AsNumber(ClampedMinutes, &NumberFormattingOptions));
+		Value_Seconds->SetText(FText::AsNumber(ClampedSeconds, &NumberFormattingOptions));
+	}
+
+	const bool bSongTitleTextEmpty = Value_SongTitle->GetText().IsEmptyOrWhitespace();
+	const bool bComboBoxEmpty = NewSongTitle.IsEmpty();
+
+	if (!bComboBoxEmpty)
+	{
+		AudioConfig.SongTitle = NewSongTitle;
+		if (SelectionType != ESelectInfo::Type::Direct && !bSongTitleTextEmpty)
+		{
+			Value_SongTitle->SetText(FText());
+		}
+	}
+
+	Button_Start->SetIsEnabled(!bSongTitleTextEmpty || !bComboBoxEmpty);
 }
 
 void UAudioSelectWidget::OnCheckStateChanged_PlaybackAudio(const bool bIsChecked)
 {
 	AudioConfig.bPlaybackAudio = bIsChecked;
-}
-
-void UAudioSelectWidget::PopulateSongOptionComboBox()
-{
-	for (const FPlayerScore& SavedScoreObj : LoadPlayerScores())
-	{
-		if (ComboBox_SongTitle->FindOptionIndex(SavedScoreObj.SongTitle) == -1)
-		{
-			ComboBox_SongTitle->AddOption(SavedScoreObj.SongTitle);
-		}
-	}
 }
 
 bool UAudioSelectWidget::OpenFileDialog(TArray<FString>& OutFileNames)

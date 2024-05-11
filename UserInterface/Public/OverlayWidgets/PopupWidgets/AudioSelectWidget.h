@@ -57,6 +57,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UTooltipImage* QMark_PlaybackAudio;
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UTooltipImage* QMark_Input;
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UTooltipImage* QMark_Output;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UBSButton* Button_AudioFromFile;
@@ -126,7 +130,7 @@ private:
 	UFUNCTION()
 	void OnSelectionChanged_OutAudioDevice(const FString SelectedOutAudioDevice, const ESelectInfo::Type SelectionType);
 	UFUNCTION()
-	void OnSelectionChanged_SongTitle(const FString SelectedSongTitle, const ESelectInfo::Type SelectionType);
+	void OnSelectionChanged_SongTitle(const FString NewSongTitle, const ESelectInfo::Type SelectionType);
 	UFUNCTION()
 	void OnCheckStateChanged_PlaybackAudio(const bool bIsChecked);
 
@@ -140,8 +144,6 @@ private:
 	bool FileDialogShared(bool bSave, const void* ParentWindowHandle, const FString& DialogTitle,
 		const FString& DefaultPath, const FString& DefaultFile, const FString& FileTypes, uint32 Flags,
 		TArray<FString>& OutFilenames, int32& OutFilterIndex);
-
-	void PopulateSongOptionComboBox();
 
 	FWidgetAnimationDynamicEvent FadeOutDelegate;
 
@@ -157,4 +159,7 @@ private:
 
 	UPROPERTY()
 	UTooltipWidget* ActiveTooltipWidget;
+
+	UPROPERTY()
+	TMap<FString, float> SongDurationMap;
 };
