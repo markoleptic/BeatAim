@@ -335,8 +335,8 @@ void USpawnAreaManagerComponent::HandleTargetDamageEvent(const FTargetDamageEven
 			// Total Tracking Damage Possible is done on tick in UpdateTotalTrackingDamagePossible
 
 			// Only increment total tracking damage if damage came from player
-			if (!DamageEvent.bDamagedSelf && DamageEvent.DamageDelta > 0.f)
-				SpawnAreaByLoc->IncrementTotalTrackingDamage();
+			if (!DamageEvent.bDamagedSelf && DamageEvent.DamageDelta > 0.f) SpawnAreaByLoc->
+				IncrementTotalTrackingDamage();
 		}
 		break;
 	case ETargetDamageType::Hit:
@@ -901,6 +901,8 @@ TSet<FTargetSpawnParams> USpawnAreaManagerComponent::GetTargetSpawnParams(const 
 			SpawnArea->SetTargetScale(Scales[i++]);
 			if (i >= Scales.Num()) break;
 		}
+
+		UpdateMostRecentGridBlocks(ValidSpawnAreas, NumToSpawn);
 	}
 	/* ------------------------------------ */
 	/* -- All Other Target Distributions -- */
@@ -1201,7 +1203,6 @@ void USpawnAreaManagerComponent::FindAdjacentGridUsingDFS(TSet<USpawnArea*>& Val
 		}
 	}
 	ValidSpawnAreas = MoveTemp(ValidPath);
-	UpdateMostRecentGridBlocks(ValidSpawnAreas, NumToSpawn);
 }
 
 void USpawnAreaManagerComponent::FindGridBlockUsingLargestRectangle(TSet<USpawnArea*>& ValidSpawnAreas,
@@ -1313,8 +1314,6 @@ void USpawnAreaManagerComponent::FindGridBlockUsingLargestRectangle(TSet<USpawnA
 			}
 		}
 	}
-
-	UpdateMostRecentGridBlocks(ValidSpawnAreas, BlockSize);
 }
 
 void USpawnAreaManagerComponent::RemoveOverlappingSpawnAreas(TSet<USpawnArea*>& ValidSpawnAreas,
@@ -1395,13 +1394,34 @@ int32 USpawnAreaManagerComponent::RemoveNonAdjacentIndices(TSet<USpawnArea*>& Va
 void USpawnAreaManagerComponent::UpdateMostRecentGridBlocks(const TSet<USpawnArea*>& ValidSpawnAreas,
 	const int32 NumToSpawn) const
 {
-	const int32 GridBlockCapacity = TargetConfig().MaxNumRecentTargets > 0
-		? ceil(TargetConfig().MaxNumRecentTargets / NumToSpawn)
-		: 1;
-	if (RecentGridBlocks.Num() >= GridBlockCapacity)
+	if (NumToSpawn <= 0 || ValidSpawnAreas.IsEmpty())
+    {
+    	return;
+    }
+	
+	int32 CurrentNumRecentSpawnAreas = 0;
+	for (const auto& GridBlock : RecentGridBlocks)
 	{
-		RecentGridBlocks.Pop();
+		CurrentNumRecentSpawnAreas += GridBlock.Num();
 	}
+
+	int32 NewNumRecentSpawnAreas = CurrentNumRecentSpawnAreas + NumToSpawn;
+
+	if (TargetConfig().RecentTargetMemoryPolicy == ERecentTargetMemoryPolicy::NumTargetsBased)
+	{
+		while (!RecentGridBlocks.IsEmpty() && NewNumRecentSpawnAreas > TargetConfig().MaxNumRecentTargets)
+		{
+			NewNumRecentSpawnAreas -= RecentGridBlocks.Pop().Num();
+		}
+	}
+	else
+	{
+		while (!RecentGridBlocks.IsEmpty())
+		{
+			RecentGridBlocks.Pop();
+		}
+	}
+
 	RecentGridBlocks.Push(ValidSpawnAreas);
 }
 

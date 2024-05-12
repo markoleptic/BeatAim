@@ -10,9 +10,10 @@
 void UCGMWC_TargetScaling::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
-	SliderTextBoxOption_DeactivatedTargetScaleMultiplier->SetValues(Constants::MinValue_ConsecutiveChargeScaleMultiplier,
-		Constants::MaxValue_ConsecutiveChargeScaleMultiplier, Constants::SnapSize_ConsecutiveChargeScaleMultiplier);
+
+	SliderTextBoxOption_DeactivatedTargetScaleMultiplier->SetValues(
+		Constants::MinValue_ConsecutiveChargeScaleMultiplier, Constants::MaxValue_ConsecutiveChargeScaleMultiplier,
+		Constants::SnapSize_ConsecutiveChargeScaleMultiplier);
 	SliderTextBoxOption_StartThreshold->SetValues(Constants::MinValue_DynamicStartThreshold,
 		Constants::MaxValue_DynamicStartThreshold, Constants::SnapSize_DynamicStartThreshold);
 	SliderTextBoxOption_EndThreshold->SetValues(Constants::MinValue_DynamicEndThreshold,
@@ -23,7 +24,7 @@ void UCGMWC_TargetScaling::NativeConstruct()
 		Constants::MaxValue_TargetScale, Constants::SnapSize_TargetScale);
 	MenuOption_TargetScale->SetValues(Constants::MinValue_TargetScale, Constants::MaxValue_TargetScale,
 		Constants::SnapSize_TargetScale);
-	
+
 	SliderTextBoxOption_DeactivatedTargetScaleMultiplier->OnSliderTextBoxValueChanged.AddUObject(this,
 		&ThisClass::OnSliderTextBoxValueChanged);
 	SliderTextBoxOption_StartThreshold->OnSliderTextBoxValueChanged.AddUObject(this,
@@ -34,8 +35,7 @@ void UCGMWC_TargetScaling::NativeConstruct()
 		&ThisClass::OnSliderTextBoxValueChanged);
 	SliderTextBoxOption_LifetimeTargetScaleMultiplier->OnSliderTextBoxValueChanged.AddUObject(this,
 		&ThisClass::OnSliderTextBoxValueChanged);
-	MenuOption_TargetScale->OnMinMaxMenuOptionChanged.AddUObject(this,
-		&ThisClass::OnMinMaxMenuOptionChanged);
+	MenuOption_TargetScale->OnMinMaxMenuOptionChanged.AddUObject(this, &ThisClass::OnMinMaxMenuOptionChanged);
 
 	ComboBoxOption_ConsecutiveTargetScalePolicy->ComboBox->OnSelectionChanged.AddUniqueDynamic(this,
 		&ThisClass::OnSelectionChanged_ConsecutiveTargetScalePolicy);
@@ -52,13 +52,15 @@ void UCGMWC_TargetScaling::NativeConstruct()
 	}
 	ComboBoxOption_ConsecutiveTargetScalePolicy->SortAddOptionsAndSetEnumType<EConsecutiveTargetScalePolicy>(Options);
 	Options.Empty();
-	
+
 	SliderTextBoxOption_StartThreshold->SetVisibility(ESlateVisibility::Collapsed);
 	SliderTextBoxOption_EndThreshold->SetVisibility(ESlateVisibility::Collapsed);
 	SliderTextBoxOption_DecrementAmount->SetVisibility(ESlateVisibility::Collapsed);
 
-	SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_LifetimeTargetScaleMultiplier, EMenuOptionEnabledState::Enabled);
-	SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_DeactivatedTargetScaleMultiplier, EMenuOptionEnabledState::Enabled);
+	SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_LifetimeTargetScaleMultiplier,
+		EMenuOptionEnabledState::Enabled);
+	SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_DeactivatedTargetScaleMultiplier,
+		EMenuOptionEnabledState::Enabled);
 
 	SetupWarningTooltipCallbacks();
 	UpdateBrushColors();
@@ -96,12 +98,12 @@ void UCGMWC_TargetScaling::UpdateOptionsFromConfig()
 void UCGMWC_TargetScaling::SetupWarningTooltipCallbacks()
 {
 	MenuOption_TargetScale->AddDynamicWarningTooltipData(
-	FTooltipData("Invalid_Grid_MaxSpawnedTargetScale", ETooltipImageType::Warning),
-	"Invalid_Grid_MaxSpawnedTargetScale_Fallback", Constants::MinValue_TargetScale, 2).BindLambda([this]()
+		FTooltipData("Invalid_Grid_MaxSpawnedTargetScale", ETooltipImageType::Warning),
+		"Invalid_Grid_MaxSpawnedTargetScale_Fallback", Constants::MinValue_TargetScale, 2).BindLambda([this]()
 	{
 		const float Max = FMath::Max(BSConfig->TargetConfig.MaxSpawnedTargetScale,
 			BSConfig->TargetConfig.MinSpawnedTargetScale);
-		return FDynamicTooltipState(Max, GetMaxAllowedTargetScale(), !MenuOption_TargetScale->IsInConstantMode());
+		return FDynamicTooltipState(Max, GetMaxAllowedTargetScale());
 	});
 }
 
@@ -110,25 +112,28 @@ void UCGMWC_TargetScaling::UpdateDependentOptions_TargetActivationResponses(
 {
 	if (InResponses.Contains(ETargetActivationResponse::ApplyLifetimeTargetScaling))
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_LifetimeTargetScaleMultiplier, EMenuOptionEnabledState::Enabled);
+		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_LifetimeTargetScaleMultiplier,
+			EMenuOptionEnabledState::Enabled);
 	}
 	else
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_LifetimeTargetScaleMultiplier, EMenuOptionEnabledState::DependentMissing, "DM_LifetimeTargetScaleMultiplier");
+		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_LifetimeTargetScaleMultiplier,
+			EMenuOptionEnabledState::DependentMissing, "DM_LifetimeTargetScaleMultiplier");
 	}
 }
 
 void UCGMWC_TargetScaling::UpdateDependentOptions_TargetDeactivationResponses(
 	const TArray<ETargetDeactivationCondition>& Conditions, const TArray<ETargetDeactivationResponse>& Responses)
 {
-
 	if (Responses.Contains(ETargetDeactivationResponse::ApplyDeactivatedTargetScaleMultiplier))
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_DeactivatedTargetScaleMultiplier, EMenuOptionEnabledState::Enabled);
+		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_DeactivatedTargetScaleMultiplier,
+			EMenuOptionEnabledState::Enabled);
 	}
 	else
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_DeactivatedTargetScaleMultiplier, EMenuOptionEnabledState::DependentMissing, "DM_DeactivatedTargetScaleMultiplier");
+		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_DeactivatedTargetScaleMultiplier,
+			EMenuOptionEnabledState::DependentMissing, "DM_DeactivatedTargetScaleMultiplier");
 	}
 }
 
@@ -197,11 +202,12 @@ void UCGMWC_TargetScaling::OnMinMaxMenuOptionChanged(UConstantMinMaxMenuOptionWi
 		{
 			BSConfig->TargetConfig.ConsecutiveTargetScalePolicy = EConsecutiveTargetScalePolicy::Static;
 			UpdateValueIfDifferent(ComboBoxOption_ConsecutiveTargetScalePolicy,
-			GetStringFromEnum_FromTagMap(BSConfig->TargetConfig.ConsecutiveTargetScalePolicy));
+				GetStringFromEnum_FromTagMap(BSConfig->TargetConfig.ConsecutiveTargetScalePolicy));
 			UpdateDependentOptions_ConsecutiveTargetScalePolicy(BSConfig->TargetConfig.ConsecutiveTargetScalePolicy);
 		}
 		// Constant has been unchecked while Static
-		else if (!bChecked && BSConfig->TargetConfig.ConsecutiveTargetScalePolicy == EConsecutiveTargetScalePolicy::Static)
+		else if (!bChecked && BSConfig->TargetConfig.ConsecutiveTargetScalePolicy ==
+			EConsecutiveTargetScalePolicy::Static)
 		{
 			if (LastSelectedConsecutiveTargetScalePolicy != EConsecutiveTargetScalePolicy::None)
 			{
@@ -212,10 +218,9 @@ void UCGMWC_TargetScaling::OnMinMaxMenuOptionChanged(UConstantMinMaxMenuOptionWi
 				BSConfig->TargetConfig.ConsecutiveTargetScalePolicy = EConsecutiveTargetScalePolicy::Random;
 			}
 			UpdateValueIfDifferent(ComboBoxOption_ConsecutiveTargetScalePolicy,
-			GetStringFromEnum_FromTagMap(BSConfig->TargetConfig.ConsecutiveTargetScalePolicy));
+				GetStringFromEnum_FromTagMap(BSConfig->TargetConfig.ConsecutiveTargetScalePolicy));
 			UpdateDependentOptions_ConsecutiveTargetScalePolicy(BSConfig->TargetConfig.ConsecutiveTargetScalePolicy);
 		}
-
 	}
 	UpdateBrushColors();
 	UpdateAllOptionsValid();
@@ -229,7 +234,8 @@ void UCGMWC_TargetScaling::OnSelectionChanged_ConsecutiveTargetScalePolicy(const
 		return;
 	}
 
-	BSConfig->TargetConfig.ConsecutiveTargetScalePolicy = GetEnumFromString_FromTagMap<EConsecutiveTargetScalePolicy>(Selected[0]);
+	BSConfig->TargetConfig.ConsecutiveTargetScalePolicy = GetEnumFromString_FromTagMap<
+		EConsecutiveTargetScalePolicy>(Selected[0]);
 	UpdateDependentOptions_ConsecutiveTargetScalePolicy(BSConfig->TargetConfig.ConsecutiveTargetScalePolicy);
 
 	if (BSConfig->TargetConfig.ConsecutiveTargetScalePolicy == EConsecutiveTargetScalePolicy::Static)
@@ -249,6 +255,7 @@ void UCGMWC_TargetScaling::OnSelectionChanged_ConsecutiveTargetScalePolicy(const
 FString UCGMWC_TargetScaling::GetComboBoxEntryTooltipStringTableKey_ConsecutiveTargetScalePolicy(
 	const FString& EnumString)
 {
-	const EConsecutiveTargetScalePolicy EnumValue = GetEnumFromString_FromTagMap<EConsecutiveTargetScalePolicy>(EnumString);
+	const EConsecutiveTargetScalePolicy EnumValue = GetEnumFromString_FromTagMap<
+		EConsecutiveTargetScalePolicy>(EnumString);
 	return GetStringTableKeyNameFromEnum(EnumValue);
 }
