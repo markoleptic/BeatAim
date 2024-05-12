@@ -59,8 +59,6 @@ protected:
 	UTooltipImage* QMark_PlaybackAudio;
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UTooltipImage* QMark_Input;
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	UTooltipImage* QMark_Output;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UBSButton* Button_AudioFromFile;
@@ -84,8 +82,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UComboBoxString* ComboBox_InAudioDevices;
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	UComboBoxString* ComboBox_OutAudioDevices;
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UComboBoxString* ComboBox_SongTitle;
 
@@ -128,8 +124,6 @@ private:
 	UFUNCTION()
 	void OnSelectionChanged_InAudioDevice(const FString SelectedInAudioDevice, const ESelectInfo::Type SelectionType);
 	UFUNCTION()
-	void OnSelectionChanged_OutAudioDevice(const FString SelectedOutAudioDevice, const ESelectInfo::Type SelectionType);
-	UFUNCTION()
 	void OnSelectionChanged_SongTitle(const FString NewSongTitle, const ESelectInfo::Type SelectionType);
 	UFUNCTION()
 	void OnCheckStateChanged_PlaybackAudio(const bool bIsChecked);
@@ -153,9 +147,6 @@ private:
 	/** Contains information relating to the audio format the user has selected. Passed to GameModesWidget
 	 *  using OnStartButtonClickedDelegate */
 	FBS_AudioConfig AudioConfig;
-
-	/** Whether or not the user was in fullscreen mode before OpenFileDialog */
-	bool bWasInFullScreenMode;
 
 	UPROPERTY()
 	UTooltipWidget* ActiveTooltipWidget;

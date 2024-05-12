@@ -403,8 +403,7 @@ enum class ETransitionState : uint8
 	QuitToMainMenu UMETA(DisplayName="QuitToMainMenu"),
 	QuitToDesktop UMETA(DisplayName="QuitToDesktop"),
 	PlayAgain UMETA(DisplayName="PlayAgain"),
-	None UMETA(DisplayName="None")
-};
+	None UMETA(DisplayName="None")};
 
 ENUM_RANGE_BY_FIRST_AND_LAST(ETransitionState, ETransitionState::StartFromMainMenu, ETransitionState::None);
 
@@ -487,11 +486,12 @@ struct FBS_DefiningConfig
 	}
 };
 
-template<typename T>
+template <typename T>
 bool CheckEquality(const T& CurrentValue, const T& NewValue)
 {
 	return CurrentValue == NewValue;
 }
+
 USTRUCT(BlueprintType)
 struct FBS_AIConfig
 {
@@ -638,10 +638,6 @@ struct FBS_AudioConfig
 	UPROPERTY(BlueprintReadOnly, Transient)
 	FString InAudioDevice;
 
-	/** The output audio device */
-	UPROPERTY(BlueprintReadOnly, Transient)
-	FString OutAudioDevice;
-
 	/** The path to the song file */
 	UPROPERTY(BlueprintReadOnly, Transient)
 	FString SongPath;
@@ -656,10 +652,9 @@ struct FBS_AudioConfig
 
 	FBS_AudioConfig()
 	{
-		bPlaybackAudio = false;
+		bPlaybackAudio = true;
 		AudioFormat = EAudioFormat::None;
 		InAudioDevice = "";
-		OutAudioDevice = "";
 		SongPath = "";
 		SongTitle = "";
 		SongLength = 0.f;
@@ -1457,7 +1452,7 @@ struct FBSConfig
 		}
 		return FString();
 	}
-	
+
 	/** Returns a serialized Json object representation of the struct */
 	FString EncodeToString() const
 	{
@@ -1465,7 +1460,6 @@ struct FBSConfig
 		if (!JsonString.IsEmpty())
 		{
 			return FBase64::Encode(JsonString);
-			
 		}
 		return FString();
 	}
@@ -1477,12 +1471,12 @@ struct FBSConfig
 		const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
 		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
 		{
-			return FJsonObjectConverter::JsonObjectToUStruct<FBSConfig>(JsonObject.ToSharedRef(), &OutConfig,
-				0, CPF_Transient | CPF_SkipSerialization, false, OutFailReason);
+			return FJsonObjectConverter::JsonObjectToUStruct<FBSConfig>(JsonObject.ToSharedRef(), &OutConfig, 0,
+				CPF_Transient | CPF_SkipSerialization, false, OutFailReason);
 		}
 		return false;
 	}
-	
+
 	/** Initializes the OutConfig from a serialized Json object, returns true if successful */
 	static bool DecodeFromString(const FString& EncodedString, FBSConfig& OutConfig, FText* OutFailReason = nullptr)
 	{
@@ -1545,6 +1539,7 @@ public:
 	{
 		return DefaultGameModes;
 	}
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ForceInlineRow))
 	TMap<FBS_DefiningConfig, FBSConfig> DefaultGameModes;

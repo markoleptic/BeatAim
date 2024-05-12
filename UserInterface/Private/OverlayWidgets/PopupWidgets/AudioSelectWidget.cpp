@@ -58,26 +58,17 @@ void UAudioSelectWidget::NativeConstruct()
 	Value_Minutes->OnTextCommitted.AddUniqueDynamic(this, &UAudioSelectWidget::OnValueChanged_Minutes);
 	ComboBox_InAudioDevices->OnSelectionChanged.AddUniqueDynamic(this,
 		&UAudioSelectWidget::OnSelectionChanged_InAudioDevice);
-	ComboBox_OutAudioDevices->OnSelectionChanged.AddUniqueDynamic(this,
-		&UAudioSelectWidget::OnSelectionChanged_OutAudioDevice);
 	ComboBox_SongTitle->OnSelectionChanged.AddUniqueDynamic(this, &UAudioSelectWidget::OnSelectionChanged_SongTitle);
 	Checkbox_PlaybackAudio->OnCheckStateChanged.AddUniqueDynamic(this,
 		&UAudioSelectWidget::OnCheckStateChanged_PlaybackAudio);
 
 	SetupTooltip(QMark_PlaybackAudio, GetTooltipTextFromKey("PlaybackAudio"));
 	SetupTooltip(QMark_Input, GetTooltipTextFromKey("AF_InputAudioDevice"));
-	SetupTooltip(QMark_Output, GetTooltipTextFromKey("AF_OutputAudioDevice"));
 
 	UAudioAnalyzerManager* Manager = NewObject<UAudioAnalyzerManager>(this);
-	TArray<FString> OutAudioDeviceList;
 	TArray<FString> InAudioDeviceList;
-	Manager->GetOutputAudioDevices(OutAudioDeviceList);
 	Manager->GetInputAudioDevices(InAudioDeviceList);
 
-	for (const FString& AudioDevice : OutAudioDeviceList)
-	{
-		ComboBox_OutAudioDevices->AddOption(AudioDevice);
-	}
 	for (const FString& AudioDevice : InAudioDeviceList)
 	{
 		ComboBox_InAudioDevices->AddOption(AudioDevice);
@@ -105,6 +96,9 @@ void UAudioSelectWidget::NativeConstruct()
 
 	Box_AudioDevice->SetVisibility(ESlateVisibility::Collapsed);
 	Box_SongTitleLength->SetVisibility(ESlateVisibility::Collapsed);
+
+	Checkbox_PlaybackAudio->SetIsChecked(true);
+
 	OnValueChanged_Seconds(FText::AsNumber(0), ETextCommit::Type::Default);
 	OnValueChanged_Minutes(FText::AsNumber(0), ETextCommit::Type::Default);
 }
@@ -163,7 +157,6 @@ void UAudioSelectWidget::OnButtonClicked_AudioFromFile()
 	Button_LoadFile->SetIsEnabled(true);
 
 	ComboBox_InAudioDevices->ClearSelection();
-	ComboBox_OutAudioDevices->ClearSelection();
 
 	Box_AudioDevice->SetVisibility(ESlateVisibility::Collapsed);
 	Box_SongTitleLength->SetVisibility(ESlateVisibility::Collapsed);
@@ -176,17 +169,15 @@ void UAudioSelectWidget::OnButtonClicked_CaptureAudio()
 	Button_LoadFile->SetIsEnabled(false);
 
 	ComboBox_InAudioDevices->ClearSelection();
-	ComboBox_OutAudioDevices->ClearSelection();
 
 	Box_AudioDevice->SetVisibility(ESlateVisibility::Visible);
 	Box_SongTitleLength->SetVisibility(ESlateVisibility::Collapsed);
 
 	const FPlayerSettings_AudioAnalyzer PlayerSettings = LoadPlayerSettings().AudioAnalyzer;
-	ComboBox_InAudioDevices->SetSelectedOption(PlayerSettings.LastSelectedInputAudioDevice);
-	ComboBox_OutAudioDevices->SetSelectedOption(PlayerSettings.LastSelectedOutputAudioDevice);
 
-	const bool bAudioDeviceSelectionValid = ComboBox_OutAudioDevices->GetSelectedIndex() != -1 &&
-		ComboBox_InAudioDevices->GetSelectedIndex() != -1;
+	ComboBox_InAudioDevices->SetSelectedOption(PlayerSettings.LastSelectedInputAudioDevice);
+
+	const bool bAudioDeviceSelectionValid = ComboBox_InAudioDevices->GetSelectedIndex() != -1;
 	const bool bSongSelectionValid = !ComboBox_SongTitle->GetSelectedOption().IsEmpty() || !Value_SongTitle->GetText().
 		IsEmptyOrWhitespace();
 
@@ -204,10 +195,6 @@ void UAudioSelectWidget::OnButtonClicked_Start()
 	if (!ComboBox_InAudioDevices->GetSelectedOption().IsEmpty())
 	{
 		PlayerSettings.LastSelectedInputAudioDevice = ComboBox_InAudioDevices->GetSelectedOption();
-	}
-	if (!ComboBox_OutAudioDevices->GetSelectedOption().IsEmpty())
-	{
-		PlayerSettings.LastSelectedOutputAudioDevice = ComboBox_OutAudioDevices->GetSelectedOption();
 	}
 	SavePlayerSettings(PlayerSettings);
 	if (!OnStartButtonClickedDelegate.ExecuteIfBound(AudioConfig))
@@ -295,21 +282,9 @@ void UAudioSelectWidget::OnValueChanged_Seconds(const FText& NewSeconds, ETextCo
 void UAudioSelectWidget::OnSelectionChanged_InAudioDevice(const FString SelectedInAudioDevice,
 	const ESelectInfo::Type SelectionType)
 {
-	AudioConfig.InAudioDevice = SelectedInAudioDevice;
-	if (ComboBox_OutAudioDevices->GetSelectedIndex() != -1 && ComboBox_InAudioDevices->GetSelectedIndex() != -1)
+	if (ComboBox_InAudioDevices->GetSelectedIndex() != -1)
 	{
-		Box_SongTitleLength->SetVisibility(ESlateVisibility::Visible);
-		Box_SongTitle->SetVisibility(ESlateVisibility::Visible);
-		Box_SongLength->SetVisibility(ESlateVisibility::Visible);
-	}
-}
-
-void UAudioSelectWidget::OnSelectionChanged_OutAudioDevice(const FString SelectedOutAudioDevice,
-	const ESelectInfo::Type SelectionType)
-{
-	AudioConfig.OutAudioDevice = SelectedOutAudioDevice;
-	if (ComboBox_OutAudioDevices->GetSelectedIndex() != -1 && ComboBox_InAudioDevices->GetSelectedIndex() != -1)
-	{
+		AudioConfig.InAudioDevice = SelectedInAudioDevice;
 		Box_SongTitleLength->SetVisibility(ESlateVisibility::Visible);
 		Box_SongTitle->SetVisibility(ESlateVisibility::Visible);
 		Box_SongLength->SetVisibility(ESlateVisibility::Visible);

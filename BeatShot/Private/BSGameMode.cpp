@@ -6,6 +6,7 @@
 #include "Visualizers/VisualizerManager.h"
 #include "Character/BSCharacter.h"
 #include "BSGameInstance.h"
+#include "BSGameUserSettings.h"
 #include "MediaSoundComponent.h"
 #include "RuntimeAudioImporterLibrary.h"
 #include "AbilitySystem/BSAbilitySystemComponent.h"
@@ -432,6 +433,7 @@ void ABSGameMode::RegisterGun(ABSGun* InGun)
 bool ABSGameMode::InitializeAudioManagers()
 {
 	AATracker = NewObject<UAudioAnalyzerManager>(this);
+	UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 
 	switch (BSConfig->AudioConfig.AudioFormat)
 	{
@@ -452,7 +454,7 @@ bool ABSGameMode::InitializeAudioManagers()
 	case EAudioFormat::Capture:
 		{
 			AATracker->SetDefaultDevicesCapturerAudio(*BSConfig->AudioConfig.InAudioDevice,
-				*BSConfig->AudioConfig.OutAudioDevice);
+				*GameUserSettings->GetAudioOutputDeviceId());
 			if (!AATracker->InitCapturerAudioEx(48000, EAA_AudioDepth::B_16, EAA_AudioFormat::Signed_Int, 1.f, false))
 			{
 				return false;
@@ -469,8 +471,8 @@ bool ABSGameMode::InitializeAudioManagers()
 	case EAudioFormat::Loopback:
 		{
 			AATracker->SetDefaultDevicesCapturerAudio(*BSConfig->AudioConfig.InAudioDevice,
-				*BSConfig->AudioConfig.OutAudioDevice);
-			AATracker->SetDefaultDeviceLoopbackAudio(*BSConfig->AudioConfig.OutAudioDevice);
+				*GameUserSettings->GetAudioOutputDeviceId());
+			AATracker->SetDefaultDeviceLoopbackAudio(*GameUserSettings->GetAudioOutputDeviceId());
 			if (!AATracker->InitLoopbackAudio())
 			{
 				return false;

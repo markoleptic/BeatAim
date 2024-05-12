@@ -308,9 +308,6 @@ struct FPlayerSettings_AudioAnalyzer
 	UPROPERTY(BlueprintReadOnly)
 	FString LastSelectedInputAudioDevice;
 
-	UPROPERTY(BlueprintReadOnly)
-	FString LastSelectedOutputAudioDevice;
-
 	FPlayerSettings_AudioAnalyzer()
 	{
 		BandLimits = Constants::DefaultBandLimits;
@@ -321,7 +318,6 @@ struct FPlayerSettings_AudioAnalyzer
 		HistorySize = Constants::DefaultHistorySize;
 		MaxNumBandChannels = Constants::DefaultMaxNumBandChannels;
 		LastSelectedInputAudioDevice = "";
-		LastSelectedOutputAudioDevice = "";
 	}
 
 	/** Resets all settings to default, but keeps audio device information */

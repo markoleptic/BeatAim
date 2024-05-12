@@ -60,7 +60,6 @@ void UPostGameMenuWidget::ShowAudioFormatSelect()
 		GameModeTransitionState.BSConfig.AudioConfig.SongTitle = AudioConfig.SongTitle;
 		GameModeTransitionState.BSConfig.AudioConfig.SongLength = AudioConfig.SongLength;
 		GameModeTransitionState.BSConfig.AudioConfig.InAudioDevice = AudioConfig.InAudioDevice;
-		GameModeTransitionState.BSConfig.AudioConfig.OutAudioDevice = AudioConfig.OutAudioDevice;
 		GameModeTransitionState.BSConfig.AudioConfig.SongPath = AudioConfig.SongPath;
 		GameModeTransitionState.BSConfig.AudioConfig.bPlaybackAudio = AudioConfig.bPlaybackAudio;
 		GameModeTransitionState.BSConfig.AudioConfig.AudioFormat = AudioConfig.AudioFormat;
