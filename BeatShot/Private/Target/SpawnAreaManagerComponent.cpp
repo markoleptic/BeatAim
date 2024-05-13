@@ -60,7 +60,7 @@ USpawnAreaManagerComponent::USpawnAreaManagerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	bShowDebug_AllSpawnAreas = false;
 	bShowDebug_ValidInvalidSpawnAreas = false;
 	bPrintDebug_SpawnAreaStateInfo = false;
@@ -73,7 +73,7 @@ USpawnAreaManagerComponent::USpawnAreaManagerComponent()
 	ShowDebug_Vertices = 0;
 	bPrintDebug_Grid = false;
 	bShowDebug_NonAdjacent = false;
-	#endif
+#endif
 
 	BSConfig = nullptr;
 	TotalSpawnAreaSize = FIntVector3();
@@ -116,7 +116,7 @@ FIntVector3 USpawnAreaManagerComponent::Init(const TSharedPtr<FBSConfig>& InConf
 
 	OriginSpawnArea = GetSpawnArea(Origin);
 
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	if (!GIsAutomationTesting)
 	{
 		UE_LOG(LogTargetManager, Display, TEXT("Origin: %s "), *Origin.ToString());
@@ -128,7 +128,7 @@ FIntVector3 USpawnAreaManagerComponent::Init(const TSharedPtr<FBSConfig>& InConf
 		UE_LOG(LogTargetManager, Display, TEXT("Num Spawn Areas: %d Allocated Size: %llu"), SpawnAreas.Num(),
 			SpawnAreas.GetAllocatedSize());
 	}
-	#endif
+#endif
 
 	return SpawnAreaDimensions;
 }
@@ -275,9 +275,9 @@ void USpawnAreaManagerComponent::Clear()
 
 	RequestRLCSpawnArea.Unbind();
 
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	FlushPersistentDebugLines(GetWorld());
-	#endif
+#endif
 }
 
 bool USpawnAreaManagerComponent::ShouldConsiderManagedAsInvalid() const
@@ -311,9 +311,9 @@ void USpawnAreaManagerComponent::HandleTargetDamageEvent(const FTargetDamageEven
 	USpawnArea* SpawnArea = GetSpawnArea(DamageEvent.Guid);
 	if (!SpawnArea)
 	{
-		#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 		UE_LOG(LogTargetManager, Warning, TEXT("Could not find SpawnArea from DamageEvent Guid."));
-		#endif
+#endif
 		return;
 	}
 
@@ -325,10 +325,10 @@ void USpawnAreaManagerComponent::HandleTargetDamageEvent(const FTargetDamageEven
 			USpawnArea* SpawnAreaByLoc = GetSpawnArea(DamageEvent.Transform.GetLocation());
 			if (!SpawnAreaByLoc)
 			{
-				#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 				UE_LOG(LogTargetManager, Warning, TEXT("Could not find SpawnArea from Transform: %s."),
 					*DamageEvent.Transform.GetLocation().ToString());
-				#endif
+#endif
 				return;
 			}
 
@@ -364,9 +364,9 @@ void USpawnAreaManagerComponent::HandleTargetDamageEvent(const FTargetDamageEven
 	case ETargetDamageType::None:
 	case ETargetDamageType::Combined:
 		{
-			#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 			UE_LOG(LogTargetManager, Warning, TEXT("DamageEvent with DamageType None or Combined."));
-			#endif
+#endif
 		}
 		break;
 	}
@@ -736,12 +736,12 @@ void USpawnAreaManagerComponent::RemoveRecentFlagFromSpawnArea(USpawnArea* Spawn
 
 void USpawnAreaManagerComponent::RefreshRecentFlags()
 {
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	if (bPrintDebug_SpawnAreaStateInfo)
 	{
 		PrintDebug_SpawnAreaStateInfo();
 	}
-	#endif
+#endif
 
 	if (TargetConfig().RecentTargetMemoryPolicy != ERecentTargetMemoryPolicy::NumTargetsBased) return;
 
@@ -844,12 +844,12 @@ TSet<FTargetSpawnParams> USpawnAreaManagerComponent::GetTargetSpawnParams(const 
 		// Get all SpawnAreas that are managed, deactivated, and not recent
 		ValidSpawnAreas = GetUnflaggedSpawnAreas();
 
-		#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 		if (bShowDebug_SpawnableSpawnAreas && !GIsAutomationTesting)
 		{
 			DebugCached_SpawnableValidSpawnAreas = ValidSpawnAreas;
 		}
-		#endif
+#endif
 
 		// Don't make every function have to check this
 		if (ValidSpawnAreas.IsEmpty()) return TSet<FTargetSpawnParams>();
@@ -961,12 +961,12 @@ TSet<FTargetSpawnParams> USpawnAreaManagerComponent::GetTargetSpawnParams(const 
 			// If multiple are spawning with different scales, one further along might be able to fit
 			if (ValidSpawnAreasCopy.IsEmpty()) continue;
 
-			#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 			if (bShowDebug_SpawnableSpawnAreas && i == 0 && !GIsAutomationTesting)
 			{
 				DebugCached_SpawnableValidSpawnAreas = ValidSpawnAreas;
 			}
-			#endif
+#endif
 
 			if (USpawnArea* Chosen = ChooseSpawnableSpawnArea(PreviousSpawnArea, ValidSpawnAreasCopy, ChosenSpawnAreas))
 			{
@@ -1234,21 +1234,21 @@ void USpawnAreaManagerComponent::FindGridBlockUsingLargestRectangle(TSet<USpawnA
 		}
 		UpdateRectangleCandidateAdjacentIndices(Rectangles, Adjacent);
 
-		#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 		if (bPrintDebug_Grid)
 		{
 			UE_LOG(LogTemp, Display, TEXT("Number Of Adjacent Spawn Areas: %d"), Adjacent.Num());
 		}
-		#endif
+#endif
 	}
 
 	// Choose a rectangle
 	FRectCandidate&& ChosenRectangle = ChooseRectangleCandidate(Rectangles, bBordering, BlockSize);
 	if (!ChosenRectangle.HasChosenSubRectangle())
 	{
-		#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 		UE_LOG(LogTargetManager, Warning, TEXT("Chosen Rectangle does not have Chosen SubRectangle"));
-		#endif
+#endif
 		return;
 	}
 
@@ -1258,13 +1258,13 @@ void USpawnAreaManagerComponent::FindGridBlockUsingLargestRectangle(TSet<USpawnA
 	// Choose the position and start/end indices within the chosen rectangle's available area
 	const auto [bIAsRow, bIncrement] = ChooseRectanglePosition(ChosenRectangle, Orientation, bBordering);
 
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	if (bPrintDebug_Grid)
 	{
 		PrintDebug_Matrix(IndexValidity, TotalSpawnAreaSize.Z, TotalSpawnAreaSize.Y);
 		PrintDebug_GridLargestRect(Rectangles, ChosenRectangle, TotalSpawnAreaSize.Y, Orientation);
 	}
-	#endif
+#endif
 
 	auto ICheck = [&](const int32 Index)
 	{
@@ -1293,12 +1293,12 @@ void USpawnAreaManagerComponent::FindGridBlockUsingLargestRectangle(TSet<USpawnA
 			{
 				ValidSpawnAreas.Add(SpawnArea);
 			}
-			#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 			else
 			{
 				UE_LOG(LogTargetManager, Warning, TEXT("Invalid Index: %d"), Index);
 			}
-			#endif
+#endif
 		}
 	}
 
@@ -1338,7 +1338,7 @@ void USpawnAreaManagerComponent::RemoveOverlappingSpawnAreas(TSet<USpawnArea*>& 
 		}
 		else
 		{
-			#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 			if (!GIsAutomationTesting)
 			{
 				Invalid.Append(SpawnArea->SetMakeDebugOccupiedVertices(NewScale));
@@ -1347,9 +1347,9 @@ void USpawnAreaManagerComponent::RemoveOverlappingSpawnAreas(TSet<USpawnArea*>& 
 			{
 				Invalid.Append(SpawnArea->MakeOccupiedVertices(NewScale));
 			}
-			#else
+#else
 			Invalid.Append(SpawnArea->MakeOccupiedVertices(NewScale));
-			#endif
+#endif
 		}
 	}
 
@@ -1380,12 +1380,12 @@ int32 USpawnAreaManagerComponent::RemoveNonAdjacentIndices(TSet<USpawnArea*>& Va
 		}
 	}
 
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	if (bShowDebug_NonAdjacent)
 	{
 		DebugCached_NonAdjacentSpawnAreas = ValidSpawnAreas.Difference(BorderingSpawnAreas);
 	}
-	#endif
+#endif
 
 	ValidSpawnAreas = MoveTemp(BorderingSpawnAreas);
 	return PreviousSize - ValidSpawnAreas.Num();
@@ -1395,10 +1395,10 @@ void USpawnAreaManagerComponent::UpdateMostRecentGridBlocks(const TSet<USpawnAre
 	const int32 NumToSpawn) const
 {
 	if (NumToSpawn <= 0 || ValidSpawnAreas.IsEmpty())
-    {
-    	return;
-    }
-	
+	{
+		return;
+	}
+
 	int32 CurrentNumRecentSpawnAreas = 0;
 	for (const auto& GridBlock : RecentGridBlocks)
 	{
@@ -1869,12 +1869,12 @@ FAccuracyData USpawnAreaManagerComponent::GetLocationAccuracy()
 	TotalSpawns.Init(-1, SpawnAreas.Num());
 	TotalHits.Init(0, SpawnAreas.Num());
 
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	int32 TotalSpawnsValueRef = 0;
 	int32 TotalHitsValueRef = 0;
 	int32 TotalSpawnsValueTest = 0;
 	int32 TotalHitsValueTest = 0;
-	#endif
+#endif
 
 	const bool bHitDamage = TargetConfig().TargetDamageType == ETargetDamageType::Hit;
 	// For now only handle separate Hit and Tracking Damage
@@ -1892,7 +1892,7 @@ FAccuracyData USpawnAreaManagerComponent::GetLocationAccuracy()
 		TotalSpawns[Index] = SpawnsValue;
 		TotalHits[Index] = HitsValue;
 
-		#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 		if (SpawnsValue >= 0)
 		{
 			TotalSpawnsValueRef += SpawnsValue;
@@ -1901,7 +1901,7 @@ FAccuracyData USpawnAreaManagerComponent::GetLocationAccuracy()
 		{
 			TotalHitsValueRef += HitsValue;
 		}
-		#endif
+#endif
 	}
 
 	FAccuracyData OutData = GetAveragedAccuracyData(TotalSpawns, TotalHits, TotalSpawnAreaSize.Z, TotalSpawnAreaSize.Y);
@@ -1914,7 +1914,7 @@ FAccuracyData USpawnAreaManagerComponent::GetLocationAccuracy()
 		OutData.ModifyForSmallerInput();
 	}
 
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	for (int i = 0; i < OutData.AccuracyRows.Num(); i++)
 	{
 		for (int j = 0; j < OutData.AccuracyRows[i].Size; j++)
@@ -1934,7 +1934,7 @@ FAccuracyData USpawnAreaManagerComponent::GetLocationAccuracy()
 	}
 	UE_LOG(LogTargetManager, Display, TEXT("Total Spawns/Hits Ref: %d %d"), TotalSpawnsValueRef, TotalHitsValueRef);
 	UE_LOG(LogTargetManager, Display, TEXT("Total Spawns/Hits Test: %d %d"), TotalSpawnsValueTest, TotalHitsValueTest);
-	#endif
+#endif
 
 	return OutData;
 }

@@ -13,11 +13,14 @@ struct FAccuracyData;
 struct FIndexPair
 {
 	int32 StartIndex, EndIndex;
-	
+
 	FIndexPair() : StartIndex(-1), EndIndex(-1)
-	{}
+	{
+	}
+
 	FIndexPair(const int32 InStart, const int32 InEnd) : StartIndex(InStart), EndIndex(InEnd)
-	{}
+	{
+	}
 
 	friend FORCEINLINE uint32 GetTypeHash(const FIndexPair& Other)
 	{
@@ -42,11 +45,14 @@ struct FIndexPair
 struct FRectDims
 {
 	int32 Width, Height;
-	
+
 	FRectDims() : Width(0), Height(0)
-	{}
+	{
+	}
+
 	FRectDims(const int32 InWidth, const int32 InHeight) : Width(InWidth), Height(InHeight)
-	{}
+	{
+	}
 };
 
 /** A unique pair of factors for a number */
@@ -57,13 +63,16 @@ struct FFactor
 	int32 Distance;
 
 	FFactor(): Factor1(-1), Factor2(-1), Distance(-1)
-	{}
+	{
+	}
 
 	FFactor(const int32 F1, const int32 F2) : Factor1(F1), Factor2(F2), Distance(abs(F1 - F2))
-	{}
+	{
+	}
 
 	explicit FFactor(const int32 InDistance) : Factor1(-1), Factor2(-1), Distance(InDistance)
-	{}
+	{
+	}
 
 	bool IsValid() const
 	{
@@ -142,13 +151,15 @@ struct FSubRectangle
 
 	/** Indices that have been validated as being potential start index candidates */
 	TArray<FIndexPair> StartIndexCandidates;
-	
+
 	FSubRectangle() : Index(-1), ColIndex(-1), Area(0)
-	{}
+	{
+	}
 
 	FSubRectangle(const int32 InIndex, const int32 InColIndex, const int32 InHeight) : Index(InIndex),
 		ColIndex(InColIndex), Dimensions(0, InHeight), Area(0)
-	{}
+	{
+	}
 
 	/** Updates the width, StartEndIndex, Dimensions, Area, Row, and Col. */
 	void UpdateDimensions(const int32 InNewWidth)
@@ -172,17 +183,17 @@ struct FSubRectangle
 		return FString::Printf(TEXT("Index: [%d, %d] Size: %dx%d"), BoundingIndices.StartIndex,
 			BoundingIndices.EndIndex, Dimensions.Width, Dimensions.Height);
 	}
-	
+
 	FORCEINLINE bool operator==(const FSubRectangle& Other) const
 	{
 		return BoundingIndices == Other.BoundingIndices;
 	}
-	
+
 	FORCEINLINE bool operator<(const FSubRectangle& Other) const
 	{
 		return BoundingIndices < Other.BoundingIndices;
 	}
-	
+
 	friend FORCEINLINE uint32 GetTypeHash(const FSubRectangle& Other)
 	{
 		return GetTypeHash(Other.BoundingIndices);
@@ -199,11 +210,13 @@ struct FFSubRectangleKeyFuncs : BaseKeyFuncs<FSubRectangle, FIndexPair, false>
 	{
 		return A == B;
 	}
+
 	/** Calculates a hash index for a key. */
 	static FORCEINLINE uint32 GetKeyHash(const FIndexPair& Key)
 	{
 		return GetTypeHash(Key);
 	}
+
 	/** Extracts the key from an element. */
 	static FORCEINLINE const FIndexPair& GetSetKey(const FSubRectangle& Element)
 	{
@@ -216,13 +229,13 @@ struct FRectCandidate
 {
 	/** The factor for this candidate */
 	FFactor Factor;
-	
+
 	/** (ChosenStartRowIndex, ChosenEndRowIndex) */
 	FIndexPair ChosenRow;
 
 	/** (ChosenStartColIndex, ChosenEndColIndex) */
 	FIndexPair ChosenCol;
-	
+
 	/** Sub rectangles within this rectangle candidate */
 	TSet<FSubRectangle, FFSubRectangleKeyFuncs> SubRectangles;
 
@@ -242,14 +255,16 @@ struct FRectCandidate
 	int32 ChosenBlockSize;
 
 	FRectCandidate(): NumRowsAvailable(0), NumColsAvailable(0), ActualBlockSize(0), ChosenBlockSize(0)
-	{}
+	{
+	}
 
 	explicit FRectCandidate(const FFactor& InFactor) : Factor(InFactor), NumRowsAvailable(-1), NumColsAvailable(-1),
-		ActualBlockSize(-1), ChosenBlockSize(-1)
-	{}
+	                                                   ActualBlockSize(-1), ChosenBlockSize(-1)
+	{
+	}
 
 	~FRectCandidate() = default;
-	
+
 	/** Updates the candidate with new dimensions and indices. */
 	void UpdateSubRectangles(const FSubRectangle& SubRectangle)
 	{
@@ -258,13 +273,13 @@ struct FRectCandidate
 
 	/** Merges similar sub rectangles. */
 	void MergeSubRectangles();
-	
+
 	/** Sets the value of ChosenSubRectangle. Updates NumRowsAvailable, NumColsAvailable, ActualBlockSize, 
 	 *  and initializes the ChosenRow, ChosenCol to SubRectangle.Row, SubRectangle.Col. */
 	void SetChosenSubRectangle(const FSubRectangle& SubRectangle, const int32 InBlockSize)
 	{
 		ChosenSubRectangle = SubRectangle;
-		
+
 		NumRowsAvailable = SubRectangle.Row.EndIndex - SubRectangle.Row.StartIndex + 1;
 		NumColsAvailable = SubRectangle.Col.EndIndex - SubRectangle.Col.StartIndex + 1;
 		ActualBlockSize = FMath::Min(InBlockSize, SubRectangle.Area);
@@ -272,7 +287,7 @@ struct FRectCandidate
 		ChosenRow = SubRectangle.Row;
 		ChosenCol = SubRectangle.Col;
 	}
-	
+
 	/** Returns true if the first factor is less than number of rows available and the second factor is less than the
      *  number of columns available. */
 	bool FirstFactorComboFits() const
@@ -306,9 +321,9 @@ struct FRectCandidate
 	/** Returns a human-readable string of the rectangle. */
 	FString ToString() const
 	{
-		return FString::Printf(TEXT("Candidate [%d, %d]"), Factor.Factor1,Factor.Factor2);
+		return FString::Printf(TEXT("Candidate [%d, %d]"), Factor.Factor1, Factor.Factor2);
 	}
-	
+
 	FORCEINLINE bool operator<(const FRectCandidate& Other) const
 	{
 		// Sort by factor
@@ -334,11 +349,13 @@ struct FLargestRectangleKeyFuncs : BaseKeyFuncs<FRectCandidate, FFactor, false>
 	{
 		return A == B;
 	}
+
 	/** Calculates a hash index for a key. */
 	static FORCEINLINE uint32 GetKeyHash(const FFactor& Key)
 	{
 		return GetTypeHash(Key);
 	}
+
 	/** Extracts the key from an element. */
 	static FORCEINLINE const FFactor& GetSetKey(const FRectCandidate& Element)
 	{
@@ -357,6 +374,7 @@ class BEATSHOT_API USpawnAreaManagerComponent : public UActorComponent
 
 	friend class FTargetCollisionTest;
 	friend class ABeatShotGameModeFunctionalTest;
+
 public:
 	USpawnAreaManagerComponent();
 
@@ -429,7 +447,7 @@ public:
 	/** Gathers all total hits and total spawns for the game mode session and converts them into a 5X5 matrix using
 	 *  GetAveragedAccuracyData. Calls UpdateAccuracy once the values are copied over, and returns the struct */
 	FAccuracyData GetLocationAccuracy();
-	
+
 	/** Get the most recent Spawn Area's index.
 	 *  @return the index of the most recent Spawn Area, or -1 if there isn't one
 	 */
@@ -462,7 +480,7 @@ protected:
 	/* ------------------------------- */
 	/* -- SpawnArea finders/getters -- */
 	/* ------------------------------- */
-	
+
 	/** Finds a SpawnArea using its index as an FSetElementId.
 	 *  @return Spawn Area found by its index
 	 */
@@ -592,7 +610,7 @@ protected:
 
 	/** Removes the oldest SpawnArea recent flags if the max number of recent targets has been exceeded */
 	void RefreshRecentFlags();
-	
+
 	/* --------------------------------------------------- */
 	/* -- Finding Valid SpawnAreas for Spawn/Activation -- */
 	/* --------------------------------------------------- */
@@ -617,7 +635,7 @@ public:
 	 *  @return A set of target spawn parameters
 	 */
 	TSet<FTargetSpawnParams> GetTargetSpawnParams(const TArray<FVector>& Scales, const int32 NumToSpawn) const;
-	
+
 protected:
 	/** Uses a priority list to return a SpawnArea to activate. Always verifies that the candidate has a valid Guid,
 	 *  meaning that it corresponds to a valid target. Priority is origin (setting permitting), reinforcement learning
@@ -697,10 +715,10 @@ protected:
 	 *  @param Directions the directions allowed to choose from
 	 *  @return a set of type OutType adjacent to InSpawnAreas
 	 */
-	template<typename OutType>
+	template <typename OutType>
 	TSet<OutType> GetAdjacentSpawnAreas(const TSet<USpawnArea*>& InSpawnAreas,
 		const TSet<EAdjacentDirection>& Directions) const;
-	
+
 	/** Creates an array with size equal to the number of Spawn Areas, where each index represents whether or not the
 	 *  SpawnArea should be consider valid.
 	 *
@@ -740,7 +758,7 @@ protected:
 	 */
 	static void UpdateSubRectangles(FRectangleSet& Rectangles, const TArray<FFactor>& Factors,
 		const FSubRectangle& SubRectangle);
-	
+
 	/** Converts the rectangle set into a sorted array. If bordering, it returns the first rectangle where StartIndex
 	 *  candidates is not empty. Otherwise, it returns the first value in the sorted array.
 	 *
@@ -826,7 +844,7 @@ protected:
 
 	/** General SpawnAreas filter function that takes in a filter function to apply. */
 	static TArray<int32> FilterIndices(TArray<USpawnArea*>& ValidSpawnAreas, bool (USpawnArea::*FilterFunc)() const);
-	
+
 	/** Preferred dimensions for a Spawn Area */
 	UPROPERTY(EditAnywhere, Category="SpawnArea")
 	TArray<int32> PreferredSpawnAreaDimensions = {50, 45, 40, 30, 25, 20, 15, 10, 5};
@@ -890,6 +908,7 @@ protected:
 	int32 DebugSphereSegments = 12;
 
 #if !UE_BUILD_SHIPPING
+
 public:
 	/** Draws debug boxes and/or lines based on debug bool variables. */
 	void DrawDebug() const;
@@ -918,7 +937,7 @@ protected:
 
 	/** Prints a formatted matrix (upside down from how indexes appear in SpawnAreas so that it matches in game). */
 	static void PrintDebug_Matrix(const TArray<int32>& Matrix, const int32 NumRows, const int32 NumCols);
-	
+
 public:
 	/** Toggles showing debug boxes for all SpawnAreas. */
 	bool bShowDebug_AllSpawnAreas;
@@ -963,7 +982,6 @@ public:
 #endif
 
 private:
-
 	/** Pointer to TargetManager's BSConfig */
 	TSharedPtr<FBSConfig> BSConfig;
 

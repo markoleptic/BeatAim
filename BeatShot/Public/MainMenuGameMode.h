@@ -9,7 +9,7 @@
 #include "MainMenuGameMode.generated.h"
 
 struct FBSConfig;
-class UGameModesWidget;
+class UGameModeMenuWidget;
 class ATargetManagerPreview;
 class ABSPlayerController;
 class UTargetWidget;
@@ -28,7 +28,7 @@ public:
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_Game& GameSettings) override;
 
 	/** Enables communication between GameModesWidget and TargetManager. */
-	void SetupTargetManager(UGameModesWidget* GameModesWidget);
+	void SetupTargetManager(UGameModeMenuWidget* GameModesWidget);
 
 	/** Called when the GameModesWidget wants to start or stop previewing a game mode. */
 	void OnRequestSimulationStateChange(const bool bSimulate);

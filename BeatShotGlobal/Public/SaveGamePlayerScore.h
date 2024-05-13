@@ -157,13 +157,13 @@ struct FAccuracyData
 			AccuracyRows[i].CalculateAccuracy();
 		}
 	}
-	
+
 	/** Modifies only the accuracy values to conform to a 5X5 matrix if the SpawnAreaSize.Y or SpawnAreaSize.Z is less
 	 *  than 5. Only used just before placing inside the PlayerScore. Resets when CalculateAccuracy is called */
 	void ModifyForSmallerInput()
 	{
 		TArray<float> Temp = MakeIndexArray();
-		
+
 		// (2X2) Use Average2X2Array function
 		if (SpawnAreaSize.Y == 2 && SpawnAreaSize.Z == 2)
 		{
@@ -205,7 +205,7 @@ struct FAccuracyData
 				Temp.Insert((TopMid + BotMid) / 2.f, 4);
 				Temp.Insert((TopRight + BotRight) / 2.f, 5);
 			}
-			
+
 			AverageUsingUnderflow(Temp, 3, 3);
 		}
 		// (2X4) or (4X2) Average the last row/column of the one that has 4, copy 2 entire row/columns, then average
@@ -316,7 +316,7 @@ private:
 		}
 		return Start;
 	}
-	
+
 	/** Returns the end index values for each step inside the AverageUsingUnderflow main for loop,
 	 *  based on the number or rows or columns of the smaller matrix to convert from */
 	static TArray<int32> GetEndUnderflowArray(const int32 NumRowsOrCols)
@@ -340,7 +340,7 @@ private:
 		TArray<int32> StartN = GetStartUnderflowArray(NumCols);
 		TArray<int32> EndM = GetStartUnderflowArray(NumRows);
 		TArray<int32> EndN = GetEndUnderflowArray(NumCols);
-		
+
 		for (int i = 0; i < 5; i++)
 		{
 			for (int j = 0; j < 5; j++)
@@ -363,7 +363,7 @@ private:
 			}
 		}
 	}
-	
+
 	/** Gross simplification of a 2X2 to 5X5 array */
 	void Average2X2Array(const float TopLeft, const float TopRight, const float BotLeft, const float BotRight)
 	{
@@ -413,15 +413,21 @@ private:
 	TArray<float> MakeIndexArray()
 	{
 		TArray<float> Temp;
-		
-		TArray<int32> YIndices = SpawnAreaSize.Y == 2 ? TArray{0, 4}
-		: SpawnAreaSize.Y == 3 ? TArray{0, 2, 4}
-		: SpawnAreaSize.Y == 4 ? TArray{0, 1, 3, 4}
-		: TArray<int32>();
-		TArray<int32> ZIndices = SpawnAreaSize.Z == 2 ? TArray{0, 4}
-		: SpawnAreaSize.Z == 3 ? TArray{0, 2, 4}
-		: SpawnAreaSize.Z == 4 ? TArray{0, 1, 3, 4}
-		: TArray<int32>();
+
+		TArray<int32> YIndices = SpawnAreaSize.Y == 2
+			? TArray{0, 4}
+			: SpawnAreaSize.Y == 3
+			? TArray{0, 2, 4}
+			: SpawnAreaSize.Y == 4
+			? TArray{0, 1, 3, 4}
+			: TArray<int32>();
+		TArray<int32> ZIndices = SpawnAreaSize.Z == 2
+			? TArray{0, 4}
+			: SpawnAreaSize.Z == 3
+			? TArray{0, 2, 4}
+			: SpawnAreaSize.Z == 4
+			? TArray{0, 1, 3, 4}
+			: TArray<int32>();
 
 		TArray<FIntPoint> Combined = TArray<FIntPoint>();
 
@@ -435,20 +441,21 @@ private:
 
 		for (int i = 0; i < Combined.Num(); i++)
 		{
-			UE_LOG(LogTemp, Display, TEXT("ZIndex: %d YIndex: %d Value: %f"),
-				Combined[i].X, Combined[i].Y, AccuracyRows[Combined[i].X].Accuracy[Combined[i].Y]);
+			UE_LOG(LogTemp, Display, TEXT("ZIndex: %d YIndex: %d Value: %f"), Combined[i].X, Combined[i].Y,
+				AccuracyRows[Combined[i].X].Accuracy[Combined[i].Y]);
 			const float Value = AccuracyRows[Combined[i].X].Accuracy[Combined[i].Y];
 			Temp.Add(Value);
 		}
 		return Temp;
 	}
-	
+
 	/** Averages the values of a particular row, using average of the row above & below */
 	void AverageAccuracyRow(const int32 RowIndex)
 	{
 		for (int i = 0; i < 5; i++)
 		{
-			AccuracyRows[RowIndex].Accuracy[i] = (AccuracyRows[RowIndex - 1].Accuracy[i] + AccuracyRows[RowIndex + 1].Accuracy[i]) / 2.f;
+			AccuracyRows[RowIndex].Accuracy[i] = (AccuracyRows[RowIndex - 1].Accuracy[i] + AccuracyRows[RowIndex + 1].
+				Accuracy[i]) / 2.f;
 		}
 	}
 
@@ -457,7 +464,8 @@ private:
 	{
 		for (int i = 0; i < 5; i++)
 		{
-			AccuracyRows[i].Accuracy[ColIndex] = (AccuracyRows[i].Accuracy[ColIndex - 1] + AccuracyRows[i].Accuracy[ColIndex + 1]) / 2.f;
+			AccuracyRows[i].Accuracy[ColIndex] = (AccuracyRows[i].Accuracy[ColIndex - 1] + AccuracyRows[i].Accuracy[
+				ColIndex + 1]) / 2.f;
 		}
 	}
 
@@ -476,11 +484,13 @@ private:
 	{
 		if (bChangeRowValue)
 		{
-			AccuracyRows[RowIndex].Accuracy[ColIndex] = (AccuracyRows[RowIndex + 1].Accuracy[ColIndex] + AccuracyRows[RowIndex - 1].Accuracy[ColIndex]) / 2.f;
+			AccuracyRows[RowIndex].Accuracy[ColIndex] = (AccuracyRows[RowIndex + 1].Accuracy[ColIndex] + AccuracyRows[
+				RowIndex - 1].Accuracy[ColIndex]) / 2.f;
 		}
 		else
 		{
-			AccuracyRows[RowIndex].Accuracy[ColIndex] = (AccuracyRows[RowIndex].Accuracy[ColIndex + 1] + AccuracyRows[RowIndex].Accuracy[ColIndex - 1]) / 2.f;
+			AccuracyRows[RowIndex].Accuracy[ColIndex] = (AccuracyRows[RowIndex].Accuracy[ColIndex + 1] + AccuracyRows[
+				RowIndex].Accuracy[ColIndex - 1]) / 2.f;
 		}
 	}
 };
@@ -512,7 +522,8 @@ struct FCommonScoreInfo
 	/** Generic constructor */
 	FCommonScoreInfo()
 	{
-		AccuracyData = FAccuracyData(Constants::DefaultNumberOfAccuracyDataRows, Constants::DefaultNumberOfAccuracyDataColumns);
+		AccuracyData = FAccuracyData(Constants::DefaultNumberOfAccuracyDataRows,
+			Constants::DefaultNumberOfAccuracyDataColumns);
 		QTable = TArray<float>();
 		QTable.Init(0.f, Constants::DefaultQTableSize);
 		TrainingSamples = TArray<int32>();
@@ -749,8 +760,7 @@ public:
 	TMap<FBS_DefiningConfig, FCommonScoreInfo> GetCommonScoreInfo() const;
 
 	/** Finds or Adds an entry to CommonScoreInfo map for the given Defining Config. */
-	void FindOrAddCommonScoreInfo(const FBS_DefiningConfig& InDefiningConfig,
-		FCommonScoreInfo& OutCommonScoreInfo);
+	void FindOrAddCommonScoreInfo(const FBS_DefiningConfig& InDefiningConfig, FCommonScoreInfo& OutCommonScoreInfo);
 
 	/** Replaces the CommonScoreInfo entry with InCommonScoreInfo if one is found using InDefiningConfig. Otherwise, it
 	 *  adds a new entry. */

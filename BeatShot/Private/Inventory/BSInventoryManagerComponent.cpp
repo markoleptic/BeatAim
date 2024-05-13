@@ -101,8 +101,8 @@ void UBSInventoryManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimePr
 	DOREPLIFETIME(ThisClass, InventoryList);
 }
 
-UBSInventoryItemInstance* UBSInventoryManagerComponent::AddItemInstance(
-	TSubclassOf<UBSInventoryItemDefinition> ItemDef, int32 StackCount)
+UBSInventoryItemInstance* UBSInventoryManagerComponent::AddItemInstance(TSubclassOf<UBSInventoryItemDefinition> ItemDef,
+	int32 StackCount)
 {
 	UBSInventoryItemInstance* Result = nullptr;
 	if (ItemDef != nullptr)

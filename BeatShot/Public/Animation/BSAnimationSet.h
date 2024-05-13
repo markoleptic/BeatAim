@@ -17,6 +17,7 @@ enum class EBSAnimMovementMode : uint8
 	Walk UMETA(DisplayName="Walk"),
 	Jog UMETA(DisplayName="Jog"),
 };
+
 ENUM_RANGE_BY_FIRST_AND_LAST(EBSAnimMovementMode, EBSAnimMovementMode::None, EBSAnimMovementMode::Jog);
 
 /** Second level organizer */
@@ -25,8 +26,8 @@ enum class EBSAnimStateType : uint8
 {
 	Normal UMETA(DisplayName="Normal"),
 	Start UMETA(DisplayName="Start"),
-	Stop UMETA(DisplayName="Stop")
-};
+	Stop UMETA(DisplayName="Stop")};
+
 ENUM_RANGE_BY_FIRST_AND_LAST(EBSAnimStateType, EBSAnimStateType::Normal, EBSAnimStateType::Stop);
 
 /** Third level organizer */
@@ -38,6 +39,7 @@ enum class EBSAnimCardinal : uint8
 	Left UMETA(DisplayName="Left"),
 	Right UMETA(DisplayName="Right"),
 };
+
 ENUM_RANGE_BY_FIRST_AND_LAST(EBSAnimCardinal, EBSAnimCardinal::Forward, EBSAnimCardinal::Right);
 
 USTRUCT(BlueprintType, meta=(ForceInlineRow))
@@ -71,13 +73,13 @@ struct FBSIdleAnimSet
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimSequence* CrouchIdleStart;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimSequence* CrouchIdleStop;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimSequence* LeftHandPoseOverride;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimSequence* ArmIdlePoseOverride;
 };
@@ -92,10 +94,10 @@ struct FBSAimingAnimSet
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAimOffsetBlendSpace* RelaxedAimOffset;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimSequence* HipFireOverridePose;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimSequence* HipFireCrouchOverridePose;
 };
@@ -110,16 +112,16 @@ struct FBSJumpingAnimSet
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimSequence* JumpFallLoop;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimSequence* JumpFallLand;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimSequence* JumpApex;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimSequence* JumpStartLoop;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimSequence* JumpRecoveryAdditive;
 };
@@ -131,17 +133,17 @@ UCLASS(Blueprintable, Abstract, BlueprintType, EditInlineNew)
 class BEATSHOT_API UBSAnimationSet : public UDataAsset
 {
 	GENERATED_BODY()
-	
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TMap<EBSAnimMovementMode, FBSAnimSet> AnimMap;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FBSIdleAnimSet IdleAnimSet;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FBSAimingAnimSet AimingAnimSet;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FBSJumpingAnimSet JumpingAnimSet;
 

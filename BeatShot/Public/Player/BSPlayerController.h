@@ -13,10 +13,10 @@
 
 class UBSGameUserSettings;
 class AFloatingTextActor;
-class URLAgentWidget;
+class UQTableWidget;
 class ABSCharacterBase;
 class ULoginWidget;
-class UFPSCounterWidget;
+class UFrameCounterWidget;
 class UScreenFadeWidget;
 class UPostGameMenuWidget;
 class UCrossHairWidget;
@@ -110,10 +110,10 @@ public:
 
 	/** Shows the RLAgent widget, creating it if it does not exist. Binds the provided delegate to the
 	 *  widget's UpdatePanel function. */
-	void ShowRLAgentWidget(FOnQTableUpdate& OnQTableUpdate, const int32 Rows, const int32 Columns,
+	void ShowQTableWidget(FOnQTableUpdate& OnQTableUpdate, const int32 Rows, const int32 Columns,
 		const TArray<float>& QTable);
 	/** Hides and destroys the RLAgent widget, if it exists. */
-	void HideRLAgentWidget();
+	void HideQTableWidget();
 
 	/** Spawns the floating text actor (combat text) with text indicating the streak of targets destroyed. */
 	void ShowCombatText(const int32 Streak, const FTransform& Transform);
@@ -171,7 +171,7 @@ protected:
 	TSubclassOf<UPostGameMenuWidget> PostGameMenuWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
-	TSubclassOf<UFPSCounterWidget> FPSCounterClass;
+	TSubclassOf<UFrameCounterWidget> FPSCounterClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
 	TSubclassOf<UScreenFadeWidget> ScreenFadeClass;
@@ -180,7 +180,7 @@ protected:
 	TSubclassOf<UUserWidget> InteractInfoWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
-	TSubclassOf<URLAgentWidget> RLAgentWidgetClass;
+	TSubclassOf<UQTableWidget> QTableWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
 	TSubclassOf<AFloatingTextActor> FloatingTextActorClass;
@@ -212,13 +212,13 @@ private:
 	UPROPERTY()
 	TObjectPtr<UPostGameMenuWidget> PostGameMenuWidget;
 	UPROPERTY()
-	TObjectPtr<UFPSCounterWidget> FPSCounterWidget;
+	TObjectPtr<UFrameCounterWidget> FPSCounterWidget;
 	UPROPERTY()
 	TObjectPtr<UScreenFadeWidget> ScreenFadeWidget;
 	UPROPERTY()
 	TObjectPtr<UUserWidget> InteractInfoWidget;
 	UPROPERTY()
-	TObjectPtr<URLAgentWidget> RLAgentWidget;
+	TObjectPtr<UQTableWidget> QTableWidget;
 
 	/** Whether the user successfully received a steam auth ticket BeatShot api response. */
 	bool bIsLoggedIn = false;

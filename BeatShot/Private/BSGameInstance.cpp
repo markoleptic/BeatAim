@@ -11,7 +11,7 @@
 #include "MoviePlayer.h"
 #include "Blueprint/UserWidget.h"
 #include "SaveGamePlayerSettings.h"
-#include "OverlayWidgets/LoadingScreenWidgets/SLoadingScreenWidget.h"
+#include "Slate/SLoadingScreenWidget.h"
 #include "BSLoadingScreenSettings.h"
 #include "MetasoundGeneratorHandle.h"
 #include "MetasoundOutputSubsystem.h"
@@ -22,9 +22,9 @@ void UBSGameInstance::Init()
 	Super::Init();
 
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &ThisClass::OnPostLoadMapWithWorld);
-	#if !WITH_EDITOR
+#if !WITH_EDITOR
 	FCoreUObjectDelegates::PreLoadMapWithContext.AddUObject(this, &ThisClass::OnPreLoadMapWithContext);
-	#endif // !WITH_EDITOR
+#endif // !WITH_EDITOR
 
 	GetMoviePlayer()->OnPrepareLoadingScreen().AddUObject(this, &ThisClass::PrepareLoadingScreen);
 

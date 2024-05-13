@@ -4,7 +4,7 @@
 #include "Target/TargetPreview.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "WidgetComponents/GameModePreviewWidgets/TargetWidget.h"
+#include "GameModes/TargetWidget.h"
 
 ATargetPreview::ATargetPreview()
 {

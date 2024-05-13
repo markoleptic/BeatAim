@@ -63,10 +63,11 @@ void USpawnArea::Init(const int32 InIndex, const FVector& InBottomLeftVertex)
 	OccupiedVertices = TSet<FVector>();
 }
 
-TMap<EAdjacentDirection, int32> USpawnArea::CreateAdjacentIndices(const EGridIndexType InGridIndexType, const int32 InIndex, const int32 InWidth)
+TMap<EAdjacentDirection, int32> USpawnArea::CreateAdjacentIndices(const EGridIndexType InGridIndexType,
+	const int32 InIndex, const int32 InWidth)
 {
 	TMap<EAdjacentDirection, int32> Temp;
-	
+
 	const int32 UpLeft = InIndex + InWidth - 1;
 	const int32 Up = InIndex + InWidth;
 	const int32 UpRight = InIndex + InWidth + 1;
@@ -211,7 +212,7 @@ EGridIndexType USpawnArea::FindIndexType(const int32 InIndex, const int32 InSize
 	{
 		return EGridIndexType::Left;
 	}
-	
+
 	return EGridIndexType::Middle;
 }
 
@@ -225,9 +226,9 @@ void USpawnArea::SetIsManaged(const bool bManaged)
 	else
 	{
 		OccupiedVertices.Empty();
-		#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 		DebugOccupiedVertices.Empty();
-		#endif
+#endif
 	}
 }
 
@@ -268,19 +269,19 @@ void USpawnArea::SetOccupiedVertices(const TSet<FVector>& InVertices)
 TSet<FVector> USpawnArea::MakeVerticesBase(const FVector& InScale, const bool bOccupied) const
 {
 	TSet<FVector> Out;
-	
+
 	const float Radius = CalcTraceRadius(InScale);
-	
+
 	const FSphere Sphere = FSphere(Vertex_BottomLeft, Radius);
 
 	const int32 IncY = floor(Radius / Width);
 	const int32 IncZ = floor(Radius / Height);
-	
+
 	const float MinY = FMath::Max(TotalSpawnAreaExtrema.Min.Y, Vertex_BottomLeft.Y - IncY * Width);
 	const float MaxY = FMath::Min(TotalSpawnAreaExtrema.Max.Y - Width, Vertex_BottomLeft.Y + IncY * Width);
 	const float MinZ = FMath::Max(TotalSpawnAreaExtrema.Min.Z, Vertex_BottomLeft.Z - IncZ * Height);
 	const float MaxZ = FMath::Min(TotalSpawnAreaExtrema.Max.Z - Height, Vertex_BottomLeft.Z + IncZ * Height);
-	
+
 	FVector Vertex(Vertex_BottomLeft.X, 0.f, 0.f);
 
 	if (bOccupied)
@@ -309,7 +310,7 @@ TSet<FVector> USpawnArea::MakeVerticesBase(const FVector& InScale, const bool bO
 			}
 		}
 	}
-	
+
 	return Out;
 }
 
@@ -330,7 +331,7 @@ void USpawnArea::SetTotalSpawnAreaExtrema(const FExtrema& InExtrema)
 
 FVector USpawnArea::GenerateRandomOffset()
 {
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	if (GIsAutomationTesting)
 	{
 		const int32 RandomNum = FMath::RandRange(0, 3);
@@ -351,8 +352,8 @@ FVector USpawnArea::GenerateRandomOffset()
 			return FVector(0.f, Width - 1.f, Height - 1.f);
 		}
 	}
-	#endif
-	
+#endif
+
 	const float Y = roundf(FMath::FRandRange(0.f, Width - 1.f));
 	const float Z = roundf(FMath::FRandRange(0.f, Height - 1.f));
 	return FVector(0.f, Y, Z);

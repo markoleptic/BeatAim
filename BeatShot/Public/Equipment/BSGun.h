@@ -103,7 +103,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Audio")
 	FName FireAttachPointName = "hand_r";
-	
+
 	/** Whether or not the player is holding down left click */
 	UPROPERTY(BlueprintReadWrite, Category = "Weapon|State")
 	bool bIsFiring;

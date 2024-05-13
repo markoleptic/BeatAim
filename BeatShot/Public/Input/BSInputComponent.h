@@ -33,7 +33,7 @@ public:
 	/** Removes player mapped keys to the InputSubsystem */
 	void RemoveInputMappings(const UBSInputConfig* InputConfig,
 		UEnhancedInputLocalPlayerSubsystem* InputSubsystem) const;
-	
+
 	/** Binds an (EnhancedInputAction, GameplayTag) pair to the specified PressedTriggerEvent. */
 	template <class UserClass, typename FuncType>
 	void BindNativeAction(const UBSInputConfig* InputConfig, const FGameplayTag& InputTag, UserClass* Object,
@@ -59,7 +59,7 @@ public:
 
 	/** Removes and unbinds all native actions in the NativeActionBindings map. */
 	void ClearNativeActionBindings();
-	
+
 	/** Removes and unbinds all ability actions in the NativeActionBindings map. */
 	void ClearAbilityActionBindings();
 
@@ -83,8 +83,8 @@ void UBSInputComponent::BindNativeAction(const UBSInputConfig* InputConfig, cons
 }
 
 template <class UserClass, typename PressedFuncType, typename ReleasedFuncType>
-void UBSInputComponent::BindNativeAction(const UBSInputConfig* InputConfig, const FGameplayTag& InputTag, UserClass* Object,
-	PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, bool bLogIfNotFound)
+void UBSInputComponent::BindNativeAction(const UBSInputConfig* InputConfig, const FGameplayTag& InputTag,
+	UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, bool bLogIfNotFound)
 {
 	check(InputConfig);
 	const FBSInputAction IA = InputConfig->FindBSInputActionForTag(InputTag, bLogIfNotFound);
@@ -92,14 +92,14 @@ void UBSInputComponent::BindNativeAction(const UBSInputConfig* InputConfig, cons
 	{
 		if (PressedFunc)
 		{
-			FEnhancedInputActionEventBinding& Binding = BindAction(IA.InputAction, IA.PressedTriggerEvent,
-				Object, PressedFunc);
+			FEnhancedInputActionEventBinding& Binding = BindAction(IA.InputAction, IA.PressedTriggerEvent, Object,
+				PressedFunc);
 			NativeActionBindings.FindOrAdd(IA.InputTag).Add(&Binding);
 		}
 		if (ReleasedFunc)
 		{
-			FEnhancedInputActionEventBinding& Binding = BindAction(IA.InputAction, ETriggerEvent::Completed,
-				Object, ReleasedFunc);
+			FEnhancedInputActionEventBinding& Binding = BindAction(IA.InputAction, ETriggerEvent::Completed, Object,
+				ReleasedFunc);
 			NativeActionBindings.FindOrAdd(IA.InputTag).Add(&Binding);
 		}
 	}

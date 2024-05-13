@@ -26,10 +26,9 @@
 static TAutoConsoleVariable CVarAutoBHop(TEXT("move.Pogo"), 0,
 	TEXT("If holding spacebar should make the player jump whenever possible.\n"), ECVF_Default);
 static TAutoConsoleVariable CVarJumpBoost(TEXT("move.JumpBoost"), 1, TEXT(
-		"If the player should boost in a movement direction while jumping.\n0 - disables jump boosting entirely\n"
-		"1 - boosts in the direction of input, even when moving in another direction\n2 - boosts in the direction "
-		"of input when moving in the same direction\n"),
-	ECVF_Default);
+	"If the player should boost in a movement direction while jumping.\n0 - disables jump boosting entirely\n"
+	"1 - boosts in the direction of input, even when moving in another direction\n2 - boosts in the direction "
+	"of input when moving in the same direction\n"), ECVF_Default);
 static TAutoConsoleVariable CVarBunnyHop(TEXT("move.BunnyHopping"), 0, TEXT("Enable normal bunnyhopping.\n"),
 	ECVF_Default);
 
@@ -174,25 +173,24 @@ void ABSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		BSInputComponent->BindAbilityActions(LoadedConfig, this, &ThisClass::Input_AbilityInputTagPressed,
 			&ThisClass::Input_AbilityInputTagReleased);
-		
+
 		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Move_Forward, this,
 			&ThisClass::Input_Move, true);
 		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Move_Backward, this,
 			&ThisClass::Input_Move, true);
-		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Move_Left, this,
-			&ThisClass::Input_Move, true);
-		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Move_Right, this,
-			&ThisClass::Input_Move, true);
-		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Look, this,
-			&ThisClass::Input_Look, true);
-		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Jump, this,
-			&ThisClass::Jump, true);
-		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Pause, this,
-			&ThisClass::Input_OnPause, true);
-		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Walk, this,
-			&ThisClass::Input_WalkStart, &ThisClass::Input_WalkEnd, true);
-		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Crouch, this,
-			&ThisClass::Input_Crouch, &ThisClass::Input_Crouch, true);
+		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Move_Left, this, &ThisClass::Input_Move,
+			true);
+		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Move_Right, this, &ThisClass::Input_Move,
+			true);
+		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Look, this, &ThisClass::Input_Look,
+			true);
+		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Jump, this, &ThisClass::Jump, true);
+		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Pause, this, &ThisClass::Input_OnPause,
+			true);
+		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Walk, this, &ThisClass::Input_WalkStart,
+			&ThisClass::Input_WalkEnd, true);
+		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Crouch, this, &ThisClass::Input_Crouch,
+			&ThisClass::Input_Crouch, true);
 		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_Interact, this,
 			&ThisClass::Input_OnInteractStarted, &ThisClass::Input_OnInteractCompleted, true);
 		BSInputComponent->BindNativeAction(LoadedConfig, BSGameplayTags::Input_ShiftInteract, this,

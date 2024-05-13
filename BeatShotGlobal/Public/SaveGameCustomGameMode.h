@@ -14,12 +14,12 @@ class BEATSHOTGLOBAL_API USaveGameCustomGameMode : public USaveGame
 
 public:
 	USaveGameCustomGameMode();
-	
+
 	virtual void Serialize(FStructuredArchive::FRecord Record) override;
-	
+
 	/** Returns a copy of CustomGameModes */
 	TArray<FBSConfig> GetCustomGameModes() const;
-	
+
 	/** Returns true if found custom game mode and copied to OutConfig */
 	bool FindCustomGameMode(const FString& GameModeName, FBSConfig& OutConfig) const;
 

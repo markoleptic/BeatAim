@@ -44,6 +44,6 @@ bool FTestInit::RunTest(const FString& Parameters)
 	AddInfo(FString::Printf(TEXT("Shared Reference Count after Clear: %d"), BSConfig.GetSharedReferenceCount()));
 
 	CleanUpWorld();
-	
+
 	return true;
 }

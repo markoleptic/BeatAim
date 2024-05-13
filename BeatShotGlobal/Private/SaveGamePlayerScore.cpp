@@ -83,15 +83,15 @@ void USaveGamePlayerScore::SaveCommonScoreInfo(const FBS_DefiningConfig& InDefin
 	const FCommonScoreInfo& InCommonScoreInfo)
 {
 	CommonScoreInfo.FindOrAdd(InDefiningConfig) = InCommonScoreInfo;
-	
-	#if !UE_BUILD_SHIPPING
+
+#if !UE_BUILD_SHIPPING
 	if (InCommonScoreInfo.NumQTableRows != 0 && InCommonScoreInfo.QTable.Num() > 0)
 	{
 		PrintAccuracy(InDefiningConfig, InCommonScoreInfo, PercentFormat);
 		PrintQTable(InDefiningConfig, InCommonScoreInfo, QTableFormat);
 		PrintTrainingSamples(InDefiningConfig, InCommonScoreInfo, TrainingSamplesFormat);
 	}
-	#endif
+#endif
 }
 
 int32 USaveGamePlayerScore::ResetQTable(const FBS_DefiningConfig& InDefiningConfig)

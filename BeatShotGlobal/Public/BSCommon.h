@@ -9,7 +9,7 @@ namespace BSCommon
 	 *  @param Rest the values to test against actual
 	 *  @returns whether or not any of the Args are equal to Actual
 	 */
-	template<typename T, typename... Args>
+	template <typename T, typename... Args>
 	static bool Or(const T& Actual, const Args&... Rest);
 
 	/** Returns true if all of the Args are equal to Actual.
@@ -17,18 +17,18 @@ namespace BSCommon
 	 *  @param Rest the values to test against actual
 	 *  @returns whether or not all of the Args are equal to Actual
 	 */
-	template <typename T, typename ...Args>
+	template <typename T, typename... Args>
 	static bool And(const T& Actual, const Args&... Rest);
 }
 
 
-template <typename T, typename ...Args>
+template <typename T, typename... Args>
 bool BSCommon::Or(const T& Actual, const Args&... Rest)
 {
 	return ((Actual == Rest) || ...);
 }
 
-template <typename T, typename ...Args>
+template <typename T, typename... Args>
 bool BSCommon::And(const T& Actual, const Args&... Rest)
 {
 	return ((Actual == Rest) && ...);

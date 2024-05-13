@@ -4,7 +4,7 @@
 #include "FloatingTextActor.h"
 #include "GlobalConstants.h"
 #include "Components/WidgetComponent.h"
-#include "OverlayWidgets/HUDWidgets/CombatTextWidget.h"
+#include "Overlays/CombatTextWidget.h"
 
 AFloatingTextActor::AFloatingTextActor()
 {

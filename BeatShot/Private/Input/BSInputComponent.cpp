@@ -18,11 +18,11 @@ void UBSInputComponent::AddInputMappings(const UBSInputConfig* InputConfig,
 
 	ULocalPlayer* LocalPlayer = InputSubsystem->GetLocalPlayer();
 	check(LocalPlayer);
-	
+
 	FPlayerSettings_User UserSettings = LoadPlayerSettings().User;
 
 	UEnhancedInputUserSettings* EnhancedInputUserSettings = InputSubsystem->GetUserSettings();
-	
+
 	for (const TPair<FName, FKey>& Pair : UserSettings.Keybindings)
 	{
 		if (Pair.Key != NAME_None && Pair.Value.IsValid())

@@ -103,7 +103,7 @@ protected:
 
 	/** The value pulled from the KickbackCurve at time KickbackAlpha divided by KickbackDuration */
 	float KickbackAngle;
-	
+
 	/** Used in recoil to make sure the first shot has properly applied recoil */
 	int32 ShotsFired;
 };

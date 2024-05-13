@@ -17,7 +17,7 @@ ABSCharacter::ABSCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	PrimaryActorTick.bCanEverTick = true;
 	bAlwaysRelevant = true;
 	bReplicates = true;
-	
+
 	SpringArmComponent->SetupAttachment(RootComponent);
 	SpringArmComponent->SetRelativeLocation(FVector(0.f, 0.f, 64.f));
 
@@ -31,7 +31,7 @@ ABSCharacter::ABSCharacter(const FObjectInitializer& ObjectInitializer) : Super(
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.f);
 	// Set collision settings. We are the invisible player with no 3rd person mesh.
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Block);
-	
+
 	// Camera eye level
 	BaseEyeHeight = 64.f;
 	CrouchedEyeHeight = 44.f;

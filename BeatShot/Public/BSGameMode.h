@@ -7,14 +7,13 @@
 #include "SaveGamePlayerScore.h"
 #include "SaveGamePlayerSettings.h"
 #include "AbilitySystem/Globals/BSAbilitySet.h"
+#include "RuntimeAudioImporterTypes.h"
 #include "GameFramework/GameMode.h"
 #include "BSGameMode.generated.h"
 
-enum class ERuntimeImportStatus : uint8;
 class UCapturableSoundWave;
 class UImportedSoundWave;
 class URuntimeAudioImporterLibrary;
-class UMediaSoundComponent;
 class UBSGameUserSettings;
 class ABSGun;
 class UBSAbilitySet;
@@ -24,7 +23,6 @@ class ATargetManager;
 class ABSPlayerController;
 class UAudioAnalyzerManager;
 struct FPlayerScore;
-struct FRuntimeAudioInputDeviceInfo;
 struct FBSGrantedAbilitySet;
 struct FTargetDamageEvent;
 

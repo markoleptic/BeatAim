@@ -16,10 +16,10 @@ struct FDamageEventData
 
 	UPROPERTY()
 	AActor* EffectInstigator;
-	
+
 	UPROPERTY()
 	AActor* EffectCauser;
-	
+
 	const FGameplayEffectSpec* EffectSpec;
 	float EffectMagnitude;
 	float OldValue;
@@ -91,7 +91,7 @@ public:
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(SelfDamage);
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(SelfDamage);
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(SelfDamage);
-	
+
 	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(UBSAttributeSetBase, IncomingTrackingDamage);
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(IncomingTrackingDamage);
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(IncomingTrackingDamage);

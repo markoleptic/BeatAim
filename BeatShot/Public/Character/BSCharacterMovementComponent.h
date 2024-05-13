@@ -62,7 +62,7 @@ public:
 
 	/** Gets the friction from cached ground info */
 	float GetFrictionFromHit(const FHitResult& Hit) const;
-	
+
 	UPROPERTY()
 	TObjectPtr<ABSCharacterBase> BSCharacter;
 
@@ -90,7 +90,7 @@ protected:
 	/** The multiplier for acceleration when in air. (HL2's sv_airaccelerate)*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Walking")
 	float AirAccelerationMultiplier = 10.0f;
-	
+
 	/* The vector differential magnitude cap when in air. (30 air speed cap from HL2) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Jumping/Falling")
 	float AirSpeedCap = 57.15f;
@@ -113,8 +113,8 @@ protected:
 
 	/** the minimum step height from moving fast */
 	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite)
-	float MinStepHeight = 10.0f;	
-	
+	float MinStepHeight = 10.0f;
+
 	/** the minimum step height from moving fast */
 	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite)
 	float GroundBrakingDeceleration = 15.f;
@@ -135,7 +135,7 @@ protected:
 
 	/** If in the crouching transition */
 	bool bIsInCrouchTransition = false;
-	
+
 	/** The progress transitioning to a crouched state from an un-crouched state, or vice-versa. A value of 0
 	 *  means the character is not crouched, while a value of 1 indicates the character is fully crouched. */
 	float CurrentCrouchProgress = 0.f;
@@ -154,7 +154,7 @@ protected:
 	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
 		meta = (ClampMin = "0", UIMin = "0"))
 	float SprintSpeed = 609.6f;
-	
+
 	/** Speed on a ladder */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Ladder")
 	float LadderSpeed = 381.0f;
@@ -264,20 +264,14 @@ public:
 	 *  means the character is not crouched, while a value of 1 indicates the character is fully crouched. */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Crouch")
 	float GetCrouchProgress() const { return CurrentCrouchProgress; }
-	
+
 	// AnimMotionEffect Implementation
 	UFUNCTION(BlueprintCallable)
-	virtual void PlayMovementSound_Implementation(const FName Bone
-		, const FGameplayTag MotionEffect
-		, USceneComponent* StaticMeshComponent
-		, const FVector LocationOffset
-		, const FRotator RotationOffset
-		, const UAnimSequenceBase* AnimationSequence
-		, const FHitResult HitResult
-		, FGameplayTagContainer Context
-		, float AudioVolume = 1
-		, float AudioPitch = 1) override;
-	
+	virtual void PlayMovementSound_Implementation(const FName Bone, const FGameplayTag MotionEffect,
+		USceneComponent* StaticMeshComponent, const FVector LocationOffset, const FRotator RotationOffset,
+		const UAnimSequenceBase* AnimationSequence, const FHitResult HitResult, FGameplayTagContainer Context,
+		float AudioVolume = 1, float AudioPitch = 1) override;
+
 private:
 	float DefaultStepHeight;
 	float DefaultWalkableFloorZ;

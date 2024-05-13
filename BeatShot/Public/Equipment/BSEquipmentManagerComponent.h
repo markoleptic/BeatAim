@@ -28,7 +28,7 @@ struct FBSAppliedEquipmentEntry : public FFastArraySerializerItem
 	{
 		return FString::Printf(TEXT("%s of %s"), *GetNameSafe(Instance.Get()), *GetNameSafe(EquipmentDefinition.Get()));
 	};
-	
+
 	friend struct FBSEquipmentList;
 	friend class UBSEquipmentManagerComponent;
 
@@ -59,7 +59,7 @@ struct FBSEquipmentList : public FFastArraySerializer
 	FBSEquipmentList(UActorComponent* InOwnerComponent) : OwnerComponent(InOwnerComponent)
 	{
 	}
-	
+
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
 	{
 		return FFastArraySerializer::FastArrayDeltaSerialize<FBSAppliedEquipmentEntry, FBSEquipmentList>(Items,
@@ -107,7 +107,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	UBSEquipmentInstance* EquipItem(TSubclassOf<UBSEquipmentDefinition> EquipmentDefinition);
-	
+
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void UnequipItem(UBSEquipmentInstance* ItemInstance, const bool bCallOnUnequipped = true);
 
@@ -129,7 +129,7 @@ public:
 	/** Returns all equipped instances of a given type, or an empty array if none are found */
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	TArray<UBSEquipmentInstance*> GetEquipmentInstancesOfType(TSubclassOf<UBSEquipmentInstance> InstanceType) const;
-	
+
 	template <typename T>
 	T* GetFirstInstanceOfType()
 	{

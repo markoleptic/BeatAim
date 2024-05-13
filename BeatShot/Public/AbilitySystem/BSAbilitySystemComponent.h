@@ -39,7 +39,7 @@ public:
 
 	/** Clear the cached ability handles. */
 	void ClearAbilityInput();
-	
+
 	/** Returns whether or not the activation group is blocked from activation. */
 	bool IsActivationGroupBlocked(EBSAbilityActivationGroup Group) const;
 

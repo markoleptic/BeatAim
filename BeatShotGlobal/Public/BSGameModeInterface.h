@@ -22,7 +22,7 @@ class UBSGameModeInterface : public UInterface
 class BEATSHOTGLOBAL_API IBSGameModeInterface
 {
 	GENERATED_BODY()
-	
+
 public:
 	/** Returns all Custom Game Modes. */
 	static TArray<FBSConfig> LoadCustomGameModes();
@@ -53,7 +53,7 @@ public:
 
 	/** Creates a serialized Json object export string from an FBSConfig .*/
 	static FString ExportCustomGameMode(const FBSConfig& InConfig);
-	
+
 	/** Returns true if found Config corresponding to the input GameModeName string and difficulty,
 	 *  and copies to OutConfig. */
 	static bool FindPresetGameMode(const FString& GameModeName, const EGameModeDifficulty& Difficulty,

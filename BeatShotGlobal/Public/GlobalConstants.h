@@ -77,7 +77,7 @@ namespace Constants
 
 	inline constexpr int32 DefaultSpawnAreaDimension = 50;
 
-	#pragma region DefaultSettings
+#pragma region DefaultSettings
 
 	/** The default Band Limit Thresholds for the AudioAnalyzer */
 	inline const TArray DefaultBandLimits = {
@@ -146,9 +146,9 @@ namespace Constants
 	inline constexpr float MaxValue_ResolutionScale = 100;
 	inline constexpr float SnapSize_ResolutionScale = 0.001;
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region DefaultGameModes
+#pragma region DefaultGameModes
 
 	inline constexpr float DefaultPlayerDelay = 0.3f;
 	inline constexpr float DefaultSpawnBeatDelay = 0.3f;
@@ -293,9 +293,9 @@ namespace Constants
 	inline constexpr float MaxTrackingSpeed_ChargedBeatTrack_Death = 700.f;
 
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Moon
+#pragma region Moon
 
 	/** Offset of the moon from world origin */
 	inline const FVector MoonMeshOffset(250000, 0, 250000);
@@ -312,9 +312,9 @@ namespace Constants
 	/** Radius of the Moon's SphereComponent, originally used to rotate the moon around the world, but no longer used  */
 	inline constexpr float MoonOrbitRadius = 400000;
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Target
+#pragma region Target
 
 	/** The default location to spawn the SpawnBox */
 	inline const FVector DefaultTargetManagerLocation(3700.f, 0.f, 0.f);
@@ -341,9 +341,9 @@ namespace Constants
 
 	inline constexpr float BaseTrackingTargetHealth = 1000000.f;
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region MinMaxSnapSize
+#pragma region MinMaxSnapSize
 
 	inline constexpr float MinValue_PlayerDelay = 0.f;
 	inline constexpr float MaxValue_PlayerDelay = 0.5f;
@@ -496,9 +496,9 @@ namespace Constants
 	inline constexpr float MaxValue_DynamicDecrementAmount = 150.f;
 	inline constexpr float SnapSize_DynamicDecrementAmount = 1.f;
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region LightVisualizers
+#pragma region LightVisualizers
 
 	/** Location of the StaticCubeVisualizer to the left of the TargetManager */
 	inline const FVector LeftStaticCubeVisualizerLocation(4000, -1935, 210);
@@ -585,9 +585,9 @@ namespace Constants
 	/** Value to divide the Average spectrum value by, and then subtract from the max spectrum value */
 	inline constexpr float MaxSpectrumValueDecrementDivide = 500.f;
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region URLs
+#pragma region URLs
 
 	/** base url */
 	const FString OriginURL = "https://beatshot.gg";
@@ -616,5 +616,5 @@ namespace Constants
 	const FString Segment_DefaultModes = "/stats/defaultmodes";
 	/** Segment, NOT standalone URL, needs a prefix to be used, like (Segment_Profile+userID+Segment_CustomModes) */
 	const FString Segment_CustomModes = "/stats/custommodes";
-	#pragma endregion
+#pragma endregion
 }

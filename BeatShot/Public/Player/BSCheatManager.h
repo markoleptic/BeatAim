@@ -18,8 +18,7 @@ Variable.AsVariable()->SetOnChangedCallback(FConsoleVariableDelegate::CreateUObj
 Variable->AsVariable()->SetOnChangedCallback(FConsoleVariableDelegate::CreateLambda([Object] (IConsoleVariable* Var) \
 { \
 	Object->Function(Var, MemberVariable); \
-})); \
-
+}));
 /** Base CheatManager for this game */
 UCLASS(Blueprintable)
 class BEATSHOT_API UBSCheatManager : public UCheatManager
@@ -27,8 +26,8 @@ class BEATSHOT_API UBSCheatManager : public UCheatManager
 	GENERATED_BODY()
 
 public:
-	#if !UE_BUILD_SHIPPING
-	
+#if !UE_BUILD_SHIPPING
+
 	virtual void InitCheatManager() override;
 	void Cheat_AimBot(IConsoleVariable* Variable);
 	void ShowDebug(IConsoleVariable* Variable);
@@ -41,17 +40,17 @@ public:
 	void SetTimeOfDay(IConsoleVariable* Variable);
 
 	/** Sets the ComponentClass's value type to the type matching the console variable. */
-	template<typename T, class ComponentClass>
-	void SetComponentDebugValue(IConsoleVariable* Variable, T ComponentClass::*DebugVar);
-	
-	#endif
-	
+	template <typename T, class ComponentClass>
+	void SetComponentDebugValue(IConsoleVariable* Variable, T ComponentClass::* DebugVar);
+
+#endif
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Debug")
 	TSubclassOf<UGameplayAbility> AimBotAbility;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Debug")
 	float SpawnBoxLineThickness = 6.f;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Debug")
 	float StaticExtentsBoxLineThickness = 6.f;
 

@@ -24,28 +24,27 @@ void ABeatShotGameModeFunctionalTest::PrepareTest()
 	{
 		FinishTest(EFunctionalTestResult::Failed, TEXT("No TargetManagerClass."));
 	}
-	
+
 	ImportDefaultGameModes();
 	ImportCustomGameModes();
-	
+
 	if (GameModesToTest.IsEmpty())
 	{
 		FinishTest(EFunctionalTestResult::Failed, TEXT("No Games Modes to test."));
 	}
-	
+
 	GameModeConfig = MakeShareable(new FBSConfig());
 	TargetManager = GetWorld()->SpawnActor<ATargetManager>(TargetManagerClass);
 	if (bRecordGetSpawnableSpawnAreasExecutionTime)
 	{
-		TargetManager->ExecutionTimeDelegate.BindUObject(this,
-			&ThisClass::OnSpawnableSpawnAreasExecution);
+		TargetManager->ExecutionTimeDelegate.BindUObject(this, &ThisClass::OnSpawnableSpawnAreasExecution);
 	}
 }
 
 void ABeatShotGameModeFunctionalTest::ImportDefaultGameModes()
 {
 	if (!GameModeDataAsset) return;
-	
+
 	const auto Map = GameModeDataAsset->GetDefaultGameModesMap();
 	for (const auto& GameMode : DefaultGameModesToTest)
 	{
@@ -59,8 +58,8 @@ void ABeatShotGameModeFunctionalTest::ImportDefaultGameModes()
 			{
 				const FString GameModeString = UEnum::GetDisplayValueAsText(GameMode).ToString();
 				const FString DifString = UEnum::GetDisplayValueAsText(Difficulty).ToString();
-				AddWarning(FString::Printf(TEXT("Failed to import default game mode: %s %s"),
-					*GameModeString, *DifString));
+				AddWarning(FString::Printf(TEXT("Failed to import default game mode: %s %s"), *GameModeString,
+					*DifString));
 			}
 		}
 	}
@@ -117,7 +116,7 @@ void ABeatShotGameModeFunctionalTest::OnAudioAnalyzerBeat()
 	const int32 NumActivated = TargetManager->SpawnAreaManager->GetNumActivated();
 	const int32 NumManaged = TargetManager->SpawnAreaManager->GetNumManaged();
 	AssertEqual_Bool(NumActivated <= NumManaged, true, "Activated <= Managed");
-	
+
 	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [&]
 	{
 		DestroyTargets();
@@ -137,7 +136,7 @@ void ABeatShotGameModeFunctionalTest::StartGameMode()
 		const FText Custom = FText::FromString(GameModesToTest[CurrentIndex].DefiningConfig.CustomGameModeName);
 		StartStep(Custom.ToString());
 	}
-	
+
 	GameModeConfig = MakeShareable(new FBSConfig(GameModesToTest[CurrentIndex]));
 	TargetManager->Init(GameModeConfig, FCommonScoreInfo(), PlayerSettings_Game);
 	TargetManager->SetShouldSpawn(true);

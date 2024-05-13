@@ -86,10 +86,10 @@ void UBSGA_FireGun::StartTargeting()
 {
 	const auto Trace = UBSAT_PerformWeaponTraceSingle::PerformWeaponTraceSingle(this, FName(), TraceDistance);
 	Trace->OnCompleted.AddDynamic(this, &ThisClass::OnSingleWeaponTraceCompleted);
-	
+
 	UAbilitySystemComponent* Component = CurrentActorInfo->AbilitySystemComponent.Get();
 	FScopedPredictionWindow ScopedPrediction(Component, CurrentActivationInfo.GetActivationPredictionKey());
-	
+
 	Trace->ReadyForActivation();
 }
 
@@ -99,10 +99,10 @@ void UBSGA_FireGun::OnSingleWeaponTraceCompleted(const bool bSuccess, const FHit
 	{
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, true);
 	}
-	
+
 	FGameplayAbilityTargetData_SingleTargetHit* SingleTargetData = new FGameplayAbilityTargetData_SingleTargetHit();
 	SingleTargetData->HitResult = HitResult;
 	const FGameplayAbilityTargetDataHandle TargetData(SingleTargetData);
-	
+
 	OnTargetDataReadyCallback(TargetData, FGameplayTag());
 }

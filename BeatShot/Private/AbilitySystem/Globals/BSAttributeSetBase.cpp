@@ -13,11 +13,11 @@ UBSAttributeSetBase::UBSAttributeSetBase()
 	bOutOfHealth = false;
 	Health = 100.f;
 	MaxHealth = 100.f;
-	
+
 	HitDamage = 100.f;
 	TrackingDamage = 1.f;
 	SelfDamage = 0.f;
-	
+
 	IncomingHitDamage = 0.f;
 	IncomingTrackingDamage = 0.f;
 	IncomingTotalDamage = 0.f;
@@ -105,14 +105,8 @@ void UBSAttributeSetBase::PostGameplayEffectExecute(const FGameplayEffectModCall
 	{
 		if (DamageType != ETargetDamageType::None)
 		{
-			const FDamageEventData DamageEvent(
-				Instigator,
-				Causer,
-				&Data.EffectSpec,
-				Data.EvaluatedData.Magnitude,
-				HealthBeforeAttributeChange,
-				GetHealth(),
-				DamageType);
+			const FDamageEventData DamageEvent(Instigator, Causer, &Data.EffectSpec, Data.EvaluatedData.Magnitude,
+				HealthBeforeAttributeChange, GetHealth(), DamageType);
 			OnDamageTaken.Broadcast(DamageEvent);
 		}
 		OnHealthChanged.Broadcast(Instigator, Causer, &Data.EffectSpec, Data.EvaluatedData.Magnitude,

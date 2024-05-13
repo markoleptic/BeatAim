@@ -33,7 +33,7 @@ FTargetDamageEvent::FTargetDamageEvent(const FDamageEventData& InData, const flo
 		DamageType = InData.DamageType;
 		TimeAlive = InData.DamageType == ETargetDamageType::Self ? -1.f : InTimeAlive; // Override to -1 if damaged self
 	}
-	
+
 	DamageCauser = InData.EffectCauser;
 	bOutOfHealth = InData.NewValue <= 0.f;
 	Guid = InTarget->GetGuid();
@@ -138,9 +138,9 @@ void ATarget::BeginPlay()
 {
 	Super::BeginPlay();
 
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	if (GIsAutomationTesting) return;
-	#endif
+#endif
 	/* Use Color Changing Material, this is required in order to change color using C++ */
 	TargetColorChangeMaterial = UMaterialInstanceDynamic::Create(SphereMesh->GetMaterial(0), this);
 	SphereMesh->SetMaterial(0, TargetColorChangeMaterial);
@@ -163,7 +163,7 @@ void ATarget::BeginPlay()
 	StartToPeakTimeline.SetPlayRate(StartToPeakTimelinePlayRate);
 	PeakToEndTimeline.SetPlayRate(PeakToEndTimelinePlayRate);
 	ShrinkQuickAndGrowSlowTimeline.SetPlayRate(StartToPeakTimelinePlayRate);
-	
+
 	SetTargetColor(Config.OnSpawnColor);
 
 	if (Config.bUseSeparateOutlineColor)
@@ -182,7 +182,7 @@ void ATarget::BeginPlay()
 void ATarget::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	
+
 	if (UAbilitySystemComponent* ASC = GetAbilitySystemComponent())
 	{
 		GetAbilitySystemComponent()->InitAbilityActorInfo(this, this);
@@ -206,7 +206,7 @@ void ATarget::PostInitializeComponents()
 		HealthComponent->InitializeWithAbilitySystem(AbilitySystemComponent);
 		HealthComponent->OnDamageTakenDelegate.AddUObject(this, &ATarget::OnIncomingDamageTaken);
 		ASC->OnImmunityBlockGameplayEffectDelegate.AddUObject(this, &ATarget::OnImmunityBlockGameplayEffect);
-		
+
 		switch (Config.TargetDamageType)
 		{
 		case ETargetDamageType::None:
@@ -397,7 +397,7 @@ void ATarget::OnIncomingDamageTaken(const FDamageEventData& InData)
 	{
 		return;
 	}
-	
+
 	FTimerManager& TimerManager = GetWorldTimerManager();
 	const float ElapsedTime = TimerManager.GetTimerElapsed(ExpirationTimer);
 
@@ -412,9 +412,9 @@ void ATarget::OnIncomingDamageTaken(const FDamageEventData& InData)
 	{
 		TargetColorChangeMaterial->GetVectorParameterValue(MaterialParameterColorName, ColorWhenDamageTaken);
 	}
-	
+
 	FTargetDamageEvent Event(InData, ElapsedTime, this);
-	Event.SetTargetData(CurrentDeactivationHealthThreshold, { ETargetDamageType::Self, GetTargetDamageType() });
+	Event.SetTargetData(CurrentDeactivationHealthThreshold, {ETargetDamageType::Self, GetTargetDamageType()});
 	OnTargetDamageEvent.Broadcast(Event);
 }
 
@@ -475,13 +475,13 @@ bool ATarget::ActivateTarget(const float Lifespan)
 	{
 		SetTargetColor(GetNotTakingTrackingDamageColor());
 	}
-	
+
 	// This is the only place where this value changes
 	bHasBeenActivated = true;
 
 	// This value is only changed here and DeactivateTarget
 	bIsCurrentlyActivated = true;
-	
+
 	return true;
 }
 
@@ -566,7 +566,8 @@ void ATarget::InterpPeakToEnd(const float Alpha)
 
 void ATarget::InterpShrinkQuickAndGrowSlow(const float Alpha)
 {
-	SetTargetScale(FVector(UKismetMathLibrary::Lerp(Constants::MinShrinkTargetScale, GetTargetScale_Activation().X, Alpha)));
+	SetTargetScale(FVector(UKismetMathLibrary::Lerp(Constants::MinShrinkTargetScale, GetTargetScale_Activation().X,
+		Alpha)));
 	const FLinearColor Color = UKismetMathLibrary::LinearColorLerp(ColorWhenDamageTaken, Config.InactiveTargetColor,
 		ShrinkQuickAndGrowSlowTimeline.GetPlaybackPosition());
 	SetTargetColor(Color);
@@ -578,25 +579,25 @@ void ATarget::InterpShrinkQuickAndGrowSlow(const float Alpha)
 
 void ATarget::SetTargetColor(const FLinearColor& Color)
 {
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	if (GIsAutomationTesting) return;
-	#endif
+#endif
 	TargetColorChangeMaterial->SetVectorParameterValue(TEXT("BaseColor"), Color);
 }
 
 void ATarget::SetTargetOutlineColor(const FLinearColor& Color)
 {
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	if (GIsAutomationTesting) return;
-	#endif
+#endif
 	TargetColorChangeMaterial->SetVectorParameterValue(TEXT("OutlineColor"), Color);
 }
 
 void ATarget::SetUseSeparateOutlineColor(const bool bUseSeparateOutlineColor)
 {
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	if (GIsAutomationTesting) return;
-	#endif
+#endif
 	if (bUseSeparateOutlineColor)
 	{
 		SetTargetOutlineColor(Config.OutlineColor);
@@ -641,7 +642,9 @@ void ATarget::SetTargetSpeed(const float NewMovingTargetSpeed) const
 void ATarget::SetTargetScale(const FVector& NewScale) const
 {
 	// Cap target scale at MaxValue_TargetScale
-	CapsuleComponent->SetRelativeScale3D(NewScale.X < Constants::MaxValue_TargetScale ? NewScale : FVector(Constants::MaxValue_TargetScale));
+	CapsuleComponent->SetRelativeScale3D(NewScale.X < Constants::MaxValue_TargetScale
+		? NewScale
+		: FVector(Constants::MaxValue_TargetScale));
 }
 
 void ATarget::SetTargetDamageType(const ETargetDamageType& InType)
@@ -652,13 +655,13 @@ void ATarget::SetTargetDamageType(const ETargetDamageType& InType)
 void ATarget::PlayExplosionEffect(const FVector& ExplosionLocation, const float SphereRadius,
 	const FLinearColor& InColorWhenDestroyed) const
 {
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	if (GIsAutomationTesting) return;
-	#endif
+#endif
 	if (TargetExplosion && Config.TargetDamageType == ETargetDamageType::Hit)
 	{
-		if (UNiagaraComponent* ExplosionComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TargetExplosion,
-			ExplosionLocation))
+		if (UNiagaraComponent* ExplosionComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),
+			TargetExplosion, ExplosionLocation))
 		{
 			ExplosionComp->SetFloatParameter(TargetExplosionSphereRadiusParameterName, SphereRadius);
 			ExplosionComp->SetColorParameter(TargetExplosionColorParameterName, InColorWhenDestroyed);
@@ -724,8 +727,8 @@ ETargetDamageType ATarget::GetTargetDamageType() const
 {
 	if (!IsImmuneToHitDamage() && TargetDamageType == ETargetDamageType::Hit) return TargetDamageType;
 	if (!IsImmuneToTrackingDamage() && TargetDamageType == ETargetDamageType::Tracking) return TargetDamageType;
-	if (!IsImmuneToHitDamage() && !IsImmuneToTrackingDamage() &&
-		TargetDamageType == ETargetDamageType::Combined) return TargetDamageType;
+	if (!IsImmuneToHitDamage() && !IsImmuneToTrackingDamage() && TargetDamageType == ETargetDamageType::Combined)
+		return TargetDamageType;
 	UE_LOG(LogTemp, Warning, TEXT("Target DamageType != its immune counterpart."));
 	return ETargetDamageType::None;
 }

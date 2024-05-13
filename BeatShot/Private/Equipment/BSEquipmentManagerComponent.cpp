@@ -72,7 +72,8 @@ void FBSEquipmentList::RemoveEntry(UBSEquipmentInstance* Instance)
 				Entry.GrantedHandles.TakeFromAbilitySystem(ASC);
 
 				// Remove Equipped gameplay tags
-				const UBSEquipmentDefinition* EquipmentCDO = GetDefault<UBSEquipmentDefinition>(Entry.EquipmentDefinition);
+				const UBSEquipmentDefinition* EquipmentCDO = GetDefault<UBSEquipmentDefinition>(
+					Entry.EquipmentDefinition);
 				ASC->RemoveLooseGameplayTags(EquipmentCDO->EquippedTags);
 			}
 			Instance->DestroyEquipmentActors();

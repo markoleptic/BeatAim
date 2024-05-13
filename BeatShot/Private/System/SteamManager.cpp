@@ -192,7 +192,7 @@ bool USteamManager::StoreStats()
 			break;
 		case Stat_AvgRate:
 			SteamUserStats()->UpdateAvgRateStat(Stat.Key, Stat.Value.FloatAvgNumerator, Stat.Value.FloatAvgDenominator);
-			// The averaged result is calculated for us
+		// The averaged result is calculated for us
 			SteamUserStats()->GetStat(Stat.Key, &Stat.Value.FloatValue);
 			break;
 		}
@@ -234,7 +234,7 @@ void USteamManager::UpdateStat(const char* StatAPIName, T Value)
 	// Update local stats
 	FSteamStat* FoundSteamStat = StatsData.Find(StatAPIName);
 	if (!FoundSteamStat) return;
-	
+
 	int NewValue = 0;
 	switch (FoundSteamStat->StatType)
 	{
@@ -263,14 +263,14 @@ void USteamManager::UpdateStat(const char* StatAPIName, T Value)
 	for (auto& Achievement : AchievementData)
 	{
 		if (!Achievement.ProgressStat || *Achievement.ProgressStat != *FoundSteamStat) continue;
-		
+
 		int32 MinProgressLimit = 0;
 		int32 MaxProgressLimit = 0;
 		SteamUserStats()->GetAchievementProgressLimits(Achievement.APIName, &MinProgressLimit, &MaxProgressLimit);
-		
+
 		// Do not show progress if already achieved
 		if (NewValue >= MaxProgressLimit) continue;
-		
+
 		// Only show progress for one game mode achievement
 		if (!FoundSteamStat->BaseGameModes.IsEmpty())
 		{
@@ -288,13 +288,13 @@ void USteamManager::UpdateStat(const char* StatAPIName, T Value)
 			}
 		}
 	}
-	
+
 	if (MinNotYetAchieved)
 	{
 		SteamUserStats()->IndicateAchievementProgress(MinNotYetAchieved->APIName, FoundSteamStat->IntValue,
 			MinMaxProgressLimit);
 	}
-	
+
 	switch (FoundSteamStat->StatType)
 	{
 	case Stat_Int: UE_LOG(LogSteamManager, Warning, TEXT("Updated Stat %s Old Value: %d New Value: %d"),

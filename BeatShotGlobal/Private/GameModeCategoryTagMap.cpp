@@ -7,8 +7,7 @@ UGameModeCategoryTagMap::UGameModeCategoryTagMap()
 {
 }
 
-TSubclassOf<UUserWidget> UGameModeCategoryTagMap::GetWidgetByGameModeCategoryTag(
-	const FGameplayTag& GameplayTag)
+TSubclassOf<UUserWidget> UGameModeCategoryTagMap::GetWidgetByGameModeCategoryTag(const FGameplayTag& GameplayTag)
 {
 	const TSubclassOf<UUserWidget>* Class = GameplayTagWidgetMap.Find(GameplayTag);
 	return Class ? *Class : nullptr;

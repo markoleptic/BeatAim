@@ -59,9 +59,9 @@ void UBSGA_AimBot::CheckTargetQueue()
 {
 	ATarget* ActiveTarget;
 	if (!ActiveTargets_AimBot.Dequeue(ActiveTarget)) return;
-	
+
 	if (TargetLocationIsInIgnoreRange(ActiveTarget->GetActorLocation())) return;
-	
+
 	UBSAT_AimToTarget* AimToTarget = UBSAT_AimToTarget::AimToTarget(this, FName(), SmoothingCurve, ActiveTarget,
 		1.f / ActiveTarget->GetSpawnBeatDelay());
 	AimToTarget->OnCancelled.AddDynamic(this, &ThisClass::OnAimToTargetCancelled);

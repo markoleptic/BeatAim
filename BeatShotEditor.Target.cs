@@ -9,6 +9,6 @@ public class BeatShotEditorTarget : TargetRules
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V4;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
-		ExtraModuleNames.AddRange(new[] { "BeatShot", "UserInterface", "BeatShotGlobal", "BeatShotTesting"});
+		ExtraModuleNames.AddRange(new[] { "BeatShot", "UserInterface", "BeatShotGlobal", "BeatShotTesting" });
 	}
 }

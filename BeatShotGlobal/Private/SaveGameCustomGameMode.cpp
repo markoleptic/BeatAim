@@ -96,7 +96,8 @@ void USaveGameCustomGameMode::UpgradeCustomGameModeToVersion1(FBSConfig& InConfi
 	{
 		InConfig.DynamicSpawnAreaScaling.StartBounds = InConfig.TargetConfig.BoxBounds;
 	}
-	if (InConfig.TargetConfig.TargetDeactivationConditions.Contains(ETargetDeactivationCondition::Persistent_DEPRECATED))
+	if (InConfig.TargetConfig.TargetDeactivationConditions.
+	             Contains(ETargetDeactivationCondition::Persistent_DEPRECATED))
 	{
 		InConfig.TargetConfig.TargetDeactivationConditions.Remove(ETargetDeactivationCondition::Persistent_DEPRECATED);
 	}

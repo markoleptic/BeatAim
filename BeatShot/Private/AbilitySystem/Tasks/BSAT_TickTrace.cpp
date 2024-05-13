@@ -18,7 +18,7 @@ void UBSAT_TickTrace::Activate()
 	{
 		return;
 	}
-	
+
 	CancelledHandle = Ability->OnGameplayAbilityCancelled.AddUObject(this, &UBSAT_TickTrace::OnAbilityCancelled);
 }
 
@@ -44,8 +44,7 @@ void UBSAT_TickTrace::TickTask(float DeltaTime)
 }
 
 UBSAT_TickTrace* UBSAT_TickTrace::SingleWeaponTrace(UGameplayAbility* OwningAbility, const FName TaskInstanceName,
-	ABSCharacterBase* Character, const float TraceDistance,
-	const bool bStopWhenAbilityEnds)
+	ABSCharacterBase* Character, const float TraceDistance, const bool bStopWhenAbilityEnds)
 {
 	UBSAT_TickTrace* MyObj = NewAbilityTask<UBSAT_TickTrace>(OwningAbility, TaskInstanceName);
 	MyObj->Character = Character;
@@ -61,10 +60,10 @@ void UBSAT_TickTrace::PerformSingleWeaponTrace()
 	{
 		return;
 	}
-	
+
 	const USceneComponent* RecoilComponent = Character->GetRecoilComponent();
 	const FRotator CurrentRecoilRotation = Character->GetRecoilComponent()->GetCurrentRecoilRotation();
-	
+
 	const FVector RotatedVector1 = UKismetMathLibrary::RotateAngleAxis(RecoilComponent->GetForwardVector(),
 		CurrentRecoilRotation.Pitch, RecoilComponent->GetRightVector());
 	const FVector RotatedVector2 = UKismetMathLibrary::RotateAngleAxis(RotatedVector1, CurrentRecoilRotation.Yaw,
@@ -73,7 +72,7 @@ void UBSAT_TickTrace::PerformSingleWeaponTrace()
 	const FCollisionQueryParams TraceParams(SCENE_QUERY_STAT(WeaponTrace), true, Character);
 	GetWorld()->LineTraceSingleByChannel(HitResult, RecoilComponent->GetComponentLocation(), EndTrace,
 		BS_TraceChannel_Weapon, TraceParams);
-	
+
 	OnTickTraceHit.Broadcast(HitResult);
 }
 

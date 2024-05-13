@@ -7,7 +7,6 @@
 #include "Character/BSCharacter.h"
 #include "BSGameInstance.h"
 #include "BSGameUserSettings.h"
-#include "MediaSoundComponent.h"
 #include "RuntimeAudioImporterLibrary.h"
 #include "AbilitySystem/BSAbilitySystemComponent.h"
 #include "AbilitySystem/Abilities/BSGA_AimBot.h"
@@ -633,7 +632,7 @@ void ABSGameMode::HandleScoreSaving(const bool bExternalSaveScores)
 		if (bValidToSave)
 		{
 			// Update Steam Stat for Game Mode
-			#if UE_BUILD_SHIPPING
+#if UE_BUILD_SHIPPING
 			if (TimePlayedGameMode > Constants::MinStatRequirement_Duration_NumGamesPlayed)
 			{
 				GI->GetSteamManager()->UpdateStat_NumGamesPlayed(
@@ -641,12 +640,12 @@ void ABSGameMode::HandleScoreSaving(const bool bExternalSaveScores)
 					? EBaseGameMode::None
 					: CurrentPlayerScore.Value.DefiningConfig.BaseGameMode, 1);
 			}
-			#else // !UE_BUILD_SHIPPING
+#else // !UE_BUILD_SHIPPING
 			GI->GetSteamManager()->UpdateStat_NumGamesPlayed(
 				CurrentPlayerScore.Value.DefiningConfig.GameModeType == EGameModeType::Custom
 				? EBaseGameMode::None
 				: CurrentPlayerScore.Value.DefiningConfig.BaseGameMode, 1);
-			#endif // UE_BUILD_SHIPPING
+#endif // UE_BUILD_SHIPPING
 
 			// Save common score info and completed scores locally
 			CurrentPlayerScore.Key->SaveCommonScoreInfo(BSConfig->DefiningConfig, ScoreInfoInst);

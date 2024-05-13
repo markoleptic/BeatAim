@@ -34,8 +34,8 @@ public:
 	{
 	}
 
-	FTargetPair(const int32 PreviousPointIndex, const int32 CurrentPointIndex) :
-		First(PreviousPointIndex), Second(CurrentPointIndex), Reward(0.f)
+	FTargetPair(const int32 PreviousPointIndex, const int32 CurrentPointIndex) : First(PreviousPointIndex),
+		Second(CurrentPointIndex), Reward(0.f)
 	{
 	}
 
@@ -75,13 +75,13 @@ struct FQTableUpdateParams
 	/** The QTable column index for the index of maximum reward, starting from State_Index_2 */
 	int32 ActionIndex_2;
 
-	FQTableUpdateParams() : TargetPair(FTargetPair()), StateIndex(-1), ActionIndex(-1),
-		StateIndex_2(-1), ActionIndex_2(-1)
+	FQTableUpdateParams() : TargetPair(FTargetPair()), StateIndex(-1), ActionIndex(-1), StateIndex_2(-1),
+	                        ActionIndex_2(-1)
 	{
 	}
 
 	explicit FQTableUpdateParams(const FTargetPair& InTargetPair) : TargetPair(InTargetPair), StateIndex(-1),
-		ActionIndex(-1), StateIndex_2(-1), ActionIndex_2(-1)
+	                                                                ActionIndex(-1), StateIndex_2(-1), ActionIndex_2(-1)
 	{
 	}
 };
@@ -98,9 +98,8 @@ struct FSpawnAreaQTableIndexPair
 	FSpawnAreaQTableIndexPair() : QTableIndex(INDEX_NONE), SpawnAreaIndex(INDEX_NONE)
 	{
 	}
-	
-	FSpawnAreaQTableIndexPair(const int32 InSpawnAreaIndex, const int32 InQTableIndex) :
-		QTableIndex(InQTableIndex),
+
+	FSpawnAreaQTableIndexPair(const int32 InSpawnAreaIndex, const int32 InQTableIndex) : QTableIndex(InQTableIndex),
 		SpawnAreaIndex(InSpawnAreaIndex)
 	{
 	}
@@ -138,7 +137,7 @@ struct FRLAgentParams
 
 	FRLAgentParams(const FBS_AIConfig& InAIConfig, const FCommonScoreInfo& InScoreInfo,
 		const FIntVector3& InSpawnAreaSize) : AIConfig(InAIConfig), ScoreInfo(InScoreInfo),
-		SpawnAreaSize(InSpawnAreaSize)
+		                                      SpawnAreaSize(InSpawnAreaSize)
 	{
 	}
 };
@@ -288,8 +287,8 @@ private:
 	/** The number of samples collected starting from when the component was activated */
 	int64 TotalTrainingSamples;
 
-	#if !UE_BUILD_SHIPPING
-	
+#if !UE_BUILD_SHIPPING
+
 public:
 	/** Broadcasts OnQTableUpdate delegate */
 	void UpdateQTableWidget() const;
@@ -302,7 +301,7 @@ public:
 
 	void PrintGetMaxIndex(const int32 PreviousIndex, const float MaxValue, const nc::NdArray<float>& PreviousRow,
 		const nc::NdArray<unsigned>& ReverseSortedIndices) const;
-	
+
 	/** Delegate that broadcasts when the QTable is updated. Used to broadcast to widgets */
 	FOnQTableUpdate OnQTableUpdate;
 
@@ -323,6 +322,6 @@ public:
 
 	/** Whether or not to print finding the next and/or best action index to log */
 	bool bPrintDebug_ChooseActionIndex;
-	
-	#endif
+
+#endif
 };

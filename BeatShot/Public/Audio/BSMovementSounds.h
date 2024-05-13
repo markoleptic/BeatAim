@@ -21,16 +21,19 @@ struct FBSFootstepSoundKey
 	FGameplayTagContainer Context;
 
 	FBSFootstepSoundKey()
-	{}
-	
+	{
+	}
+
 	FBSFootstepSoundKey(const FGameplayTag& InEffectTag, const FGameplayTagContainer& InContext)
 		: EffectTag(InEffectTag), Context(InContext)
-	{}
+	{
+	}
 
 	FBSFootstepSoundKey(const FGameplayTag& InEffectTag, const FGameplayTag& InContext)
 		: EffectTag(InEffectTag), Context(InContext)
-	{}
-	
+	{
+	}
+
 	FORCEINLINE bool operator==(const FBSFootstepSoundKey& Other) const
 	{
 		return EffectTag.MatchesTagExact(Other.EffectTag) && Context.HasAllExact(Other.Context);
@@ -45,7 +48,7 @@ struct FBSFootstepSoundKey
 		if (Other.Context.IsEmpty()) return false;
 		return Context.First().ToString() < Other.Context.First().ToString();
 	}
-	
+
 	friend FORCEINLINE uint32 GetTypeHash(const FBSFootstepSoundKey& Object)
 	{
 		return HashCombine(GetTypeHash(Object.EffectTag), GetTypeHash(Object.Context.ToString()));
@@ -56,7 +59,7 @@ USTRUCT(BlueprintType)
 struct FBSFootstepSoundValue
 {
 	GENERATED_BODY()
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ForceInlineRow))
 	TArray<TObjectPtr<USoundBase>> Sounds;
 };
@@ -69,10 +72,10 @@ class BEATSHOT_API UBSMovementSounds : public UDataAsset
 
 public:
 	virtual void PostLoad() override;
-	
+
 	void GetFootstepSounds(const FGameplayTag Effect, const FGameplayTagContainer& Context,
 		TArray<TObjectPtr<USoundBase>>& Sounds) const;
-	
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TMap<FBSFootstepSoundKey, FBSFootstepSoundValue> FootstepSounds;

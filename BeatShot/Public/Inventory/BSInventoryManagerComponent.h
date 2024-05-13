@@ -61,7 +61,8 @@ struct FBSInventoryList : public FFastArraySerializer
 
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
 	{
-		return FFastArraySerializer::FastArrayDeltaSerialize<FBSInventoryEntry, FBSInventoryList>(Items, DeltaParms, *this);
+		return FFastArraySerializer::FastArrayDeltaSerialize<FBSInventoryEntry, FBSInventoryList>(Items, DeltaParms,
+			*this);
 	}
 
 	UBSInventoryItemInstance* AddEntry(TSubclassOf<UBSInventoryItemDefinition> ItemDef, int32 StackCount);
@@ -99,7 +100,7 @@ public:
 	UBSInventoryManagerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
+
 	/** Creates and returns an instance of the inventory item. Adds to the replicated sub object list. */
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "Inventory")
 	UBSInventoryItemInstance* AddItemInstance(TSubclassOf<UBSInventoryItemDefinition> ItemDef, int32 StackCount = 1);
@@ -161,7 +162,7 @@ public:
 	/** Returns item instance corresponding to the current slot. */
 	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category= "Inventory | Slots")
 	UBSInventoryItemInstance* GetActiveSlotItem() const;
-	
+
 	/** Returns the first empty slot (null Inventory Item Instance in Slots) */
 	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category= "Inventory | Slots")
 	int32 GetNextFreeItemSlot() const;

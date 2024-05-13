@@ -53,13 +53,12 @@ public:
 	float DestroyChance = 0.f;
 
 protected:
-
 	/** Callback function for when ExpirationTimer timer expires */
 	virtual void OnLifeSpanExpired() override;
 
 	/** Reference to the target widget in CustomGameModesWidget_Preview */
 	TObjectPtr<UTargetWidget> TargetWidget;
-	
+
 	float BoxBoundsHeight = 1000.f;
 
 public:

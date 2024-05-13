@@ -2,12 +2,10 @@
 
 
 #include "MainMenuGameMode.h"
-
 #include "BSGameInstance.h"
-#include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "SubMenuWidgets/GameModesWidgets/GameModesWidget.h"
-#include "SubMenuWidgets/GameModesWidgets/CGMW_CreatorView.h"
+#include "Menus/GameModeMenuWidget.h"
+#include "GameModes/CreatorViewWidget.h"
 #include "Target/TargetManagerPreview.h"
 
 AMainMenuGameMode::AMainMenuGameMode()
@@ -27,7 +25,7 @@ void AMainMenuGameMode::OnPlayerSettingsChanged(const FPlayerSettings_Game& Game
 	PlayerSettings_Game = GameSettings;
 }
 
-void AMainMenuGameMode::SetupTargetManager(UGameModesWidget* GameModesWidget)
+void AMainMenuGameMode::SetupTargetManager(UGameModeMenuWidget* GameModesWidget)
 {
 	PlayerSettings_Game = LoadPlayerSettings().Game;
 	BSConfig = GameModesWidget->GetBSConfig();

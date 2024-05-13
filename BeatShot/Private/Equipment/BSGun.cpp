@@ -142,8 +142,8 @@ void ABSGun::TriggerFireAudio(USoundBase* Sound, AActor* OwningActor)
 		if (USkeletalMeshComponent* MeshComponent = OwningActor->GetComponentByClass<USkeletalMeshComponent>())
 		{
 			FireAudioComponent = UGameplayStatics::SpawnSoundAttached(Sound, MeshComponent, FireAttachPointName,
-				FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset,
-				false, 1.f, 1.f, 0.f, nullptr, nullptr, true);
+				FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, false, 1.f, 1.f, 0.f,
+				nullptr, nullptr, true);
 		}
 	}
 	if (FireAudioComponent)

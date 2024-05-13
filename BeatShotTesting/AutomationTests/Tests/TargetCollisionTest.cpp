@@ -50,6 +50,7 @@ public:
 			EAutomationTestFlags::HighPriorityAndAbove | EAutomationTestFlags::EngineFilter) & ~(
 			EAutomationTestFlags::SmokeFilter));
 	}
+
 	virtual bool IsStressTest() const override { return true; }
 	virtual uint32 GetRequiredDeviceNum() const override { return 1; }
 	virtual FString GetTestSourceFileName() const override { return "TargetCollisionTest.cpp"; }
@@ -61,7 +62,7 @@ protected:
 	virtual FString GetBeautifiedTestName() const override { return "TargetManager.TargetCollision"; }
 	void TestIntersection(const FSphere& SphereOne, const FSphere& SphereTwo);
 	void ResetTestVariables();
-	
+
 	int32 TotalTargetsSpawned = 0;
 	int32 TotalCollisions = 0;
 	double MinDistance = 5000.f;
@@ -90,18 +91,18 @@ void FTargetCollisionTest::GetTests(TArray<FString>& OutBeautifiedNames, TArray<
 bool FTargetCollisionTest::RunTest(const FString& Parameters)
 {
 	if (!Init()) return false;
-	
+
 	FBSConfig* FoundConfig = TestMap.Find(Parameters);
 	if (!FoundConfig)
 	{
 		AddError(FString::Printf(TEXT("Failed to find Config for Parameters: %s"), *Parameters));
 		return false;
 	}
-	
+
 	BSConfig = MakeShared<FBSConfig>(*FoundConfig);
 	TargetManager->Init(BSConfig, FCommonScoreInfo(), FPlayerSettings_Game());
 	TargetManager->SetShouldSpawn(true);
-	
+
 	for (int Iter = 0; Iter < NumIterations; Iter++)
 	{
 		TargetManager->OnAudioAnalyzerBeat();
@@ -128,10 +129,10 @@ bool FTargetCollisionTest::RunTest(const FString& Parameters)
 	AddInfo(FString::Printf(TEXT("Min Distance between two spheres: %.4lf"), MinDistance));
 	AddInfo(FString::Printf(TEXT("Total time spent executing GetTargetSpawnParams: %.4lf"),
 		TargetSpawnParamsExecutionTime));
-	
+
 	ResetTestVariables();
 	CleanUpWorld();
-	
+
 	return true;
 }
 

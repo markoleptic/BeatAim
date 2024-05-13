@@ -15,19 +15,19 @@
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
-#include "MenuWidgets/MainMenuWidget.h"
-#include "MenuWidgets/PauseMenuWidget.h"
-#include "MenuWidgets/PostGameMenuWidget.h"
-#include "OverlayWidgets/LoadingScreenWidgets/CountdownWidget.h"
-#include "OverlayWidgets/HUDWidgets/CrossHairWidget.h"
-#include "OverlayWidgets/HUDWidgets/FPSCounterWidget.h"
-#include "OverlayWidgets/HUDWidgets/PlayerHUD.h"
-#include "OverlayWidgets/HUDWidgets/RLAgentWidget.h"
-#include "OverlayWidgets/LoadingScreenWidgets/ScreenFadeWidget.h"
-#include "OverlayWidgets/PopupWidgets/QuitMenuWidget.h"
-#include "SubMenuWidgets/ScoreBrowserWidget.h"
-#include "SubMenuWidgets/SettingsWidgets/SettingsMenuWidget.h"
-#include "SubMenuWidgets/GameModesWidgets/CGMW_CreatorView.h"
+#include "Menus/MainMenuWidget.h"
+#include "Menus/PauseMenuWidget.h"
+#include "Menus/PostGameMenuWidget.h"
+#include "Overlays/CountdownWidget.h"
+#include "Overlays/CrossHairWidget.h"
+#include "Overlays/FrameCounterWidget.h"
+#include "Overlays/PlayerHUD.h"
+#include "Overlays/QTableWidget.h"
+#include "Transitions/ScreenFadeWidget.h"
+#include "Overlays/QuitMenuWidget.h"
+#include "Menus/ScoreBrowserWidget.h"
+#include "Menus/SettingsMenuWidget.h"
+#include "GameModes/CreatorViewWidget.h"
 #include "BSLoadingScreenSettings.h"
 #include "System/SteamManager.h"
 
@@ -274,7 +274,7 @@ void ABSPlayerController::HidePlayerHUD()
 		PlayerHUDWidget->RemoveFromParent();
 		PlayerHUDWidget = nullptr;
 	}
-	HideRLAgentWidget();
+	HideQTableWidget();
 }
 
 void ABSPlayerController::UpdatePlayerHUD(const FPlayerScore& PlayerScore, const float TimeOffsetNormalized,
@@ -513,7 +513,7 @@ void ABSPlayerController::ShowFPSCounter()
 {
 	if (FPSCounterWidget == nullptr && IsLocalController())
 	{
-		FPSCounterWidget = CreateWidget<UFPSCounterWidget>(this, FPSCounterClass);
+		FPSCounterWidget = CreateWidget<UFrameCounterWidget>(this, FPSCounterClass);
 		FPSCounterWidget->AddToViewport(ZOrderFPSCounter);
 	}
 }
@@ -593,24 +593,24 @@ void ABSPlayerController::HideInteractInfo()
 	}
 }
 
-void ABSPlayerController::ShowRLAgentWidget(FOnQTableUpdate& OnQTableUpdate, const int32 Rows, const int32 Columns,
+void ABSPlayerController::ShowQTableWidget(FOnQTableUpdate& OnQTableUpdate, const int32 Rows, const int32 Columns,
 	const TArray<float>& QTable)
 {
-	if (!RLAgentWidget && IsLocalController())
+	if (!QTableWidget && IsLocalController())
 	{
-		RLAgentWidget = CreateWidget<URLAgentWidget>(this, RLAgentWidgetClass);
-		OnQTableUpdate.AddUObject(RLAgentWidget, &URLAgentWidget::UpdatePanel);
-		RLAgentWidget->InitQTable(Rows, Columns, QTable);
-		RLAgentWidget->AddToViewport();
+		QTableWidget = CreateWidget<UQTableWidget>(this, QTableWidgetClass);
+		OnQTableUpdate.AddUObject(QTableWidget, &UQTableWidget::UpdatePanel);
+		QTableWidget->InitQTable(Rows, Columns, QTable);
+		QTableWidget->AddToViewport();
 	}
 }
 
-void ABSPlayerController::HideRLAgentWidget()
+void ABSPlayerController::HideQTableWidget()
 {
-	if (RLAgentWidget && IsLocalController())
+	if (QTableWidget && IsLocalController())
 	{
-		RLAgentWidget->RemoveFromParent();
-		RLAgentWidget = nullptr;
+		QTableWidget->RemoveFromParent();
+		QTableWidget = nullptr;
 	}
 }
 

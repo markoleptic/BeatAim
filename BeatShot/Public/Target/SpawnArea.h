@@ -28,7 +28,7 @@ class BEATSHOT_API USpawnArea : public UObject
 
 	/** The total number of vertical SpawnAreas. */
 	static int32 TotalNumVerticalSpawnAreas;
-	
+
 	/** The total number of SpawnAreas that this SpawnArea is part of. */
 	static int32 Size;
 
@@ -46,7 +46,7 @@ class BEATSHOT_API USpawnArea : public UObject
 
 	/** The point chosen after a successful spawn or activation. Will be inside the sub area */
 	FVector ChosenPoint;
-	
+
 	/** Bottom left vertex of the box, used for comparison between SpawnAreas. This Vertex corresponds to a location
 	 *  in AllSpawnLocations (in TargetManager) */
 	FVector Vertex_BottomLeft;
@@ -129,7 +129,7 @@ public:
 
 	/** Returns a random offset between (0, 0, 0) and (0, Width, Height). */
 	static FVector GenerateRandomOffset();
-	
+
 	/** Returns the width of a Spawn Area. */
 	static int32 GetWidth() { return Width; }
 
@@ -138,37 +138,37 @@ public:
 
 	/** Calculates the radius that should be used to make occupied vertices. */
 	static float CalcTraceRadius(const FVector& InScale);
-	
+
 	/** Returns the index assigned on initialization */
 	int32 GetIndex() const { return Index; }
-	
+
 	/** Returns the chosen point of the last spawn or activation */
 	FVector GetChosenPoint() const { return ChosenPoint; }
-	
+
 	/** Returns the bottom left vertex of the spawn area 2D representation */
 	FVector GetBottomLeftVertex() const { return Vertex_BottomLeft; }
 
 	/** Returns the middle location between the bottom left and top left */
 	FVector GetCenterPoint() const { return CenterPoint; };
-	
+
 	/** Returns whether or not the SpawnArea contains an activated target */
 	bool IsActivated() const { return bIsActivated; }
-	
+
 	/** Returns whether or not the SpawnArea contains a managed target */
 	bool IsManaged() const { return bIsManaged; }
-	
+
 	/** Returns whether or not the SpawnArea contains a recent target */
 	bool IsRecent() const { return bIsRecent; }
-	
+
 	/** Returns whether or not this SpawnArea can be reactivated while activated */
 	bool CanActivateWhileActivated() const { return bAllowActivationWhileActivated; }
 
 	/** Returns whether or not the index borders the SpawnArea */
 	bool IsBorderingIndex(const int32 InIndex) const;
-	
+
 	/** Returns the time that this SpawnArea was flagged as recent */
 	double GetTimeSetRecent() const { return TimeSetRecent; }
-	
+
 	/** Returns a const reference to the map that maps the direction from this SpawnArea to adjacent SpawnArea indices */
 	const TMap<EAdjacentDirection, int32>& GetAdjacentIndexMap() const { return AdjacentIndexMap; }
 
@@ -177,46 +177,46 @@ public:
 
 	/** Returns a set of SpawnArea indices adjacent to this SpawnArea that match the provided directions */
 	TSet<int32> GetAdjacentIndices(const TSet<EAdjacentDirection>& Directions) const;
-	
+
 	/** Returns the vertices that this SpawnArea occupies in space based on target scale and other factors */
 	const TSet<FVector>& GetOccupiedVertices() const { return OccupiedVertices; }
-	
+
 	/** Adds vectors that are inside the sphere if bOccupied is true, otherwise adds vectors outside the sphere */
 	TSet<FVector> MakeVerticesBase(const FVector& InScale, const bool bOccupied) const;
-	
+
 	/** Finds and returns the vertices that overlap with SpawnArea by tracing a circle around the SpawnArea based on
 	 *  the target scale, minimum distance between targets, minimum overlap radius, and size of the SpawnArea */
 	TSet<FVector> MakeOccupiedVertices(const FVector& InScale) const;
-	
+
 	/** Returns the vertices that this SpawnArea did not occupy in space after tracing a sphere
 	 *  based on target scale and other factors. Only used for debug purposes */
 	TSet<FVector> MakeUnoccupiedVertices(const FVector& InScale) const;
-	
+
 	/** Returns the type of grid index */
 	EGridIndexType GetIndexType() const { return GridIndexType; }
-	
+
 	/** Returns the total targets spawned within this SpawnArea */
 	int32 GetTotalSpawns() const { return TotalSpawns; }
-	
+
 	/** Returns the total targets hit by the player within this SpawnArea */
 	int32 GetTotalHits() const { return TotalHits; }
-	
+
 	/** Returns the total tracking damage applied to a target by the player within this SpawnArea */
 	int32 GetTotalTrackingDamage() const { return TotalTrackingDamage; }
-	
+
 	/** Returns the total tracking damage that could possibly be applied to a target by the player
 	 *  within this SpawnArea */
 	int32 GetTotalTrackingDamagePossible() const { return TotalTrackingDamagePossible; }
-	
+
 	/** Returns the scale of the last target spawned in this SpawnArea */
 	FVector GetTargetScale() const { return TargetScale; }
-	
+
 	/** Returns the Guid of the last target spawned in this SpawnArea */
 	FGuid GetGuid() const { return Guid; }
-	
+
 	/** Sets the Guid of this SpawnArea */
 	void SetGuid(const FGuid InGuid) { Guid = InGuid; }
-	
+
 	/** Resets the Guid of this SpawnArea */
 	void ResetGuid() { Guid.Invalidate(); }
 
@@ -225,9 +225,10 @@ public:
 
 	/** Sets the value of ChosenPoint, where the target should actually be spawned. */
 	void SetChosenPoint(const FVector& InLocation);
-	
+
 	/** Returns an array of indices that border the index when looking at the array like a 2D grid */
-	static TMap<EAdjacentDirection, int32> CreateAdjacentIndices(const EGridIndexType InGridIndexType, const int32 InIndex, const int32 InWidth);
+	static TMap<EAdjacentDirection, int32> CreateAdjacentIndices(const EGridIndexType InGridIndexType,
+		const int32 InIndex, const int32 InWidth);
 
 	/** Returns the corresponding index type depending on the InIndex, InSize, and InWidth */
 	static EGridIndexType FindIndexType(const int32 InIndex, const int32 InSize, const int32 InWidth);
@@ -258,7 +259,7 @@ public:
 	/** Increments TotalTrackingDamage */
 	void IncrementTotalTrackingDamage();
 
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 	/** The scale last used to generate occupied vertices. */
 	FVector LastOccupiedVerticesTargetScale;
 
@@ -268,8 +269,8 @@ public:
 	/** Sets the value of DebugOccupiedVertices, LastOccupiedVerticesTargetScale,
 	 *  and returns the DebugOccupiedVertices. */
 	TSet<FVector> SetMakeDebugOccupiedVertices(const FVector& InScale);
-	#endif
-	
+#endif
+
 	FORCEINLINE bool operator ==(const USpawnArea& Other) const
 	{
 		if (Index != INDEX_NONE && Index == Other.Index)

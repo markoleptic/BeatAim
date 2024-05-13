@@ -28,7 +28,7 @@ void UWeaponAudioFunctions::SetEarlyReflections(AActor* Target, const FGameplayC
 	USubmixEffectTapDelayPreset* SubmixEffect)
 {
 	if (!Target) return;
-	
+
 	ABSCharacterBase* BSCharacter = Cast<ABSCharacterBase>(Target);
 	if (!BSCharacter) return;
 
@@ -57,7 +57,7 @@ void UWeaponAudioFunctions::SetEarlyReflections(AActor* Target, const FGameplayC
 
 	FCollisionQueryParams CParams;
 	CParams.AddIgnoredActor(Target);
-	
+
 	// Direct hit (HitResult from GCN)
 	CalculateTapProperties("Direct.Primary", SubmixEffect, Camera, ListenerLoc, HitLoc, TapIDs[0], DirectHitDist, bHit);
 
@@ -68,12 +68,12 @@ void UWeaponAudioFunctions::SetEarlyReflections(AActor* Target, const FGameplayC
 	DirectLOS.Distance += DirectHitDist;
 	CalculateTapProperties("Direct.Second.C", SubmixEffect, Camera, ListenerLoc, DirectLOS.Location, TapIDs[1],
 		DirectLOS.Distance, bHit);
-	
+
 	// Side Reflections from line of sight
 	FVector LeftAngle, RightAngle;
 	FVector UpVector = FRotationMatrix(HitNormal.ToOrientationRotator()).GetScaledAxis(EAxis::Z);
 	GetSideReflectionAngles(HitLoc, HitNormal, 4000.f, UpVector, LeftAngle, RightAngle);
-	
+
 	FHitResult LeftLOS;
 	bHit = Target->GetWorld()->LineTraceSingleByChannel(LeftLOS, HitLoc, LeftAngle, ECC_Visibility, CParams);
 	LeftLOS.Distance += DirectHitDist;
@@ -89,17 +89,17 @@ void UWeaponAudioFunctions::SetEarlyReflections(AActor* Target, const FGameplayC
 	// Side Reflections from Line of Sight's Direct Reflection
 	UpVector = FRotationMatrix(DirectLOS.Normal.ToOrientationRotator()).GetScaledAxis(EAxis::Z);
 	GetSideReflectionAngles(DirectLOS.Location, DirectLOS.Normal, 4000.f, UpVector, LeftAngle, RightAngle);
-	
+
 	FHitResult LeftLOSDirect;
-	bHit = Target->GetWorld()->LineTraceSingleByChannel(LeftLOSDirect, DirectLOS.Location, LeftAngle,
-		ECC_Visibility, CParams);
+	bHit = Target->GetWorld()->LineTraceSingleByChannel(LeftLOSDirect, DirectLOS.Location, LeftAngle, ECC_Visibility,
+		CParams);
 	LeftLOSDirect.Distance += DirectLOS.Distance;
 	CalculateTapProperties("Direct.Second.L", SubmixEffect, Camera, ListenerLoc, LeftLOSDirect.Location, TapIDs[2],
 		LeftLOSDirect.Distance, bHit);
 
 	FHitResult RightLOSDirect;
-	bHit = Target->GetWorld()->LineTraceSingleByChannel(RightLOSDirect, DirectLOS.Location, RightAngle,
-		ECC_Visibility, CParams);
+	bHit = Target->GetWorld()->LineTraceSingleByChannel(RightLOSDirect, DirectLOS.Location, RightAngle, ECC_Visibility,
+		CParams);
 	RightLOSDirect.Distance += DirectLOS.Distance;
 	CalculateTapProperties("Direct.Second.R", SubmixEffect, Camera, ListenerLoc, RightLOSDirect.Location, TapIDs[3],
 		RightLOSDirect.Distance, bHit);
@@ -121,9 +121,9 @@ void UWeaponAudioFunctions::SetEarlyReflections(AActor* Target, const FGameplayC
 		RightWeapon.Distance, bHit);
 }
 
-void UWeaponAudioFunctions::CalculateTapProperties(const FString& DebugString, USubmixEffectTapDelayPreset* SubmixEffect,
-	UCameraComponent* CameraComponent, const FVector& ListenerLocation, const FVector& HitLocation, const int32 TapID,
-	const float TravelDistance, const bool bHit)
+void UWeaponAudioFunctions::CalculateTapProperties(const FString& DebugString,
+	USubmixEffectTapDelayPreset* SubmixEffect, UCameraComponent* CameraComponent, const FVector& ListenerLocation,
+	const FVector& HitLocation, const int32 TapID, const float TravelDistance, const bool bHit)
 {
 	// Carry over settings on hit to minimize artifacts
 	if (!bHit)
@@ -140,12 +140,12 @@ void UWeaponAudioFunctions::CalculateTapProperties(const FString& DebugString, U
 	FTapDelayInfo TapDelayInfo;
 	TapDelayInfo.OutputChannel = 0;
 	TapDelayInfo.TapLineMode = ETapLineMode::Panning;
-	
+
 	const float HitDistance = (ListenerLocation - HitLocation).Length();
 
 	const float Alpha = FMath::GetMappedRangeValueUnclamped(FVector2f(0, 10000.f), FVector2f(0, 1.f),
 		TravelDistance + HitDistance);
-	
+
 	// Attenuate when direct hits are nearby
 	const float AttenuatedHitDistance = FMath::GetMappedRangeValueClamped(FVector2f(0, 1000.f), FVector2f(0, 1.f),
 		HitDistance);
@@ -155,13 +155,13 @@ void UWeaponAudioFunctions::CalculateTapProperties(const FString& DebugString, U
 	// Ease in
 	TapDelayInfo.DelayLength = FMath::GetMappedRangeValueUnclamped(FVector2f(0, 1.f), FVector2f(10.f, 600.f),
 		Alpha * Alpha);
-	
+
 	FVector CameraDistance = CameraComponent->GetComponentLocation() - HitLocation;
 	CameraDistance.Normalize();
 	const FVector RightVector = FRotationMatrix(CameraComponent->GetComponentRotation()).GetScaledAxis(EAxis::Y);
 	const float DotProduct = RightVector.Dot(CameraDistance);
 	TapDelayInfo.PanInDegrees = DotProduct * 180.f;
-	
+
 	SubmixEffect->SetTap(TapID, TapDelayInfo);
 }
 

@@ -15,7 +15,7 @@ UCLASS()
 class BEATSHOT_API UWeaponAudioFunctions : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-	
+
 public:
 	UFUNCTION(BlueprintCallable, Category="Audio")
 	static void SetWeaponSoundParams(AActor* Actor, const FGameplayCueNotify_SpawnResult& SpawnResult);
@@ -23,11 +23,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Audio")
 	static void SetEarlyReflections(AActor* Target, const FGameplayCueParameters& Params,
 		USubmixEffectTapDelayPreset* SubmixEffect);
-	
+
 protected:
 	static void CalculateTapProperties(const FString& DebugString, USubmixEffectTapDelayPreset* SubmixEffect,
-		UCameraComponent* CameraComponent, const FVector& ListenerLocation, const FVector& HitLocation, const int32 TapID,
-		const float TravelDistance, const bool bHit);
+		UCameraComponent* CameraComponent, const FVector& ListenerLocation, const FVector& HitLocation,
+		const int32 TapID, const float TravelDistance, const bool bHit);
 
 	static void GetSideReflectionAngles(const FVector& Origin, const FVector& Normal, const float TraceDistance,
 		const FVector& Axis, FVector& OutAngleLeft, FVector& OutAngleRight);

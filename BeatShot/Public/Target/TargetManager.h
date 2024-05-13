@@ -19,19 +19,21 @@ struct FPlayerSettings_Game;
 struct FBS_TargetConfig;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTargetManager, Log, All);
+
 static constexpr int32 DefaultNumTargetsToActivate = 100;
 static constexpr int32 DefaultMinToActivate_MinClamp = 1;
 static constexpr int32 MaxToActivate_MinClamp = 1;
 
-static const TArray AnyDirectionModeMultipliers = {FVector(0, -1, -1), FVector(0, 1, -1),
-	FVector(0, -1, 1), FVector(0, 1, 1)};
+static const TArray AnyDirectionModeMultipliers = {
+	FVector(0, -1, -1), FVector(0, 1, -1), FVector(0, -1, 1), FVector(0, 1, 1)
+};
 
 /** Class responsible for spawning and managing targets for all game modes. */
 UCLASS()
 class BEATSHOT_API ATargetManager : public AActor
 {
 	GENERATED_BODY()
-	
+
 	friend class UBSCheatManager;
 	friend class ABeatShotGameModeFunctionalTest;
 	friend class FTargetManagerTestBase;
@@ -39,7 +41,7 @@ class BEATSHOT_API ATargetManager : public AActor
 
 public:
 	ATargetManager();
-	
+
 	virtual void Tick(float DeltaTime) override;
 
 	/** Delegate that is executed every time a target has been activated */
@@ -66,7 +68,7 @@ protected:
 	/** The 2D spawn area representing the largest the SpawnBox will ever be. Visual only. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UBoxComponent> StaticExtentsBox;
-	
+
 	/** Three-dimensional spawn area that all targets must fit inside. Used to update boundary boxes. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UBoxComponent> SpawnVolume;
@@ -118,7 +120,7 @@ public:
 	/** Initializes  */
 	void Init(const TSharedPtr<FBSConfig>& InConfig, const FCommonScoreInfo& InCommonScoreInfo,
 		const FPlayerSettings_Game& InPlayerSettings);
-	
+
 	/** Resets all state and destroys all actors. Calls clear on Components who also manage state. */
 	void Clear();
 
@@ -154,23 +156,24 @@ protected:
 	/** Calls DeactivateTarget and executes any deactivation responses to the target being deactivated.
 	 *  Possible to reactivate the target if conditions permit. */
 	virtual void DeactivateTarget(ATarget* InTarget, const bool bExpired, const bool bOutOfHealth) const;
-	
+
 	/** Returns true if the target should be deactivated based on TargetDeactivationConditions */
-	bool ShouldDeactivateTarget(const bool bExpired, const float CurrentHealth, const float DeactivationThreshold) const;
+	bool ShouldDeactivateTarget(const bool bExpired, const float CurrentHealth,
+		const float DeactivationThreshold) const;
 
 	/** Returns true if the target should be destroyed based on TargetDestructionConditions */
 	bool ShouldDestroyTarget(const bool bExpired, const bool bOutOfHealth) const;
 
 	/** Spawns targets at the beginning of a game mode based on the TargetDistributionPolicy */
 	int32 HandleUpfrontSpawning();
-	
+
 	/** Tries to spawn target(s) if there are less targets in ManagedTargets than the game mode allows at one time.
 	 *  Can be limited by number of targets to activate if the game mode doesn't allow spawning without activation. */
 	int32 HandleRuntimeSpawning();
-	
+
 	/** Activate target(s) if there are any ManagedTargets that are not activated and the game modes settings permit. */
 	int32 HandleTargetActivation() const;
-	
+
 	/** Returns the number of targets that are allowed to be spawned at once, at runtime */
 	int32 GetNumberOfTargetsToSpawn() const;
 
@@ -185,7 +188,7 @@ protected:
 
 	/** Finds the correct damage type for the next target spawn */
 	ETargetDamageType FindNextTargetDamageType();
-	
+
 	/** The expiration or destruction of any target is bound to this function, which handles firing delegates,
 	 *  target flags, target removal */
 	UFUNCTION()
@@ -203,11 +206,11 @@ protected:
 
 	/** Static function that returns the static location to place the SpawnBox */
 	static FVector GenerateStaticLocation(const FBSConfig* InCfg);
-	
+
 	/** Static function that returns the ending extents for a game mode. If dynamic, this is the extents that the
 	 *  curves lerp towards from StartExtents */
 	static FVector GenerateStaticExtents(const FBSConfig* InCfg);
-	
+
 	/** Static function that returns the absolute minimum and maximum corners of the spawn volume, based on the
 	 *  Static Extents and SpawnBox origin. */
 	static FExtrema GenerateStaticExtrema(const FBSConfig* InCfg, const FVector& InOrigin,
@@ -215,7 +218,8 @@ protected:
 
 	/** Static function that returns the location to place the SpawnVolume based on the Factor if dynamic or the
 	 *  StaticExtents otherwise. X and Y will be the same as the SpawnBox's location */
-	static FVector GenerateSpawnVolumeLocation(const FBSConfig* InCfg, const FVector& InOrigin, const FVector& InSpawnVolumeExtents);
+	static FVector GenerateSpawnVolumeLocation(const FBSConfig* InCfg, const FVector& InOrigin,
+		const FVector& InSpawnVolumeExtents);
 
 	/** Static function that returns the extents to apply to the SpawnVolume based on the Factor if dynamic or the
 	 *  StaticExtents otherwise. X and Y will be the same as the SpawnBox's extents */
@@ -228,22 +232,22 @@ protected:
 
 	/** Returns SpawnVolume's Location */
 	FVector GetSpawnVolumeLocation() const;
-	
+
 	/** Returns SpawnVolume's BoxExtents */
 	FVector GetSpawnVolumeExtents() const;
-	
+
 	/** Returns a FExtrema struct containing both the min extrema and max extrema of the SpawnVolume */
 	FExtrema GetSpawnVolumeExtrema() const;
 
 	/** Returns SpawnBox's origin. X will always be 3700 */
 	FVector GetSpawnBoxOrigin() const;
-	
+
 	/** Returns SpawnBox's current BoxExtents. X will always be 0 */
 	FVector GetSpawnBoxExtents() const;
-	
+
 	/** Returns the current min and max extrema for the SpawnBox. X will always be 0 */
 	FExtrema GetSpawnBoxExtrema() const;
-	
+
 	/** Sets the SpawnBox's BoxExtents based on the current value of DynamicScaleFactor */
 	void UpdateSpawnBoxExtents(const float Factor) const;
 
@@ -280,12 +284,12 @@ protected:
 
 	/** Returns a map containing the locations of all moving targets in ManagedTargets. */
 	void GetMovingTargetLocations(FMovingTargetLocations& MovingTargetLocations) const;
+
 public:
-	
 	/** Function called from BSGameMode any time a player changes settings.
 	 *  Propagates to all targets currently active */
 	void UpdatePlayerSettings(const FPlayerSettings_Game& InPlayerSettings);
-	
+
 	/** Called from DefaultGameMode, returns the player accuracy matrix */
 	FAccuracyData GetLocationAccuracy() const;
 
@@ -295,7 +299,7 @@ public:
 protected:
 	/** Random number stream to keep randomization in sync between HandleRuntimeSpawning and HandleTargetActivation */
 	FRandomStream RandomNumToActivateStream;
-	
+
 	/** Initialized at start of game mode by DefaultGameMode */
 	TSharedPtr<FBSConfig> BSConfig;
 
@@ -346,12 +350,12 @@ protected:
 	/** Spawn parameters for spawning targets */
 	FActorSpawnParameters TargetSpawnInfo;
 
-	#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING
 
 	/** Clears all debug persistent lines and draws debug boxes and/or lines based on debug bool variables. Calls
 	 *	same function on Spawn Area Manager. */
 	void DrawDebug() const;
-	
+
 	/** Delegate used to record execution time taken for SpawnAreaManager's GetSpawnableSpawnAreas function. */
 	TDelegate<void(const double)> ExecutionTimeDelegate;
 
@@ -363,6 +367,6 @@ protected:
 	 *  set to any. */
 public:
 	bool bShowDebug_AnyMovingTargetDirectionMode;
-	
-	#endif
+
+#endif
 };

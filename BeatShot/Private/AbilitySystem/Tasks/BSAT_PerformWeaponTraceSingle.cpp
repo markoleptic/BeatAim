@@ -15,14 +15,14 @@ UBSAT_PerformWeaponTraceSingle::UBSAT_PerformWeaponTraceSingle()
 void UBSAT_PerformWeaponTraceSingle::Activate()
 {
 	Super::Activate();
-	
+
 	FHitResult HitResult;
 	const bool bSuccess = LineTraceSingle(HitResult);
 	if (ShouldBroadcastAbilityTaskDelegates())
 	{
 		OnCompleted.Broadcast(bSuccess, HitResult);
 	}
-	
+
 	EndTask();
 }
 
@@ -55,7 +55,7 @@ bool UBSAT_PerformWeaponTraceSingle::LineTraceSingle(FHitResult& HitResult) cons
 
 	const USceneComponent* RecoilComponent = Character->GetRecoilComponent();
 	const FRotator CurrentRecoilRotation = Character->GetRecoilComponent()->GetCurrentRecoilRotation();
-	
+
 	const FVector RotatedVector1 = UKismetMathLibrary::RotateAngleAxis(RecoilComponent->GetForwardVector(),
 		CurrentRecoilRotation.Pitch, RecoilComponent->GetRightVector());
 	const FVector RotatedVector2 = UKismetMathLibrary::RotateAngleAxis(RotatedVector1, CurrentRecoilRotation.Yaw,

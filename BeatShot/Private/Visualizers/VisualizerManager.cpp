@@ -68,7 +68,7 @@ void AVisualizerManager::InitializeVisualizers(const FPlayerSettings_Game& Playe
 			Visualizers.AddUnique(SpawnedVisualizer);
 		}
 	}
-	
+
 	/* Split visualizer types into their own containers so that UpdateVisualizers can be as efficient as possible */
 	SplitVisualizers();
 
@@ -128,7 +128,7 @@ void AVisualizerManager::UpdateVisualizers(const TArray<float>& SpectrumValues)
 			MaxSpectrumValues[i] -= AvgSpectrumValues[i] / MaxSpectrumValueDecrementDivide;
 		}
 	}
-	
+
 	MarkVisualizerRenderStateDirty();
 }
 
@@ -183,7 +183,7 @@ void AVisualizerManager::UpdateVisualizerSettings(const FPlayerSettings_Game& Pl
 	SetActivationState_BeamVisualizer(3, PlayerSettings.bShow_LVRightBeam);
 	SetActivationState_CubeVisualizer(0, PlayerSettings.bShow_LVLeftCube);
 	SetActivationState_CubeVisualizer(1, PlayerSettings.bShow_LVRightCube);
-	
+
 	bUpdateCubeVisualizers = PlayerSettings.bShow_LVLeftCube || PlayerSettings.bShow_LVRightCube;
 	bUpdateBeamVisualizers = PlayerSettings.bShow_LVFrontBeam || PlayerSettings.bShow_LVTopBeam || PlayerSettings.
 		bShow_LVLeftBeam || PlayerSettings.bShow_LVRightBeam;

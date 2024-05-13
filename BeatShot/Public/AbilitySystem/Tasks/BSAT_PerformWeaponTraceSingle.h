@@ -9,7 +9,8 @@
 class UBSRecoilComponent;
 class UBSGameplayAbility;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPerformWeaponTraceDelegate, const bool, bSuccess, const FHitResult&, HitResult);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPerformWeaponTraceDelegate, const bool, bSuccess, const FHitResult&,
+	HitResult);
 
 UCLASS()
 class BEATSHOT_API UBSAT_PerformWeaponTraceSingle : public UAbilityTask

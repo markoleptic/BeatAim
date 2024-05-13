@@ -3,8 +3,8 @@
 
 #include "Animation/BSAnimationSet.h"
 
-UAnimSequence* UBSAnimationSet::FindAnimSequence(const EBSAnimMovementMode MovementMode, const EBSAnimStateType StateType,
-		const EBSAnimCardinal AnimCardinal) const
+UAnimSequence* UBSAnimationSet::FindAnimSequence(const EBSAnimMovementMode MovementMode,
+	const EBSAnimStateType StateType, const EBSAnimCardinal AnimCardinal) const
 {
 	if (const auto AnimSet = AnimMap.Find(MovementMode))
 	{

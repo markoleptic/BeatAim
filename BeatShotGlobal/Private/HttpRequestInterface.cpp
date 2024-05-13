@@ -263,7 +263,7 @@ void IHttpRequestInterface::DeleteScores(const FString CustomGameModeName, const
 			else
 			{
 				DeleteScoresResponse->HttpStatus = Response->GetResponseCode();
-				
+
 				if (DeleteScoresResponse->HttpStatus >= 200 && DeleteScoresResponse->HttpStatus <= 300)
 				{
 					DeleteScoresResponse->OK = true;

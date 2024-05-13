@@ -220,17 +220,18 @@ protected:
 	float MaxHeightIndentedText = 55.f;
 
 	/** Displays which settings are on/off etc by lighting the correct words */
-	void Init(const FPlayerSettings_Game& GameSettings, const FPlayerSettings_User& UserSettings, const bool bFromSettingsUpdate = false);
+	void Init(const FPlayerSettings_Game& GameSettings, const FPlayerSettings_User& UserSettings,
+		const bool bFromSettingsUpdate = false);
 
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_Game& GameSettings) override;
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_User& UserSettings) override;
 
 	void SetupMainText(UText3DComponent* InComponent, USceneComponent* InParent, const bool bFirstText,
 		const FString& Key, const FVector& AdditionalOffset = FVector::ZeroVector) const;
-	
+
 	void SetupToggleText(USceneComponent* InParent, UText3DComponent* InToggleTextOn, UText3DComponent* InToggleTextOff,
 		UBoxComponent* InBoxOn, UBoxComponent* InBoxOff, const FVector& AdditionalOffset = FVector::ZeroVector);
-	
+
 	void ToggleText(const bool bIsOn, UText3DComponent* InToggleTextOn, UText3DComponent* InToggleTextOff) const;
 
 	FVector Position_Corkboard = {300.f, 50.f, 0.f};

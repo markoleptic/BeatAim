@@ -63,7 +63,7 @@ struct FTargetDamageEvent
 
 	/** The absolute value between the health attribute's NewValue and OldValue */
 	float DamageDelta;
-	
+
 	/** The time the target was alive for before the damage event, or -1 if expired/damaged self */
 	float TimeAlive;
 
@@ -72,7 +72,7 @@ struct FTargetDamageEvent
 
 	/** The amount of health required to deactivate if a Deactivation Condition is Specific Health Amount */
 	float CurrentDeactivationHealthThreshold;
-	
+
 	/** The transform of the target */
 	FTransform Transform;
 
@@ -96,9 +96,9 @@ struct FTargetDamageEvent
 		TimeAlive = -1.f;
 		TotalPossibleTrackingDamage = 0.f;
 		CurrentDeactivationHealthThreshold = 0.f;
-		
+
 		Transform = FTransform();
-		
+
 		Streak = -1;
 	}
 
@@ -108,7 +108,8 @@ struct FTargetDamageEvent
 	void SetTargetData(const float InCurrentDeactivationHealthThreshold, const TArray<ETargetDamageType>& InTypes);
 
 	/** Called by the TargetManager to set data that only it will have access to */
-	void SetTargetManagerData(const bool bDeactivate, const bool bDestroy, const int32 InStreak, const float InTotalPossibleTrackingDamage);
+	void SetTargetManagerData(const bool bDeactivate, const bool bDestroy, const int32 InStreak,
+		const float InTotalPossibleTrackingDamage);
 
 	FORCEINLINE bool operator ==(const FTargetDamageEvent& Other) const
 	{
@@ -140,7 +141,7 @@ protected:
 
 	UPROPERTY()
 	const UBSAttributeSetBase* AttributeSetBase;
-   
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target Properties")
 	UCapsuleComponent* CapsuleComponent;
 
@@ -333,7 +334,7 @@ public:
 	/** Returns the color inactive target color */
 	UFUNCTION(BlueprintPure)
 	FLinearColor GetInActiveTargetColor() const;
-	
+
 	/** Returns the color for when the target is actively taking tracking damage */
 	UFUNCTION(BlueprintPure)
 	FLinearColor GetTakingTrackingDamageColor() const;
@@ -363,7 +364,7 @@ public:
 	/** Whether or not the target is immune to tracking damage */
 	UFUNCTION(BlueprintPure)
 	bool IsImmuneToTrackingDamage() const;
-	
+
 	ETargetDamageType GetTargetDamageType() const;
 
 	/** Returns the velocity / speed of the ProjectileMovementComponent (unit direction vector) */
@@ -439,7 +440,7 @@ protected:
 
 	/** The color of the target when it was destroyed */
 	FLinearColor ColorWhenDamageTaken;
-	
+
 	/** The type of damage this target is vulnerable to */
 	ETargetDamageType TargetDamageType;
 
@@ -454,7 +455,7 @@ protected:
 
 	/** Whether or not the last direction change was horizontally */
 	bool bLastDirectionChangeHorizontal;
-	
+
 	/** Whether or not to apply the LifetimeTargetScaling Method */
 	bool bApplyLifetimeTargetScaling;
 

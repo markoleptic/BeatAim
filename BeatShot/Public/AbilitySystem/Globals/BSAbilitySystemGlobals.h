@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemGlobals.h"
+#include "GameplayEffect.h"
 #include "BSAbilitySystemGlobals.generated.h"
 
 UCLASS()
@@ -21,5 +22,5 @@ public:
 	static UBSAbilitySystemGlobals& GetTestGlobals();
 
 private:
-	TArray<struct FGameplayEffectSpec> CurrentGameplayEffectSpecStack;
+	TArray<FGameplayEffectSpec> CurrentGameplayEffectSpecStack;
 };

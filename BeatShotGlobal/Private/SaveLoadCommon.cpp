@@ -47,11 +47,12 @@ USaveGameCustomGameMode* SaveLoadCommon::LoadFromSlot(const FString& InSlotName,
 	}
 	else
 	{
-		SaveGameObject = Cast<USaveGameCustomGameMode>(UGameplayStatics::CreateSaveGameObject(USaveGameCustomGameMode::StaticClass()));
+		SaveGameObject = Cast<USaveGameCustomGameMode>(
+			UGameplayStatics::CreateSaveGameObject(USaveGameCustomGameMode::StaticClass()));
 	}
-	
+
 	if (!SaveGameObject) return nullptr;
-	
+
 	if (SaveGameObject->GetLastLoadedVersion() < Constants::CustomGameModeVersion)
 	{
 		const int32 Old = SaveGameObject->GetLastLoadedVersion();

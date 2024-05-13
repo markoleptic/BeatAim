@@ -46,7 +46,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category=Equipment)
 	AActor* GetFirstSpawnedActor() const;
-	
+
 	/** Spawns the equipment actors from the ActorsToSpawn array */
 	virtual void SpawnEquipmentActors(const TArray<FBSEquipmentActorToSpawn>& ActorsToSpawn);
 
@@ -58,7 +58,7 @@ public:
 
 	/** Called after removing from FBSEquipmentList. */
 	virtual void OnUnequipped();
-	
+
 	UFUNCTION(BlueprintImplementableEvent, Category=Equipment, meta=(DisplayName="OnEquipped"))
 	void K2_OnEquipped();
 
@@ -71,7 +71,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category=Equipment)
 	void CancelUnequip();
 
-	template<class T>
+	template <class T>
 	T* GetTypedSpawnedActor() const;
 
 	FOnEnequipConfirmed OnUnequipConfirmed;

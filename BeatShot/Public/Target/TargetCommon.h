@@ -110,15 +110,14 @@ struct FAreaKey
 
 	FAreaKey() = default;
 
-	FAreaKey(const FVector& InBotLeft, const FVector& InTopRight) :
-		Vertex_BottomLeft(InBotLeft),
-		Vertex_TopRight(InTopRight)
+	FAreaKey(const FVector& InBotLeft, const FVector& InTopRight) : Vertex_BottomLeft(InBotLeft),
+	                                                                Vertex_TopRight(InTopRight)
 	{
 	}
 
-	FAreaKey(const FVector& InBotLeft, const FIntVector3& InInc) : 
-		Vertex_BottomLeft(InBotLeft),
-		Vertex_TopRight(InBotLeft + FVector(0.f, InInc.Y, InInc.Z))
+	FAreaKey(const FVector& InBotLeft, const FIntVector3& InInc) : Vertex_BottomLeft(InBotLeft),
+	                                                               Vertex_TopRight(InBotLeft + FVector(0.f, InInc.Y,
+		                                                               InInc.Z))
 	{
 	}
 
@@ -150,9 +149,10 @@ struct FTargetSpawnParams
 
 	FTargetSpawnParams() = default;
 
-	FTargetSpawnParams(const FVector& InLoc, const FVector& InScale, const int32 InIndex) :
-		Location(InLoc), Scale(InScale), SpawnAreaIndex(InIndex)
-	{}
+	FTargetSpawnParams(const FVector& InLoc, const FVector& InScale, const int32 InIndex) : Location(InLoc),
+		Scale(InScale), SpawnAreaIndex(InIndex)
+	{
+	}
 
 	FTransform Transform() const
 	{
@@ -176,9 +176,10 @@ struct FAnyMovingTargetDirectionModeSector
 {
 	FVector Center, Extents;
 
-	FAnyMovingTargetDirectionModeSector(const FVector& InCenter, const FVector& InExtents) :
-		Center(InCenter), Extents(InExtents)
-	{}
+	FAnyMovingTargetDirectionModeSector(const FVector& InCenter, const FVector& InExtents) : Center(InCenter),
+		Extents(InExtents)
+	{
+	}
 };
 
 /** Info to debug MovingTargetDirectionMode::Any. */

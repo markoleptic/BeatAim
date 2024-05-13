@@ -152,15 +152,17 @@ void AWallMenu::BeginPlay()
 	if (UBSGameInstance* GI = Cast<UBSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
 	{
 		GI->RegisterPlayerSettingsUpdaters(OnPlayerSettingsChangedDelegate_Game);
-		GI->RegisterPlayerSettingsSubscriber<AWallMenu, FPlayerSettings_Game>(this, &AWallMenu::OnPlayerSettingsChanged);
-		GI->RegisterPlayerSettingsSubscriber<AWallMenu, FPlayerSettings_User>(this, &AWallMenu::OnPlayerSettingsChanged);
+		GI->RegisterPlayerSettingsSubscriber<
+			AWallMenu, FPlayerSettings_Game>(this, &AWallMenu::OnPlayerSettingsChanged);
+		GI->RegisterPlayerSettingsSubscriber<
+			AWallMenu, FPlayerSettings_User>(this, &AWallMenu::OnPlayerSettingsChanged);
 	}
 
 	if (TimeOfDayManager)
 	{
 		TimeOfDayManager->OnTimeOfDayTransitionCompleted.BindUObject(this, &ThisClass::OnTimeOfDayChangeCompleted);
 	}
-	
+
 	BoxToTextMap.Add(Box_LightVisualizers_On, FText3DToggle(MainText_Enable_LightVisualizers, Box_LightVisualizers_On,
 		ToggleText_LightVisualizers_On, ToggleText_LightVisualizers_Off, true, "bShowLightVisualizers"));
 	BoxToTextMap.Add(Box_LightVisualizers_Off, FText3DToggle(MainText_Enable_LightVisualizers, Box_LightVisualizers_Off,
@@ -242,7 +244,7 @@ void AWallMenu::BeginPlay()
 			Pair.Value.OnText->SetFont(Font_Text3D);
 			Pair.Value.OffText->SetFont(Font_Text3D);
 		}
-		
+
 		if (!Material_Toggle) continue;
 
 		UMaterialInstanceDynamic* DynamicMatFrontOn = UMaterialInstanceDynamic::Create(Material_Toggle,
@@ -370,7 +372,7 @@ void AWallMenu::OnGameplayEffectAppliedToSelf(UAbilitySystemComponent* ABS, cons
 				bRequiresSave = (PlayerSettings.Game.bShow_LVRightCube != Found->bIsOnText) || bRequiresSave;
 				PlayerSettings.Game.bShow_LVRightCube = Found->bIsOnText;
 			}
-			
+
 			if (bRequiresSave)
 			{
 				SavePlayerSettings(PlayerSettings.Game);
@@ -411,7 +413,8 @@ void AWallMenu::Init(const FPlayerSettings_Game& GameSettings, const FPlayerSett
 	if (bFromSettingsUpdate) return;
 
 	ToggleText(GameSettings.bShowLightVisualizers, ToggleText_LightVisualizers_On, ToggleText_LightVisualizers_Off);
-	ToggleText(UserSettings.bNightModeUnlocked && GameSettings.bNightModeSelected, ToggleText_NightMode_On, ToggleText_NightMode_Off);
+	ToggleText(UserSettings.bNightModeUnlocked && GameSettings.bNightModeSelected, ToggleText_NightMode_On,
+		ToggleText_NightMode_Off);
 	ToggleText(GameSettings.bShow_LVTopBeam, ToggleText_LV_TopBeam_On, ToggleText_LV_TopBeam_Off);
 	ToggleText(GameSettings.bShow_LVLeftCube, ToggleText_LV_LeftCube_On, ToggleText_LV_LeftCube_Off);
 	ToggleText(GameSettings.bShow_LVRightCube, ToggleText_LV_RightCube_On, ToggleText_LV_RightCube_Off);

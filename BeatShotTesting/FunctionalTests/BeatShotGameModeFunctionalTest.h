@@ -55,11 +55,11 @@ protected:
 
 	/** Callback function for TargetManager's SpawnableSpawnAreasExecutionTimeDelegate. */
 	void OnSpawnableSpawnAreasExecution(const double ElapsedTime);
-	
+
 	/** Default Game Modes data asset to pull configs from. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GameModes|Default")
 	TObjectPtr<UBSGameModeDataAsset> GameModeDataAsset;
-	
+
 	/** Default Game Modes to test. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GameModes|Default",
 		meta = (EditCondition = "GameModeDataAsset != nullptr"))
@@ -69,11 +69,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GameModes|Default",
 		meta = (EditCondition = "GameModeDataAsset != nullptr"))
 	TSet<EGameModeDifficulty> DefaultGameModeDifficultiesToTest;
-	
+
 	/** Custom Game modes to test that have been exported as a string from within the game. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GameModes|Custom")
 	TArray<FString> CustomGameModesToTest;
-	
+
 	/** Blueprint class to use for the TargetManager. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
 	TSubclassOf<ATargetManager> TargetManagerClass;
@@ -81,11 +81,11 @@ protected:
 	/** Game settings for the spawned targets. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
 	FPlayerSettings_Game PlayerSettings_Game;
-	
+
 	/** The length of time to test each individual game mode and difficulty. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
 	float GameModeDuration = 10.f;
-	
+
 	/** How frequently to call the OnAudioAnalyzerBeat function of target manager, effectively spawning or activating
 	 *  targets. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
@@ -94,7 +94,7 @@ protected:
 	/** Initial offset applied to the BeatTimer. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
 	float InitialDelay = 0.1f;
-	
+
 	/** Whether or not to destroy all activated targets at each time step, or defer to NumActivatedToDestroy. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
 	bool bDestroyAllActivatedTargetsOnTimeStep = true;
@@ -107,11 +107,11 @@ protected:
 	/** Whether or not to record execution times for calls to SpawnAreaManager's GetSpawnableSpawnAreas function. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
 	bool bRecordGetSpawnableSpawnAreasExecutionTime = false;
-	
+
 	/** All game modes to test. */
 	UPROPERTY()
 	TArray<FBSConfig> GameModesToTest;
-	
+
 	/** The spawned target manager. */
 	UPROPERTY()
 	TObjectPtr<ATargetManager> TargetManager;
@@ -124,7 +124,7 @@ protected:
 
 	/** The current game mode config shared with the target manager. */
 	TSharedPtr<FBSConfig> GameModeConfig;
-	
+
 	/** The current index inside GameModeConfigs. */
 	int32 CurrentIndex = 0;
 

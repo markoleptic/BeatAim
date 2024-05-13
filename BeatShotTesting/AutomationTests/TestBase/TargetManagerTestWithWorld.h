@@ -11,25 +11,27 @@
 class FTargetManagerTestWithWorld : public FTargetManagerTestBase
 {
 	typedef ::FTargetManagerTestBase Super;
-	
+
 public:
-	FTargetManagerTestWithWorld(const FString& InName, const bool bInComplexTask):
-		Super(InName, bInComplexTask), World(nullptr), InitialFrameCounter(0),
-	TargetSpawnParamsExecutionTime(0.0f), TargetManager(nullptr), GameModeDataAsset(nullptr)
-	{}
-	
+	FTargetManagerTestWithWorld(const FString& InName, const bool bInComplexTask): Super(InName, bInComplexTask),
+		World(nullptr), InitialFrameCounter(0), TargetSpawnParamsExecutionTime(0.0f), TargetManager(nullptr),
+		GameModeDataAsset(nullptr)
+	{
+	}
+
 	virtual ~FTargetManagerTestWithWorld() override
 	{
 		CleanUpWorld();
 	}
+
 	virtual bool Init() override;
 
 	void CleanUpWorld();
-	
+
 protected:
 	/** Ticks the World and increments GFrameCounter. */
 	void TickWorld(float Time);
-	
+
 	/** The World created in Init. */
 	UWorld* World;
 
@@ -41,19 +43,19 @@ protected:
 
 	/** Increments TimeSpentInSpawnableSpawnAreas. */
 	void UpdateExecutionTime(const double Time);
-	
+
 	/** Initializes the Target Manager. */
 	virtual bool InitTargetManager();
 
 	/** Initializes the Target Manager. */
 	virtual bool InitGameModeDataAsset(const FString& InPath) const;
-	
+
 	/** Returns the SpawnAreaManager. */
 	TObjectPtr<USpawnAreaManagerComponent> GetSpawnAreaManager() const;
 
 	/** Returns the ManagedTargets map. */
 	TMap<FGuid, ATarget*> GetManagedTargets() const;
-	
+
 	/** Pointer to the Target Manager. */
 	ATargetManager* TargetManager;
 
@@ -64,8 +66,8 @@ protected:
 	 *  Mutable so that it can be set during GetTests. */
 	mutable UBSGameModeDataAsset* GameModeDataAsset;
 
-	const FTransform TargetManagerTransform = FTransform(FRotator(),
-		Constants::DefaultTargetManagerLocation, FVector(1.f));
+	const FTransform TargetManagerTransform = FTransform(FRotator(), Constants::DefaultTargetManagerLocation,
+		FVector(1.f));
 
 	/** Map to pull game mode configs from during tests. */
 	mutable TMap<FString, FBSConfig> TestMap;

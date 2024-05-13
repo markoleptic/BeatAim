@@ -40,8 +40,8 @@ inline float SimpleSpline(const float Value)
 
 /** Base Character for this game */
 UCLASS()
-class BEATSHOT_API ABSCharacterBase : public ACharacter, public IBSPlayerSettingsInterface, public IAbilitySystemInterface,
-                                  public IGameplayTagAssetInterface
+class BEATSHOT_API ABSCharacterBase : public ACharacter, public IBSPlayerSettingsInterface,
+                                      public IAbilitySystemInterface, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
 
@@ -60,7 +60,7 @@ protected:
 	/** The Equipment Manager component */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BeatShot|Components")
 	TObjectPtr<UBSEquipmentManagerComponent> EquipmentManagerComponent;
-	
+
 	/** The Equipment Manager component */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BeatShot|Components")
 	TObjectPtr<UBSInventoryManagerComponent> InventoryManagerComponent;
@@ -74,7 +74,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Input")
 	int32 BaseMappingPriority = 0;
-	
+
 	/** Input configuration used by player controlled pawns to create input mappings and bind input actions. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Input")
 	TObjectPtr<UBSInputConfig> InputConfig;
@@ -141,11 +141,11 @@ public:
 
 	UFUNCTION(Category = "BeatShot|Character", BlueprintCallable)
 	void SetAutoBunnyHop(bool Value) { bAutoBunnyHop = Value; }
-	
+
 	/** Implement IGameplayTagAssetInterface */
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 	/** End Implement IGameplayTagAssetInterface */
-	
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
@@ -165,10 +165,10 @@ protected:
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PrevCustomMode) override;
 	virtual bool CanCrouch() const override;
 	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
-	
+
 public:
 	virtual bool IsSprinting() const;
-	
+
 protected:
 	/** Grant abilities on the Server. The Ability Specs will be replicated to the owning client. Called from inside PossessedBy(). */
 	virtual void AddCharacterAbilities();
@@ -213,15 +213,15 @@ protected:
 	void Input_OnLeftClick(const FInputActionValue& Value);
 	void Input_AbilityInputTagPressed(FGameplayTag InputTag);
 	void Input_AbilityInputTagReleased(FGameplayTag InputTag);
-	
+
 	/** Implement IBSPlayerSettingsInterface */
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_Game& GameSettings) override;
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_User& UserSettings) override;
 	/** End Implement IBSPlayerSettingsInterface */
-	
+
 	/** Multiplier to controller pitch and yaw */
 	float Sensitivity;
-	
+
 	/** Automatic bunny-hopping */
 	UPROPERTY(EditAnywhere, Category = "BeatShot|Character")
 	bool bAutoBunnyHop;

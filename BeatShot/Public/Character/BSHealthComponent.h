@@ -37,7 +37,7 @@ protected:
 
 	/** Callback function for when the owner's AttributeSetBase OnDamageTaken delegate is broadcast */
 	void OnDamageTaken(const FDamageEventData& DamageEvent);
-	
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:

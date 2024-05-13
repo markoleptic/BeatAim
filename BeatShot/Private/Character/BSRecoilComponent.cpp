@@ -58,9 +58,9 @@ void UBSRecoilComponent::Recoil(const float FireRate)
 			}
 		}
 	}
-	
+
 	bIsFiring = true;
-	
+
 	RecoilTimeline.SetPlayRate(1.f);
 	GetWorld()->GetTimerManager().SetTimer(FireRateTimer, FireRateDelegate, FireRate, false, -1);
 	/* Resume timeline from current position if it hasn't fully recovered */

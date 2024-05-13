@@ -28,16 +28,16 @@ class BEATSHOT_API UBSGameInstance : public UGameInstance, public IBSPlayerSetti
 
 	virtual void Init() override;
 
-	#if WITH_EDITOR
+#if WITH_EDITOR
 	/** Called as soon as the game mode is spawned, prior to creating the local players. */
 	virtual FGameInstancePIEResult PostCreateGameModeForPIE(const FGameInstancePIEParameters& Params,
 		AGameModeBase* GameMode) override;
 	/** Called to actually start the game when doing Play/Simulate In Editor. */
 	virtual FGameInstancePIEResult StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer,
 		const FGameInstancePIEParameters& Params) override;
-	#else
+#else
 	void OnPreLoadMapWithContext(const FWorldContext& InWorldContext, const FString& MapName);
-	#endif WITH_EDITOR
+#endif WITH_EDITOR
 
 	/** Called after a level has been loaded */
 	void OnPostLoadMapWithWorld(UWorld* World);

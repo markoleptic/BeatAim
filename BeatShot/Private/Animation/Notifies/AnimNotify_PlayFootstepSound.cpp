@@ -46,12 +46,12 @@ void UAnimNotify_PlayFootstepSound::Notify(USkeletalMeshComponent* MeshComp, UAn
 				FVector TraceStart = bAttached
 					? MeshComp->GetSocketLocation(SocketName)
 					: MeshComp->GetComponentLocation();
-				
+
 				if (UWorld* World = OwningActor->GetWorld())
 				{
 					World->LineTraceSingleByChannel(HitResult, TraceStart,
-						(TraceStart + TraceProperties.EndTraceLocationOffset),
-						TraceProperties.TraceChannel, QueryParams, FCollisionResponseParams::DefaultResponseParam);
+						(TraceStart + TraceProperties.EndTraceLocationOffset), TraceProperties.TraceChannel,
+						QueryParams, FCollisionResponseParams::DefaultResponseParam);
 				}
 			}
 
@@ -67,7 +67,7 @@ void UAnimNotify_PlayFootstepSound::Notify(USkeletalMeshComponent* MeshComp, UAn
 				// If so, add it to the Array
 				ImplementingObjects.Add(OwningActor);
 			}
-			
+
 			for (const auto Component : OwningActor->GetComponents())
 			{
 				if (Component && Component->Implements<UBSMovementSoundInterface>())
@@ -79,13 +79,10 @@ void UAnimNotify_PlayFootstepSound::Notify(USkeletalMeshComponent* MeshComp, UAn
 			// Cycle through all objects implementing the Context Effect Interface
 			for (UObject* ImplementingObject : ImplementingObjects)
 			{
-
-					// If the object is still valid, Execute the AnimMotionEffect Event on it, passing in relevant data
-					IBSMovementSoundInterface::Execute_PlayMovementSound(ImplementingObject,
-						bAttached ? SocketName : FName("None"),
-						Effect, MeshComp, LocationOffset, RotationOffset,
-						Animation, HitResult, Context,
-						AudioProperties.VolumeMultiplier, AudioProperties.PitchMultiplier);
+				// If the object is still valid, Execute the AnimMotionEffect Event on it, passing in relevant data
+				IBSMovementSoundInterface::Execute_PlayMovementSound(ImplementingObject,
+					bAttached ? SocketName : FName("None"), Effect, MeshComp, LocationOffset, RotationOffset, Animation,
+					HitResult, Context, AudioProperties.VolumeMultiplier, AudioProperties.PitchMultiplier);
 			}
 		}
 	}
@@ -107,6 +104,5 @@ void UAnimNotify_PlayFootstepSound::SetParameters(const FGameplayTag EffectIn, c
 	TraceProperties.EndTraceLocationOffset = TracePropertiesIn.EndTraceLocationOffset;
 	TraceProperties.TraceChannel = TracePropertiesIn.TraceChannel;
 	TraceProperties.bIgnoreActor = TracePropertiesIn.bIgnoreActor;
-
 }
 #endif

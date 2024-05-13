@@ -15,11 +15,11 @@ bool FTargetManagerTestWithWorld::Init()
 
 	FWorldContext& WorldContext = GEngine->CreateNewWorldContext(EWorldType::Game);
 	WorldContext.SetCurrentWorld(World);
-	
+
 	InitialFrameCounter = GFrameCounter;
 	World->InitializeActorsForPlay(FURL());
 	World->BeginPlay();
-	
+
 	return InitTargetManager();
 }
 
@@ -40,7 +40,7 @@ void FTargetManagerTestWithWorld::CleanUpWorld()
 	TargetManager = nullptr;
 	BSConfig = nullptr;
 	GameModeDataAsset = nullptr;
-	
+
 	if (World)
 	{
 		UPackage* Package = World->GetPackage();
