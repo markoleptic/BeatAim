@@ -385,10 +385,6 @@ void UBSGameUserSettings::ValidateNvidiaSettings()
 	{
 		if (UDLSSLibrary::IsDLSSSupported())
 		{
-			if (DLSSMode == UDLSSMode::Off)
-			{
-				DLSSMode = UDLSSMode::Auto;
-			}
 			if (!UDLSSLibrary::IsDLSSModeSupported(DLSSMode) && DLSSMode != UDLSSMode::Auto)
 			{
 				DLSSMode = UDLSSMode::Off;

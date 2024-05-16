@@ -268,15 +268,16 @@ void UVideoAndSoundSettingsWidget::OnSelectionChanged_WindowMode(const TArray<FS
 	{
 		return;
 	}
-	const FString SelectedOption = SelectedOptions[0];
-
-	UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
-	LastConfirmedResolution = GameUserSettings->GetLastConfirmedScreenResolution();
-	LastConfirmedWindowMode = GameUserSettings->GetLastConfirmedFullscreenMode();
-
-	if (const auto Found = WindowModeMap.Find(SelectedOption))
+	if (const auto Found = WindowModeMap.Find(SelectedOptions[0]))
 	{
-		GameUserSettings->SetFullscreenMode(static_cast<EWindowMode::Type>(*Found));
+		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
+		const EWindowMode::Type NewWindowMode = static_cast<EWindowMode::Type>(*Found);
+		if (GameUserSettings->GetFullscreenMode() != EWindowMode::Type::Fullscreen && NewWindowMode ==
+			EWindowMode::Type::Fullscreen)
+		{
+			GameUserSettings->SetScreenResolution(GameUserSettings->GetDesktopResolution());
+		}
+		GameUserSettings->SetFullscreenMode(NewWindowMode);
 		GameUserSettings->ApplyResolutionSettings(false);
 		ShowConfirmVideoSettingsMessage();
 	}
@@ -299,11 +300,9 @@ void UVideoAndSoundSettingsWidget::OnSelectionChanged_Resolution(const TArray<FS
 	const FIntPoint NewResolution = FIntPoint(FCString::Atoi(*LeftS), FCString::Atoi(*RightS));
 
 	UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
-	LastConfirmedResolution = GameUserSettings->GetLastConfirmedScreenResolution();
-	LastConfirmedWindowMode = GameUserSettings->GetLastConfirmedFullscreenMode();
-
 	GameUserSettings->SetScreenResolution(NewResolution);
 	GameUserSettings->ApplyResolutionSettings(false);
+
 	ShowConfirmVideoSettingsMessage();
 }
 
@@ -319,6 +318,13 @@ void UVideoAndSoundSettingsWidget::OnSelectionChanged_DLSS_EnabledMode(const TAr
 	{
 		UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 		GameUserSettings->SetDLSSEnabledMode(*Found);
+		if (SelectedOptions[0] == "On")
+		{
+			if (const auto FoundDLSSMode = DLSSModeMap.Find("Auto"))
+			{
+				GameUserSettings->SetDLSSMode(*FoundDLSSMode);
+			}
+		}
 		GameUserSettings->ApplySettings(false);
 		HandleDLSSEnabledChanged(GameUserSettings->IsDLSSEnabled(), GameUserSettings->IsNISEnabled());
 		UpdateNvidiaSettings();
@@ -664,18 +670,10 @@ void UVideoAndSoundSettingsWidget::HandleDLSSEnabledChanged(const bool bDLSSEnab
 		SliderTextBoxOption_DLSS_Sharpness->SetValue(0.f);
 
 		// Enable Settings that are don't require DLSS to be on
-		ComboBoxOption_NIS_Mode->ComboBox->SetIsEnabled(false);
 		ComboBoxOption_Reflex->ComboBox->SetIsEnabled(true);
 
-		// Enable Resolution Scale if NIS is off
-		if (!bNISEnabled)
-		{
-			SliderTextBoxOption_ResolutionScale->SetSliderAndTextBoxEnabledStates(true);
-		}
-		else
-		{
-			SliderTextBoxOption_ResolutionScale->SetSliderAndTextBoxEnabledStates(false);
-		}
+		SliderTextBoxOption_ResolutionScale->SetSliderAndTextBoxEnabledStates(!bNISEnabled);
+		ComboBoxOption_NIS_Mode->ComboBox->SetIsEnabled(bNISEnabled);
 		CheckBoxOption_VSync->CheckBox->SetIsEnabled(true);
 	}
 }
@@ -808,10 +806,6 @@ void UVideoAndSoundSettingsWidget::OnButtonPressed_ConfirmVideoSettings(const UB
 	UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 
 	GameUserSettings->ConfirmVideoMode();
-
-	// ???
-	GameUserSettings->SetResolutionScaleValueEx(100.f);
-	SliderTextBoxOption_ResolutionScale->SetValue(1.f);
 	GameUserSettings->ApplyResolutionSettings(false);
 	GameUserSettings->SaveSettings();
 
@@ -831,25 +825,16 @@ void UVideoAndSoundSettingsWidget::OnButtonPressed_CancelVideoSettings(const UBS
 	UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
 
 	GameUserSettings->RevertVideoMode();
-	GameUserSettings->SetScreenResolution(LastConfirmedResolution);
-	GameUserSettings->SetFullscreenMode(LastConfirmedWindowMode);
-	GameUserSettings->SetResolutionScaleValueEx(100.f);
-
-	SliderTextBoxOption_ResolutionScale->SetValue(1.f);
-
 	GameUserSettings->ApplyResolutionSettings(false);
-	GameUserSettings->ConfirmVideoMode();
-	// TODO: Is this necessary?
-	GameUserSettings->SaveSettings();
 
-	for (const auto& [Key,Value] : WindowModeMap)
+	const EWindowMode::Type LastConfirmedFullscreenMode = GameUserSettings->GetLastConfirmedFullscreenMode();
+	const FIntPoint LastConfirmedResolution = GameUserSettings->GetLastConfirmedScreenResolution();
+
+	if (const FString* Found = WindowModeMap.FindKey(LastConfirmedFullscreenMode))
 	{
-		if (LastConfirmedWindowMode == Value)
-		{
-			ComboBoxOption_WindowMode->ComboBox->SetSelectedOption(Key);
-			break;
-		}
+		ComboBoxOption_WindowMode->ComboBox->SetSelectedOption(*Found);
 	}
+
 	ComboBoxOption_Resolution->ComboBox->SetSelectedOption(
 		FString::FormatAsNumber(LastConfirmedResolution.X) + "x" + FString::FormatAsNumber(LastConfirmedResolution.Y));
 

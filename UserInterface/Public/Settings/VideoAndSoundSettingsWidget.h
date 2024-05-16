@@ -216,12 +216,6 @@ private:
 	FString GetComboBoxEntryTooltipStringTableKey_DLSS_SuperResolution(const FString& EnumString);
 	FString GetComboBoxEntryTooltipStringTableKey_Reflex(const FString& EnumString);
 
-	/** Holds the last confirmed resolution. */
-	FIntPoint LastConfirmedResolution;
-
-	/** Holds the last confirmed WindowMode. */
-	EWindowMode::Type LastConfirmedWindowMode;
-
 	/** Timer that starts when window mode or resolution is changed. If it expires, it reverts those changes.
 	 *  Not bound to any function, but checked every second in RevertVideoSettingsTimerCallback. */
 	FTimerHandle RevertVideoSettingsTimer;

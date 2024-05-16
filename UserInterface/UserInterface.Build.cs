@@ -7,8 +7,6 @@ public class UserInterface : ModuleRules
 {
 	public UserInterface(ReadOnlyTargetRules Target) : base(Target)
 	{
-		// For some reason this is necessary, otherwise get errors for AudioMixerQuantizedCommands
-		bUseUnity = false;
 		PublicDependencyModuleNames.AddRange(new[]
 		{
 			"Core", "ApplicationCore", "CoreUObject", "Engine", "UMG", "Slate", "SlateCore", "WebBrowserWidget",
