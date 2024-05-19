@@ -288,6 +288,11 @@ void UAudioSelectWidget::OnSelectionChanged_InAudioDevice(const FString Selected
 		Box_SongTitleLength->SetVisibility(ESlateVisibility::Visible);
 		Box_SongTitle->SetVisibility(ESlateVisibility::Visible);
 		Box_SongLength->SetVisibility(ESlateVisibility::Visible);
+
+		const bool bSongSelectionValid = !ComboBox_SongTitle->GetSelectedOption().IsEmpty() || !Value_SongTitle->
+			GetText().IsEmptyOrWhitespace();
+
+		Button_Start->SetIsEnabled(bSongSelectionValid);
 	}
 }
 
