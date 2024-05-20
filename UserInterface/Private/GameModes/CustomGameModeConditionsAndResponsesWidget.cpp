@@ -164,12 +164,20 @@ void UCustomGameModeConditionsAndResponsesWidget::UpdateDependentOptions_TargetA
 void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetActivationResponses(
 	const TArray<FString>& Selected, const ESelectInfo::Type SelectionType)
 {
-	if (SelectionType == ESelectInfo::Type::Direct) return;
+	if (SelectionType == ESelectInfo::Type::Direct)
+	{
+		return;
+	}
 
-	if (Selected.IsEmpty()) BSConfig->TargetConfig.TargetActivationResponses.Empty();
+	if (Selected.IsEmpty())
+	{
+		BSConfig->TargetConfig.TargetActivationResponses.Empty();
+	}
 	else
+	{
 		BSConfig->TargetConfig.TargetActivationResponses = GetEnumArrayFromStringArray_FromTagMap<
 			ETargetActivationResponse>(Selected);
+	}
 
 	UpdateDependentOptions_TargetActivationResponses(BSConfig->TargetConfig.TargetActivationResponses);
 	UpdateBrushColors();
@@ -179,12 +187,20 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetActiv
 void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetSpawnResponses(
 	const TArray<FString>& Selected, const ESelectInfo::Type SelectionType)
 {
-	if (SelectionType == ESelectInfo::Type::Direct) return;
+	if (SelectionType == ESelectInfo::Type::Direct)
+	{
+		return;
+	}
 
-	if (Selected.IsEmpty()) BSConfig->TargetConfig.TargetSpawnResponses.Empty();
+	if (Selected.IsEmpty())
+	{
+		BSConfig->TargetConfig.TargetSpawnResponses.Empty();
+	}
 	else
+	{
 		BSConfig->TargetConfig.TargetSpawnResponses = GetEnumArrayFromStringArray_FromTagMap<
 			ETargetSpawnResponse>(Selected);
+	}
 
 	UpdateDependentOptions_TargetSpawnResponses(BSConfig->TargetConfig.TargetSpawnResponses);
 	UpdateBrushColors();
@@ -194,12 +210,20 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetSpawn
 void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDeactivationConditions(
 	const TArray<FString>& Selected, const ESelectInfo::Type SelectionType)
 {
-	if (SelectionType == ESelectInfo::Type::Direct) return;
+	if (SelectionType == ESelectInfo::Type::Direct)
+	{
+		return;
+	}
 
-	if (Selected.IsEmpty()) BSConfig->TargetConfig.TargetDeactivationConditions.Empty();
+	if (Selected.IsEmpty())
+	{
+		BSConfig->TargetConfig.TargetDeactivationConditions.Empty();
+	}
 	else
+	{
 		BSConfig->TargetConfig.TargetDeactivationConditions = GetEnumArrayFromStringArray_FromTagMap<
 			ETargetDeactivationCondition>(Selected);
+	}
 
 	UpdateBrushColors();
 	UpdateAllOptionsValid();
@@ -208,12 +232,20 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDeact
 void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDeactivationResponses(
 	const TArray<FString>& Selected, const ESelectInfo::Type SelectionType)
 {
-	if (SelectionType == ESelectInfo::Type::Direct) return;
+	if (SelectionType == ESelectInfo::Type::Direct)
+	{
+		return;
+	}
 
-	if (Selected.IsEmpty()) BSConfig->TargetConfig.TargetDeactivationResponses.Empty();
+	if (Selected.IsEmpty())
+	{
+		BSConfig->TargetConfig.TargetDeactivationResponses.Empty();
+	}
 	else
+	{
 		BSConfig->TargetConfig.TargetDeactivationResponses = GetEnumArrayFromStringArray_FromTagMap<
 			ETargetDeactivationResponse>(Selected);
+	}
 
 	UpdateDependentOptions_TargetDeactivationResponses(BSConfig->TargetConfig.TargetDeactivationResponses);
 	UpdateBrushColors();
@@ -223,12 +255,20 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDeact
 void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDestructionConditions(
 	const TArray<FString>& Selected, const ESelectInfo::Type SelectionType)
 {
-	if (SelectionType == ESelectInfo::Type::Direct) return;
+	if (SelectionType == ESelectInfo::Type::Direct)
+	{
+		return;
+	}
 
-	if (Selected.IsEmpty()) BSConfig->TargetConfig.TargetDestructionConditions.Empty();
+	if (Selected.IsEmpty())
+	{
+		BSConfig->TargetConfig.TargetDestructionConditions.Empty();
+	}
 	else
+	{
 		BSConfig->TargetConfig.TargetDestructionConditions = GetEnumArrayFromStringArray_FromTagMap<
 			ETargetDestructionCondition>(Selected);
+	}
 
 	UpdateBrushColors();
 	UpdateAllOptionsValid();

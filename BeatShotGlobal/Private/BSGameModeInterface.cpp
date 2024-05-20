@@ -2,11 +2,11 @@
 
 
 #include "BSGameModeInterface.h"
-#include "SaveGameCustomGameMode.h"
-#include "SaveGamePlayerScore.h"
-#include "SaveLoadCommon.h"
-
-using namespace SaveLoadCommon;
+#include "BSGameModeConfig/BSConfig.h"
+#include "BSGameModeConfig/BSGameModeDataAsset.h"
+#include "SaveGames/SaveGameCustomGameMode.h"
+#include "SaveGames/SaveGamePlayerScore.h"
+#include "Utilities/SaveLoadCommon.h"
 
 /* --------------------------- */
 /* ---- Custom Game Modes ---- */
@@ -14,7 +14,7 @@ using namespace SaveLoadCommon;
 
 TArray<FBSConfig> IBSGameModeInterface::LoadCustomGameModes()
 {
-	if (const USaveGameCustomGameMode* SaveGameCustomGameMode = LoadFromSlot<USaveGameCustomGameMode>(
+	if (const USaveGameCustomGameMode* SaveGameCustomGameMode = SaveLoadCommon::LoadFromSlot<USaveGameCustomGameMode>(
 		TEXT("CustomGameModesSlot"), 3))
 	{
 		return SaveGameCustomGameMode->GetCustomGameModes();
@@ -24,7 +24,7 @@ TArray<FBSConfig> IBSGameModeInterface::LoadCustomGameModes()
 
 bool IBSGameModeInterface::FindCustomGameMode(const FString& CustomGameModeName, FBSConfig& OutConfig)
 {
-	if (const USaveGameCustomGameMode* SaveGameCustomGameMode = LoadFromSlot<USaveGameCustomGameMode>(
+	if (const USaveGameCustomGameMode* SaveGameCustomGameMode = SaveLoadCommon::LoadFromSlot<USaveGameCustomGameMode>(
 		TEXT("CustomGameModesSlot"), 3))
 	{
 		return SaveGameCustomGameMode->FindCustomGameMode(CustomGameModeName, OutConfig);
@@ -34,30 +34,31 @@ bool IBSGameModeInterface::FindCustomGameMode(const FString& CustomGameModeName,
 
 void IBSGameModeInterface::SaveCustomGameMode(const FBSConfig& ConfigToSave)
 {
-	if (USaveGameCustomGameMode* SaveGameCustomGameMode = LoadFromSlot<USaveGameCustomGameMode>(
+	if (USaveGameCustomGameMode* SaveGameCustomGameMode = SaveLoadCommon::LoadFromSlot<USaveGameCustomGameMode>(
 		TEXT("CustomGameModesSlot"), 3))
 	{
 		SaveGameCustomGameMode->SaveCustomGameMode(ConfigToSave);
-		SaveToSlot(SaveGameCustomGameMode, TEXT("CustomGameModesSlot"), 3);
+		SaveLoadCommon::SaveToSlot(SaveGameCustomGameMode, TEXT("CustomGameModesSlot"), 3);
 	}
 }
 
 int32 IBSGameModeInterface::RemoveCustomGameMode(const FBSConfig& ConfigToRemove)
 {
 	int32 NumCustomGameModesRemoved = 0;
-	if (USaveGameCustomGameMode* SaveGameCustomGameMode = LoadFromSlot<USaveGameCustomGameMode>(
+	if (USaveGameCustomGameMode* SaveGameCustomGameMode = SaveLoadCommon::LoadFromSlot<USaveGameCustomGameMode>(
 		TEXT("CustomGameModesSlot"), 3))
 	{
 		NumCustomGameModesRemoved = SaveGameCustomGameMode->RemoveCustomGameMode(ConfigToRemove);
-		SaveToSlot(SaveGameCustomGameMode, TEXT("CustomGameModesSlot"), 3);
+		SaveLoadCommon::SaveToSlot(SaveGameCustomGameMode, TEXT("CustomGameModesSlot"), 3);
 	}
-	if (USaveGamePlayerScore* SaveGamePlayerScore = LoadFromSlot<USaveGamePlayerScore>(TEXT("ScoreSlot"), 1))
+	if (USaveGamePlayerScore* SaveGamePlayerScore = SaveLoadCommon::LoadFromSlot<USaveGamePlayerScore>(
+		TEXT("ScoreSlot"), 1))
 	{
 		const int32 NumCommonScoreInfosRemoved = SaveGamePlayerScore->RemoveCommonScoreInfo(
 			ConfigToRemove.DefiningConfig);
 		UE_LOG(LogTemp, Display, TEXT("%d Common Score Infos removed when removing a custom game mode."),
 			NumCommonScoreInfosRemoved);
-		SaveToSlot(SaveGamePlayerScore, TEXT("ScoreSlot"), 1);
+		SaveLoadCommon::SaveToSlot(SaveGamePlayerScore, TEXT("ScoreSlot"), 1);
 	}
 	return NumCustomGameModesRemoved;
 }
@@ -65,25 +66,26 @@ int32 IBSGameModeInterface::RemoveCustomGameMode(const FBSConfig& ConfigToRemove
 int32 IBSGameModeInterface::RemoveAllCustomGameModes()
 {
 	int32 NumCustomGameModesRemoved = 0;
-	if (USaveGameCustomGameMode* SaveGameCustomGameMode = LoadFromSlot<USaveGameCustomGameMode>(
+	if (USaveGameCustomGameMode* SaveGameCustomGameMode = SaveLoadCommon::LoadFromSlot<USaveGameCustomGameMode>(
 		TEXT("CustomGameModesSlot"), 3))
 	{
 		NumCustomGameModesRemoved = SaveGameCustomGameMode->RemoveAll();
-		SaveToSlot(SaveGameCustomGameMode, TEXT("CustomGameModesSlot"), 3);
+		SaveLoadCommon::SaveToSlot(SaveGameCustomGameMode, TEXT("CustomGameModesSlot"), 3);
 	}
-	if (USaveGamePlayerScore* SaveGamePlayerScore = LoadFromSlot<USaveGamePlayerScore>(TEXT("ScoreSlot"), 1))
+	if (USaveGamePlayerScore* SaveGamePlayerScore = SaveLoadCommon::LoadFromSlot<USaveGamePlayerScore>(
+		TEXT("ScoreSlot"), 1))
 	{
 		const int32 NumCommonScoreInfosRemoved = SaveGamePlayerScore->RemoveAllCustomGameModeCommonScoreInfo();
 		UE_LOG(LogTemp, Display, TEXT("%d Common Score Infos removed when removing all custom game modes."),
 			NumCommonScoreInfosRemoved);
-		SaveToSlot(SaveGamePlayerScore, TEXT("ScoreSlot"), 1);
+		SaveLoadCommon::SaveToSlot(SaveGamePlayerScore, TEXT("ScoreSlot"), 1);
 	}
 	return NumCustomGameModesRemoved;
 }
 
 bool IBSGameModeInterface::IsCustomGameMode(const FString& GameModeName)
 {
-	if (const USaveGameCustomGameMode* SaveGameCustomGameMode = LoadFromSlot<USaveGameCustomGameMode>(
+	if (const USaveGameCustomGameMode* SaveGameCustomGameMode = SaveLoadCommon::LoadFromSlot<USaveGameCustomGameMode>(
 		TEXT("CustomGameModesSlot"), 3))
 	{
 		return SaveGameCustomGameMode->IsCustomGameMode(GameModeName);
@@ -166,7 +168,10 @@ bool IBSGameModeInterface::FindPresetGameMode(const FString& GameModeName, const
 		}
 	}
 
-	if (BaseGameMode == EBaseGameMode::None) return false;
+	if (BaseGameMode == EBaseGameMode::None)
+	{
+		return false;
+	}
 
 	return FindPresetGameMode(BaseGameMode, Difficulty, PresetGameModeDataAsset, OutConfig);
 }
@@ -177,7 +182,7 @@ bool IBSGameModeInterface::FindPresetGameMode(const EBaseGameMode& BaseGameMode,
 	if (BaseGameMode != EBaseGameMode::None)
 	{
 		const FBS_DefiningConfig DefiningConfig = FBSConfig::GetConfigForPreset(BaseGameMode, Difficulty);
-		const TMap<FBS_DefiningConfig, FBSConfig> Map = PresetGameModeDataAsset->GetDefaultGameModesMap();
+		const TMap<FBS_DefiningConfig, FBSConfig> Map = PresetGameModeDataAsset->GetGameModesMap();
 		if (const FBSConfig* Found = Map.Find(DefiningConfig))
 		{
 			OutConfig = *Found;

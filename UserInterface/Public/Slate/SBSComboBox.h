@@ -4,27 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "InputCoreTypes.h"
-#include "Layout/Margin.h"
-#include "Styling/SlateColor.h"
-#include "Widgets/SNullWidget.h"
-#include "Widgets/DeclarativeSyntaxSupport.h"
-#include "Input/Events.h"
-#include "Input/Reply.h"
-#include "Widgets/SWidget.h"
-#include "Sound/SlateSound.h"
-#include "Styling/SlateTypes.h"
-#include "Styling/AppStyle.h"
-#include "Framework/SlateDelegates.h"
-#include "Framework/Application/SlateApplication.h"
-#include "Framework/Application/SlateUser.h"
-#include "Widgets/Text/STextBlock.h"
-#include "Widgets/Layout/SBox.h"
-#include "Widgets/Input/SComboButton.h"
-#include "Widgets/Views/STableViewBase.h"
-#include "Framework/Views/TableViewTypeTraits.h"
 #include "SBSComboBox.h"
 #include "SBSListView.h"
 #include "SBSTableRow.h"
+#include "Framework/SlateDelegates.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Framework/Application/SlateUser.h"
+#include "Framework/Views/TableViewTypeTraits.h"
+#include "Input/Events.h"
+#include "Input/Reply.h"
+#include "Layout/Margin.h"
+#include "Sound/SlateSound.h"
+#include "Styling/AppStyle.h"
+#include "Styling/SlateColor.h"
+#include "Styling/SlateTypes.h"
+#include "Widgets/DeclarativeSyntaxSupport.h"
+#include "Widgets/SNullWidget.h"
+#include "Widgets/SWidget.h"
+#include "Widgets/Input/SComboButton.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/Text/STextBlock.h"
+#include "Widgets/Views/STableViewBase.h"
 
 #ifdef PlaySound
 #undef PlaySound
@@ -32,19 +32,19 @@
 
 #if WITH_ACCESSIBILITY
 #include "GenericPlatform/Accessibility/GenericAccessibleInterfaces.h"
-#include "Widgets/Accessibility/SlateCoreAccessibleWidgets.h"
 #include "Widgets/Accessibility/SlateAccessibleMessageHandler.h"
+#include "Widgets/Accessibility/SlateCoreAccessibleWidgets.h"
 #endif
 
 DECLARE_DELEGATE(FOnComboBoxOpening)
-/** Delegate that executes on selection changed with all current selections */
+/** Delegate that executes on selection changed with all current selections. */
 DECLARE_DELEGATE_TwoParams(FOnMultiSelectionChanged, const TArray<TSharedPtr<FString>>&, const ESelectInfo::Type);
 
 template <typename OptionType>
 class SBSComboRow : public SBSTableRow<OptionType>
 {
 public:
-	typedef SBSTableRow<OptionType> SBSTableRowOptionType;
+	using SBSTableRowOptionType = SBSTableRow<OptionType>;
 
 	SLATE_BEGIN_ARGS(SBSComboRow) : _Style(&FAppStyle::Get().GetWidgetStyle<FTableRowStyle>("ComboBox.Row")),
 	                                _Content(), _Padding(FMargin(0)), _MaxNumSelectedItems(-1), _CanSelectNone(false)
@@ -73,17 +73,17 @@ template <typename OptionType>
 class SBSComboBox : public SComboButton
 {
 public:
-	typedef TListTypeTraits<OptionType> ListTypeTraits;
-	typedef typename TListTypeTraits<OptionType>::NullableType NullableOptionType;
+	using ListTypeTraits = TListTypeTraits<OptionType>;
+	using NullableOptionType = typename TListTypeTraits<OptionType>::NullableType;
 
 	/** Type of list used for showing menu options. */
-	typedef SBSListView<OptionType> SComboListType;
+	using SComboListType = SBSListView<OptionType>;
 
 	/** Delegate type used to generate widgets that represent Options */
-	typedef typename TSlateDelegates<OptionType>::FOnGenerateWidget FOnGenerateWidget;
+	using FOnGenerateWidget = typename TSlateDelegates<OptionType>::FOnGenerateWidget;
 
 	/** Delegate type used for when a selection has been changed */
-	typedef typename TSlateDelegates<NullableOptionType>::FOnSelectionChanged FOnSelectionChanged;
+	using FOnSelectionChanged = typename TSlateDelegates<NullableOptionType>::FOnSelectionChanged;
 
 	SLATE_BEGIN_ARGS(SBSComboBox)
 			: _Content(), _ComboBoxStyle(&FAppStyle::Get().GetWidgetStyle<FComboBoxStyle>("ComboBox")),
@@ -96,11 +96,11 @@ public:
 		{
 		}
 
-		/** Slot for this button's content (optional) */
+		/** Slot for this button's content (optional). */
 		SLATE_DEFAULT_SLOT(FArguments, Content)
 		SLATE_STYLE_ARGUMENT(FComboBoxStyle, ComboBoxStyle)
 
-		/** The visual style of the button part of the combo box (overrides ComboBoxStyle) */
+		/** The visual style of the button part of the combo box (overrides ComboBoxStyle). */
 		SLATE_STYLE_ARGUMENT(FButtonStyle, ButtonStyle)
 		SLATE_STYLE_ARGUMENT(FTableRowStyle, ItemStyle)
 		SLATE_ATTRIBUTE(FMargin, ContentPadding)
@@ -110,28 +110,28 @@ public:
 		SLATE_EVENT(FOnGenerateWidget, OnGenerateWidget)
 		SLATE_EVENT(FOnMultiSelectionChanged, OnMultiSelectionChanged)
 
-		/** Called when combo box is opened, before list is actually created */
+		/** Called when combo box is opened, before list is actually created. */
 		SLATE_EVENT(FOnComboBoxOpening, OnComboBoxOpening)
 
-		/** The custom scrollbar to use in the ListView */
+		/** The custom scrollbar to use in the ListView. */
 		SLATE_ARGUMENT(TSharedPtr<SScrollBar>, CustomScrollbar)
 
-		/** The option that should be selected when the combo box is first created */
+		/** The option that should be selected when the combo box is first created. */
 		SLATE_ARGUMENT(TArray<NullableOptionType>, InitiallySelectedItems)
 		SLATE_ARGUMENT(TOptional<EPopupMethod>, Method)
 
-		/** The max height of the combo box menu */
+		/** The max height of the combo box menu. */
 		SLATE_ARGUMENT(float, MaxListHeight)
 
-		/** The sound to play when the button is pressed (overrides ComboBoxStyle) */
+		/** The sound to play when the button is pressed (overrides ComboBoxStyle). */
 		SLATE_ARGUMENT(TOptional<FSlateSound>, PressedSoundOverride)
 
-		/** The sound to play when the selection changes (overrides ComboBoxStyle) */
+		/** The sound to play when the selection changes (overrides ComboBoxStyle). */
 		SLATE_ARGUMENT(TOptional<FSlateSound>, SelectionChangeSoundOverride)
 
 		/**
-		 * When false, the down arrow is not generated and it is up to the API consumer
-		 * to make their own visual hint that this is a drop down.
+		 * When false, the down arrow is not generated, and it is up to the API consumer
+		 * to make their own visual hint that this is a drop-down.
 		 */
 		SLATE_ARGUMENT(bool, HasDownArrow)
 
@@ -141,28 +141,27 @@ public:
 		*/
 		SLATE_ARGUMENT(bool, EnableGamepadNavigationMode)
 
-		/** When true, allows the combo box to receive keyboard focus */
+		/** When true, allows the combo box to receive keyboard focus. */
 		SLATE_ARGUMENT(bool, IsFocusable)
 
-		/** True if this combo's menu should be collapsed when our parent receives focus, false (default) otherwise */
+		/** True if this combo's menu should be collapsed when our parent receives focus, false (default) otherwise. */
 		SLATE_ARGUMENT(bool, CollapseMenuOnParentFocus)
 		SLATE_ARGUMENT(bool, CloseComboBoxOnSelectionChanged)
 
-		/** When true, allows the combo box to receive keyboard focus */
+		/** When true, allows the combo box to receive keyboard focus. */
 		SLATE_ARGUMENT(TAttribute<ESelectionMode::Type>, SelectionMode)
 
-		/** Max number of selections, or -1 if unlimited */
+		/** Max number of selections, or -1 if unlimited. */
 		SLATE_ARGUMENT(int32, MaxNumSelectedItems)
 
-		/** Should the user be able to select no options */
+		/** Should the user be able to select no options. */
 		SLATE_ARGUMENT(bool, CanSelectNone)
 
 	SLATE_END_ARGS()
 
 	/**
-	 * Construct the widget from a declaration
-	 *
-	 * @param InArgs   Declaration from which to construct the combo box
+	 * Construct the widget from a declaration.
+	 * @param InArgs Declaration from which to construct the combo box
 	 */
 	void Construct(const FArguments& InArgs)
 	{
@@ -171,7 +170,8 @@ public:
 		ItemStyle = InArgs._ItemStyle;
 		MenuRowPadding = InArgs._ComboBoxStyle->MenuRowPadding;
 
-		// Work out which values we should use based on whether we were given an override, or should use the style's version
+		// Work out which values we should use based on whether we were given an override, or should use the style's
+		// version.
 		const FComboButtonStyle& OurComboButtonStyle = InArgs._ComboBoxStyle->ComboButtonStyle;
 		const FButtonStyle* const OurButtonStyle = InArgs._ButtonStyle
 			? InArgs._ButtonStyle
@@ -194,7 +194,8 @@ public:
 		CustomScrollbar = InArgs._CustomScrollbar;
 
 
-		TSharedRef<SWidget> ComboBoxMenuContent = SNew(SBox).MaxDesiredHeight(InArgs._MaxListHeight)
+		TSharedRef<SWidget> ComboBoxMenuContent = SNew(SBox)
+			.MaxDesiredHeight(InArgs._MaxListHeight)
 			[
 				SAssignNew(this->ComboListView, SComboListType)
 				.ListItemsSource(InArgs._OptionsSource)
@@ -268,15 +269,11 @@ protected:
 		{
 		}
 
-		// IAccessibleWidget
 		virtual IAccessibleProperty* AsProperty() override
 		{
 			return this;
 		}
 
-		// ~
-
-		// IAccessibleProperty
 		virtual FString GetValue() const override
 		{
 			if (Widget.IsValid())
@@ -303,8 +300,6 @@ protected:
 		{
 			return FVariant(GetValue());
 		}
-
-		// ~
 	};
 
 public:
@@ -316,9 +311,9 @@ public:
 
 	virtual TOptional<FText> GetDefaultAccessibleText(EAccessibleType AccessibleType) const override
 	{
-		// current behaviour will red out the  templated type of the combo box which is verbose and unhelpful 
-		// This coupled with UIA type will announce Combo Box twice, but it's the best we can do for now if there's no label
-		//@TODOAccessibility: Give a better name
+		// current behaviour will red out the templated type of the combo box which is verbose and unhelpful 
+		// This coupled with UIA type will announce Combo Box twice, but it's the best we can do for now if there's
+		// no label.
 		static FString Name(TEXT("BS Combo Box"));
 		return FText::FromString(Name);
 	}
@@ -373,8 +368,7 @@ public:
 	}
 
 	/** 
-	 * Requests a list refresh after updating options 
-	 * Call SetSelectedItem to update the selected item if required
+	 * Requests a list refresh after updating options. Call SetSelectedItem to update the selected item if required.
 	 * @see SetSelectedItem
 	 */
 	void RefreshOptions()
@@ -383,7 +377,7 @@ public:
 	}
 
 protected:
-	/** Handle key presses that SListView ignores */
+	/** Handle key presses that SListView ignores. */
 	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override
 	{
 		if (IsInteractable())
@@ -393,7 +387,8 @@ protected:
 			if (EnableGamepadNavigationMode)
 			{
 				// The controller's bottom face button must be pressed once to begin manipulating the combobox value.
-				// Navigation away from the widget is prevented until the button has been pressed again or focus is lost.
+				// Navigation away from the widget is prevented until the button has been pressed again or focus is
+				// lost.
 				if (NavAction == EUINavigationAction::Accept)
 				{
 					if (bControllerInputCaptured == false)
@@ -505,7 +500,8 @@ protected:
 	}
 
 private:
-	/** Generate a row for the InItem in the combo box's list (passed in as OwnerTable). Do this by calling the user-specified OnGenerateWidget */
+	/** Generate a row for the InItem in the combo box's list (passed in as OwnerTable). Do this by calling the
+	 *  user-specified OnGenerateWidget. */
 	TSharedRef<ITableRow> GenerateMenuItemRow(OptionType InItem, const TSharedRef<STableViewBase>& OwnerTable)
 	{
 		if (OnGenerateWidget.IsBound())
@@ -516,19 +512,21 @@ private:
 				.MaxNumSelectedItems(MaxNumSelectedItems)
 				.CanSelectNone(bCanSelectNone)
 				[
-					OnGenerateWidget.Execute(InItem)
+					OnGenerateWidget
+					.Execute(InItem)
 				];
 			//BSComboRow->SetMaxNumSelectedItems(MaxNumSelectedItems);
 			return BSComboRow;
 		}
 		return SNew(SBSComboRow<OptionType>, OwnerTable)
 			[
-				SNew(STextBlock).Text(NSLOCTEXT("SlateCore", "ComboBoxMissingOnGenerateWidgetMethod",
+				SNew(STextBlock)
+				.Text(NSLOCTEXT("SlateCore", "ComboBoxMissingOnGenerateWidgetMethod",
 					"Please provide a .OnGenerateWidget() handler."))
 			];
 	}
 
-	//** Called if the menu is closed
+	/** Called if the menu is closed. */
 	void OnMenuOpenChanged(bool bOpen)
 	{
 		if (bOpen == false)
@@ -560,7 +558,7 @@ private:
 		}
 	}
 
-	/** Invoked when the selection in the list changes */
+	/** Invoked when the selection in the list changes. */
 	void OnSelectionChanged_Internal(NullableOptionType ProposedSelection, ESelectInfo::Type SelectInfo)
 	{
 		if (SelectInfo != ESelectInfo::OnNavigation)
@@ -578,7 +576,7 @@ private:
 		}
 	}
 
-	/** Handle clicking on the content menu */
+	/** Handle clicking on the content menu. */
 	virtual FReply OnButtonClicked() override
 	{
 		// if user clicked to close the combo menu
@@ -623,38 +621,38 @@ private:
 	}
 
 
-	/** Play the pressed sound */
+	/** Play the pressed sound. */
 	void PlayPressedSound() const
 	{
 		FSlateApplication::Get().PlaySound(PressedSound);
 	}
 
-	/** Play the selection changed sound */
+	/** Play the selection changed sound. */
 	void PlaySelectionChangeSound() const
 	{
 		FSlateApplication::Get().PlaySound(SelectionChangeSound);
 	}
 
-	/** The Sound to play when the button is pressed */
+	/** The Sound to play when the button is pressed. */
 	FSlateSound PressedSound;
 
-	/** The Sound to play when the selection is changed */
+	/** The Sound to play when the selection is changed. */
 	FSlateSound SelectionChangeSound;
 
 	/** The item style to use. */
 	const FTableRowStyle* ItemStyle;
 
-	/** The padding around each menu row */
+	/** The padding around each menu row. */
 	FMargin MenuRowPadding;
 
 private:
-	/** Delegate that is invoked when the selected item in the combo box changes */
+	/** Delegate that is invoked when the selected item in the combo box changes. */
 	FOnSelectionChanged OnSelectionChanged;
-	/** Delegate that is invoked when the selected items in the combo box changes */
+	/** Delegate that is invoked when the selected items in the combo box changes. */
 	FOnMultiSelectionChanged OnMultiSelectionChanged;
-	/** The item currently selected in the combo box */
+	/** The item currently selected in the combo box. */
 	NullableOptionType SelectedItem;
-	/** The item currently selected in the combo box */
+	/** The item currently selected in the combo box. */
 	TArray<NullableOptionType> SelectedItems;
 	/** The ListView that we pop up; visualized the available options. */
 	TSharedPtr<SComboListType> ComboListView;
@@ -664,10 +662,10 @@ private:
 	FOnComboBoxOpening OnComboBoxOpening;
 	/** Delegate to invoke when we need to visualize an option as a widget. */
 	FOnGenerateWidget OnGenerateWidget;
-	// Use activate button to toggle ListView when enabled
+	/** Use activate button to toggle ListView when enabled. */
 	bool EnableGamepadNavigationMode;
-	// Holds a flag indicating whether a controller/keyboard is manipulating the combobox value. 
-	// When true, navigation away from the widget is prevented until a new value has been accepted or canceled. 
+	/** Holds a flag indicating whether a controller/keyboard is manipulating the combobox value. When true, navigation
+	 *  away from the widget is prevented until a new value has been accepted or canceled. */
 	bool bControllerInputCaptured;
 	bool bCloseComboBoxOnSelectionChanged;
 

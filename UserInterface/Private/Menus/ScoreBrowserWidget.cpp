@@ -3,10 +3,10 @@
 
 #include "Menus/ScoreBrowserWidget.h"
 #include "BSPlayerSettingsInterface.h"
-#include "SaveGamePlayerSettings.h"
 #include "Components/Image.h"
-#include "Components/TextBlock.h"
 #include "Components/Overlay.h"
+#include "Components/TextBlock.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 #include "Utilities/WebBrowserWidget.h"
 
 void UScoreBrowserWidget::NativeConstruct()
@@ -56,7 +56,7 @@ void UScoreBrowserWidget::InitScoreBrowser(const EScoreBrowserType InScoreBrowse
 
 		int64 MinTimeDifference = FDateTime::MinValue().ToUnixTimestamp();
 		FPlayerScore MinDateScore = FPlayerScore();
-		/** Could probably just use the last value in PlayerScoreArray, but just to be sure: */
+		// Could probably just use the last value in PlayerScoreArray, but just to be sure
 		for (const FPlayerScore& Score : LoadPlayerScores())
 		{
 			FDateTime ParsedTime;

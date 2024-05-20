@@ -2,13 +2,16 @@
 
 
 #include "Audio/BSMovementSounds.h"
-#include "BSAudioSettings.h"
+#include "DeveloperSettings/BSAudioSettings.h"
 
 void UBSMovementSounds::PostLoad()
 {
 	UObject::PostLoad();
 
-	if (!FootstepSounds.IsEmpty()) return;
+	if (!FootstepSounds.IsEmpty())
+	{
+		return;
+	}
 
 	const UBSAudioSettings* AudioSettings = GetDefault<UBSAudioSettings>();
 	if (AudioSettings)

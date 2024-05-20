@@ -2,8 +2,8 @@
 
 
 #include "Utilities/TooltipImage.h"
-#include "Utilities/BSWidgetInterface.h"
 #include "Components/Button.h"
+#include "Utilities/BSWidgetInterface.h"
 
 
 // FDynamicTooltipData
@@ -169,8 +169,14 @@ void FTooltipData::UpdateDynamicTooltipText(const FDynamicTooltipState& InUpdate
 	LastActual = InUpdateData.Actual;
 	LastMaxAllowed = InUpdateData.MaxAllowed;
 
-	if (InUpdateData.bOverride) SetShouldShowTooltipImage(false);
-	else SetShouldShowTooltipImage(InUpdateData.Actual > InUpdateData.MaxAllowed);
+	if (InUpdateData.bOverride)
+	{
+		SetShouldShowTooltipImage(false);
+	}
+	else
+	{
+		SetShouldShowTooltipImage(InUpdateData.Actual > InUpdateData.MaxAllowed);
+	}
 }
 
 bool FTooltipData::IsDirty() const

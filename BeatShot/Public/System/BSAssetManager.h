@@ -6,7 +6,7 @@
 #include "Engine/AssetManager.h"
 #include "BSAssetManager.generated.h"
 
-/** The most basic of Asset Managers */
+/** The most basic of Asset Managers. */
 UCLASS()
 class BEATSHOT_API UBSAssetManager : public UAssetManager
 {

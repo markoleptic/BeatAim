@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BSGameModeDataAsset.h"
 #include "MenuOptionWidget.h"
+#include "BSGameModeConfig/DefiningConfig.h"
 #include "DefaultGameModeSelectWidget.generated.h"
 
 class UCommonTextBlock;

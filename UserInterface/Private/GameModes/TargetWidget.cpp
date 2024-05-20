@@ -2,7 +2,7 @@
 
 
 #include "GameModes/TargetWidget.h"
-#include "GlobalConstants.h"
+#include "BSConstants.h"
 #include "Components/Image.h"
 #include "Components/OverlaySlot.h"
 

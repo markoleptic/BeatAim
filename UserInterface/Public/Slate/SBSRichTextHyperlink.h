@@ -12,10 +12,11 @@ enum class ETextShapingMethod : uint8;
 class SBSRichTextHyperlink : public SButton
 {
 public:
-	SLATE_BEGIN_ARGS(SBSRichTextHyperlink)
-			: _Text(), _Style(&FCoreStyle::Get().GetWidgetStyle<FHyperlinkStyle>("Hyperlink")), _TextStyle(nullptr),
-			  _UnderlineStyle(nullptr), _Padding(), _OnNavigate(), _TextShapingMethod(), _TextFlowDirection(),
-			  _HighlightColor(), _HighlightShape(), _HighlightText()
+	SLATE_BEGIN_ARGS(SBSRichTextHyperlink) : _Text(),
+	                                         _Style(&FCoreStyle::Get().GetWidgetStyle<FHyperlinkStyle>("Hyperlink")),
+	                                         _TextStyle(nullptr), _UnderlineStyle(nullptr), _Padding(), _OnNavigate(),
+	                                         _TextShapingMethod(), _TextFlowDirection(), _HighlightColor(),
+	                                         _HighlightShape(), _HighlightText()
 		{
 		}
 

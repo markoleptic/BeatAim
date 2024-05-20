@@ -149,7 +149,10 @@ void UCustomGameModeMovementWidget::UpdateDependentOptions_DeactivationResponses
 void UCustomGameModeMovementWidget::OnSelectionChanged_MovingTargetDirectionMode(const TArray<FString>& Selected,
 	const ESelectInfo::Type SelectionType)
 {
-	if (SelectionType == ESelectInfo::Type::Direct || Selected.Num() != 1) return;
+	if (SelectionType == ESelectInfo::Type::Direct || Selected.Num() != 1)
+	{
+		return;
+	}
 
 	BSConfig->TargetConfig.MovingTargetDirectionMode = GetEnumFromString_FromTagMap<
 		EMovingTargetDirectionMode>(Selected[0]);

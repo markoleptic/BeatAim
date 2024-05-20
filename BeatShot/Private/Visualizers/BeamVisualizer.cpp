@@ -158,7 +158,10 @@ void ABeamVisualizer::InitializeVisualizerFromWorld(const FPlayerSettings_AudioA
 
 void ABeamVisualizer::UpdateVisualizer(const int32 Index, const float SpectrumAlpha)
 {
-	if (!bIsActivated) return;
+	if (!bIsActivated)
+	{
+		return;
+	}
 	for (const int32 LightIndex : GetLightIndices(Index))
 	{
 		if (ActiveLightIndices.Contains(LightIndex))

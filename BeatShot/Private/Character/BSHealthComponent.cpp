@@ -2,9 +2,9 @@
 
 
 #include "Character/BSHealthComponent.h"
-#include "Target/Target.h"
 #include "AbilitySystem/Globals/BSAttributeSetBase.h"
 #include "GameFramework/Actor.h"
+#include "Target/Target.h"
 
 UBSHealthComponent::UBSHealthComponent()
 {

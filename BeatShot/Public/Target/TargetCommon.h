@@ -22,7 +22,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnTargetActivated, const ETargetDamageType&
 DECLARE_MULTICAST_DELEGATE_OneParam(FPostTargetDamageEvent, const FTargetDamageEvent& Event);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnTargetActivated_AimBot, ATarget* Target);
 
-/** Enum representing the bordering directions for a SpawnArea */
+/** Enum representing the bordering directions for a SpawnArea. */
 UENUM(BlueprintType)
 enum class EAdjacentDirection : uint8
 {
@@ -39,7 +39,7 @@ enum class EAdjacentDirection : uint8
 
 ENUM_RANGE_BY_FIRST_AND_LAST(EAdjacentDirection, EAdjacentDirection::Left, EAdjacentDirection::DownRight);
 
-/** Enum representing the types of Grid Indices */
+/** Enum representing the types of Grid Indices. */
 UENUM(BlueprintType)
 enum class EGridIndexType : uint8
 {
@@ -62,18 +62,18 @@ ENUM_RANGE_BY_FIRST_AND_LAST(EGridIndexType, EGridIndexType::TopLeftCorner, EGri
 
 namespace DirectionTypes
 {
-	/** Cardinal direction Index types that are valid to use when searching for GridBlocks */
+	/** Cardinal direction Index types that are valid to use when searching for GridBlocks. */
 	inline const TSet GridBlock = {
 		EAdjacentDirection::Left, EAdjacentDirection::Right, EAdjacentDirection::Up, EAdjacentDirection::Down
 	};
 
-	/** Up-Down only index types */
+	/** Up-Down only index types. */
 	inline const TSet Vertical = {EAdjacentDirection::Up, EAdjacentDirection::Down};
 
-	/** Left-right only index types */
+	/** Left-right only index types. */
 	inline const TSet Horizontal = {EAdjacentDirection::Left, EAdjacentDirection::Right};
 
-	/** All index types */
+	/** All index types. */
 	inline const TSet All = {
 		EAdjacentDirection::UpLeft, EAdjacentDirection::UpRight, EAdjacentDirection::DownLeft,
 		EAdjacentDirection::DownRight, EAdjacentDirection::Left, EAdjacentDirection::Right, EAdjacentDirection::Up,
@@ -84,10 +84,10 @@ namespace DirectionTypes
 /** Contains the minimum and maximum of a Box, i.e. the bottom left corner location and top right corner location. */
 struct FExtrema
 {
-	/** The min extrema */
+	/** The min extrema. */
 	FVector Min;
 
-	/** The max extrema */
+	/** The max extrema. */
 	FVector Max;
 
 	FExtrema() = default;
@@ -99,7 +99,7 @@ struct FExtrema
 };
 
 
-/** Key used for location-based indexing */
+/** Key used for location-based indexing. */
 USTRUCT()
 struct FAreaKey
 {

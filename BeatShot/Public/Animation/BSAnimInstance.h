@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Animation/AnimInstance.h"
 #include "GameplayEffectTypes.h"
+#include "Animation/AnimInstance.h"
 #include "BSAnimInstance.generated.h"
 
 class UBSAnimationSet;
@@ -25,8 +25,8 @@ protected:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-	// Gameplay tags that can be mapped to blueprint variables. The variables will automatically update as the tags are added or removed.
-	// These should be used instead of manually querying for the gameplay tags.
+	/** Gameplay tags that can be mapped to blueprint variables. The variables will automatically update as the tags are
+	 *  added or removed. These should be used instead of manually querying for the gameplay tags. */
 	UPROPERTY(EditDefaultsOnly, Category = "GameplayTags")
 	FGameplayTagBlueprintPropertyMap GameplayTagPropertyMap;
 

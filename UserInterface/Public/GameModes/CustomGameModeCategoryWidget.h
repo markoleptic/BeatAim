@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CustomGameModeWidget.h"
-#include "EnumTagMap.h"
+#include "Mappings/EnumTagMap.h"
 #include "Utilities/BSSettingCategoryWidget.h"
 #include "CustomGameModeCategoryWidget.generated.h"
 
@@ -170,7 +170,7 @@ FString UCustomGameModeCategoryWidget::GetStringFromEnum_FromTagMap(const T& InE
 {
 	if (EnumTagMap)
 	{
-		FString Found = EnumTagMap->GetStringFromEnumTagPair<T>(InEnum);
+		FString Found = EnumTagMap->FindStringFromEnum<T>(InEnum);
 		if (!Found.IsEmpty())
 		{
 			return Found;

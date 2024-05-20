@@ -2,26 +2,25 @@
 
 
 #include "Character/BSCharacterBase.h"
-
 #include "BSGameInstance.h"
 #include "EnhancedInputSubsystems.h"
-#include "SaveGamePlayerSettings.h"
 #include "AbilitySystem/BSAbilitySystemComponent.h"
 #include "AbilitySystem/Globals/BSAttributeSetBase.h"
 #include "BeatShot/BSGameplayTags.h"
 #include "Camera/CameraComponent.h"
 #include "Character/BSCharacterMovementComponent.h"
+#include "Character/BSRecoilComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
 #include "Equipment/BSEquipmentManagerComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Character/BSRecoilComponent.h"
 #include "Input/BSInputComponent.h"
 #include "Inventory/BSInventoryManagerComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BSPlayerController.h"
 #include "Player/BSPlayerState.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 
 static TAutoConsoleVariable CVarAutoBHop(TEXT("move.Pogo"), 0,
 	TEXT("If holding spacebar should make the player jump whenever possible.\n"), ECVF_Default);
@@ -262,11 +261,11 @@ void ABSCharacterBase::OnRep_PlayerState()
 	}
 }
 
-void ABSCharacterBase::ApplyDamageMomentum(float DamageTaken, FDamageEvent const& DamageEvent, APawn* PawnInstigator,
+void ABSCharacterBase::ApplyDamageMomentum(float DamageTaken, const FDamageEvent& DamageEvent, APawn* PawnInstigator,
 	AActor* DamageCauser)
 {
 	Super::ApplyDamageMomentum(DamageTaken, DamageEvent, PawnInstigator, DamageCauser);
-	UDamageType const* const DmgTypeCDO = DamageEvent.DamageTypeClass->GetDefaultObject<UDamageType>();
+	const UDamageType* const DmgTypeCDO = DamageEvent.DamageTypeClass->GetDefaultObject<UDamageType>();
 
 	if (GetCharacterMovement())
 	{
@@ -290,7 +289,7 @@ void ABSCharacterBase::ApplyDamageMomentum(float DamageTaken, FDamageEvent const
 		Magnitude = FMath::Min(Magnitude, 1905.0f);
 
 		FVector Impulse = ImpulseDir * Magnitude;
-		bool const bMassIndependentImpulse = !DmgTypeCDO->bScaleMomentumByMass;
+		const bool bMassIndependentImpulse = !DmgTypeCDO->bScaleMomentumByMass;
 		float MassScale = 1.f;
 		if (!bMassIndependentImpulse && GetCharacterMovement()->Mass > SMALL_NUMBER)
 		{
@@ -726,7 +725,10 @@ void ABSCharacterBase::Input_AbilityInputTagReleased(FGameplayTag InputTag)
 
 void ABSCharacterBase::OnPlayerSettingsChanged(const FPlayerSettings_Game& GameSettings)
 {
-	if (!GetAbilitySystemComponent()) return;
+	if (!GetAbilitySystemComponent())
+	{
+		return;
+	}
 	/* Changing activation policy for FireGun ability based on automatic fire bool */
 	if (TArray<FGameplayAbilitySpec*> Specs = GetBSAbilitySystemComponent()->GetAbilitySpecsFromGameplayTag(
 		BSGameplayTags::Input_Fire); !Specs.IsEmpty())

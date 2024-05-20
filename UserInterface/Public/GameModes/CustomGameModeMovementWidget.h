@@ -17,14 +17,14 @@ protected:
 	virtual void UpdateOptionsFromConfig() override;
 	void SetupWarningTooltipCallbacks();
 
-	/** Updates options that depend on TargetSpawnResponses (and ConstantSpawnedTargetVelocity) */
+	/** Updates options that depend on TargetSpawnResponses (and ConstantSpawnedTargetVelocity). */
 	void UpdateDependentOptions_SpawnResponses(const TArray<ETargetSpawnResponse>& Responses, const bool bConstant);
 
-	/** Updates options that depend on TargetActivationResponses (and ConstantActivationTargetVelocity) */
+	/** Updates options that depend on TargetActivationResponses (and ConstantActivationTargetVelocity). */
 	void UpdateDependentOptions_ActivationResponses(const TArray<ETargetActivationResponse>& Responses,
 		const bool bConstant);
 
-	/** Updates options that depend on TargetDeactivationResponses (and ConstantDeactivatedTargetVelocity) */
+	/** Updates options that depend on TargetDeactivationResponses (and ConstantDeactivatedTargetVelocity). */
 	void UpdateDependentOptions_DeactivationResponses(const TArray<ETargetDeactivationResponse>& Responses,
 		const bool bConstant);
 

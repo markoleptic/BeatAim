@@ -2,9 +2,9 @@
 
 #include "AbilitySystem/Abilities/BSGameplayAbility.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/BSAbilitySystemComponent.h"
 #include "Character/BSCharacterBase.h"
 #include "Player/BSPlayerController.h"
-#include "AbilitySystem/BSAbilitySystemComponent.h"
 
 #define ENSURE_ABILITY_IS_INSTANTIATED_OR_RETURN(FunctionName, ReturnValue)																				\
 {																																						\

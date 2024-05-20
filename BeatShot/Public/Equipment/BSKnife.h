@@ -18,7 +18,7 @@ public:
 	ABSKnife();
 
 protected:
-	/** Called when the game starts or when spawned */
+	/** Called when the game starts or when spawned. */
 	virtual void BeginPlay() override;
 
 	/** ~IBSPlayerSettingsInterface begin */
@@ -28,7 +28,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* Knife;
 
-	/** Sets whether or not the weapon mesh is visible, updating its GameplayTags */
+	/** Sets whether the weapon mesh is visible, updating its GameplayTags. */
 	UFUNCTION(BlueprintCallable)
 	void SetShowKnifeMesh(const bool bShow);
 };

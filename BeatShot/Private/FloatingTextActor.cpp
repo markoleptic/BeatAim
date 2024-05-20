@@ -2,7 +2,7 @@
 
 
 #include "FloatingTextActor.h"
-#include "GlobalConstants.h"
+#include "BSConstants.h"
 #include "Components/WidgetComponent.h"
 #include "Overlays/CombatTextWidget.h"
 

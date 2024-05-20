@@ -8,7 +8,7 @@
 
 class UBSEquipmentDefinition;
 
-/** An inventory fragment that can be equipped */
+/** An inventory fragment that can be equipped. */
 UCLASS()
 class BEATSHOT_API UEquippableFragment : public UBSInventoryItemFragment
 {

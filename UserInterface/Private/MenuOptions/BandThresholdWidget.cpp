@@ -2,8 +2,7 @@
 
 
 #include "MenuOptions/BandThresholdWidget.h"
-
-#include "GlobalConstants.h"
+#include "BSConstants.h"
 #include "Components/TextBlock.h"
 
 void UBandThresholdWidget::NativeConstruct()

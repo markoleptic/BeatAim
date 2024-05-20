@@ -79,7 +79,7 @@ struct FText3DToggle
 };
 
 
-/** Displays some settings on a wall that can be changed by shooting them */
+/** Displays some settings on a wall that can be changed by shooting them. */
 UCLASS()
 class BEATSHOT_API AWallMenu : public AActor, public IBSPlayerSettingsInterface, public IAbilitySystemInterface
 {
@@ -219,7 +219,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Text3D")
 	float MaxHeightIndentedText = 55.f;
 
-	/** Displays which settings are on/off etc by lighting the correct words */
+	/** Displays which settings are on/off etc. by lighting the correct words. */
 	void Init(const FPlayerSettings_Game& GameSettings, const FPlayerSettings_User& UserSettings,
 		const bool bFromSettingsUpdate = false);
 
@@ -236,23 +236,23 @@ protected:
 
 	FVector Position_Corkboard = {300.f, 50.f, 0.f};
 
-	/** Offset from main text to to the on text */
+	/** Offset from main text to the on text. */
 	FVector Offset_OnText = {0, 747.f, 0};
-	/** Offset from main text to to the off text */
+	/** Offset from main text to the off text. */
 	FVector Offset_OffText = {0, 944.f, 0};
 
-	/** Offset from Corkboard to first main text */
+	/** Offset from Corkboard to first main text. */
 	FVector Position_FirstMainText = {335.f, 55.f, 55.f};
 	/** Rotation first main text */
 	FRotator Rotation_FirstMainText = {-90.f, 0.f, 0.f};
 
-	/** Offset from Toggle text to box component */
+	/** Offset from Toggle text to box component. */
 	FVector Position_BoxCollision = {2.f, 0, 16.75f};
-	/** Box component extents */
+	/** Box component extents. */
 	FVector Extents_BoxCollision = {1.f, 32.f, 32.f};
-	/** Box component scale for on */
+	/** Box component scale for on. */
 	FVector Scale_BoxCollision_On = {3.f, 1.2f, 0.65f};
-	/** Box component scale for off */
+	/** Box component scale for off. */
 	FVector Scale_BoxCollision_Off = {3.f, 1.4f, 0.65f};
 
 	TMap<TObjectPtr<UBoxComponent>, FText3DToggle> BoxToTextMap;

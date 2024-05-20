@@ -7,37 +7,37 @@
 #include "Animation/AnimNotifies/AnimNotify_PlaySound.h"
 #include "AnimNotify_PlayFootstepSound.generated.h"
 
-/** Sound settings for Notify sounds */
+/** Sound settings for Notify sounds. */
 USTRUCT(BlueprintType)
 struct FBSAnimNotifySoundSettings
 {
 	GENERATED_BODY()
 
-	/** Volume Multiplier */
+	/** Volume Multiplier. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sound)
 	float VolumeMultiplier = 1.0f;
 
-	/** Pitch Multiplier */
+	/** Pitch Multiplier. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sound)
 	float PitchMultiplier = 1.0f;
 };
 
 
-/** Trace settings for Notify sounds */
+/** Trace settings for Notify sounds. */
 USTRUCT(BlueprintType)
 struct FBSAnimNotifyTraceSettings
 {
 	GENERATED_BODY()
 
-	/** Trace Channel */
+	/** Trace Channel. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Trace)
 	TEnumAsByte<ECollisionChannel> TraceChannel = ECollisionChannel::ECC_Visibility;
 
-	/** Vector offset from Effect Location */
+	/** Vector offset from Effect Location. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Trace)
 	FVector EndTraceLocationOffset = FVector::ZeroVector;
 
-	/** Ignore this Actor when getting trace result */
+	/** Ignore this Actor when getting trace result. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Trace)
 	bool bIgnoreActor = true;
 };
@@ -65,37 +65,37 @@ public:
 #endif
 
 
-	/** Effect to Play */
+	/** Effect to Play. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimNotify",
 		meta = (DisplayName = "Effect", ExposeOnSpawn = true))
 	FGameplayTag Effect;
 
-	/** Location offset from the socket */
+	/** Location offset from the socket. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimNotify", meta = (ExposeOnSpawn = true))
 	FVector LocationOffset = FVector::ZeroVector;
 
-	/** Rotation offset from socket */
+	/** Rotation offset from socket. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimNotify", meta = (ExposeOnSpawn = true))
 	FRotator RotationOffset = FRotator::ZeroRotator;
 
-	// Scale to spawn the particle system at */
+	/** Scale to spawn the particle system at. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimNotify", meta = (ExposeOnSpawn = true))
 	FBSAnimNotifySoundSettings AudioProperties;
 
-	// Should attach to the bone/socket */
+	/** Should attach to the bone/socket. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttachmentProperties", meta = (ExposeOnSpawn = true))
 	uint32 bAttached : 1; //~ Does not follow coding standard due to redirection from BP
 
-	// SocketName to attach to */
+	/** SocketName to attach to. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttachmentProperties",
 		meta = (ExposeOnSpawn = true, EditCondition = "bAttached"))
 	FName SocketName;
 
-	// Will perform a trace, required for SurfaceType to Context Conversion */
+	/** Will perform a trace, required for SurfaceType to Context Conversion. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimNotify", meta = (ExposeOnSpawn = true))
 	uint32 bPerformTrace : 1;
 
-	// Scale to spawn the particle system at */
+	/** Scale to spawn the particle system at. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimNotify",
 		meta = (ExposeOnSpawn = true, EditCondition = "bPerformTrace"))
 	FBSAnimNotifyTraceSettings TraceProperties;

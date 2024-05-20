@@ -13,13 +13,13 @@ class UBSMovementSoundInterface : public UInterface
 	GENERATED_BODY()
 };
 
-/** */
+/** Interface to play a movement sound at a location. */
 class BEATSHOT_API IBSMovementSoundInterface
 {
 	GENERATED_BODY()
 
 public:
-	/** */
+	/** Plays a movement sound. */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void PlayMovementSound(const FName Bone, const FGameplayTag MotionEffect, USceneComponent* StaticMeshComponent,
 		const FVector LocationOffset, const FRotator RotationOffset, const UAnimSequenceBase* AnimationSequence,

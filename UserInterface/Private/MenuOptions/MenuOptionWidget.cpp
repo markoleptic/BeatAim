@@ -2,8 +2,6 @@
 
 
 #include "MenuOptions/MenuOptionWidget.h"
-
-#include "Utilities/BSWidgetInterface.h"
 #include "Components/BorderSlot.h"
 #include "Components/CheckBox.h"
 #include "Components/EditableTextBox.h"
@@ -11,9 +9,10 @@
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/Spacer.h"
 #include "Components/TextBlock.h"
+#include "Styles/MenuOptionStyle.h"
+#include "Utilities/BSWidgetInterface.h"
 #include "Utilities/GameModeCategoryTagWidget.h"
 #include "Utilities/TooltipImage.h"
-#include "Styles/MenuOptionStyle.h"
 
 
 void UMenuOptionWidget::NativePreConstruct()

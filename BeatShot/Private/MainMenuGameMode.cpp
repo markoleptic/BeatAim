@@ -3,9 +3,9 @@
 
 #include "MainMenuGameMode.h"
 #include "BSGameInstance.h"
+#include "GameModes/CreatorViewWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Menus/GameModeMenuWidget.h"
-#include "GameModes/CreatorViewWidget.h"
 #include "Target/TargetManagerPreview.h"
 
 AMainMenuGameMode::AMainMenuGameMode()

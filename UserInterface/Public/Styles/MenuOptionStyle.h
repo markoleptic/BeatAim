@@ -7,7 +7,7 @@
 #include "Utilities/TooltipImage.h"
 #include "MenuOptionStyle.generated.h"
 
-/** Defines styles used in MenuOptionWidgets */
+/** Defines styles used in MenuOptionWidgets. */
 UCLASS(Abstract, Blueprintable, BlueprintType)
 class USERINTERFACE_API UMenuOptionStyle : public UObject
 {

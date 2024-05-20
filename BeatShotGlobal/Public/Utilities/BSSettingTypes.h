@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-/** Nvidia DLSS Enabled Mode */
+/** Nvidia DLSS Enabled Mode. */
 UENUM(BlueprintType)
 enum class EDLSSEnabledMode : uint8
 {
@@ -14,7 +14,7 @@ enum class EDLSSEnabledMode : uint8
 
 ENUM_RANGE_BY_FIRST_AND_LAST(EDLSSEnabledMode, EDLSSEnabledMode::Off, EDLSSEnabledMode::On);
 
-/** Nvidia NIS Enabled Mode */
+/** Nvidia NIS Enabled Mode. */
 UENUM(BlueprintType)
 enum class ENISEnabledMode : uint8
 {
@@ -24,7 +24,7 @@ enum class ENISEnabledMode : uint8
 
 ENUM_RANGE_BY_FIRST_AND_LAST(ENISEnabledMode, ENISEnabledMode::Off, ENISEnabledMode::On);
 
-/** Scalability Quality Video Settings */
+/** Scalability Quality Video Settings. */
 UENUM()
 enum class EVideoSettingType : uint8
 {
@@ -40,7 +40,7 @@ enum class EVideoSettingType : uint8
 
 ENUM_RANGE_BY_FIRST_AND_LAST(EVideoSettingType, EVideoSettingType::AntiAliasing, EVideoSettingType::VisualEffect);
 
-/** Scalability Quality Video Settings */
+/** Scalability Quality Video Settings. */
 UENUM()
 enum class ENvidiaSettingType : uint8
 {

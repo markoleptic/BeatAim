@@ -29,7 +29,7 @@ struct FNavButtonStyle
 	TEnumAsByte<EVerticalAlignment> VAlign = VAlign_Fill;
 
 	/** Whether to fill the width or use Auto Width. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(ScriptName="DoFillWidth"))
 	bool bFillWidth = true;
 
 	/** Fill width coefficient. */

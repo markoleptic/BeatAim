@@ -22,16 +22,16 @@ protected:
 	virtual void UpdateOptionsFromConfig() override;
 	void SetupWarningTooltipCallbacks();
 
-	/** Updates options that depend on the value selection of RecentTargetMemoryPolicy */
+	/** Updates options that depend on the value selection of RecentTargetMemoryPolicy. */
 	void UpdateDependentOptions_RecentTargetMemoryPolicy(const ERecentTargetMemoryPolicy& InRecentTargetMemoryPolicy);
 
 	void UpdateDependentOptions_DeactivationConditions(const TArray<ETargetDeactivationCondition>& Conditions);
 
-	/** Updates options that depend on the value selection of bEnableReinforcementLearning */
+	/** Updates options that depend on the value selection of bEnableReinforcementLearning. */
 	void UpdateDependentOptions_EnableAI(const bool bInEnableReinforcementLearning,
 		const EReinforcementLearningHyperParameterMode HyperParameterMode);
 
-	/** Updates options that depend on the value selection of HyperParameterMode */
+	/** Updates options that depend on the value selection of HyperParameterMode. */
 	void UpdateDependentOptions_HyperParameterMode(const bool bInEnableReinforcementLearning,
 		const EReinforcementLearningHyperParameterMode HyperParameterMode);
 

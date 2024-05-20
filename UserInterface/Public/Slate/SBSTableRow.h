@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "InputCoreTypes.h"
-#include "Widgets/Views/ITableRow.h"
 #include "Framework/Views/ITypedTableView.h"
 #include "Framework/Views/TableViewTypeTraits.h"
 #include "Input/DragAndDrop.h"
@@ -19,20 +18,21 @@
 #include "Styling/SlateTypes.h"
 #include "Types/SlateStructs.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
-#include "Widgets/Layout/SBorder.h"
-#include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/SNullWidget.h"
 #include "Widgets/SWidget.h"
+#include "Widgets/Layout/SBorder.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/Views/ITableRow.h"
 #include "Widgets/Views/SExpanderArrow.h"
-#include "Widgets/Views/STableRow.h"
 #include "Widgets/Views/SHeaderRow.h"
+#include "Widgets/Views/STableRow.h"
 #include "Widgets/Views/STableViewBase.h"
 #if WITH_ACCESSIBILITY
 #include "GenericPlatform/Accessibility/GenericAccessibleInterfaces.h"
-#include "Widgets/Accessibility/SlateCoreAccessibleWidgets.h"
-#include "Widgets/Accessibility/SlateAccessibleWidgetCache.h"
 #include "Widgets/Accessibility/SlateAccessibleMessageHandler.h"
+#include "Widgets/Accessibility/SlateAccessibleWidgetCache.h"
+#include "Widgets/Accessibility/SlateCoreAccessibleWidgets.h"
 #endif
 
 template <typename ItemType>
@@ -156,13 +156,19 @@ public:
 
 			// Rows in a TreeView need an expander button and some indentation
 			this->ChildSlot[SNew(SHorizontalBox)
-			+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Right).VAlign(VAlign_Fill)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.HAlign(HAlign_Right)
+			.VAlign(VAlign_Fill)
 			[
 				SAssignNew(ExpanderArrowWidget, SExpanderArrow, SharedThis(this))
 				.StyleSet(ExpanderStyleSet)
 				.ShouldDrawWires(bShowWires)
 			]
-			+ SHorizontalBox::Slot().FillWidth(1).Expose(InnerContentSlotNativePtr).Padding(InPadding)
+			+ SHorizontalBox::Slot()
+			.FillWidth(1)
+			.Expose(InnerContentSlotNativePtr)
+			.Padding(InPadding)
 			[
 				InContent
 			]];
@@ -188,14 +194,13 @@ protected:
 		{
 		}
 
-		// IAccessibleWidget
-		virtual IAccessibleTableRow* AsTableRow()
+		// ~IAccessibleWidget
+		virtual IAccessibleTableRow* AsTableRow() override
 		{
 			return this;
 		}
 
-		// ~
-		// IAccessibleTableRow
+		// ~IAccessibleTableRow
 		virtual void Select() override
 		{
 			if (Widget.IsValid())
@@ -212,7 +217,6 @@ protected:
 						const bool bIsSelected = OwnerTable->Private_IsItemSelected(MyItem);
 						OwnerTable->Private_ClearSelection();
 						OwnerTable->Private_SetItemSelection(MyItem, true, true);
-						// @TODOAccessibility: Not sure if  irnoring  the signal selection mode will affect anything 
 						OwnerTable->Private_SignalSelectionChanged(ESelectInfo::Direct);
 					}
 				}
@@ -267,7 +271,7 @@ public:
 	}
 #endif
 
-	/** Retrieves a brush for rendering a drop indicator for the specified drop zone */
+	/** Retrieves a brush for rendering a drop indicator for the specified drop zone. */
 	const FSlateBrush* GetDropIndicatorBrush(EItemDropZone InItemDropZone) const
 	{
 		switch (InItemDropZone)
@@ -681,7 +685,7 @@ public:
 		}
 	}
 
-	virtual void OnDragEnter(FGeometry const& MyGeometry, FDragDropEvent const& DragDropEvent) override
+	virtual void OnDragEnter(const FGeometry& MyGeometry, const FDragDropEvent& DragDropEvent) override
 	{
 		if (OnDragEnter_Handler.IsBound())
 		{
@@ -689,7 +693,7 @@ public:
 		}
 	}
 
-	virtual void OnDragLeave(FDragDropEvent const& DragDropEvent) override
+	virtual void OnDragLeave(const FDragDropEvent& DragDropEvent) override
 	{
 		ItemDropZone = TOptional<EItemDropZone>();
 
@@ -1086,7 +1090,7 @@ protected:
 	 * @param InArgs Declaration data for this widget.
 	 * @param InOwnerTableView The table that this row belongs to.
 	 */
-	void ConstructInternal(FArguments const& InArgs, TSharedRef<STableViewBase> const& InOwnerTableView)
+	void ConstructInternal(const FArguments& InArgs, const TSharedRef<STableViewBase>& InOwnerTableView)
 	{
 		bProcessingSelectionTouch = false;
 
@@ -1169,7 +1173,7 @@ protected:
 		else
 		{
 			checkf(OwnerTable->Private_IsPendingRefresh(),
-				TEXT("We were unable to find the item for this widget.  If it was removed from the source collection, "
+				TEXT( "We were unable to find the item for this widget.  If it was removed from the source collection, "
 					"the list should be pending a refresh." ));
 		}
 

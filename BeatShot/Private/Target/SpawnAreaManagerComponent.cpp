@@ -2,18 +2,21 @@
 
 
 #include "Target/SpawnAreaManagerComponent.h"
-#include "Target/Target.h"
+#include <stack>
+#include "Algo/RandomShuffle.h"
 #include "Target/MatrixFunctions.h"
 #include "Target/SpawnArea.h"
-#include "Algo/RandomShuffle.h"
-#include <stack>
+#include "Target/Target.h"
 #if !UE_BUILD_SHIPPING
 #include "Target/TargetManager.h"
 #endif
 
 void FRectCandidate::MergeSubRectangles()
 {
-	if (SubRectangles.IsEmpty()) return;
+	if (SubRectangles.IsEmpty())
+	{
+		return;
+	}
 
 	TArray<FSubRectangle> SortedSubRectangles = SubRectangles.Array();
 	SortedSubRectangles.Sort();
@@ -287,14 +290,20 @@ bool USpawnAreaManagerComponent::ShouldConsiderManagedAsInvalid() const
 
 int32 USpawnAreaManagerComponent::GetMostRecentSpawnAreaIndex() const
 {
-	if (!MostRecentSpawnArea) return -1;
+	if (!MostRecentSpawnArea)
+	{
+		return -1;
+	}
 	return MostRecentSpawnArea->GetIndex();
 }
 
 int32 USpawnAreaManagerComponent::GetSpawnAreaIndex(const FGuid& TargetGuid) const
 {
 	const USpawnArea* SpawnArea = GetSpawnArea(TargetGuid);
-	if (!SpawnArea) return -1;
+	if (!SpawnArea)
+	{
+		return -1;
+	}
 	return SpawnArea->GetIndex();
 }
 
@@ -335,8 +344,10 @@ void USpawnAreaManagerComponent::HandleTargetDamageEvent(const FTargetDamageEven
 			// Total Tracking Damage Possible is done on tick in UpdateTotalTrackingDamagePossible
 
 			// Only increment total tracking damage if damage came from player
-			if (!DamageEvent.bDamagedSelf && DamageEvent.DamageDelta > 0.f) SpawnAreaByLoc->
-				IncrementTotalTrackingDamage();
+			if (!DamageEvent.bDamagedSelf && DamageEvent.DamageDelta > 0.f)
+			{
+				SpawnAreaByLoc->IncrementTotalTrackingDamage();
+			}
 		}
 		break;
 	case ETargetDamageType::Hit:
@@ -345,7 +356,10 @@ void USpawnAreaManagerComponent::HandleTargetDamageEvent(const FTargetDamageEven
 			SpawnArea->IncrementTotalSpawns();
 
 			// Only increment total hits if damage came from player
-			if (!DamageEvent.bDamagedSelf && DamageEvent.DamageDelta > 0.f) SpawnArea->IncrementTotalHits();
+			if (!DamageEvent.bDamagedSelf && DamageEvent.DamageDelta > 0.f)
+			{
+				SpawnArea->IncrementTotalHits();
+			}
 		}
 		break;
 	case ETargetDamageType::Self:
@@ -577,7 +591,10 @@ TSet<USpawnArea*> USpawnAreaManagerComponent::GetUnflaggedSpawnAreas() const
 void USpawnAreaManagerComponent::FlagSpawnAreaAsManaged(const int32 SpawnAreaIndex, const FGuid TargetGuid)
 {
 	USpawnArea* SpawnArea = GetSpawnArea(SpawnAreaIndex);
-	if (!SpawnArea) return;
+	if (!SpawnArea)
+	{
+		return;
+	}
 
 	if (SpawnArea->IsManaged())
 	{
@@ -603,10 +620,16 @@ void USpawnAreaManagerComponent::FlagSpawnAreaAsActivated(const FGuid TargetGuid
 	}
 
 	// Ignore already activated target that can be reactivated
-	if (SpawnArea->CanActivateWhileActivated() && SpawnArea->IsActivated()) return;
+	if (SpawnArea->CanActivateWhileActivated() && SpawnArea->IsActivated())
+	{
+		return;
+	}
 
 	// Should no longer be considered recent if activated
-	if (SpawnArea->IsRecent()) RemoveRecentFlagFromSpawnArea(SpawnArea);
+	if (SpawnArea->IsRecent())
+	{
+		RemoveRecentFlagFromSpawnArea(SpawnArea);
+	}
 
 	if (SpawnArea->IsActivated())
 	{
@@ -629,7 +652,10 @@ void USpawnAreaManagerComponent::FlagSpawnAreaAsActivated(const FGuid TargetGuid
 
 void USpawnAreaManagerComponent::FlagSpawnAreaAsRecent(USpawnArea* SpawnArea)
 {
-	if (!SpawnArea) return;
+	if (!SpawnArea)
+	{
+		return;
+	}
 
 	if (SpawnArea->IsRecent())
 	{
@@ -701,7 +727,10 @@ void USpawnAreaManagerComponent::RemoveManagedFlagFromSpawnArea(const FGuid Targ
 
 void USpawnAreaManagerComponent::RemoveActivatedFlagFromSpawnArea(USpawnArea* SpawnArea)
 {
-	if (!SpawnArea) return;
+	if (!SpawnArea)
+	{
+		return;
+	}
 
 	// Remove from activated cache
 	const int32 NumRemovedFromCache = CachedActivated.Remove(SpawnArea);
@@ -719,7 +748,10 @@ void USpawnAreaManagerComponent::RemoveActivatedFlagFromSpawnArea(USpawnArea* Sp
 
 void USpawnAreaManagerComponent::RemoveRecentFlagFromSpawnArea(USpawnArea* SpawnArea)
 {
-	if (!SpawnArea) return;
+	if (!SpawnArea)
+	{
+		return;
+	}
 
 	const int32 NumRemovedFromCache = CachedRecent.Remove(SpawnArea);
 
@@ -743,10 +775,16 @@ void USpawnAreaManagerComponent::RefreshRecentFlags()
 	}
 #endif
 
-	if (TargetConfig().RecentTargetMemoryPolicy != ERecentTargetMemoryPolicy::NumTargetsBased) return;
+	if (TargetConfig().RecentTargetMemoryPolicy != ERecentTargetMemoryPolicy::NumTargetsBased)
+	{
+		return;
+	}
 
 	const int32 NumToRemove = CachedRecent.Num() - TargetConfig().MaxNumRecentTargets;
-	if (NumToRemove <= 0) return;
+	if (NumToRemove <= 0)
+	{
+		return;
+	}
 
 	for (int32 CurrentRemoveNum = 0; CurrentRemoveNum < NumToRemove; CurrentRemoveNum++)
 	{
@@ -852,7 +890,10 @@ TSet<FTargetSpawnParams> USpawnAreaManagerComponent::GetTargetSpawnParams(const 
 #endif
 
 		// Don't make every function have to check this
-		if (ValidSpawnAreas.IsEmpty()) return TSet<FTargetSpawnParams>();
+		if (ValidSpawnAreas.IsEmpty())
+		{
+			return TSet<FTargetSpawnParams>();
+		}
 
 		switch (TargetConfig().RuntimeTargetSpawningLocationSelectionMode)
 		{
@@ -899,7 +940,10 @@ TSet<FTargetSpawnParams> USpawnAreaManagerComponent::GetTargetSpawnParams(const 
 		for (USpawnArea* SpawnArea : ValidSpawnAreas)
 		{
 			SpawnArea->SetTargetScale(Scales[i++]);
-			if (i >= Scales.Num()) break;
+			if (i >= Scales.Num())
+			{
+				break;
+			}
 		}
 
 		UpdateMostRecentGridBlocks(ValidSpawnAreas, NumToSpawn);
@@ -933,7 +977,10 @@ TSet<FTargetSpawnParams> USpawnAreaManagerComponent::GetTargetSpawnParams(const 
 				check(FoundByLocation);
 				check(FoundByGuid);
 
-				if (!FoundByGuid || !FoundByLocation) continue;
+				if (!FoundByGuid || !FoundByLocation)
+				{
+					continue;
+				}
 
 				// If target has moved from its original location, don't make overlapping vertices at original
 				if (FoundByLocation->GetIndex() != FoundByGuid->GetIndex())
@@ -959,7 +1006,10 @@ TSet<FTargetSpawnParams> USpawnAreaManagerComponent::GetTargetSpawnParams(const 
 			RemoveOverlappingSpawnAreas(ValidSpawnAreasCopy, InvalidSpawnAreas, Scales[i]);
 
 			// If multiple are spawning with different scales, one further along might be able to fit
-			if (ValidSpawnAreasCopy.IsEmpty()) continue;
+			if (ValidSpawnAreasCopy.IsEmpty())
+			{
+				continue;
+			}
 
 #if !UE_BUILD_SHIPPING
 			if (bShowDebug_SpawnableSpawnAreas && i == 0 && !GIsAutomationTesting)
@@ -1158,7 +1208,10 @@ void USpawnAreaManagerComponent::FindAdjacentGridUsingDFS(TSet<USpawnArea*>& Val
 	while (ValidPath.Num() < NumToSpawn)
 	{
 		// Explore all candidate paths if necessary
-		if (StartNodeCandidates.IsEmpty()) break;
+		if (StartNodeCandidates.IsEmpty())
+		{
+			break;
+		}
 		USpawnArea* StartNode = StartNodeCandidates[FMath::RandRange(0, StartNodeCandidates.Num() - 1)];
 		StartNodeCandidates.RemoveSwap(StartNode);
 
@@ -1170,7 +1223,10 @@ void USpawnAreaManagerComponent::FindAdjacentGridUsingDFS(TSet<USpawnArea*>& Val
 		while (!Stack.IsEmpty())
 		{
 			USpawnArea* Vertex = Stack.Pop(false);
-			if (Visited.Contains(Vertex)) continue;
+			if (Visited.Contains(Vertex))
+			{
+				continue;
+			}
 
 			CurrentPath.Add(Vertex);
 
@@ -1365,7 +1421,10 @@ void USpawnAreaManagerComponent::RemoveOverlappingSpawnAreas(TSet<USpawnArea*>& 
 int32 USpawnAreaManagerComponent::RemoveNonAdjacentIndices(TSet<USpawnArea*>& ValidSpawnAreas,
 	const USpawnArea* Current) const
 {
-	if (!Current) return 0;
+	if (!Current)
+	{
+		return 0;
+	}
 
 	const int32 PreviousSize = ValidSpawnAreas.Num();
 	TSet<USpawnArea*> BorderingSpawnAreas;
@@ -1512,7 +1571,10 @@ FRectangleSet USpawnAreaManagerComponent::FindLargestValidRectangles(const TArra
 		UpdateLargestRectangles(ValidRectangles, Factors, Heights, Row);
 	}
 
-	for (auto& Rectangle : ValidRectangles) Rectangle.MergeSubRectangles();
+	for (auto& Rectangle : ValidRectangles)
+	{
+		Rectangle.MergeSubRectangles();
+	}
 
 	return ValidRectangles;
 }
@@ -1772,7 +1834,10 @@ void USpawnAreaManagerComponent::UpdateRectangleCandidateAdjacentIndices(FRectan
 TSet<FFactor> USpawnAreaManagerComponent::FindAllFactors(const int32 Number)
 {
 	TSet<FFactor> Out;
-	if (Number == 0) return Out;
+	if (Number == 0)
+	{
+		return Out;
+	}
 	if (Number == 1)
 	{
 		Out.Add(FFactor(1, 1));
@@ -1844,9 +1909,18 @@ TSet<FFactor> USpawnAreaManagerComponent::FindBestFittingFactors(const int32 Num
 
 constexpr bool USpawnAreaManagerComponent::IsPrime(const int32 Number)
 {
-	if (Number <= 1) return false;
-	if (Number == 2 || Number == 3) return true;
-	if (Number % 2 == 0 || Number % 3 == 0) return false;
+	if (Number <= 1)
+	{
+		return false;
+	}
+	if (Number == 2 || Number == 3)
+	{
+		return true;
+	}
+	if (Number % 2 == 0 || Number % 3 == 0)
+	{
+		return false;
+	}
 
 	// All prime numbers > 3 can be expressed by 6k ± 1, where k is a positive integer
 	int i = 5;
@@ -1854,7 +1928,10 @@ constexpr bool USpawnAreaManagerComponent::IsPrime(const int32 Number)
 	while (i * i <= Number)
 	{
 		// Check divisibility from (5, sqrt(number)), or by an integer that is 2 greater
-		if (Number % i == 0 || Number % (i + 2) == 0) return false;
+		if (Number % i == 0 || Number % (i + 2) == 0)
+		{
+			return false;
+		}
 		i += 6;
 	}
 
@@ -2025,8 +2102,8 @@ void USpawnAreaManagerComponent::DrawDebug() const
 			}
 		}
 
-		const TSet<USpawnArea*> OverlappingValid = CachedExtrema.
-			Difference(OverlappingInvalid.Union(OverlappingRecent));
+		const TSet<USpawnArea*> OverlappingValid = CachedExtrema.Difference(
+			OverlappingInvalid.Union(OverlappingRecent));
 		DrawDebug_Boxes(OverlappingValid, DebugColor_ValidOverlap, DebugBoxLineThickness, true);
 		DrawDebug_Boxes(OverlappingRecent, DebugColor_RecentSpawnAreas, DebugBoxLineThickness, true);
 		DrawDebug_Boxes(OverlappingInvalid, DebugColor_InvalidOverlap, DebugBoxLineThickness, true);
@@ -2286,7 +2363,10 @@ void USpawnAreaManagerComponent::PrintDebug_Matrix(const TArray<int32>& Matrix, 
 	FString DashedLine;
 	FString ColumnNumberLine = "Cols";
 
-	for (int i = 0; i < RowNumberOptions.MinimumIntegralDigits; i++) ColumnNumberLine += " ";
+	for (int i = 0; i < RowNumberOptions.MinimumIntegralDigits; i++)
+	{
+		ColumnNumberLine += " ";
+	}
 
 	ColumnNumberLine += "| ";
 
@@ -2295,7 +2375,10 @@ void USpawnAreaManagerComponent::PrintDebug_Matrix(const TArray<int32>& Matrix, 
 		ColumnNumberLine += FText::AsNumber(i, &Options).ToString() + " ";
 	}
 
-	for (int i = 0; i < ColumnNumberLine.Len() - 1; i++) DashedLine += "-";
+	for (int i = 0; i < ColumnNumberLine.Len() - 1; i++)
+	{
+		DashedLine += "-";
+	}
 
 	UE_LOG(LogTargetManager, Display, TEXT("Index Validity:"));
 	UE_LOG(LogTargetManager, Display, TEXT("%s"), *ColumnNumberLine);

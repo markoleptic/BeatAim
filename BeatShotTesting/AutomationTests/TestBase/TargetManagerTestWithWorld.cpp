@@ -1,8 +1,8 @@
 ﻿// Copyright 2022-2023 Markoleptic Games, SP. All Rights Reserved.
 
 #include "TargetManagerTestWithWorld.h"
-#include "Target/TargetManager.h"
 #include "PackageTools.h"
+#include "Target/TargetManager.h"
 
 using namespace TargetManagerTestHelpers;
 
@@ -85,7 +85,10 @@ bool FTargetManagerTestWithWorld::InitTargetManager()
 
 bool FTargetManagerTestWithWorld::InitGameModeDataAsset(const FString& InPath) const
 {
-	if (GameModeDataAsset) return true;
+	if (GameModeDataAsset)
+	{
+		return true;
+	}
 
 	UObject* LoadedObject = StaticLoadObject(UBSGameModeDataAsset::StaticClass(), nullptr, *InPath);
 	if (!LoadedObject)

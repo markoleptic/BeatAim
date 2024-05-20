@@ -2,23 +2,22 @@
 
 
 #include "RangeActors/TimeOfDayManager.h"
-
+#include "BSConstants.h"
 #include "BSGameInstance.h"
 #include "BSGameMode.h"
 #include "BSGameUserSettings.h"
-#include "Components/StaticMeshComponent.h"
-#include "RangeActors/Moon.h"
 #include "Components/DirectionalLightComponent.h"
 #include "Components/LightComponent.h"
 #include "Components/SkyLightComponent.h"
+#include "Components/SpotLightComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Components/TimelineComponent.h"
 #include "Engine/DirectionalLight.h"
 #include "Engine/RectLight.h"
 #include "Engine/SkyLight.h"
 #include "Engine/StaticMeshActor.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "GlobalConstants.h"
-#include "Components/SpotLightComponent.h"
+#include "RangeActors/Moon.h"
 #include "RangeActors/SpawnAreaSpotLight.h"
 
 using namespace Constants;

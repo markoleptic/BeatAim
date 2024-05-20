@@ -2,15 +2,14 @@
 // Credit to Project Borealis for almost all of this code
 
 #include "Character/BSCharacterMovementComponent.h"
-
 #include "Audio/BSMovementSounds.h"
 #include "Character/BSCharacterBase.h"
 #include "Components/CapsuleComponent.h"
+#include "DeveloperSettings/BSAudioSettings.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "PhysicsEngine/PhysicsSettings.h"
-#include "BSAudioSettings.h"
 
 static TAutoConsoleVariable CVarShowPos(TEXT("cl.ShowPos"), 0, TEXT("Show position and movement information.\n"),
 	ECVF_Default);
@@ -295,7 +294,10 @@ void UBSCharacterMovementComponent::TickComponent(float DeltaTime, ELevelTick Ti
 
 	if (IsMovingOnGround())
 	{
-		if (!bBrakingWindowElapsed) BrakingWindowTimeElapsed += DeltaTime * 1000;
+		if (!bBrakingWindowElapsed)
+		{
+			BrakingWindowTimeElapsed += DeltaTime * 1000;
+		}
 
 		if (BrakingWindowTimeElapsed >= BrakingWindow)
 		{

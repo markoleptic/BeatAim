@@ -2,10 +2,10 @@
 
 #pragma once
 #include "CoreMinimal.h"
-#include "SaveGamePlayerScore.h"
 #include "NumCpp.hpp"
+#include "SaveGames/SaveGamePlayerScore.h"
 
-/** Converts an NdArray of floats to a TArray of floats */
+/** Converts an NdArray of floats to a TArray of floats. */
 template <typename T>
 static TArray<T> GetTArrayFromNdArray(const nc::NdArray<T>& InArray)
 {
@@ -25,7 +25,7 @@ static TArray<T> GetTArrayFromNdArray(const nc::NdArray<T>& InArray)
 	return Out;
 }
 
-/** Converts a TArray of floats to an NdArray of floats */
+/** Converts a TArray of floats to an NdArray of floats. */
 template <typename T>
 static nc::NdArray<T> GetNdArrayFromTArray(const TArray<T>& InTArray, const int32 NumRows, const int32 NumCols)
 {
@@ -41,7 +41,7 @@ static nc::NdArray<T> GetNdArrayFromTArray(const TArray<T>& InTArray, const int3
 	return Out;
 }
 
-/** Returns a flattened array of 5 values containing which indices should take in additional values in their average */
+/** Returns a flattened array of 5 values containing which indices should take in additional values in their average. */
 static nc::NdArray<int> Get5X5OverflowArray(const int32 Overflow)
 {
 	return nc::NdArray<int>({
@@ -116,7 +116,7 @@ nc::NdArray<T> GetAveraged5X5NdArray(const TArray<T>& In, const int32 NumRows, c
 }
 
 /** Returns a 5x5 TArray, averaging each value from the input array using the smallest amount of surrounding values
- *  as possible. Does not re-use any values from the input array
+ *  as possible. Does not re-use any values from the input array.
  *
  *  @param In Any sized rectangular matrix having NumRows rows and NumCols columns
  *  @param NumRows Number of rows in the input matrix

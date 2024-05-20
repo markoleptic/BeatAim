@@ -9,22 +9,19 @@
 class USphereComponent;
 class UDirectionalLightComponent;
 
-/** Represents the moon */
+/** Represents the moon. */
 UCLASS()
 class BEATSHOT_API AMoon : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	AMoon();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

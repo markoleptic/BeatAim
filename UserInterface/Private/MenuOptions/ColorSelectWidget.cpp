@@ -2,13 +2,13 @@
 
 
 #include "MenuOptions/ColorSelectWidget.h"
-#include "Utilities/BSWidgetInterface.h"
 #include "Components/EditableTextBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/Image.h"
 #include "Components/Slider.h"
 #include "Components/TextBlock.h"
 #include "Styles/MenuOptionStyle.h"
+#include "Utilities/BSWidgetInterface.h"
 
 void UColorSelectWidget::NativeConstruct()
 {

@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
-#include "BSGameModeDataAsset.h"
+#include "AttributeSet.h"
+#include "BSGameModeConfig/TargetConfig.h"
 #include "BSAttributeSetBase.generated.h"
 
-/** Struct containing info about when incoming damage occurs */
+/** Struct containing info about when incoming damage occurs. */
 USTRUCT()
 struct FDamageEventData
 {
@@ -50,14 +50,14 @@ struct FDamageEventData
 	}
 };
 
-// Delegate used to broadcast attribute events.
+/** Delegate used to broadcast attribute events. */
 DECLARE_MULTICAST_DELEGATE_SixParams(FBSAttributeEvent, AActor* EffectInstigator, AActor* EffectCauser,
 	const FGameplayEffectSpec* EffectSpec, float EffectMagnitude, float OldValue, float NewValue);
 
-// Delegate used to broadcast incoming damage attribute events.
+/** Delegate used to broadcast incoming damage attribute events. */
 DECLARE_MULTICAST_DELEGATE_OneParam(FBSDamageEvent, const FDamageEventData& InDamageEventData);
 
-/** The base AttributeSet used for this game */
+/** The base AttributeSet used for this game. */
 UCLASS()
 class BEATSHOT_API UBSAttributeSetBase : public UAttributeSet
 {
@@ -112,17 +112,17 @@ public:
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(IncomingSelfDamage);
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(IncomingSelfDamage);
 
-	/** Delegate when health changes due to damage/healing, some information may be missing on the client */
+	/** Delegate when health changes due to damage/healing, some information may be missing on the client. */
 	mutable FBSAttributeEvent OnHealthChanged;
 
-	/** Delegate when max health changes */
+	/** Delegate when max health changes. */
 	mutable FBSAttributeEvent OnMaxHealthChanged;
 
-	/** Delegate to broadcast when the health attribute reaches zero */
+	/** Delegate to broadcast when the health attribute reaches zero. */
 	mutable FBSAttributeEvent OnOutOfHealth;
 
 	/** Delegate to broadcast when IncomingTrackingDamage, IncomingHitDamage, or IncomingSelfDamage is changed by
-	 *  a GameplayEffect */
+	 *  a GameplayEffect. */
 	mutable FBSDamageEvent OnDamageTaken;
 
 protected:
@@ -131,9 +131,9 @@ protected:
 	 *	PostAttribute modify. There is no additional context provided here since anything can trigger this. Executed
 	 *	effects, duration based effects, effects being removed, immunity being applied, stacking rules changing, etc.
 	 *	This function is meant to enforce things like "Health = Clamp(Health, 0, MaxHealth)" and NOT things like
-	 *	"trigger this extra thing if damage is applied, etc".
+	 *	"trigger this extra thing if damage is applied, etc.".
 	 *	
-	 *	NewValue is a mutable reference so you are able to clamp the newly applied value as well.
+	 *	NewValue is a mutable reference, so you are able to clamp the newly applied value as well.
 	 */
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 
@@ -157,7 +157,7 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/** These OnRep functions exist to make sure that the ability system internal representations are synchronized
-	 *  properly during replication */
+	 *  properly during replication. */
 
 	UFUNCTION()
 	virtual void OnRep_Health(const FGameplayAttributeData& OldHealth);
@@ -176,27 +176,27 @@ private:
 		Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData Health;
 
-	/** MaxHealth is its own attribute since GameplayEffects may modify it */
+	/** MaxHealth is its own attribute since GameplayEffects may modify it. */
 	UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing = OnRep_MaxHealth,
 		Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData MaxHealth;
 
-	/** HitDamage is is the amount of Hit-Based damage a player can deal in a single damage execution */
+	/** HitDamage is the amount of Hit-Based damage a player can deal in a single damage execution. */
 	UPROPERTY(BlueprintReadOnly, Category = "Damage", ReplicatedUsing = OnRep_HitDamage,
 		Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData HitDamage;
 
-	/** TrackingDamage is is the amount of Tracking-Based damage a player can deal in a single damage execution  */
+	/** TrackingDamage is the amount of Tracking-Based damage a player can deal in a single damage execution. */
 	UPROPERTY(BlueprintReadOnly, Category = "Damage", ReplicatedUsing = OnRep_TrackingDamage,
 		Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData TrackingDamage;
 
-	/** Self Damage is is the amount of damage a target does to itself when called to damage itself */
+	/** Self Damage is the amount of damage a target does to itself when called to damage itself. */
 	UPROPERTY(BlueprintReadOnly, Category = "Damage", Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData SelfDamage;
 
-	/** IncomingTotalDamage is a meta attribute used by the DamageExecution to calculate final damage, which then turns into
-	 *  -Health. Temporary value that only exists on the Server. Not replicated. */
+	/** IncomingTotalDamage is a meta attribute used by the DamageExecution to calculate final damage, which then turns
+	 *  into -Health. Temporary value that only exists on the Server. Not replicated. */
 	UPROPERTY(BlueprintReadOnly, Category = "Damage", Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData IncomingTotalDamage;
 
@@ -216,18 +216,20 @@ private:
 	FGameplayAttributeData IncomingSelfDamage;
 
 	/** Helper function to proportionally adjust the value of an attribute when it's associated max attribute changes.
-	 *  (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before) */
+	 *  (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before). */
 	void AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute,
 		const FGameplayAttributeData& MaxAttribute, float NewMaxValue,
 		const FGameplayAttribute& AffectedAttributeProperty);
 
-	// Store the health before any changes 
+	/** Stores the max health before any changes. */
 	float MaxHealthBeforeAttributeChange;
+
+	/** Stores the health before any changes. */
 	float HealthBeforeAttributeChange;
 
-	// Used to track when the health reaches 0
+	/** Used to track when the health reaches 0. */
 	bool bOutOfHealth;
 
-	// Min possible health
+	/** Min possible health. */
 	const float MinPossibleHealth = 0.0f;
 };

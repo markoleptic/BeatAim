@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include "GameplayTagContainer.h"
 #include "Engine/DeveloperSettings.h"
 #include "UObject/SoftObjectPtr.h"
-#include "GameplayTagContainer.h"
 #include "BSAudioSettings.generated.h"
 
 class UObject;

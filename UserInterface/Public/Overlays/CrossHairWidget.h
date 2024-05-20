@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
 #include "BSPlayerSettingsInterface.h"
+#include "Blueprint/UserWidget.h"
 #include "CrossHairWidget.generated.h"
 
 class UCanvasPanelSlot;

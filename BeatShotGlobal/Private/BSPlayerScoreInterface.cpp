@@ -2,14 +2,13 @@
 
 
 #include "BSPlayerScoreInterface.h"
-#include "SaveGamePlayerScore.h"
-#include "SaveLoadCommon.h"
-
-using namespace SaveLoadCommon;
+#include "SaveGames/SaveGamePlayerScore.h"
+#include "Utilities/SaveLoadCommon.h"
 
 TArray<FPlayerScore> IBSPlayerScoreInterface::LoadPlayerScores()
 {
-	if (const USaveGamePlayerScore* SaveGamePlayerScore = LoadFromSlot<USaveGamePlayerScore>(TEXT("ScoreSlot"), 1))
+	if (const USaveGamePlayerScore* SaveGamePlayerScore = SaveLoadCommon::LoadFromSlot<USaveGamePlayerScore>(
+		TEXT("ScoreSlot"), 1))
 	{
 		return SaveGamePlayerScore->GetPlayerScores();
 	}
@@ -18,7 +17,8 @@ TArray<FPlayerScore> IBSPlayerScoreInterface::LoadPlayerScores()
 
 TArray<FPlayerScore> IBSPlayerScoreInterface::LoadPlayerScores_UnsavedToDatabase()
 {
-	if (const USaveGamePlayerScore* SaveGamePlayerScore = LoadFromSlot<USaveGamePlayerScore>(TEXT("ScoreSlot"), 1))
+	if (const USaveGamePlayerScore* SaveGamePlayerScore = SaveLoadCommon::LoadFromSlot<USaveGamePlayerScore>(
+		TEXT("ScoreSlot"), 1))
 	{
 		return SaveGamePlayerScore->GetPlayerScores_UnsavedToDatabase();
 	}
@@ -27,10 +27,11 @@ TArray<FPlayerScore> IBSPlayerScoreInterface::LoadPlayerScores_UnsavedToDatabase
 
 void IBSPlayerScoreInterface::SetAllPlayerScoresSavedToDatabase()
 {
-	if (USaveGamePlayerScore* SaveGamePlayerScore = LoadFromSlot<USaveGamePlayerScore>(TEXT("ScoreSlot"), 1))
+	if (USaveGamePlayerScore* SaveGamePlayerScore = SaveLoadCommon::LoadFromSlot<USaveGamePlayerScore>(
+		TEXT("ScoreSlot"), 1))
 	{
 		SaveGamePlayerScore->SetAllScoresSavedToDatabase();
-		SaveToSlot(SaveGamePlayerScore, TEXT("ScoreSlot"), 1);
+		SaveLoadCommon::SaveToSlot(SaveGamePlayerScore, TEXT("ScoreSlot"), 1);
 	}
 }
 
@@ -48,10 +49,11 @@ TArray<FPlayerScore> IBSPlayerScoreInterface::GetMatchingPlayerScores(const FPla
 
 void IBSPlayerScoreInterface::SavePlayerScoreInstance(const FPlayerScore& PlayerScoreToSave)
 {
-	if (USaveGamePlayerScore* SaveGamePlayerScore = LoadFromSlot<USaveGamePlayerScore>(TEXT("ScoreSlot"), 1))
+	if (USaveGamePlayerScore* SaveGamePlayerScore = SaveLoadCommon::LoadFromSlot<USaveGamePlayerScore>(
+		TEXT("ScoreSlot"), 1))
 	{
 		SaveGamePlayerScore->AddPlayerScoreInstance(PlayerScoreToSave);
-		SaveToSlot(SaveGamePlayerScore, TEXT("ScoreSlot"), 1);
+		SaveLoadCommon::SaveToSlot(SaveGamePlayerScore, TEXT("ScoreSlot"), 1);
 	}
 }
 
@@ -62,7 +64,8 @@ void IBSPlayerScoreInterface::SavePlayerScoreInstance(const FPlayerScore& Player
 FCommonScoreInfo IBSPlayerScoreInterface::FindOrAddCommonScoreInfo(const FBS_DefiningConfig& DefiningConfig)
 {
 	FCommonScoreInfo CommonScoreInfo;
-	if (USaveGamePlayerScore* SaveGamePlayerScore = LoadFromSlot<USaveGamePlayerScore>(TEXT("ScoreSlot"), 1))
+	if (USaveGamePlayerScore* SaveGamePlayerScore = SaveLoadCommon::LoadFromSlot<USaveGamePlayerScore>(
+		TEXT("ScoreSlot"), 1))
 	{
 		SaveGamePlayerScore->FindOrAddCommonScoreInfo(DefiningConfig, CommonScoreInfo);
 	}
@@ -72,29 +75,38 @@ FCommonScoreInfo IBSPlayerScoreInterface::FindOrAddCommonScoreInfo(const FBS_Def
 void IBSPlayerScoreInterface::SaveCommonScoreInfo(const FBS_DefiningConfig& DefiningConfig,
 	const FCommonScoreInfo& CommonScoreInfoToSave)
 {
-	if (USaveGamePlayerScore* SaveGamePlayerScore = LoadFromSlot<USaveGamePlayerScore>(TEXT("ScoreSlot"), 1))
+	if (USaveGamePlayerScore* SaveGamePlayerScore = SaveLoadCommon::LoadFromSlot<USaveGamePlayerScore>(
+		TEXT("ScoreSlot"), 1))
 	{
 		SaveGamePlayerScore->SaveCommonScoreInfo(DefiningConfig, CommonScoreInfoToSave);
-		SaveToSlot(SaveGamePlayerScore, TEXT("ScoreSlot"), 1);
+		SaveLoadCommon::SaveToSlot(SaveGamePlayerScore, TEXT("ScoreSlot"), 1);
 	}
 }
 
 int32 IBSPlayerScoreInterface::RemoveCommonScoreInfo(const FBS_DefiningConfig& DefiningConfig)
 {
-	if (USaveGamePlayerScore* SaveGamePlayerScore = LoadFromSlot<USaveGamePlayerScore>(TEXT("ScoreSlot"), 1))
+	if (USaveGamePlayerScore* SaveGamePlayerScore = SaveLoadCommon::LoadFromSlot<USaveGamePlayerScore>(
+		TEXT("ScoreSlot"), 1))
 	{
 		const int32 NumRemoved = SaveGamePlayerScore->RemoveCommonScoreInfo(DefiningConfig);
-		if (SaveToSlot(SaveGamePlayerScore, TEXT("ScoreSlot"), 1)) return NumRemoved;
+		if (SaveLoadCommon::SaveToSlot(SaveGamePlayerScore, TEXT("ScoreSlot"), 1))
+		{
+			return NumRemoved;
+		}
 	}
 	return 0;
 }
 
 int32 IBSPlayerScoreInterface::ResetQTable(const FBS_DefiningConfig& DefiningConfig)
 {
-	if (USaveGamePlayerScore* SaveGamePlayerScore = LoadFromSlot<USaveGamePlayerScore>(TEXT("ScoreSlot"), 1))
+	if (USaveGamePlayerScore* SaveGamePlayerScore = SaveLoadCommon::LoadFromSlot<USaveGamePlayerScore>(
+		TEXT("ScoreSlot"), 1))
 	{
 		const int32 NumCleared = SaveGamePlayerScore->ResetQTable(DefiningConfig);
-		if (SaveToSlot(SaveGamePlayerScore, TEXT("ScoreSlot"), 1)) return NumCleared;
+		if (SaveLoadCommon::SaveToSlot(SaveGamePlayerScore, TEXT("ScoreSlot"), 1))
+		{
+			return NumCleared;
+		}
 	}
 	return 0;
 }

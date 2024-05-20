@@ -4,11 +4,11 @@
 #include "GameModes/CustomGameModeActivationWidget.h"
 #include "Components/CheckBox.h"
 #include "Components/Slider.h"
-#include "Utilities/ComboBox/BSComboBoxString.h"
 #include "MenuOptions/CheckBoxWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "MenuOptions/DualRangeInputWidget.h"
 #include "MenuOptions/SingleRangeInputWidget.h"
+#include "Utilities/ComboBox/BSComboBoxString.h"
 
 
 void UCustomGameModeActivationWidget::NativeConstruct()

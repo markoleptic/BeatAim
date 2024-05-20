@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "BSGameModeInterface.h"
-#include "Utilities/BSWidgetInterface.h"
 #include "HttpRequestInterface.h"
 #include "Blueprint/UserWidget.h"
 #include "Utilities/BSCarouselNavBar.h"
+#include "Utilities/BSWidgetInterface.h"
+#include "Utilities/GameModeTransitionState.h"
 #include "GameModeMenuWidget.generated.h"
 
 class UCommonWidgetCarousel;

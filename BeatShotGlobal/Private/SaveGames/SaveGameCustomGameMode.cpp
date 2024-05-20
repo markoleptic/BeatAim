@@ -1,7 +1,8 @@
 ﻿// Copyright 2022-2023 Markoleptic Games, SP. All Rights Reserved.
 
 
-#include "SaveGameCustomGameMode.h"
+#include "SaveGames/SaveGameCustomGameMode.h"
+#include "BSGameModeConfig/BSConfig.h"
 
 USaveGameCustomGameMode::USaveGameCustomGameMode()
 {

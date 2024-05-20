@@ -9,7 +9,7 @@
 class UCombatTextWidget;
 class UWidgetComponent;
 
-/** Provides a way to display floating text on player's screen showing their current target streak */
+/** Provides a way to display floating text on player's screen showing their current target streak. */
 UCLASS(Abstract)
 class BEATSHOT_API AFloatingTextActor : public AActor
 {
@@ -17,16 +17,16 @@ class BEATSHOT_API AFloatingTextActor : public AActor
 
 	AFloatingTextActor();
 
-	/* Called when the game starts or when spawned */
+	/* Called when the game starts or when spawned. */
 	virtual void BeginPlay() override;
 
-	/* Called every frame */
+	/* Called every frame. */
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void PostInitializeComponents() override;
 
 public:
-	/** Sets the CombatTextWidgetComponent's widget's text */
+	/** Sets the CombatTextWidgetComponent's widget's text. */
 	void SetText(const FText& InText);
 
 	FTransform GetTextTransform(const FTransform& InTargetTransform, const bool bDisplayAbove);

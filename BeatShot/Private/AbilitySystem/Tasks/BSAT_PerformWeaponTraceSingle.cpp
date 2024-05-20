@@ -48,10 +48,16 @@ UBSAT_PerformWeaponTraceSingle* UBSAT_PerformWeaponTraceSingle::PerformWeaponTra
 bool UBSAT_PerformWeaponTraceSingle::LineTraceSingle(FHitResult& HitResult) const
 {
 	AActor* AvatarActor = Ability->GetAvatarActorFromActorInfo();
-	if (!AvatarActor) return false;
+	if (!AvatarActor)
+	{
+		return false;
+	}
 
 	const auto Character = Cast<ABSCharacterBase>(AvatarActor);
-	if (!Character) return false;
+	if (!Character)
+	{
+		return false;
+	}
 
 	const USceneComponent* RecoilComponent = Character->GetRecoilComponent();
 	const FRotator CurrentRecoilRotation = Character->GetRecoilComponent()->GetCurrentRecoilRotation();

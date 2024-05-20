@@ -13,17 +13,17 @@ struct FPlayerSettings_User;
 struct FPlayerSettings_CrossHair;
 class USaveGamePlayerSettings;
 
-/** Broadcast when game specific settings are changed and saved */
+/** Broadcast when game specific settings are changed and saved. */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerSettingsChanged_Game, const FPlayerSettings_Game& GameSettings);
 
-/** Broadcast when Audio Analyzer specific settings are changed and saved */
+/** Broadcast when Audio Analyzer specific settings are changed and saved. */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerSettingsChanged_AudioAnalyzer,
 	const FPlayerSettings_AudioAnalyzer& AudioAnalyzerSettings);
 
-/** Broadcast when User specific settings are changed and saved */
+/** Broadcast when User specific settings are changed and saved. */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerSettingsChanged_User, const FPlayerSettings_User& UserSettings);
 
-/** Broadcast when CrossHair specific settings are changed and saved */
+/** Broadcast when CrossHair specific settings are changed and saved. */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerSettingsChanged_CrossHair,
 	const FPlayerSettings_CrossHair& CrossHairSettings);
 
@@ -39,19 +39,27 @@ class BEATSHOTGLOBAL_API IBSPlayerSettingsInterface
 	GENERATED_BODY()
 
 public:
-	/** Loads all player settings from slot */
+	/** @return all player settings loaded from slot. */
 	static FPlayerSettings LoadPlayerSettings();
 
-	/** Saves specific sub-setting struct, preserving all other settings */
+	/** Saves specific sub-setting struct, preserving all other settings.
+	 *  @param InSettingsStruct settings to save
+	 */
 	void SavePlayerSettings(const FPlayerSettings_AudioAnalyzer& InSettingsStruct);
 
-	/** Saves specific sub-setting struct, preserving all other settings */
+	/** Saves specific sub-setting struct, preserving all other settings.
+	 *  @param InSettingsStruct settings to save
+	 */
 	void SavePlayerSettings(const FPlayerSettings_CrossHair& InSettingsStruct);
 
-	/** Saves specific sub-setting struct, preserving all other settings */
+	/** Saves specific sub-setting struct, preserving all other settings.
+	 *  @param InSettingsStruct settings to save
+	 */
 	void SavePlayerSettings(const FPlayerSettings_Game& InSettingsStruct);
 
-	/** Saves specific sub-setting struct, preserving all other settings */
+	/** Saves specific sub-setting struct, preserving all other settings.
+	 *  @param InSettingsStruct settings to save
+	 */
 	void SavePlayerSettings(const FPlayerSettings_User& InSettingsStruct);
 
 protected:
@@ -71,15 +79,15 @@ protected:
 	{
 	}
 
-	/** The delegate that is broadcast when this class saves Audio Analyzer settings */
+	/** The delegate that is broadcast when this class saves Audio Analyzer settings. */
 	FOnPlayerSettingsChanged_AudioAnalyzer OnPlayerSettingsChangedDelegate_AudioAnalyzer;
 
-	/** The delegate that is broadcast when this class saves CrossHair settings */
+	/** The delegate that is broadcast when this class saves CrossHair settings. */
 	FOnPlayerSettingsChanged_CrossHair OnPlayerSettingsChangedDelegate_CrossHair;
 
-	/** The delegate that is broadcast when this class saves Game settings */
+	/** The delegate that is broadcast when this class saves Game settings. */
 	FOnPlayerSettingsChanged_Game OnPlayerSettingsChangedDelegate_Game;
 
-	/** The delegate that is broadcast when this class saves User settings */
+	/** The delegate that is broadcast when this class saves User settings. */
 	FOnPlayerSettingsChanged_User OnPlayerSettingsChangedDelegate_User;
 };

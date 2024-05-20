@@ -13,7 +13,8 @@ class AStaticCubeVisualizer;
 class ABeamVisualizer;
 class UAudioAnalyzerManager;
 
-/** The class responsible for managing visualizers in a level. There is only one per level, and the GameMode spawns it */
+/** The class responsible for managing visualizers in a level. There is only one per level,
+ *  and the GameMode spawns it. */
 UCLASS()
 class BEATSHOT_API AVisualizerManager : public AActor
 {
@@ -22,28 +23,28 @@ class BEATSHOT_API AVisualizerManager : public AActor
 public:
 	AVisualizerManager();
 
-	/** Checks for any visualizers already in the level that have been placed in Visualizers and calls InitializeVisualizer on each.
-	 *  Spawns all default visualizers in Default Spawn Through Code Visualizers array, calls InitializeVisualizer on each, and adds them to Visualizers array.
-	 *  Calls SplitVisualizers at the end */
+	/** Checks for any visualizers already in the level that have been placed in Visualizers and calls
+	 *  InitializeVisualizer on each. Spawns all default visualizers in Default Spawn Through Code Visualizers array,
+	 *  calls InitializeVisualizer on each, and adds them to Visualizers array. Calls SplitVisualizers at the end. */
 	void InitializeVisualizers(const FPlayerSettings_Game& PlayerSettings,
 		const FPlayerSettings_AudioAnalyzer& InAASettings);
 
-	/** Main function to update all visualizers, called on tick in GameMode */
+	/** Main function to update all visualizers, called on tick in GameMode. */
 	void UpdateVisualizers(const TArray<float>& SpectrumValues);
 
-	/** Deactivates all visualizers */
+	/** Deactivates all visualizers. */
 	void DeactivateVisualizers();
 
-	/** Updates a Beam Visualizer's activation state */
+	/** Updates a Beam Visualizer's activation state. */
 	void SetActivationState_BeamVisualizer(const int32 Index, const bool bActivate);
 
-	/** Updates a Cube Visualizer's activation state */
+	/** Updates a Cube Visualizer's activation state. */
 	void SetActivationState_CubeVisualizer(const int32 Index, const bool bActivate);
 
-	/** Updates visualizers based on player game settings */
+	/** Updates visualizers based on player game settings. */
 	void UpdateVisualizerSettings(const FPlayerSettings_Game& PlayerSettings);
 
-	/** Updates visualizers based on player AudioAnalyzer settings */
+	/** Updates visualizers based on player AudioAnalyzer settings. */
 	void UpdateAASettings(const FPlayerSettings_AudioAnalyzer& NewAASettings);
 
 	UPROPERTY(VisibleAnywhere, Category = "VisualizerManager | Update")
@@ -59,23 +60,23 @@ public:
 	TArray<float> MaxSpectrumValues;
 
 protected:
-	/* The base StaticCubeVisualizer class to spawn through code */
+	/* The base StaticCubeVisualizer class to spawn through code. */
 	UPROPERTY(EditDefaultsOnly, Category = "VisualizerManager | Classes")
 	TSubclassOf<AStaticCubeVisualizer> BaseClass_CubeVisualizer;
 
-	/** The base BeamVisualizer class to spawn through code */
+	/** The base BeamVisualizer class to spawn through code. */
 	UPROPERTY(EditDefaultsOnly, Category = "VisualizerManager | Classes")
 	TSubclassOf<ABeamVisualizer> BaseClass_BeamVisualizer;
 
-	/** An array of visualizers that will be spawned when this actor is initialized */
+	/** An array of visualizers that will be spawned when this actor is initialized. */
 	UPROPERTY(EditDefaultsOnly, Category = "VisualizerManager | Classes")
 	TArray<TSubclassOf<AVisualizerBase>> DefaultSpawnThroughCode_Visualizers;
 
-	/** An array of visualizers that have already been placed in the level editor */
+	/** An array of visualizers that have already been placed in the level editor. */
 	UPROPERTY(EditDefaultsOnly, Category = "VisualizerManager | References")
 	TArray<TSoftObjectPtr<AVisualizerBase>> LevelVisualizers;
 
-	/** All visualizers being managed */
+	/** All visualizers being managed. */
 	UPROPERTY()
 	TArray<TObjectPtr<AVisualizerBase>> Visualizers;
 
@@ -93,18 +94,18 @@ private:
 	TArray<TObjectPtr<AStaticCubeVisualizer>>& GetCubeVisualizers() { return CubeVisualizers; }
 	TArray<TObjectPtr<AVisualizerBase>>& GetVisualizers() { return Visualizers; }
 
-	/** Splits Visualizers into smaller subclass groups */
+	/** Splits Visualizers into smaller subclass groups. */
 	void SplitVisualizers();
 
-	/** Updates any Beam Visualizers in BeamVisualizers */
+	/** Updates any Beam Visualizers in BeamVisualizers. */
 	void UpdateBeamVisualizers(const int32 Index, const float SpectrumValue);
 
-	/** Updates any Cube Visualizers in CubeVisualizers */
+	/** Updates any Cube Visualizers in CubeVisualizers. */
 	void UpdateCubeVisualizers(const int32 Index, const float SpectrumValue);
 
-	/** Returns a normalized spectrum value based on recent spectrum values */
+	/** Returns a normalized spectrum value based on recent spectrum values. */
 	float GetNormalizedSpectrumValue(const int32 Index, const bool bIsBeam);
 
-	/** Marks the render state dirty on any visualizers using instanced static meshes */
+	/** Marks the render state dirty on any visualizers using instanced static meshes. */
 	void MarkVisualizerRenderStateDirty();
 };

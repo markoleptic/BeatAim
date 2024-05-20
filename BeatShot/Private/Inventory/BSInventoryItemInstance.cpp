@@ -2,9 +2,9 @@
 
 
 #include "Inventory/BSInventoryItemInstance.h"
-#include "Inventory/BSInventoryItemDefinition.h"
-#include "Containers/Array.h"
 #include "GameplayTagContainer.h"
+#include "Containers/Array.h"
+#include "Inventory/BSInventoryItemDefinition.h"
 #include "Net/UnrealNetwork.h"
 #include "UObject/Class.h"
 

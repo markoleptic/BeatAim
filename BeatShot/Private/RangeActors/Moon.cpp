@@ -2,9 +2,9 @@
 
 
 #include "RangeActors/Moon.h"
-#include "GlobalConstants.h"
-#include "Components/SphereComponent.h"
+#include "BSConstants.h"
 #include "Components/DirectionalLightComponent.h"
+#include "Components/SphereComponent.h"
 
 AMoon::AMoon()
 {

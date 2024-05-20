@@ -2,19 +2,19 @@
 
 
 #include "Target/Target.h"
-#include "Character/BSHealthComponent.h"
-#include "NiagaraSystem.h"
-#include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
-#include "SaveGamePlayerSettings.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
+#include "AbilitySystem/Globals/BSAttributeSetBase.h"
 #include "BeatShot/BSGameplayTags.h"
-#include "Materials/MaterialInstanceDynamic.h"
-#include "Materials/MaterialInterface.h"
+#include "Character/BSHealthComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "AbilitySystem/Globals/BSAttributeSetBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialInterface.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 
 
 FTargetDamageEvent::FTargetDamageEvent(const FDamageEventData& InData, const float InTimeAlive, ATarget* InTarget)
@@ -139,7 +139,10 @@ void ATarget::BeginPlay()
 	Super::BeginPlay();
 
 #if !UE_BUILD_SHIPPING
-	if (GIsAutomationTesting) return;
+	if (GIsAutomationTesting)
+	{
+		return;
+	}
 #endif
 	/* Use Color Changing Material, this is required in order to change color using C++ */
 	TargetColorChangeMaterial = UMaterialInstanceDynamic::Create(SphereMesh->GetMaterial(0), this);
@@ -458,10 +461,16 @@ void ATarget::ResetHealth()
 
 bool ATarget::ActivateTarget(const float Lifespan)
 {
-	if (IsActivated() && !Config.bAllowActivationWhileActivated) return false;
+	if (IsActivated() && !Config.bAllowActivationWhileActivated)
+	{
+		return false;
+	}
 
 	// Don't update activation target scale for re-activations
-	if (!IsActivated()) TargetScale_Activation = GetActorScale();
+	if (!IsActivated())
+	{
+		TargetScale_Activation = GetActorScale();
+	}
 
 	// Only set an expiration timer if Lifespan > 0
 	if (Lifespan > 0.f)
@@ -496,7 +505,10 @@ void ATarget::DeactivateTarget()
 void ATarget::CheckForHealthReset(const bool bOutOfHealth)
 {
 	const bool bUnlimitedHealth = Config.MaxHealth <= 0.f;
-	if (bUnlimitedHealth && bOutOfHealth) ResetHealth();
+	if (bUnlimitedHealth && bOutOfHealth)
+	{
+		ResetHealth();
+	}
 }
 
 /* ------------------------ */
@@ -580,7 +592,10 @@ void ATarget::InterpShrinkQuickAndGrowSlow(const float Alpha)
 void ATarget::SetTargetColor(const FLinearColor& Color)
 {
 #if !UE_BUILD_SHIPPING
-	if (GIsAutomationTesting) return;
+	if (GIsAutomationTesting)
+	{
+		return;
+	}
 #endif
 	TargetColorChangeMaterial->SetVectorParameterValue(TEXT("BaseColor"), Color);
 }
@@ -588,7 +603,10 @@ void ATarget::SetTargetColor(const FLinearColor& Color)
 void ATarget::SetTargetOutlineColor(const FLinearColor& Color)
 {
 #if !UE_BUILD_SHIPPING
-	if (GIsAutomationTesting) return;
+	if (GIsAutomationTesting)
+	{
+		return;
+	}
 #endif
 	TargetColorChangeMaterial->SetVectorParameterValue(TEXT("OutlineColor"), Color);
 }
@@ -596,7 +614,10 @@ void ATarget::SetTargetOutlineColor(const FLinearColor& Color)
 void ATarget::SetUseSeparateOutlineColor(const bool bUseSeparateOutlineColor)
 {
 #if !UE_BUILD_SHIPPING
-	if (GIsAutomationTesting) return;
+	if (GIsAutomationTesting)
+	{
+		return;
+	}
 #endif
 	if (bUseSeparateOutlineColor)
 	{
@@ -656,7 +677,10 @@ void ATarget::PlayExplosionEffect(const FVector& ExplosionLocation, const float 
 	const FLinearColor& InColorWhenDestroyed) const
 {
 #if !UE_BUILD_SHIPPING
-	if (GIsAutomationTesting) return;
+	if (GIsAutomationTesting)
+	{
+		return;
+	}
 #endif
 	if (TargetExplosion && Config.TargetDamageType == ETargetDamageType::Hit)
 	{
@@ -725,10 +749,18 @@ bool ATarget::IsImmuneToTrackingDamage() const
 
 ETargetDamageType ATarget::GetTargetDamageType() const
 {
-	if (!IsImmuneToHitDamage() && TargetDamageType == ETargetDamageType::Hit) return TargetDamageType;
-	if (!IsImmuneToTrackingDamage() && TargetDamageType == ETargetDamageType::Tracking) return TargetDamageType;
-	if (!IsImmuneToHitDamage() && !IsImmuneToTrackingDamage() && TargetDamageType == ETargetDamageType::Combined)
+	if (!IsImmuneToHitDamage() && TargetDamageType == ETargetDamageType::Hit)
+	{
 		return TargetDamageType;
+	}
+	if (!IsImmuneToTrackingDamage() && TargetDamageType == ETargetDamageType::Tracking)
+	{
+		return TargetDamageType;
+	}
+	if (!IsImmuneToHitDamage() && !IsImmuneToTrackingDamage() && TargetDamageType == ETargetDamageType::Combined)
+	{
+		return TargetDamageType;
+	}
 	UE_LOG(LogTemp, Warning, TEXT("Target DamageType != its immune counterpart."));
 	return ETargetDamageType::None;
 }

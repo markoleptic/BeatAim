@@ -3,8 +3,8 @@
 
 #include "Overlays/LoginWidget.h"
 #include "Animation/WidgetAnimation.h"
-#include "Components/HorizontalBox.h"
 #include "Components/EditableTextBox.h"
+#include "Components/HorizontalBox.h"
 #include "Components/TextBlock.h"
 #include "Utilities/Buttons/BSButton.h"
 

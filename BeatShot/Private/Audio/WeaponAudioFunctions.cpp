@@ -27,16 +27,25 @@ void UWeaponAudioFunctions::SetWeaponSoundParams(AActor* Actor, const FGameplayC
 void UWeaponAudioFunctions::SetEarlyReflections(AActor* Target, const FGameplayCueParameters& Params,
 	USubmixEffectTapDelayPreset* SubmixEffect)
 {
-	if (!Target) return;
+	if (!Target)
+	{
+		return;
+	}
 
 	ABSCharacterBase* BSCharacter = Cast<ABSCharacterBase>(Target);
-	if (!BSCharacter) return;
+	if (!BSCharacter)
+	{
+		return;
+	}
 
 	bool bHit = Params.PhysicalMaterial.IsValid();
 	if (bHit)
 	{
 		// Hitting another character
-		if (Params.PhysicalMaterial->SurfaceType == SurfaceType1) return;
+		if (Params.PhysicalMaterial->SurfaceType == SurfaceType1)
+		{
+			return;
+		}
 	}
 
 	UCameraComponent* Camera = BSCharacter->GetCamera();

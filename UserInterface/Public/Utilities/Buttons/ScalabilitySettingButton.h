@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "BSButton.h"
-#include "BSSettingTypes.h"
 #include "Delegates/DelegateCombinations.h"
+#include "Utilities/BSSettingTypes.h"
 #include "ScalabilitySettingButton.generated.h"
 
 /** Button representing a video setting designed to be stored in a linked list. Contains a pointer to the next one. */

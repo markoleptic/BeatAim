@@ -1,7 +1,7 @@
 ﻿// Copyright 2022-2023 Markoleptic Games, SP. All Rights Reserved.
 
 
-#include "SaveGamePlayerScore.h"
+#include "SaveGames/SaveGamePlayerScore.h"
 
 
 USaveGamePlayerScore::USaveGamePlayerScore()
@@ -98,7 +98,10 @@ int32 USaveGamePlayerScore::ResetQTable(const FBS_DefiningConfig& InDefiningConf
 {
 	FCommonScoreInfo* Found = CommonScoreInfo.Find(InDefiningConfig);
 
-	if (!Found) return 0;
+	if (!Found)
+	{
+		return 0;
+	}
 
 	Found->ResetQTable();
 	return 1;

@@ -2,13 +2,13 @@
 
 
 #include "Menus/PostGameMenuWidget.h"
-#include "Components/WidgetSwitcher.h"
 #include "Components/VerticalBox.h"
-#include "Styles/MenuStyle.h"
-#include "Menus/ScoreBrowserWidget.h"
+#include "Components/WidgetSwitcher.h"
 #include "Menus/GameModeMenuWidget.h"
+#include "Menus/ScoreBrowserWidget.h"
 #include "Overlays/AudioSelectWidget.h"
 #include "Overlays/QuitMenuWidget.h"
+#include "Styles/MenuStyle.h"
 #include "Utilities/Buttons/MenuButton.h"
 
 void UPostGameMenuWidget::NativeConstruct()
@@ -83,7 +83,10 @@ void UPostGameMenuWidget::SetScoresWidgetVisibility()
 void UPostGameMenuWidget::OnButtonClicked_BSButton(const UBSButton* Button)
 {
 	const UMenuButton* MenuButton = Cast<UMenuButton>(Button);
-	if (!MenuButton) return;
+	if (!MenuButton)
+	{
+		return;
+	}
 
 	// Always stop the game mode preview if game modes widget is not visible
 	if (MenuButton != MenuButton_GameModes)

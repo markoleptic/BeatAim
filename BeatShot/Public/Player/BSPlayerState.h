@@ -4,14 +4,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/PlayerState.h"
 #include "AbilitySystemInterface.h"
+#include "GameFramework/PlayerState.h"
 #include "BSPlayerState.generated.h"
 
 class UBSAttributeSetBase;
 class UBSAbilitySystemComponent;
 
-/** Base player state class for this game */
+/** Base player state class for this game. */
 UCLASS()
 class BEATSHOT_API ABSPlayerState : public APlayerState, public IAbilitySystemInterface
 {

@@ -1,9 +1,9 @@
 ﻿// Copyright 2022-2023 Markoleptic Games, SP. All Rights Reserved.
 
 #include "CoreMinimal.h"
-#include "SaveGamePlayerScore.h"
-#include "SaveGamePlayerSettings.h"
 #include "../TestBase/TargetManagerTestWithWorld.h"
+#include "SaveGames/SaveGamePlayerScore.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 #include "Target/TargetManager.h"
 
 
@@ -16,7 +16,7 @@ void FTestInit::GetTests(TArray<FString>& OutBeautifiedNames, TArray<FString>& O
 {
 	if (InitGameModeDataAsset(TargetManagerTestHelpers::DefaultGameModeDataAssetPath))
 	{
-		for (const auto& Mode : GameModeDataAsset->GetDefaultGameModesMap())
+		for (const auto& Mode : GameModeDataAsset->GetGameModesMap())
 		{
 			const FString GameModeString = UEnum::GetDisplayValueAsText(Mode.Key.BaseGameMode).ToString();
 			OutBeautifiedNames.Add(GameModeString);
@@ -28,7 +28,10 @@ void FTestInit::GetTests(TArray<FString>& OutBeautifiedNames, TArray<FString>& O
 
 bool FTestInit::RunTest(const FString& Parameters)
 {
-	if (!Init()) return false;
+	if (!Init())
+	{
+		return false;
+	}
 
 	const auto FoundConfig = TestMap.Find(Parameters);
 	if (!FoundConfig)

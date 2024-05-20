@@ -5,16 +5,16 @@
 #include "CoreMinimal.h"
 #include "AbilitySystem/Globals/BSAbilitySet.h"
 #include "Components/PawnComponent.h"
-#include "Net/Serialization/FastArraySerializer.h"
 #include "Equipment/BSEquipmentDefinition.h"
 #include "Equipment/BSEquipmentInstance.h"
+#include "Net/Serialization/FastArraySerializer.h"
 #include "UObject/UObjectBaseUtility.h"
 #include "BSEquipmentManagerComponent.generated.h"
 
 class UBSAbilitySystemComponent;
 class UBSEquipmentDefinition;
 
-/** A single piece of applied equipment, which contains a pointer to EquipmentInstance and the EquipmentDefinition */
+/** A single piece of applied equipment, which contains a pointer to EquipmentInstance and the EquipmentDefinition. */
 USTRUCT(BlueprintType)
 struct FBSAppliedEquipmentEntry : public FFastArraySerializerItem
 {
@@ -32,21 +32,22 @@ struct FBSAppliedEquipmentEntry : public FFastArraySerializerItem
 	friend struct FBSEquipmentList;
 	friend class UBSEquipmentManagerComponent;
 
-	/** The class default object to create the equipment from */
+	/** The class default object to create the equipment from. */
 	UPROPERTY()
 	TSubclassOf<UBSEquipmentDefinition> EquipmentDefinition;
 
-	/** The equipment instance created from the class default object */
+	/** The equipment instance created from the class default object. */
 	UPROPERTY()
 	TObjectPtr<UBSEquipmentInstance> Instance = nullptr;
 
-	/** Authority-only list of granted handles */
+	/** Authority-only list of granted handles. */
 	UPROPERTY(NotReplicated)
 	FBSGrantedAbilitySet GrantedHandles;
 };
 
 
-/** An array of FBSAppliedEquipmentEntries, which each contain a pointer to EquipmentInstance and the EquipmentDefinition */
+/** An array of FBSAppliedEquipmentEntries, which each contain a pointer to EquipmentInstance and the
+ *  EquipmentDefinition. */
 USTRUCT(BlueprintType)
 struct FBSEquipmentList : public FFastArraySerializer
 {
@@ -66,10 +67,10 @@ struct FBSEquipmentList : public FFastArraySerializer
 			DeltaParms, *this);
 	}
 
-	/** Creates and adds a new FBSAppliedEquipmentEntry, also granting any associated abilities */
+	/** Creates and adds a new FBSAppliedEquipmentEntry, also granting any associated abilities. */
 	UBSEquipmentInstance* AddEntry(TSubclassOf<UBSEquipmentDefinition> EquipmentDefinition);
 
-	/** Removes an existing FBSAppliedEquipmentEntry, also removing any associated abilities */
+	/** Removes an existing FBSAppliedEquipmentEntry, also removing any associated abilities. */
 	void RemoveEntry(UBSEquipmentInstance* Instance);
 
 private:
@@ -77,7 +78,7 @@ private:
 
 	friend UBSEquipmentManagerComponent;
 
-	/** Replicated list of equipment entries */
+	/** Replicated list of equipment entries. */
 	UPROPERTY()
 	TArray<FBSAppliedEquipmentEntry> Items;
 
@@ -122,11 +123,11 @@ public:
 	virtual void ReadyForReplication() override;
 	//~End of UActorComponent interface
 
-	/** Returns the first equipped instance of a given type, or nullptr if none are found */
+	/** Returns the first equipped instance of a given type, or nullptr if none are found. */
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UBSEquipmentInstance* GetFirstInstanceOfType(TSubclassOf<UBSEquipmentInstance> InstanceType);
 
-	/** Returns all equipped instances of a given type, or an empty array if none are found */
+	/** Returns all equipped instances of a given type, or an empty array if none are found. */
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	TArray<UBSEquipmentInstance*> GetEquipmentInstancesOfType(TSubclassOf<UBSEquipmentInstance> InstanceType) const;
 

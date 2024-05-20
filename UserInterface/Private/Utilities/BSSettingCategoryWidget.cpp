@@ -3,8 +3,8 @@
 
 #include "Utilities/BSSettingCategoryWidget.h"
 #include "Blueprint/WidgetTree.h"
-#include "Utilities/BSVerticalBox.h"
 #include "MenuOptions/MenuOptionWidget.h"
+#include "Utilities/BSVerticalBox.h"
 #include "Utilities/TooltipWidget.h"
 
 void UBSSettingCategoryWidget::NativeConstruct()

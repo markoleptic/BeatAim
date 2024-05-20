@@ -2,8 +2,8 @@
 
 #include "System/SteamManager.h"
 #include <steam/isteamutils.h>
-#include "Containers/UnrealString.h"
 #include "BSGameInstance.h"
+#include "Containers/UnrealString.h"
 
 DEFINE_LOG_CATEGORY(LogSteamManager);
 
@@ -93,7 +93,10 @@ void USteamManager::AssignGameInstance(UBSGameInstance* InDefaultGameInstance)
 bool USteamManager::CreateAuthTicketForWebApi(
 	TSharedPtr<FOnAuthTicketForWebApiResponseCallbackHandler, ESPMode::ThreadSafe> CallbackHandler)
 {
-	if (!SteamUser()) return false;
+	if (!SteamUser())
+	{
+		return false;
+	}
 	ActiveCallbacks.Enqueue(CallbackHandler);
 	CallbackHandler->Handle = SteamUser()->GetAuthTicketForWebApi("kxuhYhcZQyDdFtpS");
 	return true;
@@ -148,7 +151,10 @@ bool USteamManager::RequestStats()
  *  and StatsData to reflect the latest stats and achievement data returned from Steam. */
 void USteamManager::OnUserStatsReceived(UserStatsReceived_t* pCallback)
 {
-	if (pCallback->m_nGameID != AppId || pCallback->m_eResult != k_EResultOK) return;
+	if (pCallback->m_nGameID != AppId || pCallback->m_eResult != k_EResultOK)
+	{
+		return;
+	}
 
 	for (FSteamAchievement& Achievement : AchievementData)
 	{
@@ -177,7 +183,10 @@ void USteamManager::OnUserStatsReceived(UserStatsReceived_t* pCallback)
 
 bool USteamManager::StoreStats()
 {
-	if (!bInitializedStats || !SteamUserStats()) return false;
+	if (!bInitializedStats || !SteamUserStats())
+	{
+		return false;
+	}
 
 	// load stats
 	for (TPair<const char*, FSteamStat>& Stat : StatsData)
@@ -204,7 +213,10 @@ bool USteamManager::StoreStats()
 void USteamManager::OnUserStatsStored(UserStatsStored_t* pCallback)
 {
 	// Ignore callbacks for other games
-	if (pCallback->m_nGameID != AppId) return;
+	if (pCallback->m_nGameID != AppId)
+	{
+		return;
+	}
 
 	if (k_EResultOK == pCallback->m_eResult)
 	{
@@ -229,11 +241,17 @@ void USteamManager::OnUserStatsStored(UserStatsStored_t* pCallback)
 template <typename T>
 void USteamManager::UpdateStat(const char* StatAPIName, T Value)
 {
-	if (!bInitializedStats) return;
+	if (!bInitializedStats)
+	{
+		return;
+	}
 
 	// Update local stats
 	FSteamStat* FoundSteamStat = StatsData.Find(StatAPIName);
-	if (!FoundSteamStat) return;
+	if (!FoundSteamStat)
+	{
+		return;
+	}
 
 	int NewValue = 0;
 	switch (FoundSteamStat->StatType)
@@ -254,7 +272,10 @@ void USteamManager::UpdateStat(const char* StatAPIName, T Value)
 	}
 
 	// Store local stats
-	if (!StoreStats()) return;
+	if (!StoreStats())
+	{
+		return;
+	}
 
 	FSteamAchievement* MinNotYetAchieved = nullptr;
 	int32 MinMaxProgressLimit = INT_MAX;
@@ -262,14 +283,20 @@ void USteamManager::UpdateStat(const char* StatAPIName, T Value)
 	// Show achievement progress
 	for (auto& Achievement : AchievementData)
 	{
-		if (!Achievement.ProgressStat || *Achievement.ProgressStat != *FoundSteamStat) continue;
+		if (!Achievement.ProgressStat || *Achievement.ProgressStat != *FoundSteamStat)
+		{
+			continue;
+		}
 
 		int32 MinProgressLimit = 0;
 		int32 MaxProgressLimit = 0;
 		SteamUserStats()->GetAchievementProgressLimits(Achievement.APIName, &MinProgressLimit, &MaxProgressLimit);
 
 		// Do not show progress if already achieved
-		if (NewValue >= MaxProgressLimit) continue;
+		if (NewValue >= MaxProgressLimit)
+		{
+			continue;
+		}
 
 		// Only show progress for one game mode achievement
 		if (!FoundSteamStat->BaseGameModes.IsEmpty())
@@ -309,7 +336,10 @@ void USteamManager::UpdateStat(const char* StatAPIName, T Value)
 
 void USteamManager::UpdateStat_NumGamesPlayed(const EBaseGameMode GameMode, int IntValue)
 {
-	if (!bInitializedStats) return;
+	if (!bInitializedStats)
+	{
+		return;
+	}
 	const char* APIName = GetStat_NumGamesPlayed(GameMode);
 	if (!APIName)
 	{
@@ -342,7 +372,10 @@ void USteamManager::OnAchievementStored(UserAchievementStored_t* pCallback)
 
 bool USteamManager::SetAchievement(const char* ID) const
 {
-	if (!bInitializedStats || !SteamUserStats()) return false;
+	if (!bInitializedStats || !SteamUserStats())
+	{
+		return false;
+	}
 	SteamUserStats()->SetAchievement(ID);
 	return SteamUserStats()->StoreStats();
 }

@@ -2,10 +2,10 @@
 
 
 #include "MenuOptions/BandChannelWidget.h"
-#include "GlobalConstants.h"
+#include "BSConstants.h"
 #include "Components/EditableTextBox.h"
-#include "Components/TextBlock.h"
 #include "Components/HorizontalBoxSlot.h"
+#include "Components/TextBlock.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Styles/MenuOptionStyle.h"
 

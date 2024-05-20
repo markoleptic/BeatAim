@@ -10,7 +10,8 @@ class UBSAT_TickTrace;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerStopTrackingTarget);
 
-/** GameplayAbility that provides the user with constant tracking from their gun barrel, used in BeatTrack game modes */
+/** GameplayAbility that provides the user with constant tracking from their gun barrel, used in BeatTrack game
+ *  modes. */
 UCLASS()
 class BEATSHOT_API UBSGA_TrackGun : public UBSGameplayAbility
 {
@@ -29,17 +30,17 @@ protected:
 		const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 	virtual void OnRemoveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 
-	/** Performs non-gameplay related tasks like muzzle flash, camera recoil, and decal spawning */
+	/** Performs non-gameplay related tasks like muzzle flash, camera recoil, and decal spawning. */
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnTargetDataReady(const FGameplayAbilityTargetDataHandle& TargetData);
 
-	/** Calls OnTargetDataReady */
+	/** Calls OnTargetDataReady. */
 	void OnTargetDataReadyCallback(const FGameplayAbilityTargetDataHandle& InData, FGameplayTag ApplicationTag);
 
 	UFUNCTION()
 	void OnTickTraceHitResultHit(const FHitResult& HitResult);
 
-	/** How far to trace forward from Character camera */
+	/** How far to trace forward from Character camera. */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	float TraceDistance = 100000.f;
 

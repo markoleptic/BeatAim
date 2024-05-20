@@ -6,10 +6,10 @@
 #include "Components/Slider.h"
 #include "Components/TextBlock.h"
 #include "Kismet/KismetStringLibrary.h"
-#include "Utilities/ComboBox/BSComboBoxString.h"
-#include "Utilities/ComboBox/BSComboBoxEntry.h"
 #include "Utilities/TooltipImage.h"
 #include "Utilities/TooltipWidget.h"
+#include "Utilities/ComboBox/BSComboBoxEntry.h"
+#include "Utilities/ComboBox/BSComboBoxString.h"
 
 float IBSWidgetInterface::OnEditableTextBoxChanged(const FText& NewTextValue, UEditableTextBox* TextBoxToChange,
 	USlider* SliderToChange, const float GridSnapSize, const float Min, const float Max)

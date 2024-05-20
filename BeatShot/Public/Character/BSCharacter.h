@@ -8,7 +8,7 @@
 
 class UBSRecoilComponent;
 
-/** Base Character for this game */
+/** Base Character for this game. */
 UCLASS()
 class BEATSHOT_API ABSCharacter : public ABSCharacterBase
 {
@@ -18,7 +18,7 @@ public:
 	ABSCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	/** The skeletal mesh for hands that hold the gun */
+	/** The skeletal mesh for hands that hold the gun. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BeatShot|Components")
 	TObjectPtr<USkeletalMeshComponent> HandsMesh;
 

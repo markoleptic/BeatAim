@@ -13,11 +13,10 @@ class BEATSHOT_API ABSEquipmentActor : public AActor, public IGameplayTagAssetIn
 	GENERATED_BODY()
 
 public:
-	/** Sets default values for this actor's properties */
 	ABSEquipmentActor();
 
 protected:
-	/** Called when the game starts or when spawned */
+	/** Called when the game starts or when spawned. */
 	virtual void BeginPlay() override;
 
 	/** ~IGameplayTagAssetInterface begin */

@@ -2,13 +2,13 @@
 
 
 #include "MenuOptions/ComboBoxWidget.h"
-#include "EnumTagMap.h"
-#include "GameModeCategoryTagMap.h"
-#include "Utilities/ComboBox/BSComboBoxEntry.h"
-#include "Utilities/ComboBox/BSTaggedComboBoxEntry.h"
-#include "Utilities/GameModeCategoryTagWidget.h"
-#include "Utilities/ComboBox/BSComboBoxString.h"
+#include "Mappings/EnumTagMap.h"
+#include "Mappings/GameModeCategoryTagMap.h"
 #include "Styles/MenuOptionStyle.h"
+#include "Utilities/GameModeCategoryTagWidget.h"
+#include "Utilities/ComboBox/BSComboBoxEntry.h"
+#include "Utilities/ComboBox/BSComboBoxString.h"
+#include "Utilities/ComboBox/BSTaggedComboBoxEntry.h"
 
 void UComboBoxWidget::NativeConstruct()
 {
@@ -68,7 +68,7 @@ UWidget* UComboBoxWidget::AddGameModeCategoryTagWidgets(UBSTaggedComboBoxEntry* 
 	}
 	const FString CompareString = ComboBoxEntry->GetEntryText().ToString();
 
-	for (auto& [Index, EnumTagPair] : EnumTagMapping.NewEnumTagPairs)
+	for (auto& [Index, EnumTagPair] : EnumTagMapping.EnumTagPairs)
 	{
 		if (EnumTagPair.DisplayName.Equals(CompareString))
 		{
@@ -78,7 +78,10 @@ UWidget* UComboBoxWidget::AddGameModeCategoryTagWidgets(UBSTaggedComboBoxEntry* 
 			for (const FGameplayTag& Tag : EnumTagPair.ParentTags)
 			{
 				const TSubclassOf<UUserWidget> SubClass = GameModeCategoryTagMap->GetWidgetByGameModeCategoryTag(Tag);
-				if (!SubClass) continue;
+				if (!SubClass)
+				{
+					continue;
+				}
 
 				UGameModeCategoryTagWidget* TagWidget = CreateWidget<UGameModeCategoryTagWidget>(this, SubClass);
 				ParentTagWidgetsToAdd.Add(TagWidget);
@@ -87,7 +90,10 @@ UWidget* UComboBoxWidget::AddGameModeCategoryTagWidgets(UBSTaggedComboBoxEntry* 
 			for (const FGameplayTag& Tag : EnumTagPair.Tags)
 			{
 				const TSubclassOf<UUserWidget> SubClass = GameModeCategoryTagMap->GetWidgetByGameModeCategoryTag(Tag);
-				if (!SubClass) continue;
+				if (!SubClass)
+				{
+					continue;
+				}
 
 				UGameModeCategoryTagWidget* TagWidget = CreateWidget<UGameModeCategoryTagWidget>(this, SubClass);
 				TagWidgetsToAdd.Add(TagWidget);

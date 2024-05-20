@@ -37,25 +37,22 @@ void USettingsMenuWidget::OnCarouselWidgetIndexChanged(UCommonWidgetCarousel* In
 {
 }
 
-/** Returns the UGameSettings widget's OnPlayerSettingsChangedDelegate_Game, which is broadcast when the widget changes Game Settings */
+
 FOnPlayerSettingsChanged_Game& USettingsMenuWidget::GetGameDelegate() const
 {
 	return Game_Widget->GetPublicGameSettingsChangedDelegate();
 }
 
-/** Returns the UCrossHairSettings widget's OnPlayerSettingsChangedDelegate_Game, which is broadcast when the widget changes Game Settings */
 FOnPlayerSettingsChanged_CrossHair& USettingsMenuWidget::GetCrossHairDelegate() const
 {
 	return CrossHair_Widget->GetPublicCrossHairSettingsChangedDelegate();
 }
 
-/** Returns the UAASettings widget's OnPlayerSettingsChangedDelegate_AudioAnalyzer, which is broadcast when the widget changes Audio Analyzer Settings */
 FOnPlayerSettingsChanged_AudioAnalyzer& USettingsMenuWidget::GetAudioAnalyzerDelegate() const
 {
 	return AudioAnalyzer_Widget->GetPublicAudioAnalyzerSettingsChangedDelegate();
 }
 
-/** Returns the UInputSettings widget's OnPlayerSettingsChangedDelegate_User, which is broadcast when the widget changes User Settings */
 FOnPlayerSettingsChanged_User& USettingsMenuWidget::GetUserDelegate() const
 {
 	return Input_Widget->GetPublicUserSettingsChangedDelegate();

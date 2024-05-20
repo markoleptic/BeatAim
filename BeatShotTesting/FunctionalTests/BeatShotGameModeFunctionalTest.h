@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BSGameModeDataAsset.h"
 #include "FunctionalTest.h"
-#include "SaveGamePlayerSettings.h"
+#include "BSGameModeConfig/BSGameModeDataAsset.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 #include "BeatShotGameModeFunctionalTest.generated.h"
 
 class UBSGameModeDataAsset;
@@ -95,7 +95,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
 	float InitialDelay = 0.1f;
 
-	/** Whether or not to destroy all activated targets at each time step, or defer to NumActivatedToDestroy. */
+	/** whether to destroy all activated targets at each time step, or defer to NumActivatedToDestroy. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
 	bool bDestroyAllActivatedTargetsOnTimeStep = true;
 
@@ -104,7 +104,7 @@ protected:
 		meta = (EditCondition = "!bDestroyAllActivatedTargetsOnTimeStep", ClampMin = 1))
 	int32 NumActivatedTargetsToDestroy = 1;
 
-	/** Whether or not to record execution times for calls to SpawnAreaManager's GetSpawnableSpawnAreas function. */
+	/** whether to record execution times for calls to SpawnAreaManager's GetSpawnableSpawnAreas function. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
 	bool bRecordGetSpawnableSpawnAreasExecutionTime = false;
 

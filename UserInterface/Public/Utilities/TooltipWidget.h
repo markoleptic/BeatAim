@@ -8,7 +8,7 @@
 
 class UTextBlock;
 
-/** Simple widget used for tooltips */
+/** Simple widget used for tooltips. */
 UCLASS()
 class USERINTERFACE_API UTooltipWidget : public UUserWidget
 {

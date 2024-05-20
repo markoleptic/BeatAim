@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Utilities/BSWidgetInterface.h"
-#include "EnumTagMap.h"
 #include "MenuOptionWidget.h"
+#include "Mappings/EnumTagMap.h"
+#include "Utilities/BSWidgetInterface.h"
 #include "Utilities/ComboBox/BSComboBoxString.h"
 #include "ComboBoxWidget.generated.h"
 

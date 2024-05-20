@@ -3,13 +3,13 @@
 
 #include "RangeActors/WallMenu.h"
 #include "BSGameInstance.h"
-#include "SaveGamePlayerSettings.h"
 #include "Text3DComponent.h"
 #include "AbilitySystem/BSAbilitySystemComponent.h"
 #include "BeatShot/BSGameplayTags.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "RangeActors/TimeOfDayManager.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 
 AWallMenu::AWallMenu()
 {
@@ -227,7 +227,10 @@ void AWallMenu::BeginPlay()
 				}
 			}
 		}
-		if (!Pair.Value.OnText || !Pair.Value.OffText) continue;
+		if (!Pair.Value.OnText || !Pair.Value.OffText)
+		{
+			continue;
+		}
 
 		if (Material_Bevel)
 		{
@@ -245,14 +248,20 @@ void AWallMenu::BeginPlay()
 			Pair.Value.OffText->SetFont(Font_Text3D);
 		}
 
-		if (!Material_Toggle) continue;
+		if (!Material_Toggle)
+		{
+			continue;
+		}
 
 		UMaterialInstanceDynamic* DynamicMatFrontOn = UMaterialInstanceDynamic::Create(Material_Toggle,
 			Pair.Value.OnText.Get());
 		UMaterialInstanceDynamic* DynamicMatFrontOff = UMaterialInstanceDynamic::Create(Material_Toggle,
 			Pair.Value.OffText.Get());
 
-		if (!DynamicMatFrontOn || !DynamicMatFrontOff) continue;
+		if (!DynamicMatFrontOn || !DynamicMatFrontOff)
+		{
+			continue;
+		}
 
 		Pair.Value.OnText->SetFrontMaterial(DynamicMatFrontOn);
 		Pair.Value.OffText->SetFrontMaterial(DynamicMatFrontOff);
@@ -410,7 +419,10 @@ void AWallMenu::Init(const FPlayerSettings_Game& GameSettings, const FPlayerSett
 	ToggleText_NightMode_On->SetVisibility(UserSettings.bNightModeUnlocked);
 	ToggleText_NightMode_Off->SetVisibility(UserSettings.bNightModeUnlocked);
 
-	if (bFromSettingsUpdate) return;
+	if (bFromSettingsUpdate)
+	{
+		return;
+	}
 
 	ToggleText(GameSettings.bShowLightVisualizers, ToggleText_LightVisualizers_On, ToggleText_LightVisualizers_Off);
 	ToggleText(UserSettings.bNightModeUnlocked && GameSettings.bNightModeSelected, ToggleText_NightMode_On,
@@ -539,12 +551,18 @@ void AWallMenu::ToggleText(const bool bIsOn, UText3DComponent* InToggleTextOn, U
 	UMaterialInterface* MatFrontOn = InToggleTextOn->GetFrontMaterial();
 	UMaterialInterface* MatFrontOff = InToggleTextOff->GetFrontMaterial();
 
-	if (!MatFrontOn || !MatFrontOff) return;
+	if (!MatFrontOn || !MatFrontOff)
+	{
+		return;
+	}
 
 	UMaterialInstanceDynamic* DynamicMatFrontOn = Cast<UMaterialInstanceDynamic>(MatFrontOn);
 	UMaterialInstanceDynamic* DynamicMatFrontOff = Cast<UMaterialInstanceDynamic>(MatFrontOff);
 
-	if (!DynamicMatFrontOn || !DynamicMatFrontOff) return;
+	if (!DynamicMatFrontOn || !DynamicMatFrontOff)
+	{
+		return;
+	}
 
 	if (InToggleTextOn == ToggleText_NightMode_On)
 	{

@@ -2,10 +2,10 @@
 
 
 #include "GameModes/CreatorViewWidget.h"
+#include "CommonWidgetCarousel.h"
 #include "GameModes/CustomGameModeCategoryWidget.h"
 #include "GameModes/CustomGameModeStartWidget.h"
 #include "Utilities/BSCarouselNavBar.h"
-#include "CommonWidgetCarousel.h"
 
 void UCreatorViewWidget::NativeConstruct()
 {
@@ -28,7 +28,10 @@ void UCreatorViewWidget::UpdateAllChildWidgetOptionsValid()
 	     ChildWidgetValidityMap)
 	{
 		// Widget_Start has a separate validity check
-		if (ChildWidgetValidity.Key.IsA<UCustomGameModeStartWidget>()) continue;
+		if (ChildWidgetValidity.Key.IsA<UCustomGameModeStartWidget>())
+		{
+			continue;
+		}
 		CarouselNavBar->UpdateNotifications(ChildWidgetValidity.Key->GetIndex(), ChildWidgetValidity.Value->NumCautions,
 			ChildWidgetValidity.Value->NumWarnings);
 	}

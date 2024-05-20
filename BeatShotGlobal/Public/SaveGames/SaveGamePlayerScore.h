@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BSGameModeDataAsset.h"
+#include "BSConstants.h"
+#include "BSGameModeConfig/DefiningConfig.h"
 #include "GameFramework/SaveGame.h"
 #include "SaveGamePlayerScore.generated.h"
 
-/** Struct only used to save accuracy to database */
+/** Struct only used to save accuracy to database. */
 USTRUCT()
-struct FAccuracyRow
+struct BEATSHOTGLOBAL_API FAccuracyRow
 {
 	GENERATED_BODY()
 
@@ -43,7 +44,7 @@ struct FAccuracyRow
 		TotalHits.Init(0, Size);
 	}
 
-	/** Updates the accuracy array based on all TotalSpawns and TotalHits */
+	/** Updates the accuracy array based on all TotalSpawns and TotalHits. */
 private:
 	void CalculateAccuracy()
 	{
@@ -111,16 +112,16 @@ private:
 	}
 };
 
-/** Struct only used to save accuracy to database */
+/** Struct only used to save accuracy to database. */
 USTRUCT()
-struct FAccuracyData
+struct BEATSHOTGLOBAL_API FAccuracyData
 {
 	GENERATED_BODY()
 
 	UPROPERTY()
 	TArray<FAccuracyRow> AccuracyRows;
 
-	/** Y is number of SpawnArea columns, Z is number of SpawnArea rows */
+	/** Y is number of SpawnArea columns, Z is number of SpawnArea rows. */
 	UPROPERTY()
 	FVector SpawnAreaSize;
 
@@ -135,7 +136,7 @@ struct FAccuracyData
 		AccuracyRows.Init(FAccuracyRow(InNumCols), InNumRows);
 	}
 
-	/** Adds the InUpdate AccuracyRows to this struct's Accuracy rows, and recalculates the accuracy */
+	/** Adds the InUpdate AccuracyRows to this structs Accuracy rows, and recalculates the accuracy. */
 	void UpdateAccuracyRows(const FAccuracyData& InUpdateData)
 	{
 		for (int i = 0; i < AccuracyRows.Num(); i++)
@@ -149,7 +150,7 @@ struct FAccuracyData
 		SpawnAreaSize = FVector::ZeroVector;
 	}
 
-	/** Calculates the accuracy for each accuracy row */
+	/** Calculates the accuracy for each accuracy row. */
 	void CalculateAccuracy()
 	{
 		for (int i = 0; i < AccuracyRows.Num(); i++)
@@ -159,7 +160,7 @@ struct FAccuracyData
 	}
 
 	/** Modifies only the accuracy values to conform to a 5X5 matrix if the SpawnAreaSize.Y or SpawnAreaSize.Z is less
-	 *  than 5. Only used just before placing inside the PlayerScore. Resets when CalculateAccuracy is called */
+	 *  than 5. Only used just before placing inside the PlayerScore. Resets when CalculateAccuracy is called. */
 	void ModifyForSmallerInput()
 	{
 		TArray<float> Temp = MakeIndexArray();
@@ -302,7 +303,7 @@ struct FAccuracyData
 
 private:
 	/** Returns the starting index values for each step inside the AverageUsingUnderflow main for loop,
-	 *  based on the number or rows or columns of the smaller matrix to convert from */
+	 *  based on the number or rows or columns of the smaller matrix to convert from. */
 	static TArray<int32> GetStartUnderflowArray(const int32 NumRowsOrCols)
 	{
 		TArray<int32> Start;
@@ -318,7 +319,7 @@ private:
 	}
 
 	/** Returns the end index values for each step inside the AverageUsingUnderflow main for loop,
-	 *  based on the number or rows or columns of the smaller matrix to convert from */
+	 *  based on the number or rows or columns of the smaller matrix to convert from. */
 	static TArray<int32> GetEndUnderflowArray(const int32 NumRowsOrCols)
 	{
 		TArray<int32> End;
@@ -333,7 +334,7 @@ private:
 		return End;
 	}
 
-	/** Uses predetermined index arrays which specify which rows/columns to average from a smaller input array */
+	/** Uses predetermined index arrays which specify which rows/columns to average from a smaller input array. */
 	void AverageUsingUnderflow(const TArray<float>& Temp, const int32 NumRows, const int32 NumCols)
 	{
 		TArray<int32> StartM = GetStartUnderflowArray(NumRows);
@@ -449,7 +450,7 @@ private:
 		return Temp;
 	}
 
-	/** Averages the values of a particular row, using average of the row above & below */
+	/** Averages the values of a particular row, using average of the row above & below. */
 	void AverageAccuracyRow(const int32 RowIndex)
 	{
 		for (int i = 0; i < 5; i++)
@@ -459,7 +460,7 @@ private:
 		}
 	}
 
-	/** Averages the values of a particular column, using average of the column left & right */
+	/** Averages the values of a particular column, using average of the column left & right. */
 	void AverageAccuracyCol(const int32 ColIndex)
 	{
 		for (int i = 0; i < 5; i++)
@@ -469,7 +470,7 @@ private:
 		}
 	}
 
-	/** Copies the values of a vertical up-down column to another column */
+	/** Copies the values of a vertical up-down column to another column. */
 	void CopyAccuracyCol(const int32 SourceIndex, const int32 DestIndex)
 	{
 		for (int i = 0; i < 5; i++)
@@ -479,7 +480,7 @@ private:
 	}
 
 	/** Sets the value of a (RowIndex, ColIndex). If bChangeRowValue is true, +-1 the RowIndex is used for the average,
-	 *  using the same ColIndex. If false, +-1 the ColIndex is used for the average, using the same RowIndex */
+	 *  using the same ColIndex. If false, +-1 the ColIndex is used for the average, using the same RowIndex. */
 	void AverageMiddle(const int32 RowIndex, const int32 ColIndex, const bool bChangeRowValue)
 	{
 		if (bChangeRowValue)
@@ -495,9 +496,10 @@ private:
 	}
 };
 
-/** Struct containing any information to save between game mode sessions that does not define the game mode itself, e.g. accuracy */
+/** Struct containing any information to save between game mode sessions that does not define the game mode itself, e.g.
+ *  accuracy. */
 USTRUCT(BlueprintType)
-struct FCommonScoreInfo
+struct BEATSHOTGLOBAL_API FCommonScoreInfo
 {
 	GENERATED_BODY()
 
@@ -519,7 +521,7 @@ struct FCommonScoreInfo
 	UPROPERTY()
 	int64 TotalTrainingSamples;
 
-	/** Generic constructor */
+	/** Generic constructor. */
 	FCommonScoreInfo()
 	{
 		AccuracyData = FAccuracyData(Constants::DefaultNumberOfAccuracyDataRows,
@@ -533,13 +535,13 @@ struct FCommonScoreInfo
 		TotalTrainingSamples = 0;
 	}
 
-	/** Calls UpdateAccuracyRows on AccuracyData which recalculates the accuracy for each entry */
+	/** Calls UpdateAccuracyRows on AccuracyData which recalculates the accuracy for each entry. */
 	void UpdateAccuracy(const FAccuracyData& InAccuracyData)
 	{
 		AccuracyData.UpdateAccuracyRows(InAccuracyData);
 	}
 
-	/** Sets the value of the QTable with InQTable */
+	/** Sets the value of the QTable with InQTable. */
 	void UpdateQTable(const TArray<float>& InQTable, const int32 InNumQTableRows, const int32 InNumQTableColumns,
 		const TArray<int32>& InUpdatedTrainingSamples, const int32 InUpdatedTotalTrainingSamples)
 	{
@@ -550,7 +552,8 @@ struct FCommonScoreInfo
 		TotalTrainingSamples = InUpdatedTotalTrainingSamples;
 	}
 
-	/** Resets the QTable, TrainingSamples, NumQTableRows & NumQTableColumns, and TotalTrainingSamples to default values */
+	/** Resets the QTable, TrainingSamples, NumQTableRows & NumQTableColumns, and TotalTrainingSamples to default
+	 *  values. */
 	void ResetQTable()
 	{
 		QTable = TArray<float>();
@@ -562,7 +565,7 @@ struct FCommonScoreInfo
 		TotalTrainingSamples = 0;
 	}
 
-	/** Returns the average number of training samples in the TotalTrainingSamples array */
+	/** Returns the average number of training samples in the TotalTrainingSamples array. */
 	double GetAverageTrainingSample()
 	{
 		double Total = 0.f;
@@ -578,76 +581,78 @@ struct FCommonScoreInfo
 	}
 };
 
-/** Used to load and save player scores */
+/** Used to load and save player scores. */
 USTRUCT(BlueprintType)
-struct FPlayerScore
+struct BEATSHOTGLOBAL_API FPlayerScore
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defining Properties")
 	FBS_DefiningConfig DefiningConfig;
 
-	/** The song title */
+	/** The song title. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defining Properties")
 	FString SongTitle;
 
-	/** Length of song */
+	/** Length of song. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Properties")
 	float SongLength;
 
-	/** The current score at any given time during play */
+	/** The current score at any given time during play. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Score")
 	float Score;
 
-	/** Only represents highest score based on previous entries, and may become outdated */
+	/** Only represents highest score based on previous entries, and may become outdated. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Score")
 	float HighScore;
 
-	/** Total Targets hit divided by Total shots fired */
+	/** Total Targets hit divided by Total shots fired. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Score")
 	float Accuracy;
 
-	/** Total Targets hit divided by Total targets spawned */
+	/** Total Targets hit divided by Total targets spawned. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Score")
 	float Completion;
 
-	/** Incremented after receiving calls from FOnShotsFired delegate in DefaultCharacter */
+	/** Incremented after receiving calls from FOnShotsFired delegate in DefaultCharacter. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Score")
 	int32 ShotsFired;
 
-	/** Total number of targets destroyed by player */
+	/** Total number of targets destroyed by player. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Score")
 	int32 TargetsHit;
 
-	/** Total number of targets spawned, incremented after receiving calls from FOnTargetSpawnSignature in TargetManager */
+	/** Total number of targets spawned, incremented after receiving calls from FOnTargetSpawnSignature in
+	 *  TargetManager. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Score")
 	int32 TargetsSpawned;
 
-	/** Total possible damage that could have been done to tracking target, also used to determine if the score object is for Tracking game mode */
+	/** Total possible damage that could have been done to tracking target, also used to determine if the score object
+	 *  is for Tracking game mode. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Score")
 	float TotalPossibleDamage;
 
-	/** Total time offset from Spawn Beat Delay for all destroyed targets */
+	/** Total time offset from Spawn Beat Delay for all destroyed targets. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Score")
 	float TotalTimeOffset;
 
-	/** Avg Time offset from Spawn Beat Delay for destroyed targets */
+	/** Avg Time offset from Spawn Beat Delay for destroyed targets. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Score")
 	float AvgTimeOffset;
 
-	/** time that player completed the session, in Iso8601 UTC format */
+	/** time that player completed the session, in Iso8601 UTC format. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Score")
 	FString Time;
 
-	/** The maximum consecutive targets hit in a row */
+	/** The maximum consecutive targets hit in a row. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Score")
 	int32 Streak;
 
-	/** The accuracy at each point in the grid */
+	/** The accuracy at each point in the grid. */
 	UPROPERTY()
 	TArray<FAccuracyRow> LocationAccuracy;
 
-	/** Whether or not this instance has been saved to the database yet */
+	/** whether this instance has been saved to the database yet. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Score")
 	bool bSavedToDatabase;
 
@@ -696,9 +701,9 @@ struct FPlayerScore
 	}
 };
 
-/** A struct where each element is an index of a smaller matrix that represents multiple indices of a larger matrix */
+/** A struct where each element is an index of a smaller matrix that represents multiple indices of a larger matrix. */
 USTRUCT()
-struct FGenericIndexMapping
+struct BEATSHOTGLOBAL_API FGenericIndexMapping
 {
 	GENERATED_BODY()
 
@@ -744,58 +749,89 @@ class BEATSHOTGLOBAL_API USaveGamePlayerScore : public USaveGame
 public:
 	USaveGamePlayerScore();
 
-	/** Returns a copy of PlayerScoreArray */
+	/** @return a copy of PlayerScoreArray. */
 	TArray<FPlayerScore> GetPlayerScores() const;
 
-	/** Returns a copy of player scores not saved to database */
+	/** @return a copy of player scores not saved to database. */
 	TArray<FPlayerScore> GetPlayerScores_UnsavedToDatabase() const;
 
-	/** Adds a new entry to PlayerScoreArray */
+	/** Adds a new entry to PlayerScoreArray.
+	 *  @param InPlayerScore player score instance to add
+	 */
 	void AddPlayerScoreInstance(const FPlayerScore& InPlayerScore);
 
-	/** Modifies score instances in PlayerScoreArray */
+	/** Modifies score instances in PlayerScoreArray. */
 	void SetAllScoresSavedToDatabase();
 
-	/** Returns a copy of CommonScoreInfo */
+	/** @return a copy of CommonScoreInfo. */
 	TMap<FBS_DefiningConfig, FCommonScoreInfo> GetCommonScoreInfo() const;
 
-	/** Finds or Adds an entry to CommonScoreInfo map for the given Defining Config. */
+	/** Finds or Adds an entry to CommonScoreInfo map for the given Defining Config.
+	 *  @param InDefiningConfig key used to find the CommonScoreInfo
+	 *  @param OutCommonScoreInfo the found CommonScoreInfo
+	 */
 	void FindOrAddCommonScoreInfo(const FBS_DefiningConfig& InDefiningConfig, FCommonScoreInfo& OutCommonScoreInfo);
 
 	/** Replaces the CommonScoreInfo entry with InCommonScoreInfo if one is found using InDefiningConfig. Otherwise, it
-	 *  adds a new entry. */
+	 *  adds a new entry.
+	 *  @param InDefiningConfig key used to find the CommonScoreInfo
+	 *  @param InCommonScoreInfo the CommonScoreInfo to replace the existing, or the newly added entry
+	 */
 	void SaveCommonScoreInfo(const FBS_DefiningConfig& InDefiningConfig, const FCommonScoreInfo& InCommonScoreInfo);
 
-	/** Clears the QTable for an FCommonScoreInfo instance that matches the Defining Config. Returns 1 if successfully found and cleared */
+	/** Clears the QTable for an FCommonScoreInfo instance that matches the Defining Config. 
+	 *  @param InDefiningConfig key used to find the CommonScoreInfo
+	 *  @return how many successfully found and cleared.
+	 */
 	int32 ResetQTable(const FBS_DefiningConfig& InDefiningConfig);
 
-	/** Removes an FCommonScoreInfo instance that matches the Defining Config. Returns the number of removed instances (should only be 1) */
+	/** Removes an FCommonScoreInfo instance that matches the Defining Config.
+	 *  @param InDefiningConfig key used to find the CommonScoreInfo
+	 *  @return how many successfully removed CommonScoreInfo instances were removed.
+	 */
 	int32 RemoveCommonScoreInfo(const FBS_DefiningConfig& InDefiningConfig);
 
-	/** Removes all FCommonScoreInfo instances for custom game modes. Returns the number of removed instances */
+	/** Removes all FCommonScoreInfo instances for custom game modes.
+	 *  @return the number of removed instances.
+	 */
 	int32 RemoveAllCustomGameModeCommonScoreInfo();
 
-	/** Prints full QTable array to log/console */
+	/** Prints full QTable array to log/console.
+	 * 	@param InDefiningConfig defining config
+	 * 	@param InCommonScoreInfo CommonScoreInfo to print out
+	 * 	@param Options number formatting options
+	 */
 	static void PrintQTable(const FBS_DefiningConfig& InDefiningConfig, const FCommonScoreInfo& InCommonScoreInfo,
 		const FNumberFormattingOptions& Options);
 
-	/** Prints 5x5 accuracy to log/console */
+	/** Prints 5x5 accuracy to log/console.
+	 *  @param InDefiningConfig defining config
+	 * 	@param InCommonScoreInfo CommonScoreInfo to print out
+	 * 	@param Options number formatting options
+	 */
 	static void PrintAccuracy(const FBS_DefiningConfig& InDefiningConfig, const FCommonScoreInfo& InCommonScoreInfo,
 		const FNumberFormattingOptions& Options);
 
-	/** Prints full TrainingSamples array to log/console */
+	/** Prints full TrainingSamples array to log/console.
+	 *  @param InDefiningConfig defining config
+	 * 	@param InCommonScoreInfo CommonScoreInfo to print out
+	 * 	@param Options number formatting options
+	 */
 	static void PrintTrainingSamples(const FBS_DefiningConfig& InDefiningConfig,
 		const FCommonScoreInfo& InCommonScoreInfo, const FNumberFormattingOptions& Options);
 
 private:
-	/** Returns whether or not there exists a score with the same time */
+	/**
+	 * @param InPlayerScore the player score to compare to existing
+	 * @return whether there exists a score with the same time.
+	 */
 	bool ContainsExistingTime(const FPlayerScore& InPlayerScore);
 
-	/** Array containing all saved score instances */
+	/** Array containing all saved score instances. */
 	UPROPERTY()
 	TArray<FPlayerScore> PlayerScoreArray;
 
-	/** Map containing common score info for each unique defining config */
+	/** Map containing common score info for each unique defining config. */
 	UPROPERTY()
 	TMap<FBS_DefiningConfig, FCommonScoreInfo> CommonScoreInfo;
 

@@ -2,8 +2,8 @@
 
 
 #include "Menus/PauseMenuWidget.h"
-#include "Components/WidgetSwitcher.h"
 #include "Components/VerticalBox.h"
+#include "Components/WidgetSwitcher.h"
 #include "Menus/SettingsMenuWidget.h"
 #include "Overlays/QuitMenuWidget.h"
 #include "Styles/MenuStyle.h"

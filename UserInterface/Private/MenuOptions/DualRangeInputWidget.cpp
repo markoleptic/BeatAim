@@ -2,7 +2,6 @@
 
 
 #include "MenuOptions/DualRangeInputWidget.h"
-#include "Utilities/BSWidgetInterface.h"
 #include "CommonTextBlock.h"
 #include "Components/BorderSlot.h"
 #include "Components/CheckBox.h"
@@ -13,6 +12,7 @@
 #include "Components/Spacer.h"
 #include "Styles/MenuOptionStyle.h"
 #include "Utilities/BSHorizontalBox.h"
+#include "Utilities/BSWidgetInterface.h"
 
 void UDualRangeInputWidget::NativeConstruct()
 {
@@ -196,7 +196,10 @@ UWidget* UDualRangeInputWidget::SetSubMenuOptionEnabledState(const TSubclassOf<U
 
 float UDualRangeInputWidget::GetMinSliderValue(const bool bClamped) const
 {
-	if (!bClamped) return Slider_Min->GetValue();
+	if (!bClamped)
+	{
+		return Slider_Min->GetValue();
+	}
 
 	const float ClampedValue = FMath::Clamp(Slider_Min->GetValue(), Slider_Min->GetMinValue(),
 		Slider_Min->GetMaxValue());
@@ -206,7 +209,10 @@ float UDualRangeInputWidget::GetMinSliderValue(const bool bClamped) const
 
 float UDualRangeInputWidget::GetMaxSliderValue(const bool bClamped) const
 {
-	if (!bClamped) return Slider_Max->GetValue();
+	if (!bClamped)
+	{
+		return Slider_Max->GetValue();
+	}
 
 	const float ClampedValue = FMath::Clamp(Slider_Max->GetValue(), Slider_Max->GetMinValue(),
 		Slider_Max->GetMaxValue());
@@ -216,7 +222,10 @@ float UDualRangeInputWidget::GetMaxSliderValue(const bool bClamped) const
 
 float UDualRangeInputWidget::GetConstantSliderValue(const bool bClamped) const
 {
-	if (bUseMinAsConstant) return GetMinSliderValue(bClamped);
+	if (bUseMinAsConstant)
+	{
+		return GetMinSliderValue(bClamped);
+	}
 	return GetMaxSliderValue(bClamped);
 }
 
@@ -225,7 +234,10 @@ float UDualRangeInputWidget::GetMinEditableTextBoxValue(const bool bClamped) con
 	const FString StringTextValue = EditableTextBox_Min->GetText().ToString().Replace(*FString(","), *FString(),
 		ESearchCase::IgnoreCase);
 
-	if (!bClamped) return FCString::Atof(*StringTextValue);
+	if (!bClamped)
+	{
+		return FCString::Atof(*StringTextValue);
+	}
 
 	const float ClampedValue = FMath::Clamp(FCString::Atof(*StringTextValue), Slider_Min->GetMinValue(),
 		Slider_Min->GetMaxValue());
@@ -238,7 +250,10 @@ float UDualRangeInputWidget::GetMaxEditableTextBoxValue(const bool bClamped) con
 	const FString StringTextValue = EditableTextBox_Max->GetText().ToString().Replace(*FString(","), *FString(),
 		ESearchCase::IgnoreCase);
 
-	if (!bClamped) return FCString::Atof(*StringTextValue);
+	if (!bClamped)
+	{
+		return FCString::Atof(*StringTextValue);
+	}
 
 	const float ClampedValue = FMath::Clamp(FCString::Atof(*StringTextValue), Slider_Max->GetMinValue(),
 		Slider_Max->GetMaxValue());
@@ -248,7 +263,10 @@ float UDualRangeInputWidget::GetMaxEditableTextBoxValue(const bool bClamped) con
 
 float UDualRangeInputWidget::GetConstantEditableTextBoxValue(const bool bClamped) const
 {
-	if (bUseMinAsConstant) return GetMinEditableTextBoxValue(bClamped);
+	if (bUseMinAsConstant)
+	{
+		return GetMinEditableTextBoxValue(bClamped);
+	}
 	return GetMaxEditableTextBoxValue(bClamped);
 }
 

@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include "GameplayTagContainer.h"
+#include "InputTriggers.h"
 #include "Containers/Array.h"
 #include "Engine/DataAsset.h"
-#include "InputTriggers.h"
-#include "GameplayTagContainer.h"
 #include "BSInputConfig.generated.h"
 
 class UPlayerMappableInputConfig;
@@ -51,11 +51,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "BeatShot|Pawn")
 	FBSInputAction FindBSInputActionForTag(const FGameplayTag& InputTag, bool bLogNotFound = true) const;
 
-	// List of input actions used by the owner.  These input actions are mapped to a gameplay tag and must be manually bound.
+	/** List of input actions used by the owner.  These input actions are mapped to a gameplay tag and must be manually
+	 *  bound. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (TitleProperty = "InputAction"))
 	TArray<FBSInputAction> NativeInputActions;
 
-	// List of input actions used by the owner.  These input actions are mapped to a gameplay tag and are automatically bound to abilities with matching input tags.
+	/** List of input actions used by the owner.  These input actions are mapped to a gameplay tag and are automatically
+	 *  bound to abilities with matching input tags. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Meta = (TitleProperty = "InputAction"))
 	TArray<FBSInputAction> AbilityInputActions;
 };

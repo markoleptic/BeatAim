@@ -3,12 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AudioMixerBlueprintLibrary.h"
 #include "GameFramework/GameUserSettings.h"
 #include "BSGameUserSettings.generated.h"
 
-struct FPlayerSettings_VideoAndSound;
-class UVideoSettingEnumTagMap;
+class UVideoSettingEnumStringMap;
 enum class ENvidiaSettingType : uint8;
 enum class UStreamlineReflexMode : uint8;
 enum class UNISMode : uint8;
@@ -30,7 +28,7 @@ class BEATSHOTGLOBAL_API UBSGameUserSettings : public UGameUserSettings
 public:
 	UBSGameUserSettings();
 
-	/** @return the game local machine settings (resolution, windowing mode, scalability settings, etc...) */
+	/** @return the game local machine settings (resolution, windowing mode, scalability settings, etc...). */
 	static UBSGameUserSettings* Get();
 
 	/** Performs initialization of DLSS settings and the user control box mix. Binds to Slate application delegates. */
@@ -343,7 +341,7 @@ private:
 
 	/** Enum to string map storage for Nvidia settings. */
 	UPROPERTY(Transient)
-	const UVideoSettingEnumTagMap* VideoSettingEnumMap;
+	const UVideoSettingEnumStringMap* VideoSettingEnumMap;
 
 	/** Delegate bound to FSlateApplication OnApplicationActivationStateChanged. */
 	FDelegateHandle OnApplicationActivationStateChangedHandle;

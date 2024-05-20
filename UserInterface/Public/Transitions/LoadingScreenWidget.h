@@ -8,8 +8,6 @@
 
 class UImage;
 
-DECLARE_DELEGATE(FOnLoadingScreenFadeOutComplete);
-
 UCLASS(BlueprintType)
 class USERINTERFACE_API ULoadingScreenWidget : public UUserWidget
 {
@@ -22,7 +20,7 @@ public:
 	UFUNCTION()
 	void FadeOut(const float LoadingScreenWidgetFadeOutTime);
 
-	FOnLoadingScreenFadeOutComplete OnLoadingScreenFadeOutComplete;
+	TDelegate<void()> OnLoadingScreenFadeOutComplete;
 
 protected:
 	virtual void NativeConstruct() override;

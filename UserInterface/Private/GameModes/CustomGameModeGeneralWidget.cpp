@@ -3,11 +3,11 @@
 
 #include "GameModes/CustomGameModeGeneralWidget.h"
 #include "Components/CheckBox.h"
-#include "Utilities/ComboBox/BSComboBoxString.h"
 #include "MenuOptions/CheckBoxWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"
-#include "MenuOptions/ToggleableSingleRangeInputWidget.h"
 #include "MenuOptions/SingleRangeInputWidget.h"
+#include "MenuOptions/ToggleableSingleRangeInputWidget.h"
+#include "Utilities/ComboBox/BSComboBoxString.h"
 
 using namespace Constants;
 
@@ -331,7 +331,10 @@ void UCustomGameModeGeneralWidget::OnSliderTextBoxCheckBoxOptionChanged(UTogglea
 void UCustomGameModeGeneralWidget::OnSelectionChanged_RecentTargetMemoryPolicy(const TArray<FString>& Selected,
 	const ESelectInfo::Type SelectionType)
 {
-	if (SelectionType == ESelectInfo::Type::Direct || Selected.Num() != 1) return;
+	if (SelectionType == ESelectInfo::Type::Direct || Selected.Num() != 1)
+	{
+		return;
+	}
 
 	BSConfig->TargetConfig.RecentTargetMemoryPolicy = GetEnumFromString_FromTagMap<
 		ERecentTargetMemoryPolicy>(Selected[0]);
@@ -343,7 +346,10 @@ void UCustomGameModeGeneralWidget::OnSelectionChanged_RecentTargetMemoryPolicy(c
 void UCustomGameModeGeneralWidget::OnSelectionChanged_DamageType(const TArray<FString>& Selected,
 	const ESelectInfo::Type SelectionType)
 {
-	if (SelectionType == ESelectInfo::Type::Direct || Selected.Num() != 1) return;
+	if (SelectionType == ESelectInfo::Type::Direct || Selected.Num() != 1)
+	{
+		return;
+	}
 
 	BSConfig->TargetConfig.TargetDamageType = GetEnumFromString_FromTagMap<ETargetDamageType>(Selected[0]);
 	UpdateAllOptionsValid();
@@ -352,7 +358,10 @@ void UCustomGameModeGeneralWidget::OnSelectionChanged_DamageType(const TArray<FS
 void UCustomGameModeGeneralWidget::OnSelectionChanged_HyperParameterMode(const TArray<FString>& Selected,
 	const ESelectInfo::Type SelectionType)
 {
-	if (SelectionType == ESelectInfo::Type::Direct || Selected.Num() != 1) return;
+	if (SelectionType == ESelectInfo::Type::Direct || Selected.Num() != 1)
+	{
+		return;
+	}
 
 	BSConfig->AIConfig.HyperParameterMode = GetEnumFromString_FromTagMap<
 		EReinforcementLearningHyperParameterMode>(Selected[0]);

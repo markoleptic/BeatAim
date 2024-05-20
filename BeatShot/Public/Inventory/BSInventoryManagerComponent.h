@@ -42,7 +42,7 @@ private:
 
 
 /**
- *  An array of FBSInventoryEntries, which each contain a pointer to the InventoryItemInstance and the stack count
+ *  An array of FBSInventoryEntries, which each contain a pointer to the InventoryItemInstance and the stack count.
  */
 USTRUCT(BlueprintType)
 struct FBSInventoryList : public FFastArraySerializer
@@ -71,7 +71,7 @@ struct FBSInventoryList : public FFastArraySerializer
 private:
 	friend UBSInventoryManagerComponent;
 
-	// Replicated list of items
+	/** Replicated list of items. */
 	UPROPERTY()
 	TArray<FBSInventoryEntry> Items;
 
@@ -87,9 +87,9 @@ struct TStructOpsTypeTraits<FBSInventoryList> : public TStructOpsTypeTraitsBase2
 
 
 /**
- *  The component responsible for inventory management. Contains an FBSInventoryList, which holds an array of FBSInventoryEntries.
- *  Each FBSInventoryEntry contains a pointer to InventoryItemInstance and the stack count. Each InventoryItemInstance contains the
- *  item definition and the stack count
+ *  The component responsible for inventory management. Contains an FBSInventoryList, which holds an array of
+ *  FBSInventoryEntries. Each FBSInventoryEntry contains a pointer to InventoryItemInstance and the stack count. Each
+ *  InventoryItemInstance contains the item definition and the stack count.
  */
 UCLASS(BlueprintType)
 class BEATSHOT_API UBSInventoryManagerComponent : public UActorComponent
@@ -163,7 +163,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category= "Inventory | Slots")
 	UBSInventoryItemInstance* GetActiveSlotItem() const;
 
-	/** Returns the first empty slot (null Inventory Item Instance in Slots) */
+	/** Returns the first empty slot (null Inventory Item Instance in Slots). */
 	UFUNCTION(BlueprintCallable, BlueprintPure=false, Category= "Inventory | Slots")
 	int32 GetNextFreeItemSlot() const;
 
@@ -180,11 +180,11 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category= "Inventory | Equipment")
 	AActor* GetEquippedItemFirstSpawnedActor() const;
 
-	/** Returns whether or not the currently equipped item has the tag. */
+	/** Returns whether the currently equipped item has the tag. */
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category= "Inventory | Tags")
 	bool EquippedContainsTag(const FGameplayTag& Tag) const;
 
-	/** Returns whether or not the slot index item has the tag. */
+	/** Returns whether the slot index item has the tag. */
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category= "Inventory | Tags")
 	bool SlotIndexContainsTag(const int32 SlotIndex, const FGameplayTag& Tag) const;
 

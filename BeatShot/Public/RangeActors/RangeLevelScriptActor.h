@@ -9,7 +9,7 @@
 class UBSGameUserSettings;
 class APostProcessVolume;
 
-/** The base level used for this game */
+/** The base level used for this game. */
 UCLASS()
 class BEATSHOT_API ARangeLevelScriptActor : public ALevelScriptActor
 {
@@ -20,7 +20,7 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	/** Callback function to respond to video setting changes */
+	/** Callback function to respond to video setting changes. */
 	void HandleGameUserSettingsChanged(const UBSGameUserSettings* InGameUserSettings);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Lighting|References")

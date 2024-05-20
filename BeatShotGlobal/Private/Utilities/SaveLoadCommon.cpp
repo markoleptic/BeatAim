@@ -1,10 +1,10 @@
 ﻿// Copyright 2022-2023 Markoleptic Games, SP. All Rights Reserved.
 
-#include "SaveLoadCommon.h"
-#include "SaveGameCustomGameMode.h"
-#include "SaveGamePlayerScore.h"
-#include "SaveGamePlayerSettings.h"
+#include "Utilities/SaveLoadCommon.h"
 #include "Kismet/GameplayStatics.h"
+#include "SaveGames/SaveGameCustomGameMode.h"
+#include "SaveGames/SaveGamePlayerScore.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 
 template <typename T>
 T* SaveLoadCommon::LoadFromSlot(const FString& InSlotName, const int32 InSlotIndex)
@@ -51,7 +51,10 @@ USaveGameCustomGameMode* SaveLoadCommon::LoadFromSlot(const FString& InSlotName,
 			UGameplayStatics::CreateSaveGameObject(USaveGameCustomGameMode::StaticClass()));
 	}
 
-	if (!SaveGameObject) return nullptr;
+	if (!SaveGameObject)
+	{
+		return nullptr;
+	}
 
 	if (SaveGameObject->GetLastLoadedVersion() < Constants::CustomGameModeVersion)
 	{

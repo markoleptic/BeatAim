@@ -2,16 +2,15 @@
 
 
 #include "Visualizers/SimpleBeamLight.h"
-
-#include "GlobalConstants.h"
+#include "BSConstants.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Components/SpotLightComponent.h"
 #include "Components/PointLightComponent.h"
 #include "Components/SceneComponent.h"
+#include "Components/SpotLightComponent.h"
+#include "Components/TimelineComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
-#include "Components/TimelineComponent.h"
 
 using namespace Constants;
 

@@ -7,20 +7,19 @@
 #include "Engine/DataAsset.h"
 #include "GameModeCategoryTagMap.generated.h"
 
-/** Associates GameModeCategory GameplayTags to unique widgets */
+/** Associates GameModeCategory GameplayTags to unique widgets. */
 UCLASS(Blueprintable, BlueprintType, Const)
 class BEATSHOTGLOBAL_API UGameModeCategoryTagMap : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	/** Adds enums to the EnumTagMappings array */
 	UGameModeCategoryTagMap();
 
-	/** Returns the GameModeCategoryTagWidget associated with a GameplayTag */
+	/** Returns the GameModeCategoryTagWidget associated with a GameplayTag. */
 	TSubclassOf<UUserWidget> GetWidgetByGameModeCategoryTag(const FGameplayTag& GameplayTag);
 
-	/** Returns the GameplayTagWidgetMap */
+	/** Returns the GameplayTagWidgetMap. */
 	TMap<FGameplayTag, TSubclassOf<UUserWidget>>& GetMap() { return GameplayTagWidgetMap; }
 
 protected:

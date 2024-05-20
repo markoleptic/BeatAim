@@ -2,15 +2,18 @@
 
 
 #include "Utilities/BSCarouselNavBar.h"
-#include "Utilities/BSWidgetInterface.h"
-#include "Utilities/Buttons/BSButton.h"
 #include "CommonWidgetCarousel.h"
 #include "Styles/CarouselNavButtonStyle.h"
+#include "Utilities/BSWidgetInterface.h"
+#include "Utilities/Buttons/BSButton.h"
 #include "Utilities/Buttons/NotificationButtonCombo.h"
 
 void UBSCarouselNavBar::SetLinkedCarousel(UCommonWidgetCarousel* CommonCarousel)
 {
-	if (LinkedCarousel) LinkedCarousel->OnCurrentPageIndexChanged.RemoveAll(this);
+	if (LinkedCarousel)
+	{
+		LinkedCarousel->OnCurrentPageIndexChanged.RemoveAll(this);
+	}
 
 	LinkedCarousel = CommonCarousel;
 
@@ -24,10 +27,16 @@ void UBSCarouselNavBar::SetLinkedCarousel(UCommonWidgetCarousel* CommonCarousel)
 
 void UBSCarouselNavBar::UpdateNotifications(const int32 Index, const int32 NumCautions, const int32 NumWarnings)
 {
-	if (!Buttons.IsValidIndex(Index)) return;
+	if (!Buttons.IsValidIndex(Index))
+	{
+		return;
+	}
 
 	UNotificationButtonCombo* Button = Cast<UNotificationButtonCombo>(Buttons[Index]);
-	if (!Button) return;
+	if (!Button)
+	{
+		return;
+	}
 
 	Button->SetNumWarnings(NumWarnings);
 	Button->SetNumCautions(NumCautions);
@@ -69,13 +78,19 @@ TSharedRef<SWidget> UBSCarouselNavBar::RebuildWidget()
 
 void UBSCarouselNavBar::RebuildButtons()
 {
-	if (!MyContainer || !LinkedCarousel || !StyleClass) return;
+	if (!MyContainer || !LinkedCarousel || !StyleClass)
+	{
+		return;
+	}
 	if (!Style)
 	{
 		Style = IBSWidgetInterface::GetStyleCDO(StyleClass);
 	}
 
-	if (!Style) return;
+	if (!Style)
+	{
+		return;
+	}
 
 	MyContainer->ClearChildren();
 
@@ -83,12 +98,18 @@ void UBSCarouselNavBar::RebuildButtons()
 	const int32 NumButtonStyles = Style->ButtonStyles.Num();
 
 	check(NumPages == NumButtonStyles);
-	if (NumPages <= 0) return;
+	if (NumPages <= 0)
+	{
+		return;
+	}
 
 	for (int32 CurPage = 0; CurPage < NumPages; CurPage++)
 	{
 		UBSButton* ButtonUserWidget = Cast<UBSButton>(CreateWidget(GetOwningPlayer(), Style->ButtonWidgetType));
-		if (!ButtonUserWidget) continue;
+		if (!ButtonUserWidget)
+		{
+			continue;
+		}
 
 		auto [Text, Padding, HAlign, VAlign, bFillWidth, FillWidth] = Style->ButtonStyles[CurPage];
 
@@ -119,10 +140,16 @@ void UBSCarouselNavBar::RebuildButtons()
 		{
 			Buttons[CurPage]->OnBSButtonPressed.AddUObject(this, &UBSCarouselNavBar::HandleButtonClicked);
 
-			if (Buttons.IsValidIndex(NextPage)) Buttons[CurPage]->SetDefaults(CurPage, Buttons[NextPage]);
+			if (Buttons.IsValidIndex(NextPage))
+			{
+				Buttons[CurPage]->SetDefaults(CurPage, Buttons[NextPage]);
+			}
 
 			UNotificationButtonCombo* Button = Cast<UNotificationButtonCombo>(Buttons[CurPage]);
-			if (!Button) continue;
+			if (!Button)
+			{
+				continue;
+			}
 
 			// Default to 0 warnings and cautions
 			Button->SetNumCautions(0);

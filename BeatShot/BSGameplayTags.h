@@ -7,7 +7,7 @@
 
 class UGameplayTagsManager;
 
-/** Singleton containing native gameplay tags */
+/** Native Gameplay Tag declarations. */
 namespace BSGameplayTags
 {
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability);

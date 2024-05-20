@@ -7,7 +7,7 @@
 #include "BSPlayerScoreInterface.h"
 #include "BSPlayerSettingsInterface.h"
 #include "HttpRequestInterface.h"
-#include "SaveGamePlayerSettings.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 #include "Target/ReinforcementLearningComponent.h"
 #include "BSPlayerController.generated.h"
 
@@ -123,10 +123,10 @@ public:
 	/** Called by Game Instance after saving scores to database, or before if there was a problem. */
 	void OnPostScoresResponseReceived(const FString& StringTableKey = FString());
 
-	/** Called by Character when receiving input from IA_Pause, or by exiting the PostGameMenu */
+	/** Called by Character when receiving input from IA_Pause, or by exiting the PostGameMenu. */
 	void HandlePause();
 
-	/** Called by Character when receiving input from IA_LeftClick */
+	/** Called by Character when receiving input from IA_LeftClick. */
 	void HandleLeftClick();
 
 	// Server only
@@ -138,7 +138,7 @@ public:
 	/** Login the user by authenticating using GetAuthTicketForWebApi. */
 	void LoginUser();
 
-	/** Executed when the player requests to try to login through Steam after a failed attempt. */
+	/** Executed when the player requests to try to log in through Steam after a failed attempt. */
 	void InitiateSteamLogin();
 
 	/** Delegate that executes when the screen fade widget completes its animation.  */

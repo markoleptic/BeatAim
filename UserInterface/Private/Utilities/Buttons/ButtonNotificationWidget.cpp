@@ -2,7 +2,6 @@
 
 
 #include "Utilities/Buttons/ButtonNotificationWidget.h"
-
 #include "Components/Overlay.h"
 #include "Components/TextBlock.h"
 

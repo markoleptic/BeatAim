@@ -6,10 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "ScreenFadeWidget.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnFadeFromBlackFinish);
-
-DECLARE_MULTICAST_DELEGATE(FOnFadeToBlackFinish);
-
 class UImage;
 
 /** Widget used any time a screen transition needs to take place, used by PlayerController. */
@@ -22,8 +18,8 @@ class USERINTERFACE_API UScreenFadeWidget : public UUserWidget
 	virtual void NativeDestruct() override;
 
 public:
-	FOnFadeFromBlackFinish OnFadeFromBlackFinish;
-	FOnFadeToBlackFinish OnFadeToBlackFinish;
+	TMulticastDelegate<void()> OnFadeFromBlackFinish;
+	TMulticastDelegate<void()> OnFadeToBlackFinish;
 
 	void SetStartOpacity(const float Value);
 

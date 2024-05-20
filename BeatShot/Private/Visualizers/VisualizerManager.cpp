@@ -2,12 +2,11 @@
 
 
 #include "Visualizers/VisualizerManager.h"
-
-#include "SaveGamePlayerSettings.h"
-#include "Visualizers/VisualizerBase.h"
-#include "Visualizers/StaticCubeVisualizer.h"
-#include "Visualizers/BeamVisualizer.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
+#include "Visualizers/BeamVisualizer.h"
+#include "Visualizers/StaticCubeVisualizer.h"
+#include "Visualizers/VisualizerBase.h"
 
 AVisualizerManager::AVisualizerManager(): bUpdateBeamVisualizers(false), bUpdateCubeVisualizers(false)
 {

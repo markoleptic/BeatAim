@@ -2,14 +2,13 @@
 
 
 #include "GameModes/CustomGameModeStartWidget.h"
-
 #include "BSGameModeInterface.h"
 #include "Components/CheckBox.h"
 #include "Components/EditableTextBox.h"
-#include "Utilities/ComboBox/BSComboBoxString.h"
 #include "MenuOptions/CheckBoxWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "MenuOptions/TextInputWidget.h"
+#include "Utilities/ComboBox/BSComboBoxString.h"
 
 void UCustomGameModeStartWidget::NativeConstruct()
 {

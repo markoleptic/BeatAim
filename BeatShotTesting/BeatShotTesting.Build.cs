@@ -7,7 +7,6 @@ public class BeatShotTesting : ModuleRules
 {
 	public BeatShotTesting(ReadOnlyTargetRules Target) : base(Target)
 	{
-		bUseUnity = true;
 		PublicDependencyModuleNames.AddRange(new[]
 		{
 			"Core", "CoreUObject", "Engine", "UnrealEd", "FunctionalTesting", "BeatShot", "BeatShotGlobal",

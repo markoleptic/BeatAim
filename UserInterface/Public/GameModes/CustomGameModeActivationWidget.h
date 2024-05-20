@@ -22,11 +22,11 @@ protected:
 	virtual void UpdateOptionsFromConfig() override;
 	void SetupWarningTooltipCallbacks();
 
-	/** Updates options that depend on the value selection of TargetActivationResponses */
+	/** Updates options that depend on the value selection of TargetActivationResponses. */
 	void UpdateDependentOptions_TargetActivationResponses(const TArray<ETargetActivationResponse>& InResponses,
 		const bool bUseConstantTargetSpeed);
 
-	/** Updates options that depend on the value selection of TargetDistributionPolicy */
+	/** Updates options that depend on the value selection of TargetDistributionPolicy. */
 	void UpdateDependentOptions_TargetDistributionPolicy(const ETargetDistributionPolicy& Policy);
 
 	UFUNCTION()

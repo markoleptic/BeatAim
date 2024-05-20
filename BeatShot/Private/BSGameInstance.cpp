@@ -2,20 +2,21 @@
 
 
 #include "BSGameInstance.h"
-
 #include "BSGameMode.h"
 #include "BSGameUserSettings.h"
-#include "Player/BSPlayerController.h"
-#include "System/SteamManager.h"
-#include "Kismet/GameplayStatics.h"
+#include "MetasoundGeneratorHandle.h"
+#include "MetasoundOutput.h"
+#include "MetasoundOutputSubsystem.h"
 #include "MoviePlayer.h"
 #include "Blueprint/UserWidget.h"
-#include "SaveGamePlayerSettings.h"
+#include "Components/AudioComponent.h"
+#include "DeveloperSettings/BSLoadingScreenSettings.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/BSPlayerController.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 #include "Slate/SLoadingScreenWidget.h"
-#include "BSLoadingScreenSettings.h"
-#include "MetasoundGeneratorHandle.h"
-#include "MetasoundOutputSubsystem.h"
-#include "MetasoundOutput.h"
+#include "System/SteamManager.h"
+#include "Utilities/GameModeTransitionState.h"
 
 void UBSGameInstance::Init()
 {
@@ -218,7 +219,10 @@ void UBSGameInstance::EndBSGameMode(const FGameModeTransitionState& NewGameModeT
 
 void UBSGameInstance::InitializeAudioComponent(const UWorld* World)
 {
-	if (LoadingScreenAudioComponent) return;
+	if (LoadingScreenAudioComponent)
+	{
+		return;
+	}
 	if (LoadingScreenSound)
 	{
 		LoadingScreenAudioComponent = UGameplayStatics::CreateSound2D(World, LoadingScreenSound, 1, 1, 0, nullptr, true,

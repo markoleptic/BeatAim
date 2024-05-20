@@ -2,7 +2,7 @@
 
 
 #include "Target/SpawnArea.h"
-#include "GlobalConstants.h"
+#include "BSConstants.h"
 
 using namespace Constants;
 

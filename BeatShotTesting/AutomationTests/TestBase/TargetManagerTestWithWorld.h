@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "TargetManagerTestBase.h"
-#include "BSGameModeDataAsset.h"
+#include "BSGameModeConfig/BSGameModeDataAsset.h"
 #include "Misc/AutomationTest.h"
 
 /** Base class for unit tests dealing with the TargetManager, with a world. */
 class FTargetManagerTestWithWorld : public FTargetManagerTestBase
 {
-	typedef ::FTargetManagerTestBase Super;
+	using Super = ::FTargetManagerTestBase;
 
 public:
 	FTargetManagerTestWithWorld(const FString& InName, const bool bInComplexTask): Super(InName, bInComplexTask),

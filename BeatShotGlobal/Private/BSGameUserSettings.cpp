@@ -2,18 +2,18 @@
 
 
 #include "BSGameUserSettings.h"
-
+#include "AudioMixerBlueprintLibrary.h"
 #include "AudioModulationStatics.h"
-#include "BSAudioSettings.h"
-#include "BSSettingTypes.h"
-#include "GlobalConstants.h"
-#include "SaveGamePlayerSettings.h"
-#include "SoundControlBusMix.h"
-#include "VideoSettingEnumTagMap.h"
+#include "BSConstants.h"
 #include "DLSSLibrary.h"
 #include "NISLibrary.h"
+#include "SoundControlBusMix.h"
 #include "StreamlineLibraryDLSSG.h"
 #include "StreamlineLibraryReflex.h"
+#include "DeveloperSettings/BSAudioSettings.h"
+#include "Mappings/VideoSettingEnumStringMap.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
+#include "Utilities/BSSettingTypes.h"
 
 DEFINE_LOG_CATEGORY(LogBSGameUserSettings);
 
@@ -139,7 +139,7 @@ UBSGameUserSettings::UBSGameUserSettings() : bInMenu(false)
 			OnApplicationActivationStateChangedHandle = FSlateApplication::Get().OnApplicationActivationStateChanged().
 				AddUObject(this, &ThisClass::HandleApplicationActivationStateChanged);
 		}
-		VideoSettingEnumMap = GetDefault<UVideoSettingEnumTagMap>();
+		VideoSettingEnumMap = GetDefault<UVideoSettingEnumStringMap>();
 	}
 	SetToBSDefaults();
 }

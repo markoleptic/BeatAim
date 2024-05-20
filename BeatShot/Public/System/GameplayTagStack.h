@@ -1,23 +1,22 @@
 ﻿#pragma once
 
+#include "GameplayTagContainer.h"
 #include "Containers/Array.h"
 #include "Containers/ArrayView.h"
 #include "Containers/Map.h"
 #include "Containers/Set.h"
 #include "Containers/SparseArray.h"
 #include "Containers/UnrealString.h"
-#include "GameplayTagContainer.h"
 #include "HAL/Platform.h"
 #include "Net/Serialization/FastArraySerializer.h"
 #include "Templates/UnrealTemplate.h"
 #include "UObject/Class.h"
-
 #include "GameplayTagStack.generated.h"
 
 struct FGameplayTagStackContainer;
 struct FNetDeltaSerializeInfo;
 
-/** Represents one stack of a gameplay tag (tag + count) */
+/** Represents one stack of a gameplay tag (tag + count). */
 USTRUCT(BlueprintType)
 struct FGameplayTagStack : public FFastArraySerializerItem
 {
@@ -54,19 +53,19 @@ struct FGameplayTagStackContainer : public FFastArraySerializer
 	{
 	}
 
-	// Adds a specified number of stacks to the tag (does nothing if StackCount is below 1)
+	// Adds a specified number of stacks to the tag (does nothing if StackCount is below 1).
 	void AddStack(FGameplayTag Tag, int32 StackCount);
 
-	// Removes a specified number of stacks from the tag (does nothing if StackCount is below 1)
+	// Removes a specified number of stacks from the tag (does nothing if StackCount is below 1).
 	void RemoveStack(FGameplayTag Tag, int32 StackCount);
 
-	// Returns the stack count of the specified tag (or 0 if the tag is not present)
+	// Returns the stack count of the specified tag (or 0 if the tag is not present).
 	int32 GetStackCount(const FGameplayTag Tag) const
 	{
 		return TagToCountMap.FindRef(Tag);
 	}
 
-	// Returns true if there is at least one stack of the specified tag
+	// Returns true if there is at least one stack of the specified tag.
 	bool ContainsTag(const FGameplayTag Tag) const
 	{
 		return TagToCountMap.Contains(Tag);
@@ -85,11 +84,11 @@ struct FGameplayTagStackContainer : public FFastArraySerializer
 	}
 
 private:
-	// Replicated list of gameplay tag stacks
+	// Replicated list of gameplay tag stacks.
 	UPROPERTY()
 	TArray<FGameplayTagStack> Stacks;
 
-	// Accelerated list of tag stacks for queries
+	// Accelerated list of tag stacks for queries.
 	TMap<FGameplayTag, int32> TagToCountMap;
 };
 

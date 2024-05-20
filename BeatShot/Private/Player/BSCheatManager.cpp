@@ -9,17 +9,17 @@
 #if !UE_BUILD_SHIPPING
 #include "AbilitySystemComponent.h"
 #include "BSGameInstance.h"
-#include "Character/BSCharacterBase.h"
 #include "BSGameMode.h"
-#include "Player/BSPlayerController.h"
-#include "Target/TargetManager.h"
-#include "Components/BoxComponent.h"
-#include "Target/SpawnAreaManagerComponent.h"
-#include "Target/ReinforcementLearningComponent.h"
 #include "AbilitySystem/BSAbilitySystemComponent.h"
 #include "AbilitySystem/Abilities/BSGA_AimBot.h"
+#include "Character/BSCharacterBase.h"
+#include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/BSPlayerController.h"
 #include "RangeActors/TimeOfDayManager.h"
+#include "Target/ReinforcementLearningComponent.h"
+#include "Target/SpawnAreaManagerComponent.h"
+#include "Target/TargetManager.h"
 
 namespace BeatShotCVars
 {
@@ -204,7 +204,10 @@ void UBSCheatManager::Cheat_AimBot(IConsoleVariable* Variable)
 	}
 
 	UBSAbilitySystemComponent* ASC = Character->GetBSAbilitySystemComponent();
-	if (!ASC) return;
+	if (!ASC)
+	{
+		return;
+	}
 
 	const FString StringVariable = Variable->GetString();
 
@@ -228,13 +231,22 @@ void UBSCheatManager::Cheat_AimBot(IConsoleVariable* Variable)
 	}
 
 	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromHandle(AimBotSpecHandle);
-	if (!Spec) return;
+	if (!Spec)
+	{
+		return;
+	}
 
 	UGameplayAbility* Ability = Spec->GetPrimaryInstance();
-	if (!Ability) return;
+	if (!Ability)
+	{
+		return;
+	}
 
 	UBSGA_AimBot* AbilityInstance = Cast<UBSGA_AimBot>(Ability);
-	if (!AbilityInstance) return;
+	if (!AbilityInstance)
+	{
+		return;
+	}
 
 	if (!GameMode->GetTargetManager()->OnTargetActivated_AimBot.IsBoundToObject(AbilityInstance))
 	{
@@ -283,13 +295,22 @@ void UBSCheatManager::ShowDebug(IConsoleVariable* Variable)
 void UBSCheatManager::ShowDebug_ReinforcementLearningWidget(IConsoleVariable* Variable)
 {
 	const ABSGameMode* GameMode = Cast<ABSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (!GameMode) return;
+	if (!GameMode)
+	{
+		return;
+	}
 
 	const ATargetManager* TargetManager = GameMode->GetTargetManager();
-	if (!TargetManager || !TargetManager->RLComponent) return;
+	if (!TargetManager || !TargetManager->RLComponent)
+	{
+		return;
+	}
 
 	ABSPlayerController* Controller = Cast<ABSPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (!Controller) return;
+	if (!Controller)
+	{
+		return;
+	}
 
 	const FString VariableString = Variable->GetString();
 	bool bShowWidget = false;
@@ -335,10 +356,16 @@ void UBSCheatManager::ShowDebug_ReinforcementLearningWidget(IConsoleVariable* Va
 void UBSCheatManager::ShowDebug_SpawnBox(IConsoleVariable* Variable)
 {
 	const ABSGameMode* GameMode = Cast<ABSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (!GameMode) return;
+	if (!GameMode)
+	{
+		return;
+	}
 
 	const ATargetManager* TargetManager = GameMode->GetTargetManager();
-	if (!TargetManager) return;
+	if (!TargetManager)
+	{
+		return;
+	}
 
 	if (Variable->GetBool())
 	{
@@ -369,10 +396,16 @@ void UBSCheatManager::ShowDebug_SpawnBox(IConsoleVariable* Variable)
 void UBSCheatManager::ShowDebug_SpawnVolume(IConsoleVariable* Variable)
 {
 	const ABSGameMode* GameMode = Cast<ABSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (!GameMode) return;
+	if (!GameMode)
+	{
+		return;
+	}
 
 	const ATargetManager* TargetManager = GameMode->GetTargetManager();
-	if (!TargetManager) return;
+	if (!TargetManager)
+	{
+		return;
+	}
 
 	if (Variable->GetBool())
 	{
@@ -393,10 +426,16 @@ void UBSCheatManager::ShowDebug_SpawnVolume(IConsoleVariable* Variable)
 void UBSCheatManager::ShowDebug_DirectionalBoxes(IConsoleVariable* Variable)
 {
 	const ABSGameMode* GameMode = Cast<ABSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (!GameMode) return;
+	if (!GameMode)
+	{
+		return;
+	}
 
 	const ATargetManager* TargetManager = GameMode->GetTargetManager();
-	if (!TargetManager) return;
+	if (!TargetManager)
+	{
+		return;
+	}
 
 	if (Variable->GetBool())
 	{
@@ -472,10 +511,16 @@ void UBSCheatManager::ShowDebug_SpotLightFront(IConsoleVariable* Variable)
 void UBSCheatManager::ShowDebug_MovingTargetDirectionModeAny(IConsoleVariable* Variable)
 {
 	const ABSGameMode* GameMode = Cast<ABSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (!GameMode) return;
+	if (!GameMode)
+	{
+		return;
+	}
 
 	ATargetManager* TargetManager = GameMode->GetTargetManager();
-	if (!TargetManager) return;
+	if (!TargetManager)
+	{
+		return;
+	}
 
 	TargetManager->bShowDebug_AnyMovingTargetDirectionMode = Variable->GetBool();
 }
@@ -500,13 +545,22 @@ template <typename T, class ComponentClass>
 void UBSCheatManager::SetComponentDebugValue(IConsoleVariable* Variable, T ComponentClass::* DebugVar)
 {
 	const ABSGameMode* GameMode = Cast<ABSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (!GameMode) return;
+	if (!GameMode)
+	{
+		return;
+	}
 
 	const ATargetManager* TargetManager = GameMode->GetTargetManager();
-	if (!TargetManager) return;
+	if (!TargetManager)
+	{
+		return;
+	}
 
 	ComponentClass* Comp = TargetManager->GetComponentByClass<ComponentClass>();
-	if (!Comp) return;
+	if (!Comp)
+	{
+		return;
+	}
 
 	if constexpr (std::is_same_v<T, int32>)
 	{

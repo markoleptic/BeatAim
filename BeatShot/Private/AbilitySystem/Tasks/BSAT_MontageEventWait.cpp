@@ -1,9 +1,9 @@
 ﻿// Copyright 2022-2023 Markoleptic Games, SP. All Rights Reserved.
 
 #include "AbilitySystem/Tasks/BSAT_MontageEventWait.h"
-#include "GameFramework/Character.h"
 #include "AbilitySystemGlobals.h"
 #include "AbilitySystem/BSAbilitySystemComponent.h"
+#include "GameFramework/Character.h"
 
 UBSAT_MontageEventWait::UBSAT_MontageEventWait()
 {

@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include "SaveGamePlayerScore.h"
+#include "SaveGames/SaveGamePlayerScore.h"
 #include "HttpRequestInterface.generated.h"
 
-/** Executed when a response is received from a request */
+/** Executed when a response is received from a request. */
 DECLARE_DELEGATE(FOnHttpResponseReceived);
 
-/** Base struct for Http requests in this class */
+/** Base struct for Http requests in this class. */
 USTRUCT(BlueprintType)
 struct FBSHttpResponse
 {
@@ -48,7 +48,7 @@ struct FDeleteScoresResponse : public FBSHttpResponse
 	}
 };
 
-/** Simple login payload */
+/** Simple login payload. */
 USTRUCT(BlueprintType)
 struct FLoginPayload
 {
@@ -78,7 +78,7 @@ struct FLoginPayload
 	}
 };
 
-/** Login Response object */
+/** Login Response object. */
 USTRUCT(BlueprintType)
 struct FLoginResponse : public FBSHttpResponse
 {
@@ -104,7 +104,7 @@ struct FLoginResponse : public FBSHttpResponse
 	}
 };
 
-/** Response object returned as JSON from authentication using SteamAuthTicket */
+/** Response object returned as JSON from authentication using SteamAuthTicket. */
 USTRUCT(BlueprintType)
 struct FSteamAuthTicketResponse : public FBSHttpResponse
 {
@@ -142,7 +142,7 @@ struct FSteamAuthTicketResponse : public FBSHttpResponse
 	}
 };
 
-/** Used to convert PlayerScoreArray to database scores */
+/** Used to convert PlayerScoreArray to database scores. */
 USTRUCT(BlueprintType)
 struct FJsonScore
 {
@@ -152,7 +152,7 @@ struct FJsonScore
 	TArray<FPlayerScore> Scores;
 };
 
-/** Used to create a feedback Json object */
+/** Used to create a feedback Json object. */
 USTRUCT(BlueprintType)
 struct FJsonFeedback
 {
@@ -177,7 +177,7 @@ struct FJsonFeedback
 	}
 };
 
-/** Used to pass the json body containing the CustomGameModeName to delete */
+/** Used to pass the json body containing the CustomGameModeName to delete. */
 USTRUCT(BlueprintType)
 struct FJsonDeleteScores
 {
@@ -197,24 +197,24 @@ struct FJsonDeleteScores
 	}
 };
 
-/** Interface to allow all other classes in this game to use HTTP request functions */
+/** Interface to allow all other classes in this game to use HTTP request functions. */
 UINTERFACE()
 class UHttpRequestInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
-/** Interface to allow all other classes in this game to use HTTP request functions */
+/** Interface to allow all other classes in this game to use HTTP request functions. */
 class BEATSHOTGLOBAL_API IHttpRequestInterface
 {
 	GENERATED_BODY()
 
 public:
-	/** Checks to see if the user has a refresh token and if it has expired or not */
+	/** Checks to see if the user has a refresh token and if it has expired or not. */
 	static bool IsRefreshTokenValid(const FString RefreshToken);
 
 	/** Makes a GET request for a short lived access token given a valid refresh token. Executes supplied
-	 *  OnAccessTokenResponse with the access token
+	 *  OnAccessTokenResponse with the access token.
 	 *  
 	 *  @param RefreshToken the refresh token obtained when logging in
 	 *  @param AccessTokenResponse struct containing callback delegate and response info
@@ -222,7 +222,7 @@ public:
 	static void RequestAccessToken(const FString RefreshToken,
 		TSharedPtr<FAccessTokenResponse, ESPMode::ThreadSafe> AccessTokenResponse);
 
-	/** Sends a POST login request to BeatShot website given a LoginPayload. Executes delegate in struct on completion
+	/** Sends a POST login request to BeatShot website given a LoginPayload. Executes delegate in struct on completion.
 	 *
 	 *  @param LoginPayload login info to send with request
 	 *  @param LoginResponse struct containing callback delegate and response info
@@ -231,7 +231,7 @@ public:
 		TSharedPtr<FLoginResponse, ESPMode::ThreadSafe> LoginResponse);
 
 	/** Converts ScoresToPost to a JSON string and sends an http POST request to BeatShot website given a valid
-	 *  access token. Executes delegate in struct on completion
+	 *  access token. Executes delegate in struct on completion.
 	 * 
 	 *  @param ScoresToPost scores to send with the request
 	 *  @param UserID userID of the BeatShot account
@@ -241,7 +241,7 @@ public:
 	static void PostPlayerScores(const TArray<FPlayerScore> ScoresToPost, const FString UserID,
 		const FString AccessToken, TSharedPtr<FBSHttpResponse, ESPMode::ThreadSafe> PostScoresResponse);
 
-	/** Makes a POST request to BeatShot website which emails the feedback. Executes supplied OnPostFeedbackResponse
+	/** Makes a POST request to BeatShot website which emails the feedback. Executes supplied OnPostFeedbackResponse.
 	 *
 	 *  @param InFeedback struct to send with the request
 	 *  @param FeedbackResponse struct containing callback delegate and response info
@@ -249,7 +249,7 @@ public:
 	static void PostFeedback(const FJsonFeedback InFeedback,
 		TSharedPtr<FBSHttpResponse, ESPMode::ThreadSafe> FeedbackResponse);
 
-	/** Makes a DELETE request to BeatShot website which deletes all scores matching the CustomGameModeName and userID
+	/** Makes a DELETE request to BeatShot website which deletes all scores matching the CustomGameModeName and userID.
 	 *
 	 *  @param CustomGameModeName CustomGameModeName to send with the request
 	 *  @param UserID userID of the BeatShot account

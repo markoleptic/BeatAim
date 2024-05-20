@@ -3,15 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BSGameModeDataAsset.h"
 #include "BSPlayerScoreInterface.h"
 #include "BSPlayerSettingsInterface.h"
-#include "Utilities/BSWidgetInterface.h"
 #include "Blueprint/UserWidget.h"
+#include "BSGameModeConfig/AudioConfig.h"
 #include "Delegates/DelegateCombinations.h"
+#include "Utilities/BSWidgetInterface.h"
 #include "AudioSelectWidget.generated.h"
-
-DECLARE_DELEGATE_OneParam(FOnStartButtonClicked, const FBS_AudioConfig& AudioConfig);
 
 class UComboBoxString;
 class UVerticalBox;
@@ -45,7 +43,7 @@ public:
 	UFUNCTION()
 	void FadeOut();
 
-	FOnStartButtonClicked OnStartButtonClickedDelegate;
+	TDelegate<void(const FBS_AudioConfig& AudioConfig)> OnStartButtonClickedDelegate;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Audio Select Widget | Classes")

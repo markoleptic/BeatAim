@@ -3,7 +3,7 @@
 
 #include "Input/BSInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "SaveGamePlayerSettings.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 #include "UserSettings/EnhancedInputUserSettings.h"
 
 UBSInputComponent::UBSInputComponent(const FObjectInitializer& ObjectInitializer)

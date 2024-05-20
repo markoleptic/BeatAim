@@ -2,12 +2,11 @@
 
 
 #include "Equipment/BSEquipmentInstance.h"
-
 #include "BSGameMode.h"
 #include "Character/BSCharacter.h"
-#include "Equipment/BSEquipmentDefinition.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/EngineTypes.h"
+#include "Equipment/BSEquipmentDefinition.h"
 #include "Equipment/BSGun.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/Pawn.h"

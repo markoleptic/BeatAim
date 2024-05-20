@@ -2,11 +2,10 @@
 
 
 #include "GameModes/CustomGameModeTargetSizingWidget.h"
-
 #include "MenuOptions/ComboBoxWidget.h"
-#include "Utilities/ComboBox/BSComboBoxString.h"
 #include "MenuOptions/DualRangeInputWidget.h"
 #include "MenuOptions/SingleRangeInputWidget.h"
+#include "Utilities/ComboBox/BSComboBoxString.h"
 
 void UCustomGameModeTargetSizingWidget::NativeConstruct()
 {

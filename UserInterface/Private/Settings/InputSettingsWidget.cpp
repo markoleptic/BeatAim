@@ -4,14 +4,14 @@
 #include "Settings/InputSettingsWidget.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
-#include "SaveGamePlayerSettings.h"
 #include "Components/EditableTextBox.h"
 #include "Components/InputKeySelector.h"
 #include "Components/ScrollBox.h"
-#include "Utilities/Buttons/BSButton.h"
-#include "Utilities/SavedTextWidget.h"
-#include "MenuOptions/TextInputWidget.h"
 #include "MenuOptions/SingleRangeInputWidget.h"
+#include "MenuOptions/TextInputWidget.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
+#include "Utilities/SavedTextWidget.h"
+#include "Utilities/Buttons/BSButton.h"
 
 void UInputSettingsWidget::NativeConstruct()
 {
@@ -78,7 +78,10 @@ void UInputSettingsWidget::InitializeInputSettings(const TMap<FName, FKeyMapping
 
 	for (const TPair<FName, FKeyMappingRow>& Row : Rows)
 	{
-		if (Row.Value.Mappings.IsEmpty()) continue;
+		if (Row.Value.Mappings.IsEmpty())
+		{
+			continue;
+		}
 		FName MappingName = Row.Key;
 		FText DisplayCategory = Row.Value.Mappings.Array()[0].GetDisplayCategory();
 		FText DisplayName = Row.Value.Mappings.Array()[0].GetDisplayName();
@@ -145,7 +148,10 @@ void UInputSettingsWidget::OnKeySelected(const FName MappingName, const EPlayerM
 	// UE_LOG(LogTemp, Display, TEXT("NewKeySelected for %s at Slot %s: %s"), *MappingName.ToString(),
 	//	 *UEnum::GetDisplayValueAsText(InSlot).ToString(), *SelectedKey.GetInputText().ToString());
 
-	if (SelectedKey.Key == FKey()) return;
+	if (SelectedKey.Key == FKey())
+	{
+		return;
+	}
 
 	for (const TPair<FName, UInputMappingWidget*>& WidgetMapping : InputMappingWidgetMap)
 	{
@@ -156,10 +162,19 @@ void UInputSettingsWidget::OnKeySelected(const FName MappingName, const EPlayerM
 		for (EPlayerMappableKeySlot KeySlot : Widget->GetSlotsFromKey(SelectedKey.Key))
 		{
 			// Skip self
-			if (CurrentMapping == MappingName && KeySlot == InSlot) continue;
+			if (CurrentMapping == MappingName && KeySlot == InSlot)
+			{
+				continue;
+			}
 			// Skip if Fire or KnifeAttack since these are bound to same by default
-			if (MappingName == FName("Fire") && CurrentMapping == FName("KnifeAttack")) continue;
-			if (MappingName == FName("KnifeAttack") && CurrentMapping == FName("Fire")) continue;
+			if (MappingName == FName("Fire") && CurrentMapping == FName("KnifeAttack"))
+			{
+				continue;
+			}
+			if (MappingName == FName("KnifeAttack") && CurrentMapping == FName("Fire"))
+			{
+				continue;
+			}
 
 			// Unbind old key
 			Widget->SetKeyForSlot(KeySlot, FKey());

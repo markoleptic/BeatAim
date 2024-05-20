@@ -2,15 +2,14 @@
 
 
 #include "Utilities/InputMappingWidget.h"
-
-#include "Utilities/BSWidgetInterface.h"
 #include "Components/BorderSlot.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/InputKeySelector.h"
 #include "Components/TextBlock.h"
-#include "Utilities/Buttons/BSButton.h"
 #include "Styles/MenuOptionStyle.h"
+#include "Utilities/BSWidgetInterface.h"
+#include "Utilities/Buttons/BSButton.h"
 
 void UInputMappingWidget::NativeConstruct()
 {

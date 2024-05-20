@@ -2,13 +2,13 @@
 
 
 #include "Settings/GameSettingsWidget.h"
-#include "Utilities/BSWidgetInterface.h"
 #include "Components/CheckBox.h"
-#include "Utilities/Buttons/BSButton.h"
-#include "Utilities/SavedTextWidget.h"
 #include "MenuOptions/CheckBoxWidget.h"
 #include "MenuOptions/ColorSelectWidget.h"
 #include "MenuOptions/SingleRangeInputWidget.h"
+#include "Utilities/BSWidgetInterface.h"
+#include "Utilities/SavedTextWidget.h"
+#include "Utilities/Buttons/BSButton.h"
 
 void UGameSettingsWidget::NativeConstruct()
 {

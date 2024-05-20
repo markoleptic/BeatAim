@@ -3,15 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Utilities/BSWidgetInterface.h"
-#include "Slate/SBSComboBox.h"
-#include "UObject/ObjectMacros.h"
+#include "Components/Widget.h"
 #include "Fonts/SlateFontInfo.h"
 #include "Layout/Margin.h"
+#include "Slate/SBSComboBox.h"
 #include "Styling/SlateColor.h"
 #include "Styling/SlateTypes.h"
+#include "UObject/ObjectMacros.h"
+#include "Utilities/BSWidgetInterface.h"
 #include "Widgets/SWidget.h"
-#include "Components/Widget.h"
 #include "BSComboBoxString.generated.h"
 
 UENUM(BlueprintType)

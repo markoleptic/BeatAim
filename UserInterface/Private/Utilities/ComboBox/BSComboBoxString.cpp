@@ -2,15 +2,15 @@
 
 
 #include "Utilities/ComboBox/BSComboBoxString.h"
-#include "Utilities/ComboBox/BSComboBoxEntry.h"
-#include "Slate/SBSComboBox.h"
-#include "Utilities/TooltipWidget.h"
-#include "Widgets/SNullWidget.h"
-#include "UObject/EditorObjectVersion.h"
-#include "UObject/ConstructorHelpers.h"
 #include "Engine/Font.h"
+#include "Slate/SBSComboBox.h"
 #include "Styling/UMGCoreStyle.h"
+#include "UObject/ConstructorHelpers.h"
+#include "UObject/EditorObjectVersion.h"
 #include "Utilities/TooltipImage.h"
+#include "Utilities/TooltipWidget.h"
+#include "Utilities/ComboBox/BSComboBoxEntry.h"
+#include "Widgets/SNullWidget.h"
 
 #define LOCTEXT_NAMESPACE "UMG"
 
@@ -189,7 +189,9 @@ TSharedRef<SWidget> UBSComboBoxString::HandleGenerateWidget(TSharedPtr<FString> 
 	}
 
 	// If a row wasn't generated just create the default one, a simple text block of the item's name.
-	return SNew(STextBlock).Text(FText::FromString(StringItem)).Font(Font);
+	return SNew(STextBlock)
+		.Text(FText::FromString(StringItem))
+		.Font(Font);
 }
 
 void UBSComboBoxString::HandleSelectionChanged(const TArray<TSharedPtr<FString>>& Items,
@@ -257,7 +259,9 @@ TSharedRef<SWidget> UBSComboBoxString::HandleSelectionChangedGenerateWidget(
 		}
 	}
 	// If a row wasn't generated just create the default one, a simple text block of the item's name.
-	return SNew(STextBlock).Text(FText::FromString(DefaultListOfItems)).Font(Font);
+	return SNew(STextBlock)
+		.Text(FText::FromString(DefaultListOfItems))
+		.Font(Font);
 }
 
 void UBSComboBoxString::HandleOpening()

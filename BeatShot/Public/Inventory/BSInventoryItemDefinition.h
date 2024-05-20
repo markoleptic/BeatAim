@@ -20,7 +20,7 @@ class BEATSHOT_API UBSInventoryItemFragment : public UObject
 	GENERATED_BODY()
 
 public:
-	/** Called when a BSInventoryItem is created and added to a FBSInventoryList */
+	/** Called when a BSInventoryItem is created and added to a FBSInventoryList. */
 	virtual void OnInstanceCreated(UBSInventoryItemInstance* Instance) const
 	{
 	}

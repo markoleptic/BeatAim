@@ -1,8 +1,8 @@
 ﻿// Copyright 2022-2023 Markoleptic Games, SP. All Rights Reserved.
 
 #include "AbilitySystem/ExecutionCalculations/BSDamageExecCalc.h"
-#include "BeatShot/BSGameplayTags.h"
 #include "AbilitySystem/Globals/BSAttributeSetBase.h"
+#include "BeatShot/BSGameplayTags.h"
 
 // Declare the attributes to capture and define how we want to capture them from the Source and Target.
 struct BSDamageStatics

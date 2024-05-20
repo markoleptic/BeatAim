@@ -1,22 +1,20 @@
 ﻿// Copyright 2022-2023 Markoleptic Games, SP. All Rights Reserved.
 
 
-#include "BSGameModeEnumTagMap.h"
-#include "BSGameModeDataAsset.h"
+#include "Mappings/BSGameModeEnumTagMap.h"
+#include "BSGameModeConfig/BSGameModeDataAsset.h"
 
 
 UBSGameModeEnumTagMap::UBSGameModeEnumTagMap()
 {
-	EnumTypes = TSet({
+	PopulateEnumTypes(TSet({
 		StaticEnum<EBoundsScalingPolicy>(), StaticEnum<EMovingTargetDirectionMode>(),
 		StaticEnum<EConsecutiveTargetScalePolicy>(), StaticEnum<ETargetDamageType>(),
 		StaticEnum<ETargetActivationSelectionPolicy>(), StaticEnum<ERecentTargetMemoryPolicy>(),
 		StaticEnum<ETargetDeactivationCondition>(), StaticEnum<ETargetDestructionCondition>(),
 		StaticEnum<ETargetActivationResponse>(), StaticEnum<ETargetDeactivationResponse>(),
-		StaticEnum<EDynamicBoundsScalingPolicy>(), StaticEnum<ETargetSpawningPolicy>(),
-		StaticEnum<ETargetDistributionPolicy>(), StaticEnum<EReinforcementLearningMode>(),
-		StaticEnum<EReinforcementLearningHyperParameterMode>(), StaticEnum<ETargetSpawnResponse>(),
-		StaticEnum<ERuntimeTargetSpawningLocationSelectionMode>()
-	});
-	PopulateEnumTypes(EnumTypes);
+		StaticEnum<ETargetSpawningPolicy>(), StaticEnum<ETargetDistributionPolicy>(),
+		StaticEnum<EReinforcementLearningMode>(), StaticEnum<EReinforcementLearningHyperParameterMode>(),
+		StaticEnum<ETargetSpawnResponse>(), StaticEnum<ERuntimeTargetSpawningLocationSelectionMode>()
+	}));
 }

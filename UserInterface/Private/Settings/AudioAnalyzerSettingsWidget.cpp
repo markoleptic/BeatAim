@@ -3,14 +3,14 @@
 
 #include "Settings/AudioAnalyzerSettingsWidget.h"
 #include "Components/VerticalBox.h"
-#include "Utilities/ComboBox/BSComboBoxString.h"
-#include "Utilities/Buttons/BSButton.h"
-#include "Utilities/SavedTextWidget.h"
 #include "MenuOptions/BandChannelWidget.h"
 #include "MenuOptions/BandThresholdWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "MenuOptions/SingleRangeInputWidget.h"
 #include "Overlays/PopupMessageWidget.h"
+#include "Utilities/SavedTextWidget.h"
+#include "Utilities/Buttons/BSButton.h"
+#include "Utilities/ComboBox/BSComboBoxString.h"
 
 void UAudioAnalyzerSettingsWidget::InitPauseMenuChild()
 {

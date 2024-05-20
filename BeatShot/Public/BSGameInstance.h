@@ -10,6 +10,8 @@
 #include "Engine/GameInstance.h"
 #include "BSGameInstance.generated.h"
 
+struct FBSConfig;
+struct FGameModeTransitionState;
 struct FMetaSoundOutput;
 class ULoadingScreenWidgetStyle;
 class USoundControlBus;
@@ -19,7 +21,7 @@ class SLoadingScreenWidget;
 class ATimeOfDayManager;
 class USteamManager;
 
-/** Base GameInstance for this game */
+/** Base GameInstance for this game. */
 UCLASS()
 class BEATSHOT_API UBSGameInstance : public UGameInstance, public IBSPlayerSettingsInterface,
                                      public IHttpRequestInterface, public IBSPlayerScoreInterface
@@ -39,7 +41,7 @@ class BEATSHOT_API UBSGameInstance : public UGameInstance, public IBSPlayerSetti
 	void OnPreLoadMapWithContext(const FWorldContext& InWorldContext, const FString& MapName);
 #endif WITH_EDITOR
 
-	/** Called after a level has been loaded */
+	/** Called after a level has been loaded. */
 	void OnPostLoadMapWithWorld(UWorld* World);
 
 	/** Called after the loading screen widget has completed its fade out. */
@@ -52,13 +54,13 @@ class BEATSHOT_API UBSGameInstance : public UGameInstance, public IBSPlayerSetti
 	virtual void OnStart() override;
 
 public:
-	/** Handles game mode transitions initiated by Main Menu, Pause Menu, or Post Game Menu */
+	/** Handles game mode transitions initiated by Main Menu, Pause Menu, or Post Game Menu. */
 	void HandleGameModeTransition(const FGameModeTransitionState& NewGameModeTransitionState);
 
 	/** Calls EndGameMode if the current game mode is BSGameMode. */
 	void EndBSGameMode(const FGameModeTransitionState& NewGameModeTransitionState) const;
 
-	/** Returns shared pointer to defining game mode options configuration */
+	/** Returns shared pointer to defining game mode options configuration. */
 	TSharedPtr<FBSConfig> GetBSConfig() const { return BSConfig; }
 
 	/** Returns the object that interfaces with Steam API. */

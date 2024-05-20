@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SaveGamePlayerSettings.h"
 #include "BSPlayerSettingsInterface.h"
 #include "Delegates/DelegateCombinations.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 #include "Utilities/BSSettingCategoryWidget.h"
 #include "CrossHairSettingsWidget.generated.h"
 

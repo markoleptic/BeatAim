@@ -4,22 +4,22 @@
 
 #include "BSPlayerScoreInterface.h"
 #include "BSPlayerSettingsInterface.h"
-#include "Menus/GameModeMenuWidget.h"
 #include "CommonWidgetCarousel.h"
-#include "SaveGamePlayerSettings.h"
 #include "Blueprint/WidgetTree.h"
-#include "Components/VerticalBox.h"
 #include "Components/Border.h"
 #include "Components/HorizontalBoxSlot.h"
-#include "Utilities/SavedTextWidget.h"
+#include "Components/VerticalBox.h"
 #include "GameModes/CreatorViewWidget.h"
-#include "GameModes/PropertyViewWidget.h"
-#include "Utilities/Buttons/MenuButton.h"
-#include "Windows/WindowsPlatformApplicationMisc.h"
 #include "GameModes/CustomGameModePreviewWidget.h"
+#include "GameModes/PropertyViewWidget.h"
 #include "MenuOptions/DefaultGameModeSelectWidget.h"
+#include "Menus/GameModeMenuWidget.h"
 #include "Overlays/AudioSelectWidget.h"
 #include "Overlays/GameModeSharingWidget.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
+#include "Utilities/SavedTextWidget.h"
+#include "Utilities/Buttons/MenuButton.h"
+#include "Windows/WindowsPlatformApplicationMisc.h"
 
 
 void UGameModeMenuWidget::NativeConstruct()
@@ -135,7 +135,10 @@ void UGameModeMenuWidget::InitDefaultGameModesWidgets()
 
 	for (int i = 0; i < Temp.Num(); i++)
 	{
-		if (!Temp.IsValidIndex(i)) continue;
+		if (!Temp.IsValidIndex(i))
+		{
+			continue;
+		}
 		const UDefaultGameModeSelectWidget* Widget = Temp[i];
 		const int NextIndex = i == Temp.Num() - 1 ? 0 : i + 1;
 		Widget->Button->SetDefaults(static_cast<uint8>(Widget->GetBaseGameMode()), Temp[NextIndex]->Button);

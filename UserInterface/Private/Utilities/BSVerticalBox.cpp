@@ -2,10 +2,10 @@
 
 
 #include "Utilities/BSVerticalBox.h"
-#include "GlobalConstants.h"
-#include "Utilities/BSWidgetInterface.h"
+#include "BSConstants.h"
 #include "Blueprint/WidgetTree.h"
 #include "Utilities/BSHorizontalBox.h"
+#include "Utilities/BSWidgetInterface.h"
 
 TSharedRef<SWidget> UBSVerticalBox::RebuildWidget()
 {

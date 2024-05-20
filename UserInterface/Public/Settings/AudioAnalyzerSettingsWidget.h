@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SaveGamePlayerSettings.h"
 #include "BSPlayerSettingsInterface.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 #include "Utilities/BSSettingCategoryWidget.h"
 #include "AudioAnalyzerSettingsWidget.generated.h"
 
@@ -29,7 +29,7 @@ public:
 	/** Broadcast when the restart and save button is clicked to apply AudioAnalyzer settings that require a restart. */
 	TDelegate<void()> OnRestartButtonClicked;
 
-	/** Do specific things if this instance of AASettings belongs to Pause Menu */
+	/** Do specific things if this instance of AASettings belongs to Pause Menu. */
 	void InitPauseMenuChild();
 
 	/** Returns OnPlayerSettingsChangedDelegate_AudioAnalyzer, the delegate that is broadcast when this class saves

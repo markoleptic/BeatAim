@@ -3,11 +3,11 @@
 
 #include "RangeActors/MovablePlatform.h"
 #include "Character/BSCharacter.h"
-#include "RangeActors/WallMenu.h"
-#include "Player/BSPlayerController.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Player/BSPlayerController.h"
+#include "RangeActors/WallMenu.h"
 
 AMovablePlatform::AMovablePlatform()
 {

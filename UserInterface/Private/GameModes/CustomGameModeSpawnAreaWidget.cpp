@@ -3,10 +3,10 @@
 
 #include "GameModes/CustomGameModeSpawnAreaWidget.h"
 #include "Components/CheckBox.h"
-#include "Utilities/ComboBox/BSComboBoxString.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "MenuOptions/DualRangeInputWidget.h"
 #include "MenuOptions/SingleRangeInputWidget.h"
+#include "Utilities/ComboBox/BSComboBoxString.h"
 
 using namespace Constants;
 
@@ -377,7 +377,10 @@ void UCustomGameModeSpawnAreaWidget::UpdateSpreadWidgetState(UDualRangeInputWidg
 void UCustomGameModeSpawnAreaWidget::OnSelectionChanged_TargetDistributionPolicy(const TArray<FString>& Selected,
 	const ESelectInfo::Type SelectionType)
 {
-	if (SelectionType == ESelectInfo::Type::Direct || Selected.Num() != 1) return;
+	if (SelectionType == ESelectInfo::Type::Direct || Selected.Num() != 1)
+	{
+		return;
+	}
 
 	BSConfig->TargetConfig.TargetDistributionPolicy = GetEnumFromString_FromTagMap<
 		ETargetDistributionPolicy>(Selected[0]);

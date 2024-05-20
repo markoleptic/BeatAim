@@ -2,8 +2,8 @@
 
 #include "AbilitySystem/Abilities/BSGA_TrackGun.h"
 #include "AbilitySystemComponent.h"
-#include "Character/BSCharacter.h"
 #include "AbilitySystem/Tasks/BSAT_TickTrace.h"
+#include "Character/BSCharacter.h"
 
 UBSGA_TrackGun::UBSGA_TrackGun()
 {

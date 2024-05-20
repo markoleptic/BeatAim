@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "BSPlayerSettingsInterface.h"
-#include "SaveGamePlayerSettings.h"
 #include "GameFramework/GameModeBase.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 #include "MainMenuGameMode.generated.h"
 
 struct FBSConfig;
@@ -42,7 +42,7 @@ public:
 	/** Clears the timers and calls FinishSimulation on TargetManager. */
 	void FinishSimulation();
 
-	/** Returns whether or not the SimulationTimer is active. */
+	/** Returns whether the SimulationTimer is active. */
 	bool IsSimulating() const;
 
 	/** Called when the GameModesWidget contains at least one breaking game mode option, or none. */
@@ -68,7 +68,7 @@ protected:
 	/** Timer that spans the length of the simulation. */
 	FTimerHandle SimulationTimer;
 
-	/** Whether or not GameModesWidget has at least one breaking game mode option, or none.
+	/** whether GameModesWidget has at least one breaking game mode option, or none.
 	 *  Prevents simulation if true. */
 	bool bGameModeBreakingChangePresent = false;
 

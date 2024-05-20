@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "Containers/Array.h"
-#include "Engine/DataAsset.h"
 #include "ActiveGameplayEffectHandle.h"
 #include "GameplayAbilitySpec.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "GameplayTagContainer.h"
+#include "Containers/Array.h"
+#include "Engine/DataAsset.h"
 #include "BSAbilitySet.generated.h"
 
 class UBSGameplayAbility;
@@ -81,7 +81,7 @@ struct FBSGrantedAbilitySet
 	/** Wrapper around ASCs FindAbilitySpecFromHandle, just returns the first one. */
 	FGameplayAbilitySpec* FindAbilitySpecFromHandle(UBSAbilitySystemComponent* ASC);
 
-	/** Returns whether or not all granted AbilitySpecHandles, GameplayEffectHandles,
+	/** Returns whether all granted AbilitySpecHandles, GameplayEffectHandles,
 	 *  and GrantedAttributeSets are empty. */
 	bool IsEmpty() const;
 
@@ -100,7 +100,8 @@ protected:
 };
 
 
-/** A data asset that contains GameplayAbilities, GameplayEffects, and AttributeSets that should be granted to the owner */
+/** A data asset that contains GameplayAbilities, GameplayEffects, and AttributeSets that should be granted to the
+ *  owner. */
 UCLASS(BlueprintType, Const)
 class UBSAbilitySet : public UDataAsset
 {

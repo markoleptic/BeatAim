@@ -3,10 +3,10 @@
 
 #include "GameModes/CustomGameModeSpawningWidget.h"
 #include "Components/CheckBox.h"
-#include "Utilities/ComboBox/BSComboBoxString.h"
 #include "MenuOptions/CheckBoxWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "MenuOptions/SingleRangeInputWidget.h"
+#include "Utilities/ComboBox/BSComboBoxString.h"
 
 
 void UCustomGameModeSpawningWidget::NativeConstruct()
@@ -254,7 +254,10 @@ void UCustomGameModeSpawningWidget::OnSliderTextBoxValueChanged(USingleRangeInpu
 void UCustomGameModeSpawningWidget::OnSelectionChanged_RuntimeTargetSpawningLocationSelectionMode(
 	const TArray<FString>& Selected, const ESelectInfo::Type SelectionType)
 {
-	if (SelectionType == ESelectInfo::Type::Direct || Selected.Num() != 1) return;
+	if (SelectionType == ESelectInfo::Type::Direct || Selected.Num() != 1)
+	{
+		return;
+	}
 
 	BSConfig->TargetConfig.RuntimeTargetSpawningLocationSelectionMode = GetEnumFromString_FromTagMap<
 		ERuntimeTargetSpawningLocationSelectionMode>(Selected[0]);
@@ -266,7 +269,10 @@ void UCustomGameModeSpawningWidget::OnSelectionChanged_RuntimeTargetSpawningLoca
 void UCustomGameModeSpawningWidget::OnSelectionChanged_TargetSpawningPolicy(const TArray<FString>& Selected,
 	const ESelectInfo::Type SelectionType)
 {
-	if (SelectionType == ESelectInfo::Type::Direct || Selected.Num() != 1) return;
+	if (SelectionType == ESelectInfo::Type::Direct || Selected.Num() != 1)
+	{
+		return;
+	}
 
 	BSConfig->TargetConfig.TargetSpawningPolicy = GetEnumFromString_FromTagMap<ETargetSpawningPolicy>(Selected[0]);
 

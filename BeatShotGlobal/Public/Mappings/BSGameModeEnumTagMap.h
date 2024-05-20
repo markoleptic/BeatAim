@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EnumTagMap.h"
+#include "Mappings/EnumTagMap.h"
 #include "BSGameModeEnumTagMap.generated.h"
 
 UCLASS(Blueprintable, BlueprintType, Const)

@@ -2,19 +2,19 @@
 
 
 #include "GameModes/CustomGameModeCategoryWidget.h"
-#include "GameModeCategoryTagMap.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/CheckBox.h"
 #include "Components/EditableTextBox.h"
-#include "Utilities/ComboBox/BSComboBoxString.h"
-#include "Utilities/GameModeCategoryTagWidget.h"
+#include "Mappings/GameModeCategoryTagMap.h"
 #include "MenuOptions/CheckBoxWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "MenuOptions/DualRangeInputWidget.h"
+#include "MenuOptions/SingleRangeInputWidget.h"
 #include "MenuOptions/TextInputWidget.h"
 #include "MenuOptions/ToggleableSingleRangeInputWidget.h"
-#include "MenuOptions/SingleRangeInputWidget.h"
+#include "Utilities/GameModeCategoryTagWidget.h"
 #include "Utilities/TooltipWidget.h"
+#include "Utilities/ComboBox/BSComboBoxString.h"
 
 void UCustomGameModeCategoryWidget::NativeConstruct()
 {
@@ -65,7 +65,10 @@ void UCustomGameModeCategoryWidget::UpdateOptionsFromConfig()
 
 void UCustomGameModeCategoryWidget::AddGameModeCategoryTagWidgets(UMenuOptionWidget* MenuOptionWidget)
 {
-	if (!GameModeCategoryTagMap) return;
+	if (!GameModeCategoryTagMap)
+	{
+		return;
+	}
 	FGameplayTagContainer Container;
 	MenuOptionWidget->GetGameModeCategoryTags(Container);
 	TArray<UGameModeCategoryTagWidget*> GameModeCategoryTagWidgets;
@@ -165,16 +168,25 @@ bool UCustomGameModeCategoryWidget::UpdateValuesIfDifferent(const UDualRangeInpu
 	const float Min, const float Max)
 {
 	bool bDifferent = Widget->IsInConstantMode() != bIsChecked;
-	if (bDifferent) Widget->SetConstantMode(bIsChecked);
+	if (bDifferent)
+	{
+		Widget->SetConstantMode(bIsChecked);
+	}
 
 	const bool bMinDifferent = !FMath::IsNearlyEqual(Widget->GetMinSliderValue(false), Min) || !FMath::IsNearlyEqual(
 		Widget->GetMinEditableTextBoxValue(false), Min);
-	if (bMinDifferent) Widget->SetValue_Min(Min);
+	if (bMinDifferent)
+	{
+		Widget->SetValue_Min(Min);
+	}
 	bDifferent = bMinDifferent || bDifferent;
 
 	const bool bMaxDifferent = !FMath::IsNearlyEqual(Widget->GetMaxSliderValue(false), Max) || !FMath::IsNearlyEqual(
 		Widget->GetMaxEditableTextBoxValue(false), Max);
-	if (bMaxDifferent) Widget->SetValue_Max(Max);
+	if (bMaxDifferent)
+	{
+		Widget->SetValue_Max(Max);
+	}
 	bDifferent = bMaxDifferent || bDifferent;
 
 	return bDifferent;
@@ -203,7 +215,10 @@ bool UCustomGameModeCategoryWidget::UpdateValuesIfDifferent(const UToggleableSin
 	const bool bValueDiff = !FMath::IsNearlyEqual(Widget->GetSliderValue(), Value) || !FMath::IsNearlyEqual(
 		Widget->GetEditableTextBoxValue(), Value);
 
-	if (bValueDiff) Widget->SetValue(Value);
+	if (bValueDiff)
+	{
+		Widget->SetValue(Value);
+	}
 	bDifferent = bValueDiff || bDifferent;
 
 	return bDifferent;
@@ -270,7 +285,10 @@ void UCustomGameModeCategoryWidget::SetSubMenuOptionEnabledStateAndAddTooltip(UM
 	const TSubclassOf<UWidget> SubWidgetClass, const EMenuOptionEnabledState State, const FString& Key)
 {
 	UWidget* SubWidget = Widget->SetSubMenuOptionEnabledState(SubWidgetClass, State);
-	if (!SubWidget) return;
+	if (!SubWidget)
+	{
+		return;
+	}
 
 	if (State == EMenuOptionEnabledState::DependentMissing && !Key.IsEmpty())
 	{

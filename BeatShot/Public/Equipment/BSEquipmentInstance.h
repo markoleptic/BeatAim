@@ -13,7 +13,7 @@ struct FFrame;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEnequipConfirmed, class UBSEquipmentInstance*);
 
-/** Represents a piece of spawned equipment for a pawn. Contains an array of actors (equipment) */
+/** Represents a piece of spawned equipment for a pawn. Contains an array of actors (equipment). */
 UCLASS(BlueprintType, Blueprintable)
 class BEATSHOT_API UBSEquipmentInstance : public UObject
 {
@@ -47,7 +47,7 @@ public:
 	UFUNCTION(BlueprintPure, Category=Equipment)
 	AActor* GetFirstSpawnedActor() const;
 
-	/** Spawns the equipment actors from the ActorsToSpawn array */
+	/** Spawns the equipment actors from the ActorsToSpawn array. */
 	virtual void SpawnEquipmentActors(const TArray<FBSEquipmentActorToSpawn>& ActorsToSpawn);
 
 	/** Destroys the equipment actors spawned when equipped. */

@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BSGameModeDataAsset.h"
 #include "Blueprint/UserWidget.h"
 #include "Menus/GameModeMenuWidget.h"
 #include "CustomGameModeWidget.generated.h"

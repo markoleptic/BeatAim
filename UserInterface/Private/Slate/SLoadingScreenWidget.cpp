@@ -141,11 +141,14 @@ void SLoadingScreenWidget::Construct(const FArguments& InArgs)
 	// Use fallback since material instance won't load on initial
 	if (bIsInitialLoadingScreen)
 	{
-		SAssignNew(LogoImage, SSpinningImage).Image(&LoadingScreenStyle->LogoImageTexture).Period(4.0f);
+		SAssignNew(LogoImage, SSpinningImage)
+		.Image(&LoadingScreenStyle->LogoImageTexture)
+		.Period(4.0f);
 	}
 	else
 	{
-		SAssignNew(LogoImage, SImage).Image(&LoadingScreenStyle->LogoImage);
+		SAssignNew(LogoImage, SImage)
+		.Image(&LoadingScreenStyle->LogoImage);
 	}
 
 	ChildSlot
@@ -153,38 +156,65 @@ void SLoadingScreenWidget::Construct(const FArguments& InArgs)
 		SNew(SOverlay)
 		+ SOverlay::Slot()
 		[
-			SAssignNew(MainOverlay, SOverlay).RenderOpacity(0.f)
-			+ SOverlay::Slot().ZOrder(10000).HAlign(HAlign_Fill).VAlign(VAlign_Fill)
+			SAssignNew(MainOverlay, SOverlay)
+			.RenderOpacity(0.f)
+			+ SOverlay::Slot()
+			.ZOrder(10000)
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Fill)
 			[
-				SNew(SImage).Image(&LoadingScreenStyle->BackgroundImage)
+				SNew(SImage)
+				.Image(&LoadingScreenStyle->BackgroundImage)
 			]
-			+ SOverlay::Slot().ZOrder(10001).HAlign(HAlign_Fill).VAlign(VAlign_Bottom).Padding(
-				LoadingScreenStyle->MainOverlaySlotPadding)
+			+ SOverlay::Slot()
+			.ZOrder(10001)
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Bottom)
+			.Padding(LoadingScreenStyle->MainOverlaySlotPadding)
 			[
 				SNew(SHorizontalBox)
-				+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Fill).VAlign(VAlign_Bottom).Padding(
-					LoadingScreenStyle->HorizontalBoxSlotPadding)
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.HAlign(HAlign_Fill)
+				.VAlign(VAlign_Bottom)
+				.Padding(LoadingScreenStyle->HorizontalBoxSlotPadding)
 				[
 					SNew(SVerticalBox)
-					+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center).VAlign(VAlign_Center)
+					+ SVerticalBox::Slot()
+					.AutoHeight()
+					.HAlign(HAlign_Center)
+					.VAlign(VAlign_Center)
 					[
-						LogoImage.ToSharedRef()
+						LogoImage
+						.ToSharedRef()
 					]
-					+ SVerticalBox::Slot().HAlign(HAlign_Center).VAlign(VAlign_Bottom)
+					+ SVerticalBox::Slot()
+					.HAlign(HAlign_Center)
+					.VAlign(VAlign_Bottom)
 					[
 						SNew(SHorizontalBox)
-						+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Fill).VAlign(VAlign_Fill)
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						.HAlign(HAlign_Fill)
+						.VAlign(VAlign_Fill)
 						[
 							SNew(STextBlock)
 							.Font(LoadingScreenStyle->BrandFontLeft)
 							.Text(LoadingScreenStyle->BrandTextLeft)
 							.ColorAndOpacity(LoadingScreenStyle->BrandTextLeftColor)
 						]
-						+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Fill).VAlign(VAlign_Fill)
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						.HAlign(HAlign_Fill)
+						.VAlign(VAlign_Fill)
 						[
-							SNew(SSpacer).Size(LoadingScreenStyle->BrandTextSpacing)
+							SNew(SSpacer)
+							.Size(LoadingScreenStyle->BrandTextSpacing)
 						]
-						+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Fill).VAlign(VAlign_Fill)
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						.HAlign(HAlign_Fill)
+						.VAlign(VAlign_Fill)
 						[
 							SNew(STextBlock)
 							.Font(LoadingScreenStyle->BrandFontRight)

@@ -8,7 +8,7 @@
 
 class UAimOffsetBlendSpace;
 
-/** Highest level organizer */
+/** Highest level organizer. */
 UENUM(BlueprintType)
 enum class EBSAnimMovementMode : uint8
 {
@@ -20,7 +20,7 @@ enum class EBSAnimMovementMode : uint8
 
 ENUM_RANGE_BY_FIRST_AND_LAST(EBSAnimMovementMode, EBSAnimMovementMode::None, EBSAnimMovementMode::Jog);
 
-/** Second level organizer */
+/** Second level organizer. */
 UENUM(BlueprintType)
 enum class EBSAnimStateType : uint8
 {

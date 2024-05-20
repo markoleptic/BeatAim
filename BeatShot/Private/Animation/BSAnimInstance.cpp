@@ -5,7 +5,6 @@
 #include "AbilitySystemGlobals.h"
 #include "Character/BSCharacterBase.h"
 #include "Character/BSCharacterMovementComponent.h"
-
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BSAnimInstance)
 
 UBSAnimInstance::UBSAnimInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer),

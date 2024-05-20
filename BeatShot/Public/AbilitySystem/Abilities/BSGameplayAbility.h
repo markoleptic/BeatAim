@@ -13,17 +13,17 @@ class ABSPlayerController;
 UENUM(BlueprintType)
 enum class EBSAbilityActivationPolicy : uint8
 {
-	/** Try to activate the ability when the input is triggered */
+	/** Try to activate the ability when the input is triggered. */
 	OnInputTriggered UMETA(DisplayName="OnInputTriggered"),
 
-	/** Continually try to activate the ability while the input is active */
+	/** Continually try to activate the ability while the input is active. */
 	WhileInputActive UMETA(DisplayName="WhileInputActive"),
 
-	/** Try to activate the ability when an avatar is assigned */
+	/** Try to activate the ability when an avatar is assigned. */
 	OnSpawn UMETA(DisplayName="OnSpawn"),
 
 	/** Always reactivate the ability when the input is triggered. \n
-	 *  IMPORTANT: requires bRetriggerInstancedAbility set to true*/
+	 *  IMPORTANT: requires bRetriggerInstancedAbility set to true. */
 	SpammableTriggered UMETA(DisplayName="SpammableTriggered"),
 };
 
@@ -34,20 +34,20 @@ ENUM_RANGE_BY_FIRST_AND_LAST(EBSAbilityActivationPolicy, EBSAbilityActivationPol
 UENUM(BlueprintType)
 enum class EBSAbilityActivationGroup : uint8
 {
-	/** Ability runs independently of all other abilities */
+	/** Ability runs independently of all other abilities. */
 	Independent UMETA(DisplayName="Independent"),
 
-	/** Ability is canceled and replaced by other exclusive abilities */
+	/** Ability is canceled and replaced by other exclusive abilities. */
 	Exclusive_Replaceable UMETA(DisplayName="Exclusive_Replaceable"),
 
-	/** Ability blocks all other exclusive abilities from activating */
+	/** Ability blocks all other exclusive abilities from activating. */
 	Exclusive_Blocking UMETA(DisplayName="Exclusive_Blocking"),
 	Max UMETA(Hidden)};
 
 ENUM_RANGE_BY_FIRST_AND_LAST(EBSAbilityActivationGroup, EBSAbilityActivationGroup::Independent,
 	EBSAbilityActivationGroup::Max);
 
-/** Base GameplayAbility used for this game */
+/** Base GameplayAbility used for this game. */
 UCLASS()
 class BEATSHOT_API UBSGameplayAbility : public UGameplayAbility
 {

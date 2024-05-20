@@ -88,7 +88,10 @@ void AStaticCubeVisualizer::CreateCubeInstances()
 
 void AStaticCubeVisualizer::UpdateVisualizer(const int32 Index, const float SpectrumAlpha)
 {
-	if (!bIsActivated) return;
+	if (!bIsActivated)
+	{
+		return;
+	}
 	for (const int32 LightIndex : GetLightIndices(Index))
 	{
 		const float CustomDataValue = (GetScaledHeight(SpectrumAlpha) - GetFastDef().MinCubeVisualizerHeightScale) / (

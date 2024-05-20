@@ -36,7 +36,10 @@ void UCustomGameModeWidget::Init(TSharedPtr<FBSConfig> InConfig,
 			Component->RequestComponentUpdate.AddUObject(this, &ThisClass::OnRequestComponentUpdate);
 			Component->RequestGameModePreviewUpdate.AddUObject(this, &ThisClass::OnRequestGameModePreviewUpdate);
 			ChildWidgetValidityMap.FindOrAdd(Component) = Component->GetCustomGameModeCategoryInfo();
-			if (bIndexOnCarousel) Index++;
+			if (bIndexOnCarousel)
+			{
+				Index++;
+			}
 		}
 	});
 }

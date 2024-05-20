@@ -3,12 +3,12 @@
 #pragma once
 
 #include "BSPlayerSettingsInterface.h"
-#include "Input/BSInputConfig.h"
-#include "Containers/Array.h"
 #include "EnhancedInputComponent.h"
 #include "GameplayTagContainer.h"
-#include "HAL/Platform.h"
 #include "InputTriggers.h"
+#include "Containers/Array.h"
+#include "HAL/Platform.h"
+#include "Input/BSInputConfig.h"
 #include "Misc/AssertionMacros.h"
 #include "BSInputComponent.generated.h"
 

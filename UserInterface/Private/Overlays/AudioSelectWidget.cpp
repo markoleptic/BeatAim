@@ -2,19 +2,19 @@
 
 
 #include "Overlays/AudioSelectWidget.h"
+#include <shobjidl_core.h>
 #include "AudioAnalyzerManager.h"
-#include "Utilities/TooltipWidget.h"
 #include "Components/CheckBox.h"
 #include "Components/ComboBoxString.h"
 #include "Components/EditableTextBox.h"
-#include "Components/VerticalBox.h"
 #include "Components/HorizontalBox.h"
-#include "Utilities/Buttons/BSButton.h"
+#include "Components/VerticalBox.h"
 #include "Microsoft/COMPointer.h"
-#include <shobjidl_core.h>
-#include "SaveGamePlayerScore.h"
-#include "SaveGamePlayerSettings.h"
 #include "Overlays/PopupMessageWidget.h"
+#include "SaveGames/SaveGamePlayerScore.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
+#include "Utilities/TooltipWidget.h"
+#include "Utilities/Buttons/BSButton.h"
 
 #define MAX_FILETYPES_STR 4096
 #define MAX_FILENAME_STR 65536 // This buffer has to be big enough to contain the names of all the selected files as well as the null characters between them and the null character at the end

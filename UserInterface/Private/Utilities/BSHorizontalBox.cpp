@@ -2,9 +2,9 @@
 
 
 #include "Utilities/BSHorizontalBox.h"
-#include "Utilities/BSWidgetInterface.h"
 #include "Components/Border.h"
 #include "Components/HorizontalBoxSlot.h"
+#include "Utilities/BSWidgetInterface.h"
 
 TSharedRef<SWidget> UBSHorizontalBox::RebuildWidget()
 {

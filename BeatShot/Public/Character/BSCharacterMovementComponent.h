@@ -9,7 +9,7 @@
 #include "BSCharacterMovementComponent.generated.h"
 
 
-/** Crouch Timings (in seconds) */
+/** Crouch Timings (in seconds). */
 #define MOVEMENT_DEFAULT_CROUCHTIME 0.4f
 #define MOVEMENT_DEFAULT_CROUCHJUMPTIME 0.1f
 #define MOVEMENT_DEFAULT_UNCROUCHTIME 0.2f
@@ -39,7 +39,7 @@ struct FCharacterGroundInfo
 };
 
 
-/** Base CharacterMovementComponent for this game */
+/** Base CharacterMovementComponent for this game. */
 UCLASS()
 class BEATSHOT_API UBSCharacterMovementComponent : public UCharacterMovementComponent, public IBSMovementSoundInterface
 {
@@ -70,52 +70,53 @@ public:
 	TObjectPtr<UBSMovementSounds> MovementSounds;
 
 protected:
-	/** Cached ground info for the character.  Do not access this directly!  It's only updated when accessed via GetGroundInfo() */
+	/** Cached ground info for the character.  Do not access this directly!  It's only updated when accessed via
+	 *  GetGroundInfo(). */
 	FCharacterGroundInfo CachedGroundInfo;
 
-	/** If the player is using a ladder */
+	/** If the player is using a ladder. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Gameplay)
 	bool bOnLadder = false;
 
-	/** Milliseconds between step sounds */
+	/** Milliseconds between step sounds. */
 	float MoveSoundTime;
 
-	/** If we are stepping left, else, right */
+	/** If we are stepping left, else, right. */
 	bool StepSide;
 
-	/** The multiplier for acceleration when on ground. (HL2's sv_accelerate) */
+	/** The multiplier for acceleration when on ground. (HL2's sv_accelerate). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Walking")
 	float GroundAccelerationMultiplier = 10.0f;
 
-	/** The multiplier for acceleration when in air. (HL2's sv_airaccelerate)*/
+	/** The multiplier for acceleration when in air. (HL2's sv_airaccelerate). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Walking")
 	float AirAccelerationMultiplier = 10.0f;
 
-	/* The vector differential magnitude cap when in air. (30 air speed cap from HL2) */
+	/* The vector differential magnitude cap when in air. (30 air speed cap from HL2). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Jumping/Falling")
 	float AirSpeedCap = 57.15f;
 
-	/** Time to crouch on ground in seconds */
+	/** Time to crouch on ground in seconds. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Walking")
 	float CrouchTime = MOVEMENT_DEFAULT_CROUCHTIME;
 
-	/** Time to UnCrouch on ground in seconds */
+	/** Time to UnCrouch on ground in seconds. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Walking")
 	float UnCrouchTime = MOVEMENT_DEFAULT_UNCROUCHTIME;
 
-	/** Time to crouch in air in seconds */
+	/** Time to crouch in air in seconds. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Walking")
 	float CrouchJumpTime = MOVEMENT_DEFAULT_CROUCHJUMPTIME;
 
-	/** Time to UnCrouch in air in seconds */
+	/** Time to UnCrouch in air in seconds. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Walking")
 	float UnCrouchJumpTime = MOVEMENT_DEFAULT_UNCROUCHJUMPTIME;
 
-	/** the minimum step height from moving fast */
+	/** the minimum step height from moving fast. */
 	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite)
 	float MinStepHeight = 10.0f;
 
-	/** the minimum step height from moving fast */
+	/** the minimum step height from moving fast. */
 	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite)
 	float GroundBrakingDeceleration = 15.f;
 
@@ -155,29 +156,29 @@ protected:
 		meta = (ClampMin = "0", UIMin = "0"))
 	float SprintSpeed = 609.6f;
 
-	/** Speed on a ladder */
+	/** Speed on a ladder. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Ladder")
 	float LadderSpeed = 381.0f;
 
-	/** The minimum speed to scale up from for slope movement  */
+	/** The minimum speed to scale up from for slope movement. */
 	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
 		meta = (ClampMin = "0", UIMin = "0"))
 	float SpeedMultMin = SprintSpeed * 1.7f;
 
-	/** The maximum speed to scale up to for slope movement */
+	/** The maximum speed to scale up to for slope movement. */
 	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
 		meta = (ClampMin = "0", UIMin = "0"))
 	float SpeedMultMax = SprintSpeed * 2.5f;
 
-	/** The maximum angle we can roll for camera adjust */
+	/** The maximum angle we can roll for camera adjust. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement")
 	float RollAngle = 0.0f;
 
-	/** Speed of rolling the camera */
+	/** Speed of rolling the camera. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement")
 	float RollSpeed = 0.0f;
 
-	/** Speed of rolling the camera */
+	/** Speed of rolling the camera. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement")
 	float BounceMultiplier = 0.0f;
 
@@ -185,7 +186,7 @@ protected:
 		meta = (ClampMin = "0", UIMin = "0"))
 	float AxisSpeedLimit = 6667.5f;
 
-	/** Threshold relating to speed ratio and friction which causes us to catch air */
+	/** Threshold relating to speed ratio and friction which causes us to catch air. */
 	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
 		meta = (ClampMin = "0", UIMin = "0"))
 	float SlideLimit = 0.5f;
@@ -197,7 +198,7 @@ protected:
 	bool bShouldPlayMoveSounds = false;
 
 public:
-	/** Print pos and vel (Source: cl_showpos) */
+	/** Print pos and vel (Source: cl_showpos). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement")
 	uint32 bShowPos : 1;
 
@@ -240,7 +241,6 @@ public:
 	virtual bool
 	ShouldCheckForValidLandingSpot(float DeltaTime, const FVector& Delta, const FHitResult& Hit) const override;
 
-	// Acceleration
 	FORCEINLINE FVector GetAcceleration() const { return Acceleration; }
 
 	/** Is this player on a ladder? */
@@ -249,13 +249,13 @@ public:
 
 	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
 
-	/** Do camera roll effect based on velocity */
+	/** Do camera roll effect based on velocity. */
 	float GetCameraRoll();
 
-	/** Set no clip */
+	/** Set no clip. */
 	void SetNoClip(bool bNoClip);
 
-	/** Toggle no clip */
+	/** Toggle no clip. */
 	void ToggleNoClip();
 
 	bool IsBrakingWindowTolerated() const { return bBrakingWindowElapsed; }
@@ -277,7 +277,7 @@ private:
 	float DefaultWalkableFloorZ;
 	float LocalSurfaceFriction = 1.0f;
 
-	/** The time that the player can remount on the ladder */
+	/** The time that the player can remount on the ladder. */
 	float OffLadderTicks = -1.0f;
 
 	bool bHasDeferredMovementMode;

@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/Interface.h"
-#include "Components/PanelWidget.h"
 #include "TooltipImage.h"
+#include "Components/PanelWidget.h"
+#include "UObject/Interface.h"
 #include "BSWidgetInterface.generated.h"
 
 class UBSComboBoxEntry;

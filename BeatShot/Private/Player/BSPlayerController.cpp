@@ -3,33 +3,33 @@
 
 #include "Player/BSPlayerController.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystem/BSAbilitySystemComponent.h"
-#include "Character/BSCharacterBase.h"
 #include "BSGameInstance.h"
 #include "BSGameMode.h"
 #include "BSGameUserSettings.h"
 #include "FloatingTextActor.h"
 #include "MainMenuGameMode.h"
+#include "AbilitySystem/BSAbilitySystemComponent.h"
 #include "BeatShot/BSGameplayTags.h"
-#include "Player/BSPlayerState.h"
 #include "Blueprint/UserWidget.h"
+#include "Character/BSCharacterBase.h"
+#include "DeveloperSettings/BSLoadingScreenSettings.h"
 #include "GameFramework/Pawn.h"
+#include "GameModes/CreatorViewWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Menus/MainMenuWidget.h"
 #include "Menus/PauseMenuWidget.h"
 #include "Menus/PostGameMenuWidget.h"
+#include "Menus/ScoreBrowserWidget.h"
+#include "Menus/SettingsMenuWidget.h"
 #include "Overlays/CountdownWidget.h"
 #include "Overlays/CrossHairWidget.h"
 #include "Overlays/FrameCounterWidget.h"
 #include "Overlays/PlayerHUD.h"
 #include "Overlays/QTableWidget.h"
-#include "Transitions/ScreenFadeWidget.h"
 #include "Overlays/QuitMenuWidget.h"
-#include "Menus/ScoreBrowserWidget.h"
-#include "Menus/SettingsMenuWidget.h"
-#include "GameModes/CreatorViewWidget.h"
-#include "BSLoadingScreenSettings.h"
+#include "Player/BSPlayerState.h"
 #include "System/SteamManager.h"
+#include "Transitions/ScreenFadeWidget.h"
 
 void ABSPlayerController::BeginPlay()
 {
@@ -153,7 +153,10 @@ void ABSPlayerController::SetPlayerEnabledState(const bool bPlayerEnabled)
 
 void ABSPlayerController::ShowMainMenu()
 {
-	if (!IsLocalController()) return;
+	if (!IsLocalController())
+	{
+		return;
+	}
 	SetInputMode(FInputModeUIOnly());
 	SetShowMouseCursor(true);
 
@@ -197,7 +200,10 @@ void ABSPlayerController::HideMainMenu()
 
 void ABSPlayerController::ShowPauseMenu()
 {
-	if (!IsLocalController()) return;
+	if (!IsLocalController())
+	{
+		return;
+	}
 	PauseMenuWidget = CreateWidget<UPauseMenuWidget>(this, PauseMenuClass);
 	PauseMenuWidget->ResumeGame.BindLambda([this]
 	{
@@ -229,7 +235,10 @@ void ABSPlayerController::HidePauseMenu()
 
 void ABSPlayerController::ShowCrossHair()
 {
-	if (!IsLocalController()) return;
+	if (!IsLocalController())
+	{
+		return;
+	}
 	CrossHairWidget = CreateWidget<UCrossHairWidget>(this, CrossHairClass);
 
 	UBSGameInstance* GI = Cast<UBSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
@@ -250,7 +259,10 @@ void ABSPlayerController::HideCrossHair()
 
 void ABSPlayerController::ShowPlayerHUD()
 {
-	if (!IsLocalController()) return;
+	if (!IsLocalController())
+	{
+		return;
+	}
 	UBSGameInstance* GI = Cast<UBSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
 	PlayerHUDWidget = CreateWidget<UPlayerHUD>(this, PlayerHUDClass);
@@ -288,7 +300,10 @@ void ABSPlayerController::UpdatePlayerHUD(const FPlayerScore& PlayerScore, const
 
 void ABSPlayerController::ShowCountdown()
 {
-	if (!IsLocalController()) return;
+	if (!IsLocalController())
+	{
+		return;
+	}
 	SetControlRotation(FRotator(0, 0, 0));
 	ABSCharacterBase* BSCharacter = GetBSCharacter();
 	check(BSCharacter);
@@ -316,7 +331,10 @@ void ABSPlayerController::HideCountdown()
 
 void ABSPlayerController::ShowPostGameMenu()
 {
-	if (!IsLocalController()) return;
+	if (!IsLocalController())
+	{
+		return;
+	}
 	UBSGameInstance* GI = Cast<UBSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
 	PostGameMenuWidget = CreateWidget<UPostGameMenuWidget>(this, PostGameMenuWidgetClass);
@@ -342,7 +360,10 @@ void ABSPlayerController::ShowPostGameMenu()
 
 void ABSPlayerController::OnPostScoresResponseReceived(const FString& StringTableKey)
 {
-	if (!PostGameMenuWidget) return;
+	if (!PostGameMenuWidget)
+	{
+		return;
+	}
 
 	PostGameMenuWidget->ScoresWidget->InitScoreBrowser(EScoreBrowserType::PostGameModeMenuScores, StringTableKey);
 }
@@ -424,7 +445,10 @@ void ABSPlayerController::OnRep_PlayerState()
 
 void ABSPlayerController::LoginUser()
 {
-	if (!MainMenuWidget) return;
+	if (!MainMenuWidget)
+	{
+		return;
+	}
 
 	const UBSGameInstance* GI = Cast<UBSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	check(GI);
@@ -440,7 +464,10 @@ void ABSPlayerController::LoginUser()
 	{
 		if (CallbackHandler->Result != k_EResultOK)
 		{
-			if (SteamUser()) SteamUser()->CancelAuthTicket(CallbackHandler->Handle);
+			if (SteamUser())
+			{
+				SteamUser()->CancelAuthTicket(CallbackHandler->Handle);
+			}
 			MainMenuWidget->UpdateLoginState(false, "SignInState_SteamSignInFailed");
 			MainMenuWidget->TryFallbackLogin();
 		}
@@ -450,7 +477,10 @@ void ABSPlayerController::LoginUser()
 			TSharedPtr<FSteamAuthTicketResponse> SteamAuthTicketResponse(new FSteamAuthTicketResponse());
 			SteamAuthTicketResponse->OnHttpResponseReceived.BindLambda([this, SteamAuthTicketResponse, CallbackHandler]
 			{
-				if (!SteamAuthTicketResponse->bConnectedSuccessfully) return;
+				if (!SteamAuthTicketResponse->bConnectedSuccessfully)
+				{
+					return;
+				}
 				const uint64 LocalSteamID = SteamUser()->GetSteamID().ConvertToUint64();
 				const uint64 ResponseSteamID = FCString::Atoi64(*SteamAuthTicketResponse->SteamID);
 
@@ -547,7 +577,10 @@ void ABSPlayerController::CreateScreenFadeWidget(const float StartOpacity)
 
 void ABSPlayerController::FadeScreenToBlack()
 {
-	if (!IsLocalController()) return;
+	if (!IsLocalController())
+	{
+		return;
+	}
 	if (!ScreenFadeWidget)
 	{
 		CreateScreenFadeWidget(0.f);
@@ -557,7 +590,10 @@ void ABSPlayerController::FadeScreenToBlack()
 
 void ABSPlayerController::FadeScreenFromBlack()
 {
-	if (!IsLocalController()) return;
+	if (!IsLocalController())
+	{
+		return;
+	}
 	if (!ScreenFadeWidget)
 	{
 		CreateScreenFadeWidget(1.f);
@@ -616,8 +652,14 @@ void ABSPlayerController::HideQTableWidget()
 
 void ABSPlayerController::ShowCombatText(const int32 Streak, const FTransform& Transform)
 {
-	if (!IsLocalController()) return;
-	if (!PlayerSettings.Game.bShowStreakCombatText) return;
+	if (!IsLocalController())
+	{
+		return;
+	}
+	if (!PlayerSettings.Game.bShowStreakCombatText)
+	{
+		return;
+	}
 
 	if (Streak > 0 && PlayerSettings.Game.CombatTextFrequency != 0 && Streak % PlayerSettings.Game.CombatTextFrequency
 		== 0)
@@ -631,7 +673,10 @@ void ABSPlayerController::ShowCombatText(const int32 Streak, const FTransform& T
 
 void ABSPlayerController::ShowAccuracyText(const float TimeOffset, const FTransform& Transform)
 {
-	if (!IsLocalController()) return;
+	if (!IsLocalController())
+	{
+		return;
+	}
 	FString AccuracyString;
 	if (TimeOffset <= 0.1f)
 	{
@@ -693,7 +738,10 @@ void ABSPlayerController::HandleGameUserSettingsChanged(const UBSGameUserSetting
 void ABSPlayerController::TryResetAuthTicketHandle(const uint32 Handle)
 {
 	NumAuthTicketFinishes++;
-	if (NumAuthTicketFinishes < 2) return;
+	if (NumAuthTicketFinishes < 2)
+	{
+		return;
+	}
 	// Cancel auth ticket after two uses (BeatShot API and MainMenuWidget)
 	if (SteamUser() && Handle)
 	{

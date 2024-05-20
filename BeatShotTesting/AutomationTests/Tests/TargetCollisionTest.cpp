@@ -3,12 +3,11 @@
 // ReSharper disable CppNonExplicitConvertingConstructor
 // ReSharper disable CppClassCanBeFinal
 #include "CoreMinimal.h"
-#include "SaveGamePlayerScore.h"
-#include "SaveGamePlayerSettings.h"
 #include "../TestBase/TargetManagerTestWithWorld.h"
-#include "Target/SpawnAreaManagerComponent.h"
-#include "Target/TargetManager.h"
+#include "SaveGames/SaveGamePlayerScore.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 #include "Target/Target.h"
+#include "Target/TargetManager.h"
 
 using namespace Constants;
 
@@ -79,7 +78,7 @@ void FTargetCollisionTest::GetTests(TArray<FString>& OutBeautifiedNames, TArray<
 {
 	if (InitGameModeDataAsset(CollisionTestDataAssetPath))
 	{
-		for (const auto& Mode : GameModeDataAsset->GetGameModes())
+		for (const auto& Mode : GameModeDataAsset->GetGameModesMap())
 		{
 			OutBeautifiedNames.Add(Mode.Key.CustomGameModeName);
 			OutTestCommands.Add(Mode.Key.CustomGameModeName);
@@ -90,7 +89,10 @@ void FTargetCollisionTest::GetTests(TArray<FString>& OutBeautifiedNames, TArray<
 
 bool FTargetCollisionTest::RunTest(const FString& Parameters)
 {
-	if (!Init()) return false;
+	if (!Init())
+	{
+		return false;
+	}
 
 	FBSConfig* FoundConfig = TestMap.Find(Parameters);
 	if (!FoundConfig)
@@ -141,7 +143,10 @@ void FTargetCollisionTest::TestIntersection(const FSphere& SphereOne, const FSph
 	const double CenterDist = FVector::Dist(SphereOne.Center, SphereTwo.Center);
 	const double RadiusSum = SphereOne.W + SphereTwo.W;
 	const bool bIntersects = CenterDist <= RadiusSum;
-	if (bIntersects) TotalCollisions++;
+	if (bIntersects)
+	{
+		TotalCollisions++;
+	}
 
 	const double Dist = CenterDist - RadiusSum;
 	MinDistance = FMath::Min(MinDistance, Dist);

@@ -13,14 +13,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTickTraceDelegate, FGameplayTag, E
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTickTraceHit, const FHitResult&, HitResult);
 
-/** Task used to trace a line from the gun to where the owner is facing on tick */
+/** Task used to trace a line from the gun to where the owner is facing on tick. */
 UCLASS()
 class BEATSHOT_API UBSAT_TickTrace : public UAbilityTask
 {
 	GENERATED_BODY()
 
 public:
-	// Constructor and overrides
 	UBSAT_TickTrace();
 
 	virtual void Activate() override;
@@ -28,25 +27,25 @@ public:
 	virtual void OnDestroy(bool AbilityEnded) override;
 	virtual void TickTask(float DeltaTime) override;
 
-	/** How far to trace forward from Character camera */
+	/** How far to trace forward from Character camera. */
 	float TraceDistance = 100000.f;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnTickTraceHit OnTickTraceHit;
 
-	/** Broadcast when the task has finished aiming */
+	/** Broadcast when the task has finished aiming. */
 	UPROPERTY(BlueprintAssignable)
 	FTickTraceDelegate OnCompleted;
 
-	/** Broadcast if the task was interrupted */
+	/** Broadcast if the task was interrupted. */
 	UPROPERTY(BlueprintAssignable)
 	FTickTraceDelegate OnInterrupted;
 
-	/** Broadcast if the ability task was explicitly cancelled by another ability */
+	/** Broadcast if the ability task was explicitly cancelled by another ability. */
 	UPROPERTY(BlueprintAssignable)
 	FTickTraceDelegate OnCancelled;
 
-	/** Broadcast when a triggering gameplay events occurred */
+	/** Broadcast when a triggering gameplay events occurred. */
 	UPROPERTY(BlueprintAssignable)
 	FTickTraceDelegate EventReceived;
 

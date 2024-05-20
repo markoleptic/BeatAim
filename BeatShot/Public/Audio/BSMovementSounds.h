@@ -16,7 +16,7 @@ struct FBSFootstepSoundKey
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag EffectTag;
 
-	/** The context (GameplayTag associated with the physical surface type (e.g. SurfaceType.Concrete). */
+	/** The context (GameplayTag associated with the physical surface type (e.g. SurfaceType.Concrete)). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTagContainer Context;
 
@@ -24,13 +24,13 @@ struct FBSFootstepSoundKey
 	{
 	}
 
-	FBSFootstepSoundKey(const FGameplayTag& InEffectTag, const FGameplayTagContainer& InContext)
-		: EffectTag(InEffectTag), Context(InContext)
+	FBSFootstepSoundKey(const FGameplayTag& InEffectTag, const FGameplayTagContainer& InContext) :
+		EffectTag(InEffectTag), Context(InContext)
 	{
 	}
 
-	FBSFootstepSoundKey(const FGameplayTag& InEffectTag, const FGameplayTag& InContext)
-		: EffectTag(InEffectTag), Context(InContext)
+	FBSFootstepSoundKey(const FGameplayTag& InEffectTag, const FGameplayTag& InContext) : EffectTag(InEffectTag),
+		Context(InContext)
 	{
 	}
 
@@ -45,7 +45,10 @@ struct FBSFootstepSoundKey
 		{
 			return EffectTag.ToString() < Other.EffectTag.ToString();
 		}
-		if (Other.Context.IsEmpty()) return false;
+		if (Other.Context.IsEmpty())
+		{
+			return false;
+		}
 		return Context.First().ToString() < Other.Context.First().ToString();
 	}
 
@@ -64,7 +67,7 @@ struct FBSFootstepSoundValue
 	TArray<TObjectPtr<USoundBase>> Sounds;
 };
 
-/** Move and Step Sounds to play that CharacterMovementComponent uses */
+/** Move and Step Sounds to play that CharacterMovementComponent uses. */
 UCLASS(Blueprintable, Const)
 class BEATSHOT_API UBSMovementSounds : public UDataAsset
 {

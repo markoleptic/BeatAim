@@ -2,13 +2,14 @@
 
 
 #include "Overlays/PlayerHUD.h"
-#include "SaveGamePlayerScore.h"
-#include "SaveGamePlayerSettings.h"
+#include "BSGameModeConfig/BSConfig.h"
+#include "Components/HorizontalBox.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
-#include "Components/HorizontalBox.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Overlays/HitTimingWidget.h"
+#include "SaveGames/SaveGamePlayerScore.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
 
 void UPlayerHUD::NativeConstruct()
 {

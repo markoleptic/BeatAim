@@ -11,7 +11,7 @@ class UBoxComponent;
 class UWallMenuComponent;
 class UChildActorComponent;
 
-/** Enum representing the ways in which the MovablePlatform can move */
+/** Enum representing the ways in which the MovablePlatform can move. */
 UENUM(BlueprintType)
 enum class EPlatformTransitionType : uint8
 {
@@ -23,7 +23,7 @@ enum class EPlatformTransitionType : uint8
 ENUM_RANGE_BY_FIRST_AND_LAST(EPlatformTransitionType, EPlatformTransitionType::None,
 	EPlatformTransitionType::MoveDownByStepOff);
 
-/** A movable portion of ground that allows the player to rise vertically */
+/** A movable portion of ground that allows the player to rise vertically. */
 UCLASS()
 class BEATSHOT_API AMovablePlatform : public AActor
 {
@@ -85,12 +85,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	AWallMenu* WallMenu;
 
-	/** The movement state for the platform */
+	/** The movement state for the platform. */
 	EPlatformTransitionType PlatformTransitionType;
 
-	/** Whether or not the player is is overlapping the ControlTriggerVolume */
+	/** whether the player is overlapping the ControlTriggerVolume. */
 	bool bPlayerIsOverlappingControl;
 
-	/** Whether or not the player is overlapping the FloorTriggerVolume */
+	/** whether the player is overlapping the FloorTriggerVolume. */
 	bool bPlayerIsOverlappingFloor;
 };

@@ -1,10 +1,10 @@
 ﻿// Copyright 2022-2023 Markoleptic Games, SP. All Rights Reserved.
 
 #include "AbilitySystem/BSAbilitySystemComponent.h"
-#include "Character/BSCharacterBase.h"
-#include "BeatShot/BSGameplayTags.h"
 #include "AbilitySystem/Abilities/BSGameplayAbility.h"
 #include "Animation/BSAnimInstance.h"
+#include "BeatShot/BSGameplayTags.h"
+#include "Character/BSCharacterBase.h"
 
 
 void UBSAbilitySystemComponent::InitAbilityActorInfo(AActor* InOwnerActor, AActor* InAvatarActor)

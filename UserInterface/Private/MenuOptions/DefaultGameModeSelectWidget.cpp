@@ -2,7 +2,6 @@
 
 
 #include "MenuOptions/DefaultGameModeSelectWidget.h"
-
 #include "CommonTextBlock.h"
 
 void UDefaultGameModeSelectWidget::NativeConstruct()

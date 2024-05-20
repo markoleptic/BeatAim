@@ -2,8 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "GameplayAbilitySpecHandle.h"
-#include "HAL/IConsoleManager.h"
 #include "GameFramework/CheatManager.h"
+#include "HAL/IConsoleManager.h"
 #include "BSCheatManager.generated.h"
 
 class UGameplayAbility;
@@ -19,7 +19,7 @@ Variable->AsVariable()->SetOnChangedCallback(FConsoleVariableDelegate::CreateLam
 { \
 	Object->Function(Var, MemberVariable); \
 }));
-/** Base CheatManager for this game */
+/** Base CheatManager for this game. */
 UCLASS(Blueprintable)
 class BEATSHOT_API UBSCheatManager : public UCheatManager
 {

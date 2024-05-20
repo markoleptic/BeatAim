@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BSWidgetInterface.h"
 #include "BSVerticalBox.h"
+#include "BSWidgetInterface.h"
 #include "Blueprint/UserWidget.h"
 #include "BSSettingCategoryWidget.generated.h"
 

@@ -42,7 +42,7 @@ public:
 		PlayAnimationReverse(FadeOutBackgroundBlur);
 	}
 
-	/** Whether or not this instance of QuitMenu belongs to The PostGameMenuWidget or not. */
+	/** whether this instance of QuitMenu belongs to The PostGameMenuWidget or not. */
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Default", meta = (ExposeOnSpawn="true"))
 	bool bIsPostGameMenuChild;
 

@@ -26,7 +26,7 @@ public:
 	virtual void NativeConstruct() override;
 	virtual void SetStyling() override;
 
-	/** Changes video settings quality depending on input button */
+	/** Changes video settings quality depending on input button. */
 	void OnBSButtonPressed_VideoQuality(const UBSButton* Button);
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))

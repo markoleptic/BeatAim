@@ -22,7 +22,7 @@ class AMoon;
 class UMaterialInstanceDynamic;
 class ASpawnAreaSpotLight;
 
-/** Enum representing the different times of the day */
+/** Enum representing the different times of the day. */
 UENUM(BlueprintType)
 enum class ETimeOfDay : uint8
 {
@@ -50,13 +50,13 @@ public:
 
 	virtual void PostLoad() override;
 
-	/** Changes TimeOfDay and plays TransitionTimeline */
+	/** Changes TimeOfDay and plays TransitionTimeline. */
 	void BeginTransitionToNight();
 
-	/** Changes TimeOfDay and plays TransitionTimeline */
+	/** Changes TimeOfDay and plays TransitionTimeline. */
 	void BeginTransitionToDay();
 
-	/** Changes TimeOfDay based on the value of TimeOfDay_Editor */
+	/** Changes TimeOfDay based on the value of TimeOfDay_Editor. */
 	UFUNCTION(CallInEditor)
 	void UpdateTimeOfDay_Editor();
 
@@ -66,10 +66,10 @@ public:
 	UFUNCTION(CallInEditor)
 	void BeginTransitionToDay_Editor();
 
-	/** Instantly changes the time of day */
+	/** Instantly changes the time of day. */
 	void SetTimeOfDay(const ETimeOfDay InTimeOfDay);
 
-	/** Returns the current time of day */
+	/** Returns the current time of day. */
 	ETimeOfDay GetTimeOfDay() const { return TimeOfDay; }
 
 	void SetSpotLightFrontEnabledState(const bool bEnable);
@@ -77,37 +77,37 @@ public:
 	FOnTimeOfDayTransitionCompleted OnTimeOfDayTransitionCompleted;
 
 protected:
-	/** Callback function to respond to NightMode change from WallMenu */
+	/** Callback function to respond to NightMode change from WallMenu. */
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_Game& GameSettings) override;
 
-	/** Callback function to respond to NightMode change from WallMenu */
+	/** Callback function to respond to NightMode change from WallMenu. */
 	void HandleGameUserSettingsChanged(const UBSGameUserSettings* InGameUserSettings);
 
-	/** Calls RefreshMaterial function in SkySphere */
+	/** Calls RefreshMaterial function in SkySphere. */
 	UFUNCTION(BlueprintImplementableEvent)
 	void RefreshSkySphereMaterial();
 
-	/** Soft Reference to SkySphere in Range level */
+	/** Soft Reference to SkySphere in Range level. */
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Lighting|References")
 	TSoftObjectPtr<AActor> SkySphere;
 
-	/** Soft Reference to Moon in Range level */
+	/** Soft Reference to Moon in Range level. */
 	UPROPERTY(EditInstanceOnly, Category = "Lighting|References")
 	TSoftObjectPtr<AMoon> Moon;
 
-	/** Soft Reference to Daylight in Range level */
+	/** Soft Reference to Daylight in Range level. */
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Lighting|References")
 	TSoftObjectPtr<ADirectionalLight> DayDirectionalLight;
 
-	/** Soft Reference to Skylight in Range level */
+	/** Soft Reference to Skylight in Range level. */
 	UPROPERTY(EditInstanceOnly, Category = "Lighting|References")
 	TSoftObjectPtr<ASkyLight> SkyLight;
 
-	/** Reference to left roof mesh to move */
+	/** Reference to left roof mesh to move. */
 	UPROPERTY(EditInstanceOnly, Category = "Lighting|References")
 	TSoftObjectPtr<AStaticMeshActor> LeftWindowCover;
 
-	/** Reference to right roof mesh to move */
+	/** Reference to right roof mesh to move. */
 	UPROPERTY(EditInstanceOnly, Category = "Lighting|References")
 	TSoftObjectPtr<AStaticMeshActor> RightWindowCover;
 
@@ -135,13 +135,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Lighting")
 	ETimeOfDay TimeOfDay_Editor;
 
-	/** Distance along the x-axis the roofs covering the night time windows have to travel during the day to night
-	 *  transition. This value is reversed when the cycle goes from night to day */
+	/** Distance along the x-axis the roofs covering the nighttime windows have to travel during the day to night
+	 *  transition. This value is reversed when the cycle goes from night to day. */
 	UPROPERTY(EditAnywhere, Category = "Lighting")
 	float DayToNightRoofXTravelDistance = -1000.f;
 
-	/** Distance along the z-axis the roofs covering the night time windows have to travel during the day to night
-	 *  transition. This value is reversed when the cycle goes from night to day */
+	/** Distance along the z-axis the roofs covering the nighttime windows have to travel during the day to night
+	 *  transition. This value is reversed when the cycle goes from night to day. */
 	UPROPERTY(EditAnywhere, Category = "Lighting")
 	float DayToNightRoofZTravelDistance = 20.f;
 
@@ -154,7 +154,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Lighting")
 	float LowGISettingSkyLightIntensity = 1.f;
 
-	/** Constant Light Intensity of the sun */
+	/** Constant Light Intensity of the sun. */
 	UPROPERTY(EditAnywhere, Category = "Lighting|Day")
 	float DayDirectionalLightIntensity = 10.f;
 
@@ -167,7 +167,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Lighting|Day")
 	float DaySpotlightIntensity = 0.f;
 
-	/** Dynamic Light Intensity of the moon's directional light */
+	/** Dynamic Light Intensity of the moon's directional light. */
 	UPROPERTY(EditAnywhere, Category = "Lighting|Night")
 	float NightDirectionalLightIntensity = 1.f;
 
@@ -180,27 +180,29 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Lighting|Night")
 	float NightSpotlightIntensity = 2000.f;
 
-	/** Reference to SkySphere dynamic material instance */
+	/** Reference to SkySphere dynamic material instance. */
 	UPROPERTY()
 	TSoftObjectPtr<UMaterialInstanceDynamic> SkySphereMaterial;
 
-	/** The current time of day */
+	/** The current time of day. */
 	ETimeOfDay TimeOfDay;
 
-	/** Timeline bound to Position Curve */
+	/** Timeline bound to Position Curve. */
 	FTimeline TransitionTimeline;
 
-	/** Delegate that binds to TransitionTimeline's InterpFloat, using the TransitionCurve and TransitionTimeOfDay function */
+	/** Delegate that binds to TransitionTimeline's InterpFloat, using the TransitionCurve and TransitionTimeOfDay
+	 *  function. */
 	FOnTimelineFloat OnTransitionTimelineTick;
 
-	/** Delegate that binds to TransitionTimeline's TimelineFinishedFunc, using the OnTimelineCompletedCallback function */
+	/** Delegate that binds to TransitionTimeline's TimelineFinishedFunc, using the OnTimelineCompletedCallback
+	 *  function. */
 	FOnTimelineEvent OnTimelineCompleted;
 
-	/** Changes TimeOfDay after TransitionTimeline completes */
+	/** Changes TimeOfDay after TransitionTimeline completes. */
 	UFUNCTION()
 	void OnTimelineCompletedCallback();
 
-	/** Executes on every tick of TransitionTimeline, reads from TransitionCurve */
+	/** Executes on every tick of TransitionTimeline, reads from TransitionCurve. */
 	UFUNCTION()
 	void TransitionTimeOfDay(const float Value);
 

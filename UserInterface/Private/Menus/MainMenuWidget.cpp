@@ -3,16 +3,16 @@
 
 #include "Menus/MainMenuWidget.h"
 #include "Components/TextBlock.h"
-#include "Components/WidgetSwitcher.h"
 #include "Components/VerticalBox.h"
+#include "Components/WidgetSwitcher.h"
 #include "Kismet/GameplayStatics.h"
-#include "Menus/ScoreBrowserWidget.h"
-#include "Styles/MenuStyle.h"
-#include "Utilities/BSWidgetInterface.h"
-#include "SaveGamePlayerSettings.h"
 #include "Menus/GameModeMenuWidget.h"
+#include "Menus/ScoreBrowserWidget.h"
 #include "Overlays/FeedbackWidget.h"
 #include "Overlays/LoginWidget.h"
+#include "SaveGames/SaveGamePlayerSettings.h"
+#include "Styles/MenuStyle.h"
+#include "Utilities/BSWidgetInterface.h"
 #include "Utilities/Buttons/MenuButton.h"
 
 void UMainMenuWidget::NativeConstruct()
@@ -100,7 +100,10 @@ void UMainMenuWidget::TryFallbackLogin()
 void UMainMenuWidget::OnMenuButtonClicked_BSButton(const UBSButton* Button)
 {
 	const UMenuButton* MenuButton = Cast<UMenuButton>(Button);
-	if (!MenuButton) return;
+	if (!MenuButton)
+	{
+		return;
+	}
 
 	// Always stop the game mode preview if game modes widget is not visible
 	if (MenuButton != MenuButton_GameModes)
@@ -153,7 +156,10 @@ void UMainMenuWidget::OnButtonClicked_BSButton(const UBSButton* Button)
 	{
 		CurrentLoginMethod = ELoginMethod::Steam;
 		TextBlock_SignInState->SetText(FText());
-		if (OnSteamLoginRequest.IsBound()) OnSteamLoginRequest.Execute();
+		if (OnSteamLoginRequest.IsBound())
+		{
+			OnSteamLoginRequest.Execute();
+		}
 	}
 }
 

@@ -5,10 +5,9 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 #include "Abilities/BSGameplayAbility.h"
-#include "NativeGameplayTags.h"
 #include "BSAbilitySystemComponent.generated.h"
 
-/** Base AbilitySystemComponent in this game */
+/** Base AbilitySystemComponent in this game. */
 UCLASS()
 class BEATSHOT_API UBSAbilitySystemComponent : public UAbilitySystemComponent
 {
@@ -20,8 +19,8 @@ public:
 
 	virtual void InitAbilityActorInfo(AActor* InOwnerActor, AActor* InAvatarActor) override;
 
-	typedef TFunctionRef<bool(const UBSGameplayAbility* Ability, FGameplayAbilitySpecHandle Handle)>
-	TShouldCancelAbilityFunc;
+	using TShouldCancelAbilityFunc = TFunctionRef<bool(const UBSGameplayAbility* Ability,
+		FGameplayAbilitySpecHandle Handle)>;
 	/** Cancels abilities based on the ShouldCancelFunc. */
 	void CancelAbilitiesByFunc(TShouldCancelAbilityFunc ShouldCancelFunc, bool bReplicateCancelAbility);
 
@@ -40,7 +39,7 @@ public:
 	/** Clear the cached ability handles. */
 	void ClearAbilityInput();
 
-	/** Returns whether or not the activation group is blocked from activation. */
+	/** Returns whether the activation group is blocked from activation. */
 	bool IsActivationGroupBlocked(EBSAbilityActivationGroup Group) const;
 
 	/** Adds an ability to activation group. */

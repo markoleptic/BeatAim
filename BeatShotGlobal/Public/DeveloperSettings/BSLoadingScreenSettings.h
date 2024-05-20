@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "UObject/SoftObjectPtr.h"
 #include "Engine/DeveloperSettings.h"
+#include "UObject/SoftObjectPtr.h"
 #include "BSLoadingScreenSettings.generated.h"
 
 class UObject;

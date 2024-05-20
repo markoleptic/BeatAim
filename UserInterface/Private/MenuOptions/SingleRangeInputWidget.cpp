@@ -4,8 +4,8 @@
 #include "MenuOptions/SingleRangeInputWidget.h"
 #include "Components/EditableTextBox.h"
 #include "Components/Slider.h"
-#include "Utilities/BSWidgetInterface.h"
 #include "Styles/MenuOptionStyle.h"
+#include "Utilities/BSWidgetInterface.h"
 
 
 void USingleRangeInputWidget::NativeConstruct()

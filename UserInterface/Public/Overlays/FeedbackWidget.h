@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "HttpRequestInterface.h"
-#include "Utilities/BSWidgetInterface.h"
 #include "Blueprint/UserWidget.h"
+#include "Utilities/BSWidgetInterface.h"
 #include "FeedbackWidget.generated.h"
 
 class UMultiLineEditableTextBox;
@@ -22,7 +22,7 @@ class USERINTERFACE_API UFeedbackWidget : public UUserWidget, public IHttpReques
 public:
 	void ShowFeedbackWidget();
 
-	/** Broadcast when the widget is hidden after animations have completed */
+	/** Broadcast when the widget is hidden after animations have completed. */
 	FOnExitAnimationCompleted OnExitAnimationCompletedDelegate;
 
 protected:

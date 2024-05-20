@@ -33,8 +33,8 @@ public:
 	/** Broadcast to owning widget that user has clicked restart button. */
 	TDelegate<void()> OnRestartButtonClicked;
 
-	/** Returns the Game Settings widget's OnPlayerSettingsChangedDelegate_Game, which is broadcast when the widget
-	 * changes Game Settings. */
+	/** Returns the UGameSettings widget's OnPlayerSettingsChangedDelegate_Game, which is broadcast when the widget
+	 *  changes Game Settings. */
 	FOnPlayerSettingsChanged_Game& GetGameDelegate() const;
 
 	/** Returns the CrossHair Settings widget's OnPlayerSettingsChangedDelegate_Game, which is broadcast when the

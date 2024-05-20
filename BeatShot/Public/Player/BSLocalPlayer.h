@@ -22,7 +22,8 @@ public:
 	virtual void PostInitProperties() override;
 	//~End of UObject interface
 
-	/** Gets the local settings for this player, this is read from config files at process startup and is always valid */
+	/** Gets the local settings for this player, this is read from config files at process startup and is always
+	 *  valid. */
 	UFUNCTION()
 	UBSGameUserSettings* GetLocalSettings() const;
 

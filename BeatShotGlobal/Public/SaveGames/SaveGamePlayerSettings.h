@@ -3,15 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GlobalConstants.h"
+#include "BSConstants.h"
 #include "InputCoreTypes.h"
 #include "GameFramework/SaveGame.h"
 #include "UserSettings/EnhancedInputUserSettings.h"
 #include "SaveGamePlayerSettings.generated.h"
 
-/** Game settings */
+/** Game settings. */
 USTRUCT(BlueprintType)
-struct FPlayerSettings_Game
+struct BEATSHOTGLOBAL_API FPlayerSettings_Game
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -69,8 +69,6 @@ struct FPlayerSettings_Game
 	UPROPERTY(BlueprintReadWrite)
 	bool bShowHitTimingWidget;
 
-	/* Wall Menu settings */
-
 	UPROPERTY(BlueprintReadWrite)
 	bool bNightModeSelected;
 
@@ -125,7 +123,7 @@ struct FPlayerSettings_Game
 		bShow_LVRightCube = false;
 	}
 
-	/** Resets all game settings not on the wall menu */
+	/** Resets all game settings not on the wall menu. */
 	void ResetToDefault()
 	{
 		bShowStreakCombatText = true;
@@ -149,13 +147,13 @@ struct FPlayerSettings_Game
 	}
 };
 
-/** User settings */
+/** User settings. */
 USTRUCT(BlueprintType)
-struct FPlayerSettings_User
+struct BEATSHOTGLOBAL_API FPlayerSettings_User
 {
 	GENERATED_USTRUCT_BODY()
 
-	/** Sensitivity of DefaultCharacter */
+	/** Sensitivity of Character. */
 	UPROPERTY(BlueprintReadOnly)
 	float Sensitivity;
 
@@ -187,7 +185,7 @@ struct FPlayerSettings_User
 		Keybindings = TMap<FName, FKey>();
 	}
 
-	/** Returns an array of Keybindings for use with UEnhancedInputUserSettings. Empties the Keybindings map */
+	/** @return an array of Keybindings for use with UEnhancedInputUserSettings. Empties the Keybindings map */
 	TArray<FMapPlayerKeyArgs> GetLegacyKeybindings()
 	{
 		TArray<FMapPlayerKeyArgs> Out;
@@ -221,13 +219,11 @@ struct FPlayerSettings_User
 	}
 };
 
-/** CrossHair settings */
+/** CrossHair settings. */
 USTRUCT(BlueprintType)
-struct FPlayerSettings_CrossHair
+struct BEATSHOTGLOBAL_API FPlayerSettings_CrossHair
 {
 	GENERATED_USTRUCT_BODY()
-
-	// Lines
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 LineWidth;
@@ -241,15 +237,11 @@ struct FPlayerSettings_CrossHair
 	UPROPERTY(BlueprintReadOnly)
 	FLinearColor CrossHairColor;
 
-	// Outline
-
 	UPROPERTY(BlueprintReadOnly)
 	FLinearColor OutlineColor;
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 OutlineSize;
-
-	// Dot
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bShowCrossHairDot;
@@ -276,9 +268,9 @@ struct FPlayerSettings_CrossHair
 	}
 };
 
-/** Audio Analyzer specific settings */
+/** Audio Analyzer specific settings. */
 USTRUCT(BlueprintType)
-struct FPlayerSettings_AudioAnalyzer
+struct BEATSHOTGLOBAL_API FPlayerSettings_AudioAnalyzer
 {
 	GENERATED_BODY()
 
@@ -333,9 +325,9 @@ struct FPlayerSettings_AudioAnalyzer
 	}
 };
 
-/** Wrapper holding all player settings sub-structs */
+/** Wrapper holding all player settings sub-structs. */
 USTRUCT(BlueprintType)
-struct FPlayerSettings
+struct BEATSHOTGLOBAL_API FPlayerSettings
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -381,19 +373,27 @@ class BEATSHOTGLOBAL_API USaveGamePlayerSettings : public USaveGame
 	GENERATED_BODY()
 
 public:
-	/** Returns a copy of PlayerSettings */
+	/** @return a copy of PlayerSettings */
 	FPlayerSettings GetPlayerSettings() const;
 
-	/** Saves Game specific settings, preserving all other settings */
+	/** Saves Game specific settings, preserving all other settings.
+	 *  @param InGameSettings Game Settings to save
+	 */
 	void SavePlayerSettings(const FPlayerSettings_Game& InGameSettings);
 
-	/** Saves Audio Analyzer specific settings, preserving all other settings */
+	/** Saves Audio Analyzer specific settings, preserving all other settings.
+	 *  @param InAudioAnalyzerSettings Audio Analyzer Settings to save
+	 */
 	void SavePlayerSettings(const FPlayerSettings_AudioAnalyzer& InAudioAnalyzerSettings);
 
-	/** Saves User specific settings, preserving all other settings */
+	/** Saves User specific settings, preserving all other settings.
+	 *  @param InUserSettings User Settings to save
+	 */
 	void SavePlayerSettings(const FPlayerSettings_User& InUserSettings);
 
-	/** Saves CrossHair specific settings, preserving all other settings */
+	/** Saves CrossHair specific settings, preserving all other settings.
+	 *  @param InCrossHairSettings CrossHair Settings to save
+	 */
 	void SavePlayerSettings(const FPlayerSettings_CrossHair& InCrossHairSettings);
 
 private:

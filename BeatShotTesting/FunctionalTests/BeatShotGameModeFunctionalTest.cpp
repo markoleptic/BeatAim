@@ -2,9 +2,8 @@
 
 
 #include "BeatShotGameModeFunctionalTest.h"
-
-#include "SaveGamePlayerScore.h"
 #include "Algo/RandomShuffle.h"
+#include "SaveGames/SaveGamePlayerScore.h"
 #include "Target/SpawnArea.h"
 #include "Target/SpawnAreaManagerComponent.h"
 #include "Target/Target.h"
@@ -43,9 +42,12 @@ void ABeatShotGameModeFunctionalTest::PrepareTest()
 
 void ABeatShotGameModeFunctionalTest::ImportDefaultGameModes()
 {
-	if (!GameModeDataAsset) return;
+	if (!GameModeDataAsset)
+	{
+		return;
+	}
 
-	const auto Map = GameModeDataAsset->GetDefaultGameModesMap();
+	const auto Map = GameModeDataAsset->GetGameModesMap();
 	for (const auto& GameMode : DefaultGameModesToTest)
 	{
 		for (const auto& Difficulty : DefaultGameModeDifficultiesToTest)
@@ -148,7 +150,10 @@ void ABeatShotGameModeFunctionalTest::StartGameMode()
 void ABeatShotGameModeFunctionalTest::StopGameMode()
 {
 	GetWorldTimerManager().ClearAllTimersForObject(this);
-	if (!TargetManager) FinishTest(EFunctionalTestResult::Failed, TEXT("Null Target Manager"));
+	if (!TargetManager)
+	{
+		FinishTest(EFunctionalTestResult::Failed, TEXT("Null Target Manager"));
+	}
 
 	GatherData();
 

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GlobalConstants.h"
+#include "BSConstants.h"
 #include "Styling/SlateWidgetStyle.h"
 #include "Styling/SlateWidgetStyleContainerBase.h"
 #include "LoadingScreenStyle.generated.h"

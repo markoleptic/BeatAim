@@ -1,17 +1,16 @@
 // Copyright 2022-2023 Markoleptic Games, SP. All Rights Reserved.
 
 #include "Target/TargetManager.h"
-
-#include "BSCommon.h"
+#include "BSConstants.h"
 #include "BSGameMode.h"
-#include "GlobalConstants.h"
-#include "Target/Target.h"
 #include "Components/BoxComponent.h"
 #include "Engine/CompositeCurveTable.h"
 #include "Kismet/DataTableFunctionLibrary.h"
-#include "Target/ReinforcementLearningComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Target/ReinforcementLearningComponent.h"
 #include "Target/SpawnAreaManagerComponent.h"
+#include "Target/Target.h"
+#include "Utilities/BSCommon.h"
 
 FVector (&RandBoxPoint)(const FVector Center, const FVector Extents) = UKismetMathLibrary::RandomPointInBoundingBox;
 DEFINE_LOG_CATEGORY(LogTargetManager);
@@ -248,7 +247,10 @@ void ATargetManager::OnPlayerStopTrackingTarget()
 
 void ATargetManager::OnAudioAnalyzerBeat()
 {
-	if (!ShouldSpawn) return;
+	if (!ShouldSpawn)
+	{
+		return;
+	}
 
 	const int32 LastSeed = RandomNumToActivateStream.GetCurrentSeed();
 	HandleRuntimeSpawning();
@@ -265,14 +267,20 @@ ATarget* ATargetManager::SpawnTarget(const FTargetSpawnParams& Params)
 	ATarget* Target = GetWorld()->SpawnActor<ATarget>(TargetToSpawn, Params.Transform(), TargetSpawnInfo);
 
 #if !UE_BUILD_SHIPPING
-	if (GIsAutomationTesting) Target->DispatchBeginPlay();
+	if (GIsAutomationTesting)
+	{
+		Target->DispatchBeginPlay();
+	}
 #endif
 
 	Target->SetTargetDamageType(FindNextTargetDamageType());
 	Target->OnTargetDamageEvent.AddUObject(this, &ATargetManager::OnTargetDamageEvent);
 	AddToManagedTargets(Target, Params.SpawnAreaIndex);
 
-	if (!Target) return nullptr;
+	if (!Target)
+	{
+		return nullptr;
+	}
 
 	// Handle spawn responses
 	if (BSConfig->TargetConfig.TargetSpawnResponses.Contains(ETargetSpawnResponse::AddImmunity))
@@ -359,7 +367,10 @@ bool ATargetManager::ActivateTarget(ATarget* InTarget) const
 	const bool bActivated = InTarget->ActivateTarget(BSConfig->TargetConfig.TargetMaxLifeSpan);
 
 	// Don't continue if failed to activate
-	if (!bActivated) return false;
+	if (!bActivated)
+	{
+		return false;
+	}
 
 	// Cache the previous SpawnArea
 	const int32 PreviousIndex = SpawnAreaManager->GetMostRecentSpawnAreaIndex();
@@ -543,7 +554,10 @@ bool ATargetManager::ShouldDestroyTarget(const bool bExpired, const bool bOutOfH
 
 int32 ATargetManager::HandleUpfrontSpawning()
 {
-	if (BSConfig->TargetConfig.TargetSpawningPolicy != ETargetSpawningPolicy::UpfrontOnly) return 0;
+	if (BSConfig->TargetConfig.TargetSpawningPolicy != ETargetSpawningPolicy::UpfrontOnly)
+	{
+		return 0;
+	}
 
 	int32 NumSpawned = 0;
 	for (const FTargetSpawnParams& Params : GetTargetSpawnParams(GetNumberOfTargetsToSpawn()))
@@ -560,7 +574,10 @@ int32 ATargetManager::HandleRuntimeSpawning()
 {
 	const auto& Cfg = BSConfig->TargetConfig;
 
-	if (Cfg.TargetSpawningPolicy != ETargetSpawningPolicy::RuntimeOnly) return 0;
+	if (Cfg.TargetSpawningPolicy != ETargetSpawningPolicy::RuntimeOnly)
+	{
+		return 0;
+	}
 
 	int32 NumberToSpawn = GetNumberOfTargetsToSpawn();
 
@@ -596,7 +613,10 @@ int32 ATargetManager::HandleRuntimeSpawning()
 
 int32 ATargetManager::HandleTargetActivation() const
 {
-	if (ManagedTargets.IsEmpty()) return 0;
+	if (ManagedTargets.IsEmpty())
+	{
+		return 0;
+	}
 
 	const auto& Cfg = BSConfig->TargetConfig;
 
@@ -675,7 +695,10 @@ int32 ATargetManager::GetNumberOfTargetsToSpawn() const
 
 	if (Cfg.TargetSpawningPolicy == ETargetSpawningPolicy::UpfrontOnly)
 	{
-		if (NumManaged > 0) return 0;
+		if (NumManaged > 0)
+		{
+			return 0;
+		}
 		if (Cfg.TargetDistributionPolicy == ETargetDistributionPolicy::Grid)
 		{
 			return BSConfig->GridConfig.NumHorizontalGridTargets * BSConfig->GridConfig.NumVerticalGridTargets;
@@ -686,9 +709,18 @@ int32 ATargetManager::GetNumberOfTargetsToSpawn() const
 	// Batch spawning waits until there are no more Activated and Deactivated target(s)
 	if (Cfg.bUseBatchSpawning)
 	{
-		if (NumManaged > 0) return 0;
-		if (SpawnAreaManager->GetNumActivated() > 0) return 0;
-		if (SpawnAreaManager->GetNumDeactivated() > 0) return 0;
+		if (NumManaged > 0)
+		{
+			return 0;
+		}
+		if (SpawnAreaManager->GetNumActivated() > 0)
+		{
+			return 0;
+		}
+		if (SpawnAreaManager->GetNumDeactivated() > 0)
+		{
+			return 0;
+		}
 	}
 
 	// Set default value to number of runtime targets to spawn to NumRuntimeTargetsToSpawn
@@ -722,7 +754,10 @@ int32 ATargetManager::GetNumberOfTargetsToActivate(const int32 MaxAvailable, con
 	// Constraints: Max Available & Max Allowed (both must be satisfied, so pick min)
 	const int32 UpperLimit = FMath::Min(FMath::Max(0, MaxAllowed - NumActivated), MaxAvailable);
 
-	if (UpperLimit <= 0) return 0;
+	if (UpperLimit <= 0)
+	{
+		return 0;
+	}
 
 	// Can activate at least 1 at this point
 	int32 MinToActivate = FMath::Min(Cfg.MinNumTargetsToActivateAtOnce, Cfg.MaxNumTargetsToActivateAtOnce);
@@ -753,7 +788,10 @@ FVector ATargetManager::FindNextSpawnedTargetScale() const
 
 TSet<FTargetSpawnParams> ATargetManager::GetTargetSpawnParams(const int32 NumToSpawn) const
 {
-	if (NumToSpawn == 0) return {};
+	if (NumToSpawn == 0)
+	{
+		return {};
+	}
 
 	// Change the BoxExtent of the SpawnBox if dynamic
 	if (BSConfig->TargetConfig.BoundsScalingPolicy == EBoundsScalingPolicy::Dynamic)
@@ -1131,7 +1169,10 @@ void ATargetManager::UpdateSpawnBoxExtents(const float Factor) const
 		? FVector(0, LerpY, LerpZ)
 		: FVector(0, SnapY, SnapZ);
 
-	if (LastExtents == NewExtents) return;
+	if (LastExtents == NewExtents)
+	{
+		return;
+	}
 
 	SpawnBox->SetBoxExtent(NewExtents);
 	SpawnAreaManager->OnExtremaChanged(GetSpawnBoxExtrema());
@@ -1289,20 +1330,29 @@ void ATargetManager::UpdateTotalPossibleDamage()
 	TotalPossibleDamage++;
 	for (const auto Pair : ManagedTargets)
 	{
-		if (Pair.Value) SpawnAreaManager->UpdateTotalTrackingDamagePossible(Pair.Value->GetActorLocation());
+		if (Pair.Value)
+		{
+			SpawnAreaManager->UpdateTotalTrackingDamagePossible(Pair.Value->GetActorLocation());
+		}
 	}
 }
 
 bool ATargetManager::TrackingTargetIsDamageable() const
 {
-	if (!BSConfig) return false;
+	if (!BSConfig)
+	{
+		return false;
+	}
 	if (BSConfig->TargetConfig.TargetDamageType == ETargetDamageType::Hit || ManagedTargets.IsEmpty())
 	{
 		return false;
 	}
 	for (const auto Pair : ManagedTargets)
 	{
-		if (Pair.Value && !Pair.Value->IsImmuneToTrackingDamage()) return true;
+		if (Pair.Value && !Pair.Value->IsImmuneToTrackingDamage())
+		{
+			return true;
+		}
 	}
 	return false;
 }
@@ -1341,7 +1391,10 @@ float ATargetManager::GetMaxTargetDiameter(const FBS_TargetConfig& InTargetCfg)
 
 void ATargetManager::DestroyTargets()
 {
-	if (ManagedTargets.IsEmpty()) return;
+	if (ManagedTargets.IsEmpty())
+	{
+		return;
+	}
 
 	for (const auto Pair : ManagedTargets.Array())
 	{

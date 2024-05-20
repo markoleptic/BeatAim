@@ -5,8 +5,8 @@
 #include "HttpRequestInterface.h"
 #include "HttpModule.h"
 #include "JsonObjectConverter.h"
-#include "SaveGamePlayerScore.h"
 #include "Interfaces/IHttpResponse.h"
+#include "SaveGames/SaveGamePlayerScore.h"
 
 bool IHttpRequestInterface::IsRefreshTokenValid(const FString RefreshToken)
 {

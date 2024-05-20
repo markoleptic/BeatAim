@@ -2,7 +2,7 @@
 
 
 #include "Overlays/QuitMenuWidget.h"
-#include "BSGameModeDataAsset.h"
+#include "Utilities/GameModeTransitionState.h"
 #include "Utilities/Buttons/BSButton.h"
 
 void UQuitMenuWidget::NativeConstruct()

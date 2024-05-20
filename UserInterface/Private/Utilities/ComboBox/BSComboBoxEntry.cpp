@@ -2,11 +2,11 @@
 
 
 #include "Utilities/ComboBox/BSComboBoxEntry.h"
-#include "Utilities/BSWidgetInterface.h"
 #include "Components/Border.h"
 #include "Components/TextBlock.h"
-#include "Utilities/TooltipImage.h"
 #include "Styles/MenuOptionStyle.h"
+#include "Utilities/BSWidgetInterface.h"
+#include "Utilities/TooltipImage.h"
 
 void UBSComboBoxEntry::NativePreConstruct()
 {
