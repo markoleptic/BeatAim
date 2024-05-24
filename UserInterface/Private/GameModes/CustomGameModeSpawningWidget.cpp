@@ -2,12 +2,28 @@
 
 
 #include "GameModes/CustomGameModeSpawningWidget.h"
+#include "BSGameModeConfig/BSGameModeValidator.h"
 #include "Components/CheckBox.h"
+#include "GameModes/CustomGameModeWidget.h"
 #include "MenuOptions/CheckBoxWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "MenuOptions/SingleRangeInputWidget.h"
 #include "Utilities/ComboBox/BSComboBoxString.h"
 
+
+UCustomGameModeSpawningWidget::UCustomGameModeSpawningWidget(): SliderTextBoxOption_MaxNumTargetsAtOnce(nullptr),
+                                                                ComboBoxOption_TargetSpawningPolicy(nullptr),
+                                                                ComboBoxOption_RuntimeTargetSpawningLocationSelectionMode(
+	                                                                nullptr),
+                                                                CheckBoxOption_AllowSpawnWithoutActivation(nullptr),
+                                                                CheckBoxOption_BatchSpawning(nullptr),
+                                                                CheckBoxOption_SpawnAtOriginWheneverPossible(nullptr),
+                                                                CheckBoxOption_SpawnEveryOtherTargetInCenter(nullptr),
+                                                                SliderTextBoxOption_NumUpfrontTargetsToSpawn(nullptr),
+                                                                SliderTextBoxOption_NumRuntimeTargetsToSpawn(nullptr)
+{
+	GameModeCategory = EGameModeCategory::TargetSpawning;
+}
 
 void UCustomGameModeSpawningWidget::NativeConstruct()
 {
@@ -73,10 +89,6 @@ void UCustomGameModeSpawningWidget::NativeConstruct()
 	UpdateBrushColors();
 }
 
-void UCustomGameModeSpawningWidget::UpdateAllOptionsValid()
-{
-	Super::UpdateAllOptionsValid();
-}
 
 void UCustomGameModeSpawningWidget::UpdateOptionsFromConfig()
 {
@@ -212,25 +224,25 @@ void UCustomGameModeSpawningWidget::UpdateDependentOptions_TargetSpawningPolicy(
 void UCustomGameModeSpawningWidget::OnCheckStateChanged_AllowSpawnWithoutActivation(const bool bChecked)
 {
 	BSConfig->TargetConfig.bAllowSpawnWithoutActivation = bChecked;
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeSpawningWidget::OnCheckStateChanged_BatchSpawning(const bool bChecked)
 {
 	BSConfig->TargetConfig.bUseBatchSpawning = bChecked;
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeSpawningWidget::OnCheckStateChanged_SpawnAtOriginWheneverPossible(const bool bChecked)
 {
 	BSConfig->TargetConfig.bSpawnAtOriginWheneverPossible = bChecked;
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeSpawningWidget::OnCheckStateChanged_SpawnEveryOtherTargetInCenter(const bool bChecked)
 {
 	BSConfig->TargetConfig.bSpawnEveryOtherTargetInCenter = bChecked;
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeSpawningWidget::OnSliderTextBoxValueChanged(USingleRangeInputWidget* Widget, const float Value)
@@ -248,7 +260,7 @@ void UCustomGameModeSpawningWidget::OnSliderTextBoxValueChanged(USingleRangeInpu
 		BSConfig->TargetConfig.NumRuntimeTargetsToSpawn = Value;
 	}
 
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeSpawningWidget::OnSelectionChanged_RuntimeTargetSpawningLocationSelectionMode(
@@ -263,7 +275,7 @@ void UCustomGameModeSpawningWidget::OnSelectionChanged_RuntimeTargetSpawningLoca
 		ERuntimeTargetSpawningLocationSelectionMode>(Selected[0]);
 
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeSpawningWidget::OnSelectionChanged_TargetSpawningPolicy(const TArray<FString>& Selected,
@@ -278,7 +290,7 @@ void UCustomGameModeSpawningWidget::OnSelectionChanged_TargetSpawningPolicy(cons
 
 	UpdateDependentOptions_TargetSpawningPolicy(BSConfig->TargetConfig.TargetSpawningPolicy);
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 FString UCustomGameModeSpawningWidget::GetComboBoxEntryTooltipStringTableKey_RuntimeTargetSpawningLocationSelectionMode(

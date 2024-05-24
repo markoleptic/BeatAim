@@ -2,8 +2,18 @@
 
 
 #include "GameModes/CustomGameModeConditionsAndResponsesWidget.h"
+#include "BSGameModeConfig/BSGameModeValidator.h"
+#include "GameModes/CustomGameModeWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "Utilities/ComboBox/BSComboBoxString.h"
+
+UCustomGameModeConditionsAndResponsesWidget::UCustomGameModeConditionsAndResponsesWidget():
+	ComboBoxOption_TargetSpawnResponses(nullptr), ComboBoxOption_TargetActivationResponses(nullptr),
+	ComboBoxOption_TargetDeactivationConditions(nullptr), ComboBoxOption_TargetDeactivationResponses(nullptr),
+	ComboBoxOption_TargetDestructionConditions(nullptr)
+{
+	GameModeCategory = EGameModeCategory::TargetBehavior;
+}
 
 void UCustomGameModeConditionsAndResponsesWidget::NativeConstruct()
 {
@@ -78,11 +88,6 @@ void UCustomGameModeConditionsAndResponsesWidget::NativeConstruct()
 
 	SetupWarningTooltipCallbacks();
 	UpdateBrushColors();
-}
-
-void UCustomGameModeConditionsAndResponsesWidget::UpdateAllOptionsValid()
-{
-	Super::UpdateAllOptionsValid();
 }
 
 void UCustomGameModeConditionsAndResponsesWidget::UpdateOptionsFromConfig()
@@ -181,7 +186,7 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetActiv
 
 	UpdateDependentOptions_TargetActivationResponses(BSConfig->TargetConfig.TargetActivationResponses);
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetSpawnResponses(
@@ -204,7 +209,7 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetSpawn
 
 	UpdateDependentOptions_TargetSpawnResponses(BSConfig->TargetConfig.TargetSpawnResponses);
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDeactivationConditions(
@@ -226,7 +231,7 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDeact
 	}
 
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDeactivationResponses(
@@ -249,7 +254,7 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDeact
 
 	UpdateDependentOptions_TargetDeactivationResponses(BSConfig->TargetConfig.TargetDeactivationResponses);
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDestructionConditions(
@@ -271,7 +276,7 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDestr
 	}
 
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 FString UCustomGameModeConditionsAndResponsesWidget::GetComboBoxEntryTooltipStringTableKey_TargetSpawnResponses(

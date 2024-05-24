@@ -25,7 +25,7 @@ protected:
 	void OnCarouselWidgetIndexChanged(UCommonWidgetCarousel* InCarousel, const int32 NewIndex);
 
 	/** Calls UpdateAllOptionsValid for each child widget. */
-	virtual void UpdateAllChildWidgetOptionsValid() override;
+	//virtual void UpdateAllChildWidgetOptionsValid() override;
 
 public:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))

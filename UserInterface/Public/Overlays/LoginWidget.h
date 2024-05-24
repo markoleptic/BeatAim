@@ -44,7 +44,7 @@ public:
 	FOnLoginButtonClicked OnLoginButtonClicked;
 
 	/** Broadcast when the widget is hidden after animations have completed. */
-	FOnExitAnimationCompleted OnExitAnimationCompletedDelegate;
+	TMulticastDelegate<void()> OnExitAnimationCompletedDelegate;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget))

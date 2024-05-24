@@ -2,7 +2,9 @@
 
 
 #include "GameModes/CustomGameModeGeneralWidget.h"
+#include "BSGameModeConfig/BSGameModeValidator.h"
 #include "Components/CheckBox.h"
+#include "GameModes/CustomGameModeWidget.h"
 #include "MenuOptions/CheckBoxWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "MenuOptions/SingleRangeInputWidget.h"
@@ -10,6 +12,25 @@
 #include "Utilities/ComboBox/BSComboBoxString.h"
 
 using namespace Constants;
+
+UCustomGameModeGeneralWidget::UCustomGameModeGeneralWidget(): SliderTextBoxOption_SpawnBeatDelay(nullptr),
+                                                              SliderTextBoxOption_TargetSpawnCD(nullptr),
+                                                              ComboBoxOption_RecentTargetMemoryPolicy(nullptr),
+                                                              SliderTextBoxOption_MaxNumRecentTargets(nullptr),
+                                                              SliderTextBoxOption_RecentTargetTimeLength(nullptr),
+                                                              CheckBoxOption_EnableAI(nullptr),
+                                                              ComboBoxOption_HyperParameterMode(nullptr),
+                                                              SliderTextBoxOption_Alpha(nullptr),
+                                                              SliderTextBoxOption_Epsilon(nullptr),
+                                                              SliderTextBoxOption_Gamma(nullptr),
+                                                              MenuOption_TargetLifespan(nullptr),
+                                                              MenuOption_TargetHealth(nullptr),
+                                                              SliderTextBoxOption_ExpirationHealthPenalty(nullptr),
+                                                              SliderTextBoxOption_DeactivationHealthLostThreshold(
+	                                                              nullptr), ComboBoxOption_DamageType(nullptr)
+{
+	GameModeCategory = EGameModeCategory::General;
+}
 
 void UCustomGameModeGeneralWidget::NativeConstruct()
 {
@@ -109,11 +130,6 @@ void UCustomGameModeGeneralWidget::NativeConstruct()
 	UpdateBrushColors();
 }
 
-void UCustomGameModeGeneralWidget::UpdateAllOptionsValid()
-{
-	Super::UpdateAllOptionsValid();
-}
-
 void UCustomGameModeGeneralWidget::UpdateOptionsFromConfig()
 {
 	UpdateValueIfDifferent(SliderTextBoxOption_SpawnBeatDelay, BSConfig->TargetConfig.SpawnBeatDelay);
@@ -173,7 +189,7 @@ void UCustomGameModeGeneralWidget::SetupWarningTooltipCallbacks()
 }
 
 void UCustomGameModeGeneralWidget::UpdateDependentOptions_RecentTargetMemoryPolicy(
-	const ERecentTargetMemoryPolicy& InRecentTargetMemoryPolicy)
+	const ERecentTargetMemoryPolicy InRecentTargetMemoryPolicy)
 {
 	switch (InRecentTargetMemoryPolicy)
 	{
@@ -270,7 +286,7 @@ void UCustomGameModeGeneralWidget::OnCheckStateChanged_EnableAI(const bool bChec
 		BSConfig->AIConfig.HyperParameterMode);
 
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeGeneralWidget::OnSliderTextBoxValueChanged(USingleRangeInputWidget* Widget, const float Value)
@@ -311,7 +327,7 @@ void UCustomGameModeGeneralWidget::OnSliderTextBoxValueChanged(USingleRangeInput
 	{
 		BSConfig->TargetConfig.DeactivationHealthLostThreshold = Value;
 	}
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeGeneralWidget::OnSliderTextBoxCheckBoxOptionChanged(UToggleableSingleRangeInputWidget* Widget,
@@ -325,7 +341,7 @@ void UCustomGameModeGeneralWidget::OnSliderTextBoxCheckBoxOptionChanged(UTogglea
 	{
 		BSConfig->TargetConfig.TargetMaxLifeSpan = bChecked ? -1.f : Value;
 	}
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeGeneralWidget::OnSelectionChanged_RecentTargetMemoryPolicy(const TArray<FString>& Selected,
@@ -340,7 +356,7 @@ void UCustomGameModeGeneralWidget::OnSelectionChanged_RecentTargetMemoryPolicy(c
 		ERecentTargetMemoryPolicy>(Selected[0]);
 	UpdateDependentOptions_RecentTargetMemoryPolicy(BSConfig->TargetConfig.RecentTargetMemoryPolicy);
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeGeneralWidget::OnSelectionChanged_DamageType(const TArray<FString>& Selected,
@@ -352,7 +368,7 @@ void UCustomGameModeGeneralWidget::OnSelectionChanged_DamageType(const TArray<FS
 	}
 
 	BSConfig->TargetConfig.TargetDamageType = GetEnumFromString_FromTagMap<ETargetDamageType>(Selected[0]);
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeGeneralWidget::OnSelectionChanged_HyperParameterMode(const TArray<FString>& Selected,
@@ -369,7 +385,7 @@ void UCustomGameModeGeneralWidget::OnSelectionChanged_HyperParameterMode(const T
 		BSConfig->AIConfig.HyperParameterMode);
 
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 FString UCustomGameModeGeneralWidget::GetComboBoxEntryTooltipStringTableKey_HyperParameterMode(

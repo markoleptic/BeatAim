@@ -42,9 +42,12 @@ class USERINTERFACE_API UCustomGameModeSpawnAreaWidget : public UCustomGameModeC
 {
 	GENERATED_BODY()
 
+public:
+	UCustomGameModeSpawnAreaWidget();
+
 protected:
 	virtual void NativeConstruct() override;
-	virtual void UpdateAllOptionsValid() override;
+	//virtual void UpdateAllOptionsValid() override;
 	virtual void UpdateOptionsFromConfig() override;
 	void SetupWarningTooltipCallbacks();
 	void UpdateDependentOptions_TargetDistributionPolicy();

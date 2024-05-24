@@ -3,64 +3,76 @@
 
 #include "GameModes/CustomGameModeWidget.h"
 #include "Blueprint/WidgetTree.h"
+#include "BSGameModeConfig/BSGameModeValidator.h"
 #include "GameModes/CustomGameModeCategoryWidget.h"
 #include "GameModes/CustomGameModeStartWidget.h"
+
+UCustomGameModeStartWidget* UCustomGameModeWidget::GetStartWidget() const
+{
+	if (const TObjectPtr<UCustomGameModeCategoryWidget>* Widget = GameModeCategoryWidgetMap.Find(
+		EGameModeCategory::Start))
+	{
+		return Cast<UCustomGameModeStartWidget>(Widget->Get());
+	}
+	return nullptr;
+}
 
 void UCustomGameModeWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	Widget_Start->RequestGameModeTemplateUpdate.AddUObject(this, &ThisClass::OnRequestGameModeTemplateUpdate);
-	Widget_Start->OnCustomGameModeNameChanged.AddUObject(this, &ThisClass::OnStartWidget_CustomGameModeNameChanged);
+	//Widget_Start->RequestGameModeTemplateUpdate.AddUObject(this, &ThisClass::OnRequestGameModeTemplateUpdate);
+	//Widget_Start->OnCustomGameModeNameChanged.AddUObject(this, &ThisClass::OnStartWidget_CustomGameModeNameChanged);
 }
 
 void UCustomGameModeWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
-	BSConfig = nullptr;
+	//BSConfig = nullptr;
 }
 
-void UCustomGameModeWidget::Init(TSharedPtr<FBSConfig> InConfig,
+void UCustomGameModeWidget::HandlePropertyChanged(const TSet<const FProperty*>& Properties)
+{
+	OnPropertyChanged.Execute(Properties);
+}
+
+void UCustomGameModeWidget::Init(const TSharedPtr<FBSConfig>& InConfig,
 	const TObjectPtr<UBSGameModeDataAsset> InGameModeDataAsset)
 {
-	BSConfig = InConfig;
+	//BSConfig = InConfig;
 	GameModeDataAsset = InGameModeDataAsset;
-	int32 Index = 0;
+	//int32 Index = 0;
 
 	WidgetTree->ForEachWidget([&](UWidget* Widget)
 	{
 		if (UCustomGameModeCategoryWidget* Component = Cast<UCustomGameModeCategoryWidget>(Widget))
 		{
-			const bool bIndexOnCarousel = Component->ShouldIndexOnCarousel();
-			Component->InitComponent(InConfig, bIndexOnCarousel ? Index : -1);
-			Component->RequestComponentUpdate.AddUObject(this, &ThisClass::OnRequestComponentUpdate);
-			Component->RequestGameModePreviewUpdate.AddUObject(this, &ThisClass::OnRequestGameModePreviewUpdate);
-			ChildWidgetValidityMap.FindOrAdd(Component) = Component->GetCustomGameModeCategoryInfo();
+			//const bool bIndexOnCarousel = Component->ShouldIndexOnCarousel();
+			//Component->InitComponent(InConfig, bIndexOnCarousel ? Index : -1);
+			//Component->RequestComponentUpdate.AddUObject(this, &ThisClass::OnRequestComponentUpdate);
+			//Component->RequestGameModePreviewUpdate.AddUObject(this, &ThisClass::OnRequestGameModePreviewUpdate);
+			Component->OnPropertyChanged.BindUObject(this, &UCustomGameModeWidget::HandlePropertyChanged);
+			Component->InitComponent(InConfig);
+			GameModeCategoryWidgetMap.Add(Component->GetGameModeCategory(), Component);
+			/*ChildWidgetValidityMap.FindOrAdd(Component) = Component->GetCustomGameModeCategoryInfo();
 			if (bIndexOnCarousel)
 			{
 				Index++;
-			}
+			}*/
 		}
 	});
+	UpdateOptionsFromConfig();
 }
 
 void UCustomGameModeWidget::UpdateOptionsFromConfig()
 {
-	for (const TPair<TObjectPtr<UCustomGameModeCategoryWidget>, FCustomGameModeCategoryInfo*>& ChildWidgetValidity :
-	     ChildWidgetValidityMap)
+	for (const auto& [Category, Widget] : GameModeCategoryWidgetMap)
 	{
-		if (const TObjectPtr<UCustomGameModeCategoryWidget> Component = ChildWidgetValidity.Key)
-		{
-			if (Component->IsInitialized())
-			{
-				Component->UpdateOptionsFromConfig();
-			}
-		}
+		Widget->UpdateOptionsFromConfig();
 	}
-	UpdateAllChildWidgetOptionsValid();
+	//UpdateAllChildWidgetOptionsValid();
 }
 
-void UCustomGameModeWidget::UpdateAllChildWidgetOptionsValid()
+/*void UCustomGameModeWidget::UpdateAllChildWidgetOptionsValid()
 {
 	bool bAtLeastOneWarningPresent = false;
 	uint8 TotalWarnings = 0;
@@ -90,29 +102,29 @@ void UCustomGameModeWidget::UpdateAllChildWidgetOptionsValid()
 	UE_LOG(LogTemp, Display, TEXT("TotalWarnings: %d TotalCautions: %d"), TotalWarnings, TotalCautions);
 	UpdateContainsGameModeBreakingOption(bAtLeastOneWarningPresent);
 	RequestButtonStateUpdate.Broadcast();
-}
+}*/
 
-FString UCustomGameModeWidget::GetNewCustomGameModeName() const
+/*FString UCustomGameModeWidget::GetNewCustomGameModeName() const
 {
 	return Widget_Start->GetNewCustomGameModeName();
-}
+}*/
 
-void UCustomGameModeWidget::SetNewCustomGameModeName(const FString& InCustomGameModeName) const
+/*void UCustomGameModeWidget::SetNewCustomGameModeName(const FString& InCustomGameModeName) const
 {
 	Widget_Start->SetNewCustomGameModeName(InCustomGameModeName);
-}
+}*/
 
-FStartWidgetProperties UCustomGameModeWidget::GetStartWidgetProperties() const
+/*FStartWidgetProperties UCustomGameModeWidget::GetStartWidgetProperties() const
 {
 	return Widget_Start->GetStartWidgetProperties();
-}
+}*/
 
-void UCustomGameModeWidget::SetStartWidgetProperties(const FStartWidgetProperties& InProperties)
+/*void UCustomGameModeWidget::SetStartWidgetProperties(const FStartWidgetProperties& InProperties)
 {
 	Widget_Start->SetStartWidgetProperties(InProperties);
-}
+}*/
 
-bool UCustomGameModeWidget::GetAllNonStartChildWidgetOptionsValid() const
+/*bool UCustomGameModeWidget::GetAllNonStartChildWidgetOptionsValid() const
 {
 	for (const TPair<TObjectPtr<UCustomGameModeCategoryWidget>, FCustomGameModeCategoryInfo*>& ChildWidgetValidity :
 	     ChildWidgetValidityMap)
@@ -127,25 +139,25 @@ bool UCustomGameModeWidget::GetAllNonStartChildWidgetOptionsValid() const
 		}
 	}
 	return true;
-}
+}*/
 
-void UCustomGameModeWidget::RefreshGameModeTemplateComboBoxOptions(const TArray<FBSConfig>& CustomGameModes) const
+/*void UCustomGameModeWidget::RefreshGameModeTemplateComboBoxOptions(const TArray<FBSConfig>& CustomGameModes) const
 {
 	Widget_Start->RefreshGameModeTemplateComboBoxOptions(CustomGameModes);
-}
+}*/
 
-void UCustomGameModeWidget::OnRequestGameModeTemplateUpdate(const FString& InGameMode,
+/*void UCustomGameModeWidget::OnRequestGameModeTemplateUpdate(const FString& InGameMode,
 	const EGameModeDifficulty& Difficulty)
 {
 	RequestGameModeTemplateUpdate.Broadcast(InGameMode, Difficulty);
-}
+}*/
 
-void UCustomGameModeWidget::OnStartWidget_CustomGameModeNameChanged()
+/*void UCustomGameModeWidget::OnStartWidget_CustomGameModeNameChanged()
 {
 	RequestButtonStateUpdate.Broadcast();
-}
+}*/
 
-void UCustomGameModeWidget::OnRequestComponentUpdate()
+/*void UCustomGameModeWidget::OnRequestComponentUpdate()
 {
 	if (!bIsUpdatingFromComponentRequest)
 	{
@@ -153,14 +165,14 @@ void UCustomGameModeWidget::OnRequestComponentUpdate()
 		UpdateAllChildWidgetOptionsValid();
 		bIsUpdatingFromComponentRequest = false;
 	}
-}
+}*/
 
-void UCustomGameModeWidget::OnRequestGameModePreviewUpdate()
+/*void UCustomGameModeWidget::OnRequestGameModePreviewUpdate()
 {
 	RequestGameModePreviewUpdate.Broadcast();
-}
+}*/
 
-void UCustomGameModeWidget::UpdateContainsGameModeBreakingOption(const bool bGameModeBreakingOptionPresent)
+/*void UCustomGameModeWidget::UpdateContainsGameModeBreakingOption(const bool bGameModeBreakingOptionPresent)
 {
 	if (bGameModeBreakingOptionPresent == bContainsGameModeBreakingOption)
 	{
@@ -178,4 +190,4 @@ void UCustomGameModeWidget::UpdateContainsGameModeBreakingOption(const bool bGam
 	}
 	bContainsGameModeBreakingOption = bGameModeBreakingOptionPresent;
 	OnGameModeBreakingChange.Broadcast(bContainsGameModeBreakingOption);
-}
+}*/

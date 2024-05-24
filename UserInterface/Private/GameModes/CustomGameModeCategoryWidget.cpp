@@ -3,6 +3,8 @@
 
 #include "GameModes/CustomGameModeCategoryWidget.h"
 #include "Blueprint/WidgetTree.h"
+#include "BSConstants.h"
+#include "BSGameModeConfig/BSConfig.h"
 #include "Components/CheckBox.h"
 #include "Components/EditableTextBox.h"
 #include "Mappings/GameModeCategoryTagMap.h"
@@ -43,24 +45,20 @@ void UCustomGameModeCategoryWidget::NativeDestruct()
 	BSConfig = nullptr;
 }
 
-void UCustomGameModeCategoryWidget::UpdateAllOptionsValid()
+/*void UCustomGameModeCategoryWidget::UpdateAllOptionsValid()
 {
 	if (!UpdateWarningTooltips())
 	{
 		RequestComponentUpdate.Broadcast();
 	}
-}
+}*/
 
-void UCustomGameModeCategoryWidget::InitComponent(TSharedPtr<FBSConfig> InConfig, const int32 InIndex)
+void UCustomGameModeCategoryWidget::InitComponent(const TSharedPtr<FBSConfig>& InConfig)
 {
 	BSConfig = InConfig;
-	UpdateOptionsFromConfig();
-	bIsInitialized = true;
-	Index = InIndex;
-}
-
-void UCustomGameModeCategoryWidget::UpdateOptionsFromConfig()
-{
+	//UpdateOptionsFromConfig();
+	//bIsInitialized = true;
+	//Index = InIndex;
 }
 
 void UCustomGameModeCategoryWidget::AddGameModeCategoryTagWidgets(UMenuOptionWidget* MenuOptionWidget)
@@ -224,7 +222,7 @@ bool UCustomGameModeCategoryWidget::UpdateValuesIfDifferent(const UToggleableSin
 	return bDifferent;
 }
 
-bool UCustomGameModeCategoryWidget::UpdateWarningTooltips()
+/*bool UCustomGameModeCategoryWidget::UpdateWarningTooltips()
 {
 	bool bAllClean = true;
 	for (const TWeakObjectPtr<UMenuOptionWidget>& Widget : MenuOptionWidgets)
@@ -251,9 +249,9 @@ bool UCustomGameModeCategoryWidget::UpdateWarningTooltips()
 	}
 	UpdateCustomGameModeCategoryInfo();
 	return bAllClean;
-}
+}*/
 
-void UCustomGameModeCategoryWidget::UpdateCustomGameModeCategoryInfo()
+/*void UCustomGameModeCategoryWidget::UpdateCustomGameModeCategoryInfo()
 {
 	int32 NumWarnings = 0;
 	int32 NumCautions = 0;
@@ -263,7 +261,7 @@ void UCustomGameModeCategoryWidget::UpdateCustomGameModeCategoryInfo()
 		NumCautions += Widget->GetNumberOfCautions();
 	}
 	CustomGameModeCategoryInfo.Update(NumCautions, NumWarnings);
-}
+}*/
 
 void UCustomGameModeCategoryWidget::SetMenuOptionEnabledStateAndAddTooltip(UMenuOptionWidget* Widget,
 	const EMenuOptionEnabledState State, const FString& Key)

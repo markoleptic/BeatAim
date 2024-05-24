@@ -2,6 +2,7 @@
 
 
 #include "GameModes/CustomGameModePreviewWidget.h"
+#include "BSGameModeConfig/BSGameModeValidator.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
 #include "Components/SizeBox.h"
@@ -11,6 +12,19 @@
 #include "GameModes/BoxBoundsWidget.h"
 #include "GameModes/TargetWidget.h"
 
+
+UCustomGameModePreviewWidget::UCustomGameModePreviewWidget(): BoxBounds_Current(nullptr), BoxBounds_Max(nullptr),
+                                                              BoxBounds_Min(nullptr), StaticBounds(nullptr),
+                                                              FloorDistance(nullptr),
+                                                              Box_StaticBoundsAndIndicators(nullptr),
+                                                              TopSpacer(nullptr), TextBlock_FloorDistance(nullptr),
+                                                              Button_RefreshPreview(nullptr), Button_Create(nullptr),
+                                                              Button_Start(nullptr), Overlay(nullptr),
+                                                              Overlay_Bottom(nullptr),
+                                                              TextBlock_GameModePreviewAvailability(nullptr)
+{
+	GameModeCategory = EGameModeCategory::Preview;
+}
 
 void UCustomGameModePreviewWidget::SetBoxBounds_Current(const FVector2d& InBounds, const float VerticalOffset) const
 {

@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CustomGameModeWidget.h"
 #include "Mappings/EnumTagMap.h"
 #include "Utilities/BSSettingCategoryWidget.h"
 #include "CustomGameModeCategoryWidget.generated.h"
 
+enum class EGameModeCategory : uint8;
 enum class EMenuOptionEnabledState : uint8;
 struct FBSConfig;
+struct FValidationResult;
 class UToggleableSingleRangeInputWidget;
 class UDualRangeInputWidget;
 class UGameModeCategoryTagMap;
@@ -33,34 +34,45 @@ protected:
 
 public:
 	/** Sets BSConfig, sets the pointer to next widget in linked list, and calls UpdateOptionsFromConfig. */
-	virtual void InitComponent(TSharedPtr<FBSConfig> InConfig, const int32 InIndex);
+	virtual void InitComponent(const TSharedPtr<FBSConfig>& InConfig);
 
 	/** Sets all custom game mode option values using the BSConfig pointer. Only changes the values if different.
 	 *  Only called during transitions. */
-	virtual void UpdateOptionsFromConfig();
+	virtual void UpdateOptionsFromConfig()
+	{
+	};
+
+
+	TDelegate<void(const TSet<const FProperty*>&)> OnPropertyChanged;
+
+	virtual void HandlePropertyValidation(const FValidationResult& ValidationResult) // = 0
+	{
+	};
 
 	/** Broadcast when a caution/warning tooltip needed to be added, removed, or updated. Helps synchronize
 	 *  caution/warnings across different components. */
-	TMulticastDelegate<void()> RequestComponentUpdate;
+	//TMulticastDelegate<void()> RequestComponentUpdate;
 
 	/** Broadcast when a widget wants to refresh the preview after a change to the config. */
-	TMulticastDelegate<void()> RequestGameModePreviewUpdate;
+	//TMulticastDelegate<void()> RequestGameModePreviewUpdate;
 
 	/** Returns whether Init has been called. */
-	bool IsInitialized() const { return bIsInitialized; }
+	//bool IsInitialized() const { return bIsInitialized; }
 
 	/** Checks all custom game mode options for validity by calling UpdateWarningTooltips and broadcasts
 	 *  RequestComponentUpdate if any are not valid. Should be called anytime an option is changed. */
-	virtual void UpdateAllOptionsValid();
+	//virtual void UpdateAllOptionsValid();
 
 	/** Returns the struct containing info about the number of caution and warnings current present. */
-	FCustomGameModeCategoryInfo* GetCustomGameModeCategoryInfo() { return &CustomGameModeCategoryInfo; }
+	//FCustomGameModeCategoryInfo* GetCustomGameModeCategoryInfo() { return &CustomGameModeCategoryInfo; }
 
 	/** Returns the index set during initialization. */
-	int32 GetIndex() const { return Index; }
+	//int32 GetIndex() const { return Index; }
 
 	/** Returns true if the widget should be indexed on the carousel. */
-	bool ShouldIndexOnCarousel() const { return bIndexOnCarousel; }
+	//bool ShouldIndexOnCarousel() const { return bIndexOnCarousel; }
+
+	EGameModeCategory GetGameModeCategory() const { return GameModeCategory; }
 
 protected:
 	/** Adds a GameModeCategoryTagWidget for each matching GameplayTag on the Menu Option widget. */
@@ -94,11 +106,11 @@ protected:
 	/** Iterates through all MenuOptionWidgets, calling UpdateAllWarningTooltips on each. Iterates through each
 	 *  widget's TooltipWarningData, checking if any changed from the update. If so, the tooltip is updated.
 	 *  Calls UpdateCustomGameModeCategoryInfo when finished. Returns false if any tooltips required an update. */
-	bool UpdateWarningTooltips();
+	//bool UpdateWarningTooltips();
 
 	/** Iterates through all MenuOptionWidgets to sum the total of Warning and Caution tooltips visible.
 	 *  Updates CustomGameModeCategoryInfo struct. */
-	void UpdateCustomGameModeCategoryInfo();
+	//void UpdateCustomGameModeCategoryInfo();
 
 	float GetMinRequiredHorizontalSpread() const;
 	float GetMinRequiredVerticalSpread() const;
@@ -122,18 +134,12 @@ protected:
 	/** Shared pointer to the game mode config inside GameModesWidget. */
 	TSharedPtr<FBSConfig> BSConfig;
 
-	/** Pointer to next widget in linked list. Used for CreatorView. */
-	UPROPERTY()
-	TWeakObjectPtr<UCustomGameModeCategoryWidget> Next;
-
-	/** Whether Init has been called. */
-	bool bIsInitialized = false;
-
 	/** Index used for parent widgets. */
-	int32 Index = -1;
+	//int32 Index = -1;
 
 	/** Struct containing info about NumWarning & NumCaution tooltips. */
-	FCustomGameModeCategoryInfo CustomGameModeCategoryInfo;
+	//FCustomGameModeCategoryInfo CustomGameModeCategoryInfo;
+	TMap<const FProperty*, TWeakObjectPtr<UMenuOptionWidget>> PropertyMap;
 
 	UPROPERTY()
 	TArray<TWeakObjectPtr<UMenuOptionWidget>> MenuOptionWidgets;
@@ -147,6 +153,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="CustomGameModesWidgetComponent")
 	TObjectPtr<UGameModeCategoryTagMap> GameModeCategoryTagMap;
+
+	EGameModeCategory GameModeCategory;
 
 	/** Returns the string display name of the enum, or empty string if not found. Requires EnumTagMap.  */
 	template <typename T>

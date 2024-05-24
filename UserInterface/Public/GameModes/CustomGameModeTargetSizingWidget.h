@@ -7,14 +7,20 @@
 #include "CustomGameModeCategoryWidget.h"
 #include "CustomGameModeTargetSizingWidget.generated.h"
 
+enum class ETargetActivationResponse : uint8;
+enum class ETargetDeactivationCondition : uint8;
+enum class ETargetDeactivationResponse : uint8;
+enum class EConsecutiveTargetScalePolicy : uint8;
+
 UCLASS()
 class USERINTERFACE_API UCustomGameModeTargetSizingWidget : public UCustomGameModeCategoryWidget
 {
 	GENERATED_BODY()
 
 protected:
+	UCustomGameModeTargetSizingWidget();
 	virtual void NativeConstruct() override;
-	virtual void UpdateAllOptionsValid() override;
+	//virtual void UpdateAllOptionsValid() override;
 	virtual void UpdateOptionsFromConfig() override;
 	void SetupWarningTooltipCallbacks();
 
@@ -59,5 +65,5 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UComboBoxWidget* ComboBoxOption_ConsecutiveTargetScalePolicy;
 
-	EConsecutiveTargetScalePolicy LastSelectedConsecutiveTargetScalePolicy = EConsecutiveTargetScalePolicy::None;
+	EConsecutiveTargetScalePolicy LastSelectedConsecutiveTargetScalePolicy;
 };

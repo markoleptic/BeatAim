@@ -16,8 +16,6 @@ class UTooltipWidget;
 class UEditableTextBox;
 class USlider;
 
-DECLARE_MULTICAST_DELEGATE(FOnExitAnimationCompleted);
-
 /** Enum representing a setting button. */
 UENUM(BlueprintType)
 enum class ESettingButtonType : uint8
@@ -31,7 +29,6 @@ enum class ESettingButtonType : uint8
 
 ENUM_RANGE_BY_FIRST_AND_LAST(ESettingButtonType, ESettingButtonType::Save, ESettingButtonType::SaveAndRestart);
 
-/** Interface for commonly used objects and functions such as adding tooltips and syncing Sliders & TextBoxes. */
 UINTERFACE()
 class UBSWidgetInterface : public UInterface
 {

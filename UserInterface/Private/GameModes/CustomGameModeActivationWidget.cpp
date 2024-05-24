@@ -2,14 +2,23 @@
 
 
 #include "GameModes/CustomGameModeActivationWidget.h"
+#include "BSGameModeConfig/BSGameModeValidator.h"
 #include "Components/CheckBox.h"
 #include "Components/Slider.h"
+#include "GameModes/CustomGameModeWidget.h"
 #include "MenuOptions/CheckBoxWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "MenuOptions/DualRangeInputWidget.h"
 #include "MenuOptions/SingleRangeInputWidget.h"
 #include "Utilities/ComboBox/BSComboBoxString.h"
 
+
+UCustomGameModeActivationWidget::UCustomGameModeActivationWidget():
+	SliderTextBoxOption_MaxNumActivatedTargetsAtOnce(nullptr), MenuOption_NumTargetsToActivateAtOnce(nullptr),
+	CheckBoxOption_AllowActivationWhileActivated(nullptr), ComboBoxOption_TargetActivationSelectionPolicy(nullptr)
+{
+	GameModeCategory = EGameModeCategory::TargetActivation;
+}
 
 void UCustomGameModeActivationWidget::NativeConstruct()
 {
@@ -47,11 +56,6 @@ void UCustomGameModeActivationWidget::NativeConstruct()
 
 	SetupWarningTooltipCallbacks();
 	UpdateBrushColors();
-}
-
-void UCustomGameModeActivationWidget::UpdateAllOptionsValid()
-{
-	Super::UpdateAllOptionsValid();
 }
 
 void UCustomGameModeActivationWidget::UpdateOptionsFromConfig()
@@ -113,7 +117,7 @@ void UCustomGameModeActivationWidget::UpdateDependentOptions_TargetDistributionP
 void UCustomGameModeActivationWidget::OnCheckStateChanged_AllowActivationWhileActivated(const bool bChecked)
 {
 	BSConfig->TargetConfig.bAllowActivationWhileActivated = bChecked;
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeActivationWidget::OnSliderTextBoxValueChanged(USingleRangeInputWidget* Widget, const float Value)
@@ -122,7 +126,7 @@ void UCustomGameModeActivationWidget::OnSliderTextBoxValueChanged(USingleRangeIn
 	{
 		BSConfig->TargetConfig.MaxNumActivatedTargetsAtOnce = Value;
 	}
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeActivationWidget::OnMinMaxMenuOptionChanged(UDualRangeInputWidget* Widget, const bool bChecked,
@@ -134,7 +138,7 @@ void UCustomGameModeActivationWidget::OnMinMaxMenuOptionChanged(UDualRangeInputW
 		BSConfig->TargetConfig.MaxNumTargetsToActivateAtOnce = bChecked ? MinOrConstant : Max;
 	}
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeActivationWidget::OnSelectionChanged_TargetActivationSelectionPolicy(
@@ -147,7 +151,7 @@ void UCustomGameModeActivationWidget::OnSelectionChanged_TargetActivationSelecti
 
 	BSConfig->TargetConfig.TargetActivationSelectionPolicy = GetEnumFromString_FromTagMap<
 		ETargetActivationSelectionPolicy>(Selected[0]);
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 FString UCustomGameModeActivationWidget::GetComboBoxEntryTooltipStringTableKey_TargetActivationSelectionPolicy(

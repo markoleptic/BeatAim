@@ -17,6 +17,10 @@ class UBSButton;
 UCLASS()
 class USERINTERFACE_API UCustomGameModePreviewWidget : public UCustomGameModeCategoryWidget
 {
+public:
+	UCustomGameModePreviewWidget();
+
+private:
 	GENERATED_BODY()
 
 public:

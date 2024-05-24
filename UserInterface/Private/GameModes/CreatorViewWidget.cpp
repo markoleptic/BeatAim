@@ -21,7 +21,7 @@ void UCreatorViewWidget::OnCarouselWidgetIndexChanged(UCommonWidgetCarousel* InC
 	UpdateOptionsFromConfig();
 }
 
-void UCreatorViewWidget::UpdateAllChildWidgetOptionsValid()
+/*void UCreatorViewWidget::UpdateAllChildWidgetOptionsValid()
 {
 	Super::UpdateAllChildWidgetOptionsValid();
 	for (const TPair<TObjectPtr<UCustomGameModeCategoryWidget>, FCustomGameModeCategoryInfo*>& ChildWidgetValidity :
@@ -32,7 +32,7 @@ void UCreatorViewWidget::UpdateAllChildWidgetOptionsValid()
 		{
 			continue;
 		}
-		CarouselNavBar->UpdateNotifications(ChildWidgetValidity.Key->GetIndex(), ChildWidgetValidity.Value->NumCautions,
+		CarouselNavBar->UpdateNotifications(static_cast<int32>(ChildWidgetValidity.Key->GetGameModeCategory()) - 1, ChildWidgetValidity.Value->NumCautions,
 			ChildWidgetValidity.Value->NumWarnings);
 	}
-}
+}*/

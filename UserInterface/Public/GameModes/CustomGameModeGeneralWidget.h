@@ -6,6 +6,9 @@
 #include "CustomGameModeCategoryWidget.h"
 #include "CustomGameModeGeneralWidget.generated.h"
 
+enum class EReinforcementLearningHyperParameterMode : uint8;
+enum class ETargetDeactivationCondition : uint8;
+enum class ERecentTargetMemoryPolicy : uint8;
 class UToggleableSingleRangeInputWidget;
 class UCheckBoxWidget;
 class USingleRangeInputWidget;
@@ -14,16 +17,20 @@ class UComboBoxWidget;
 UCLASS()
 class USERINTERFACE_API UCustomGameModeGeneralWidget : public UCustomGameModeCategoryWidget
 {
+public:
+	UCustomGameModeGeneralWidget();
+
+private:
 	GENERATED_BODY()
 
 protected:
 	virtual void NativeConstruct() override;
-	virtual void UpdateAllOptionsValid() override;
+	//virtual void UpdateAllOptionsValid() override;
 	virtual void UpdateOptionsFromConfig() override;
 	void SetupWarningTooltipCallbacks();
 
 	/** Updates options that depend on the value selection of RecentTargetMemoryPolicy. */
-	void UpdateDependentOptions_RecentTargetMemoryPolicy(const ERecentTargetMemoryPolicy& InRecentTargetMemoryPolicy);
+	void UpdateDependentOptions_RecentTargetMemoryPolicy(const ERecentTargetMemoryPolicy InRecentTargetMemoryPolicy);
 
 	void UpdateDependentOptions_DeactivationConditions(const TArray<ETargetDeactivationCondition>& Conditions);
 

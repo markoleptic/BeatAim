@@ -23,7 +23,7 @@ public:
 	void ShowFeedbackWidget();
 
 	/** Broadcast when the widget is hidden after animations have completed. */
-	FOnExitAnimationCompleted OnExitAnimationCompletedDelegate;
+	TMulticastDelegate<void()> OnExitAnimationCompletedDelegate;
 
 protected:
 	virtual void NativeConstruct() override;

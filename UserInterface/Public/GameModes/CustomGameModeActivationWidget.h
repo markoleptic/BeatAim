@@ -6,6 +6,8 @@
 #include "CustomGameModeCategoryWidget.h"
 #include "CustomGameModeActivationWidget.generated.h"
 
+enum class ETargetDistributionPolicy : uint8;
+enum class ETargetActivationResponse : uint8;
 class USingleRangeInputWidget;
 class UTextInputWidget;
 class UCheckBoxWidget;
@@ -17,8 +19,9 @@ class USERINTERFACE_API UCustomGameModeActivationWidget : public UCustomGameMode
 	GENERATED_BODY()
 
 protected:
+	UCustomGameModeActivationWidget();
 	virtual void NativeConstruct() override;
-	virtual void UpdateAllOptionsValid() override;
+	//virtual void UpdateAllOptionsValid() override;
 	virtual void UpdateOptionsFromConfig() override;
 	void SetupWarningTooltipCallbacks();
 

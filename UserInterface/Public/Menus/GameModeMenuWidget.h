@@ -11,6 +11,7 @@
 #include "Utilities/GameModeTransitionState.h"
 #include "GameModeMenuWidget.generated.h"
 
+class UBSGameModeValidator;
 class UCommonWidgetCarousel;
 class UBSVerticalBox;
 class UDefaultGameModeSelectWidget;
@@ -31,45 +32,6 @@ class USlider;
 class UCheckBox;
 class UMenuButton;
 class UBSButton;
-
-USTRUCT()
-struct FStartWidgetProperties
-{
-	GENERATED_BODY()
-
-	FBS_DefiningConfig DefiningConfig;
-	bool bUseTemplateChecked;
-	FString NewCustomGameModeName;
-
-	FStartWidgetProperties()
-	{
-		DefiningConfig = FBS_DefiningConfig();
-		bUseTemplateChecked = false;
-		NewCustomGameModeName = FString();
-	}
-
-	FStartWidgetProperties(const FBS_DefiningConfig& InDefiningConfig, const bool bInUseTemplate)
-	{
-		DefiningConfig = InDefiningConfig;
-		bUseTemplateChecked = bInUseTemplate;
-		NewCustomGameModeName = FString();
-	}
-
-	FORCEINLINE bool operator==(const FStartWidgetProperties& Other) const
-	{
-		if (DefiningConfig == Other.DefiningConfig)
-		{
-			if (bUseTemplateChecked == Other.bUseTemplateChecked)
-			{
-				if (NewCustomGameModeName.Equals(NewCustomGameModeName, ESearchCase::CaseSensitive))
-				{
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-};
 
 USTRUCT(BlueprintType)
 struct FDefaultGameModeParams
@@ -115,6 +77,7 @@ class USERINTERFACE_API UGameModeMenuWidget : public UUserWidget, public IBSWidg
 	virtual void NativeDestruct() override;
 	virtual UTooltipWidget* ConstructTooltipWidget() override { return nullptr; }
 	TArray<FBSConfig> LoadCustomGameModesWrapper();
+	void HandlePropertyChanged(const TSet<const FProperty*>& Properties);
 
 public:
 	/** Returns BSConfig. */
@@ -163,6 +126,8 @@ protected:
 	TObjectPtr<UAudioSelectWidget> AudioSelectWidget;
 	UPROPERTY()
 	TObjectPtr<UGameModeSharingWidget> GameModeSharingWidget;
+	UPROPERTY()
+	TObjectPtr<UBSGameModeValidator> GameModeValidator;
 
 public:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))

@@ -6,6 +6,10 @@
 #include "CustomGameModeCategoryWidget.h"
 #include "CustomGameModeMovementWidget.generated.h"
 
+enum class ETargetDeactivationResponse : uint8;
+enum class ETargetActivationResponse : uint8;
+enum class ETargetSpawnResponse : uint8;
+
 UCLASS()
 class USERINTERFACE_API UCustomGameModeMovementWidget : public UCustomGameModeCategoryWidget
 {
@@ -13,7 +17,7 @@ class USERINTERFACE_API UCustomGameModeMovementWidget : public UCustomGameModeCa
 
 protected:
 	virtual void NativeConstruct() override;
-	virtual void UpdateAllOptionsValid() override;
+	//virtual void UpdateAllOptionsValid() override;
 	virtual void UpdateOptionsFromConfig() override;
 	void SetupWarningTooltipCallbacks();
 

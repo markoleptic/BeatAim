@@ -2,6 +2,7 @@
 
 
 #include "GameModes/CustomGameModeMovementWidget.h"
+#include "BSGameModeConfig/BSConfig.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "MenuOptions/DualRangeInputWidget.h"
 #include "Utilities/ComboBox/BSComboBoxString.h"
@@ -45,10 +46,10 @@ void UCustomGameModeMovementWidget::NativeConstruct()
 	UpdateBrushColors();
 }
 
-void UCustomGameModeMovementWidget::UpdateAllOptionsValid()
+/*void UCustomGameModeMovementWidget::UpdateAllOptionsValid()
 {
 	Super::UpdateAllOptionsValid();
-}
+}*/
 
 void UCustomGameModeMovementWidget::UpdateOptionsFromConfig()
 {
@@ -156,7 +157,7 @@ void UCustomGameModeMovementWidget::OnSelectionChanged_MovingTargetDirectionMode
 
 	BSConfig->TargetConfig.MovingTargetDirectionMode = GetEnumFromString_FromTagMap<
 		EMovingTargetDirectionMode>(Selected[0]);
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeMovementWidget::OnMinMaxMenuOptionChanged(UDualRangeInputWidget* Widget, const bool bChecked,
@@ -178,7 +179,7 @@ void UCustomGameModeMovementWidget::OnMinMaxMenuOptionChanged(UDualRangeInputWid
 		BSConfig->TargetConfig.MaxDeactivatedTargetSpeed = bChecked ? MinOrConstant : Max;
 	}
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 FString UCustomGameModeMovementWidget::GetComboBoxEntryTooltipStringTableKey_MovingTargetDirectionMode(

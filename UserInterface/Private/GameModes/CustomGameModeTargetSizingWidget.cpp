@@ -2,10 +2,22 @@
 
 
 #include "GameModes/CustomGameModeTargetSizingWidget.h"
+#include "BSGameModeConfig/BSGameModeValidator.h"
+#include "GameModes/CustomGameModeWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "MenuOptions/DualRangeInputWidget.h"
 #include "MenuOptions/SingleRangeInputWidget.h"
 #include "Utilities/ComboBox/BSComboBoxString.h"
+
+UCustomGameModeTargetSizingWidget::UCustomGameModeTargetSizingWidget() :
+	SliderTextBoxOption_DeactivatedTargetScaleMultiplier(nullptr), MenuOption_TargetScale(nullptr),
+	SliderTextBoxOption_StartThreshold(nullptr), SliderTextBoxOption_EndThreshold(nullptr),
+	SliderTextBoxOption_DecrementAmount(nullptr), SliderTextBoxOption_LifetimeTargetScaleMultiplier(nullptr),
+	ComboBoxOption_ConsecutiveTargetScalePolicy(nullptr),
+	LastSelectedConsecutiveTargetScalePolicy(EConsecutiveTargetScalePolicy::None)
+{
+	GameModeCategory = EGameModeCategory::TargetSizing;
+}
 
 void UCustomGameModeTargetSizingWidget::NativeConstruct()
 {
@@ -64,11 +76,6 @@ void UCustomGameModeTargetSizingWidget::NativeConstruct()
 
 	SetupWarningTooltipCallbacks();
 	UpdateBrushColors();
-}
-
-void UCustomGameModeTargetSizingWidget::UpdateAllOptionsValid()
-{
-	Super::UpdateAllOptionsValid();
 }
 
 void UCustomGameModeTargetSizingWidget::UpdateOptionsFromConfig()
@@ -186,7 +193,7 @@ void UCustomGameModeTargetSizingWidget::OnSliderTextBoxValueChanged(USingleRange
 	{
 		BSConfig->TargetConfig.LifetimeTargetScaleMultiplier = Value;
 	}
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeTargetSizingWidget::OnMinMaxMenuOptionChanged(UDualRangeInputWidget* Widget, const bool bChecked,
@@ -223,7 +230,7 @@ void UCustomGameModeTargetSizingWidget::OnMinMaxMenuOptionChanged(UDualRangeInpu
 		}
 	}
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeTargetSizingWidget::OnSelectionChanged_ConsecutiveTargetScalePolicy(const TArray<FString>& Selected,
@@ -249,7 +256,7 @@ void UCustomGameModeTargetSizingWidget::OnSelectionChanged_ConsecutiveTargetScal
 		BSConfig->TargetConfig.MaxSpawnedTargetScale = MenuOption_TargetScale->GetMaxSliderValue(true);
 	}
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 FString UCustomGameModeTargetSizingWidget::GetComboBoxEntryTooltipStringTableKey_ConsecutiveTargetScalePolicy(

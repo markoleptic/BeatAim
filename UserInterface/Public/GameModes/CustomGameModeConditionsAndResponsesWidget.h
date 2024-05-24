@@ -6,14 +6,21 @@
 #include "CustomGameModeCategoryWidget.h"
 #include "CustomGameModeConditionsAndResponsesWidget.generated.h"
 
+enum class ETargetDeactivationResponse : uint8;
+enum class ETargetActivationResponse : uint8;
+enum class ETargetSpawnResponse : uint8;
+
 UCLASS()
 class USERINTERFACE_API UCustomGameModeConditionsAndResponsesWidget : public UCustomGameModeCategoryWidget
 {
 	GENERATED_BODY()
 
+public:
+	UCustomGameModeConditionsAndResponsesWidget();
+
 protected:
 	virtual void NativeConstruct() override;
-	virtual void UpdateAllOptionsValid() override;
+	//virtual void UpdateAllOptionsValid() override;
 	virtual void UpdateOptionsFromConfig() override;
 	void SetupWarningTooltipCallbacks();
 

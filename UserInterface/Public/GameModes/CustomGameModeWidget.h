@@ -7,13 +7,9 @@
 #include "Menus/GameModeMenuWidget.h"
 #include "CustomGameModeWidget.generated.h"
 
+enum class EGameModeCategory : uint8;
 class UCustomGameModeCategoryWidget;
 class UCustomGameModeStartWidget;
-
-DECLARE_MULTICAST_DELEGATE(FRequestButtonStateUpdate);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FRequestGameModeTemplateUpdate, const FString& GameMode,
-	const EGameModeDifficulty& Difficulty);
-DECLARE_MULTICAST_DELEGATE(FRequestGameModePreviewUpdate);
 
 /** Contains data about the state of a CustomGameModesWidgetComponent. */
 USTRUCT(BlueprintType)
@@ -70,80 +66,74 @@ class USERINTERFACE_API UCustomGameModeWidget : public UUserWidget
 
 public:
 	/** Sets the value of BSConfig and GameModeDataAsset. Calls InitComponent on all widgets in ChildWidgets array. */
-	virtual void Init(TSharedPtr<FBSConfig> InConfig, const TObjectPtr<UBSGameModeDataAsset> InGameModeDataAsset);
+	virtual void Init(const TSharedPtr<FBSConfig>& InConfig,
+		const TObjectPtr<UBSGameModeDataAsset> InGameModeDataAsset);
 
 	/** Calls UpdateOptionsFromConfig on all widgets in ChildWidgets array and calls
 	 *  UpdateAllChildWidgetOptionsValid. */
-	UFUNCTION()
 	void UpdateOptionsFromConfig();
 
 	/** Returns the NewCustomGameModeName from Widget_Start. */
-	FString GetNewCustomGameModeName() const;
+	//FString GetNewCustomGameModeName() const;
 
 	/** Sets the value of NewCustomGameModeName in Widget_Start. */
-	void SetNewCustomGameModeName(const FString& InCustomGameModeName) const;
+	//void SetNewCustomGameModeName(const FString& InCustomGameModeName) const;
 
 	/** Returns the options for a start widget since they're not all shared with BSConfig pointer. */
-	FStartWidgetProperties GetStartWidgetProperties() const;
+	//FStartWidgetProperties GetStartWidgetProperties() const;
 
 	/** Sets the options for a start widget since they're not all shared with BSConfig pointer. */
-	void SetStartWidgetProperties(const FStartWidgetProperties& InProperties);
+	//void SetStartWidgetProperties(const FStartWidgetProperties& InProperties);
 
 	/** Returns whether all non Widget_Start child widget custom game mode options are valid. Iterates through
 	 *  ChildWidgetValidityMap. */
-	bool GetAllNonStartChildWidgetOptionsValid() const;
+	//bool GetAllNonStartChildWidgetOptionsValid() const;
 
 	/** Clears all GameModeTemplate ComboBox options and repopulates. */
-	void RefreshGameModeTemplateComboBoxOptions(const TArray<FBSConfig>& CustomGameModes) const;
+	//void RefreshGameModeTemplateComboBoxOptions(const TArray<FBSConfig>& CustomGameModes) const;
 
-	/** Broadcast any time Widget_Start broadcasts their RequestGameModeTemplateUpdate delegate. */
-	FRequestGameModeTemplateUpdate RequestGameModeTemplateUpdate;
+	TDelegate<void(const TSet<const FProperty*>&)> OnPropertyChanged;
 
-	/** Broadcast after calling UpdateAllOptionsValid on each child widget, or when the Widget_Start CustomGameModeName
-	 *  changes. */
-	FRequestButtonStateUpdate RequestButtonStateUpdate;
-
-	/** Broadcast true if there is a game mode breaking option. */
-	FOnGameModeBreakingChange OnGameModeBreakingChange;
-
-	/** Broadcast when a widget wants to refresh the preview after a change to the config. */
-	FRequestGameModePreviewUpdate RequestGameModePreviewUpdate;
+	UCustomGameModeStartWidget* GetStartWidget() const;
 
 protected:
 	/** Adds child widgets to ChildWidgets array, binds to Widget_Start's RequestGameModeTemplateUpdate. */
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
+	void HandlePropertyChanged(const TSet<const FProperty*>& Properties);
 
 	/** Called any time Widget_Start broadcasts their RequestGameModeTemplateUpdate delegate. */
-	virtual void OnRequestGameModeTemplateUpdate(const FString& InGameMode, const EGameModeDifficulty& Difficulty);
+	//virtual void OnRequestGameModeTemplateUpdate(const FString& InGameMode, const EGameModeDifficulty& Difficulty);
 
 	/** Called any time Widget_Start broadcasts their OnCustomGameModeNameChanged delegate. */
-	void OnStartWidget_CustomGameModeNameChanged();
+	//void OnStartWidget_CustomGameModeNameChanged();
 
 	/** Bound to all child widget's RequestComponentUpdate delegates. */
-	void OnRequestComponentUpdate();
+	//void OnRequestComponentUpdate();
 
 	/** Bound to all child widget's OnRequestGameModePreview delegates. */
-	void OnRequestGameModePreviewUpdate();
+	//void OnRequestGameModePreviewUpdate();
 
 	/** Updates the value of bContainsGameModeBreakingOption and broadcasts OnGameModeBreakingChange only if it is
 	 *  different from the current value. */
-	void UpdateContainsGameModeBreakingOption(const bool bGameModeBreakingOptionPresent);
+	//void UpdateContainsGameModeBreakingOption(const bool bGameModeBreakingOptionPresent);
 
 	/** Calls UpdateAllOptionsValid for each child widget. */
-	virtual void UpdateAllChildWidgetOptionsValid();
+	//virtual void UpdateAllChildWidgetOptionsValid();
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	TObjectPtr<UCustomGameModeStartWidget> Widget_Start;
+	//UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	//TObjectPtr<UCustomGameModeStartWidget> Widget_Start;
 
 	UPROPERTY()
 	TObjectPtr<UBSGameModeDataAsset> GameModeDataAsset;
 
 	/** Pointer to Game Mode Config held in controlling GameModesWidget. */
-	TSharedPtr<FBSConfig> BSConfig;
+	//TSharedPtr<FBSConfig> BSConfig;
+
+	TMap<EGameModeCategory, TObjectPtr<UCustomGameModeCategoryWidget>> GameModeCategoryWidgetMap;
 
 	/** Maps each child widget to struct representing if all its custom game mode options are valid. */
-	TMap<TObjectPtr<UCustomGameModeCategoryWidget>, FCustomGameModeCategoryInfo*> ChildWidgetValidityMap;
+	//TMap<TObjectPtr<UCustomGameModeCategoryWidget>, FCustomGameModeCategoryInfo*> ChildWidgetValidityMap;
 
 	bool bIsUpdatingFromComponentRequest = false;
 	bool bContainsGameModeBreakingOption = false;

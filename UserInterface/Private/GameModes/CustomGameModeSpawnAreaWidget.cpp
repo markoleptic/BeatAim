@@ -2,7 +2,9 @@
 
 
 #include "GameModes/CustomGameModeSpawnAreaWidget.h"
+#include "BSGameModeConfig/BSGameModeValidator.h"
 #include "Components/CheckBox.h"
+#include "GameModes/CustomGameModeWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "MenuOptions/DualRangeInputWidget.h"
 #include "MenuOptions/SingleRangeInputWidget.h"
@@ -10,6 +12,22 @@
 
 using namespace Constants;
 
+
+UCustomGameModeSpawnAreaWidget::UCustomGameModeSpawnAreaWidget(): ComboBoxOption_TargetDistributionPolicy(nullptr),
+                                                                  SliderTextBoxOption_StartThreshold(nullptr),
+                                                                  SliderTextBoxOption_EndThreshold(nullptr),
+                                                                  SliderTextBoxOption_DecrementAmount(nullptr),
+                                                                  SliderTextBoxOption_NumHorizontalGridTargets(nullptr),
+                                                                  SliderTextBoxOption_NumVerticalGridTargets(nullptr),
+                                                                  SliderTextBoxOption_HorizontalSpacing(nullptr),
+                                                                  SliderTextBoxOption_VerticalSpacing(nullptr),
+                                                                  MenuOption_HorizontalSpread(nullptr),
+                                                                  MenuOption_VerticalSpread(nullptr),
+                                                                  MenuOption_ForwardSpread(nullptr),
+                                                                  SliderTextBoxOption_FloorDistance(nullptr)
+{
+	GameModeCategory = EGameModeCategory::SpawnArea;
+}
 
 void UCustomGameModeSpawnAreaWidget::NativeConstruct()
 {
@@ -89,11 +107,6 @@ void UCustomGameModeSpawnAreaWidget::NativeConstruct()
 
 	SetupWarningTooltipCallbacks();
 	UpdateBrushColors();
-}
-
-void UCustomGameModeSpawnAreaWidget::UpdateAllOptionsValid()
-{
-	Super::UpdateAllOptionsValid();
 }
 
 void UCustomGameModeSpawnAreaWidget::UpdateOptionsFromConfig()
@@ -251,7 +264,7 @@ void UCustomGameModeSpawnAreaWidget::OnSliderTextBoxValueChanged(USingleRangeInp
 	else if (Widget == SliderTextBoxOption_FloorDistance)
 	{
 		BSConfig->TargetConfig.FloorDistance = Value;
-		RequestGameModePreviewUpdate.Broadcast();
+		//RequestGameModePreviewUpdate.Broadcast();
 	}
 	else if (Widget == SliderTextBoxOption_StartThreshold)
 	{
@@ -266,7 +279,7 @@ void UCustomGameModeSpawnAreaWidget::OnSliderTextBoxValueChanged(USingleRangeInp
 		BSConfig->DynamicSpawnAreaScaling.DecrementAmount = Value;
 	}
 
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeSpawnAreaWidget::OnMinMaxValueChanged(UDualRangeInputWidget* Widget, const bool bChecked,
@@ -289,7 +302,7 @@ void UCustomGameModeSpawnAreaWidget::OnMinMaxValueChanged(UDualRangeInputWidget*
 	}
 
 	UpdateDependentOption_BoundsScalingPolicy();
-	UpdateAllOptionsValid();
+	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeSpawnAreaWidget::UpdateSpreadWidgetState(UDualRangeInputWidget* Widget, const bool bTracking,
@@ -388,8 +401,8 @@ void UCustomGameModeSpawnAreaWidget::OnSelectionChanged_TargetDistributionPolicy
 	UpdateDependentOptions_TargetDistributionPolicy();
 	UpdateDependentOption_BoundsScalingPolicy();
 	UpdateBrushColors();
-	UpdateAllOptionsValid();
-	RequestGameModePreviewUpdate.Broadcast();
+	//UpdateAllOptionsValid();
+	//RequestGameModePreviewUpdate.Broadcast();
 }
 
 FString UCustomGameModeSpawnAreaWidget::GetComboBoxEntryTooltipStringTableKey_TargetDistributionPolicy(

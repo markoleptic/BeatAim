@@ -12,10 +12,14 @@ DECLARE_DELEGATE_RetVal_OneParam(bool, FValidationDelegate, const TSharedPtr<FBS
 UENUM(BlueprintType)
 enum class EGameModeWarningType: uint8
 {
-	None,
-	Caution,
-	Warning,
-	Error
+	None, Caution, Warning, Error
+};
+
+
+UENUM(BlueprintType)
+enum class EGameModeCategory : uint8
+{
+	None, Start, General, SpawnArea, TargetSpawning, TargetActivation, TargetBehavior, TargetSizing, Preview
 };
 
 USTRUCT(BlueprintType)
@@ -23,24 +27,36 @@ struct BEATSHOTGLOBAL_API FValidationCheck
 {
 	GENERATED_BODY()
 
-	FValidationCheck() : Property(nullptr), WarningType(EGameModeWarningType::None)
-	{
-	}
+	FValidationCheck() = default;
 
-	~FValidationCheck()
-	{
-		Property = nullptr;
-	}
+	explicit FValidationCheck(const FProperty* InProperty);
 
+	~FValidationCheck();
+
+	FValidationCheck& AddDependent(const FProperty* InProperty);
+	FValidationCheck& AddDependents(const TSet<const FProperty*>& InProperties);
+	FValidationCheck& SetWarningType(EGameModeWarningType InWarningType);
+	FValidationCheck& SetStringTableKey(const FString& InKey);
+	FValidationCheck& SetGameModeCategory(EGameModeCategory InGameModeCategory);
+	FValidationCheck& BindLambda(const TFunction<bool(const TSharedPtr<FBSConfig>&)>& InLambda);
+
+	bool Execute(const TSharedPtr<FBSConfig>& Config) const;
+
+	const FProperty* GetProperty() const;
+
+private:
+	friend struct FValidationCheckResult;
+	friend class UBSGameModeValidator;
 	const FProperty* Property;
-	TSet<const FProperty*> Dependencies;
+	TSet<const FProperty*> Dependents;
 	EGameModeWarningType WarningType;
 	FString StringTableKey;
-	FValidationDelegate ValidationDelegate;
+	TDelegate<bool(const TSharedPtr<FBSConfig>&)> ValidationDelegate;
+	EGameModeCategory GameModeCategory;
 };
 
 USTRUCT(BlueprintType)
-struct BEATSHOTGLOBAL_API FValidationResult
+struct BEATSHOTGLOBAL_API FValidationCheckResult
 {
 	GENERATED_BODY()
 
@@ -50,22 +66,48 @@ struct BEATSHOTGLOBAL_API FValidationResult
 	EGameModeWarningType WarningType;
 	FString StringTableKey;
 
-	FValidationResult() : bSuccess(false), Property(nullptr), WarningType(EGameModeWarningType::None)
+
+	FValidationCheckResult() : bSuccess(false), Property(nullptr), WarningType(EGameModeWarningType::None)
 	{
 	}
 
-	FValidationResult(const bool bInSuccess, const FValidationCheck& Check) : bSuccess(bInSuccess),
-	                                                                          Property(Check.Property),
-	                                                                          Dependencies(Check.Dependencies),
-	                                                                          WarningType(Check.WarningType),
-	                                                                          StringTableKey(Check.StringTableKey)
+	FValidationCheckResult(const bool bInSuccess, const FValidationCheck& Check) : bSuccess(bInSuccess),
+		Property(Check.GetProperty()), Dependencies(Check.Dependents), WarningType(Check.WarningType),
+		StringTableKey(Check.StringTableKey)
 	{
 	}
 
-	~FValidationResult()
+	~FValidationCheckResult()
 	{
 		Property = nullptr;
 	}
+};
+
+using FGameModeWarningResultMap = TMap<EGameModeWarningType, TArray<FValidationCheckResult>>;
+using FGameModeCategoryResultMap = TMap<EGameModeCategory, FGameModeWarningResultMap>;
+
+USTRUCT(BlueprintType)
+struct BEATSHOTGLOBAL_API FValidationResult
+{
+	GENERATED_BODY()
+
+public:
+	FValidationResult()
+	{
+	}
+
+	void AddValidationCheckResult(const FValidationCheckResult&& Check, EGameModeCategory GameModeCategory);
+
+	~FValidationResult()
+	{
+	}
+
+	const FGameModeCategoryResultMap& GetSucceeded() const;
+	const FGameModeCategoryResultMap& GetFailed() const;
+
+private:
+	FGameModeCategoryResultMap SucceededValidationCheckResults;
+	FGameModeCategoryResultMap FailedValidationCheckResults;
 };
 
 /** Validates a BSConfig. */
@@ -81,13 +123,52 @@ public:
 
 	void AddValidationCheck(const FValidationCheck& InValidationCheck);
 
-	TArray<FValidationResult> Validate(const TSharedPtr<FBSConfig>& InConfig);
+	FValidationResult Validate(const TSharedPtr<FBSConfig>& InConfig);
 
-	TArray<FValidationResult> Validate(const TSharedPtr<FBSConfig>& InConfig, const FName SubStructName,
+	FValidationResult Validate(const TSharedPtr<FBSConfig>& InConfig, FName SubStructName, FName PropertyName);
+
+	FValidationResult Validate(const TSharedPtr<FBSConfig>& InConfig, const TSet<const FProperty*>& Properties);
+
+	static const FProperty* FindPropertyByName(const UStruct* Owner, const FName SubStructName,
 		const FName PropertyName);
 
-	static const FProperty* FindProperty(const UStruct* Owner, const FName SubStructName, const FName PropertyName);
+	//template <typename RootStruct, typename SubStruct>
+	//static const FStructProperty* FindSubStruct(SubStruct RootStruct::* SubStructMember);
+	template <typename RootStruct>
+	static const FProperty* FindProperty(const FName SubStructProperty, const FName PropertyInSubStruct);
+
+	//template <typename RootStruct, typename SubStruct, typename... PropertyTypes>
+	//static TSet<const FProperty*> FindProperties(SubStruct RootStruct::* SubStructMember,
+	//	PropertyTypes SubStruct::*... PropertiesInSubStruct);
 
 private:
 	TMap<const FProperty*, TArray<FValidationCheck>> ValidationChecks;
 };
+
+/*template <typename RootStruct, typename SubStruct>
+const FStructProperty* UBSGameModeValidator::FindSubStruct(SubStruct RootStruct::* SubStructMember)
+{
+	return FindFProperty<FStructProperty>(RootStruct::StaticStruct(),
+		GET_MEMBER_NAME_CHECKED(RootStruct, SubStructMember));
+}*/
+
+template <typename RootStruct>
+const FProperty* UBSGameModeValidator::FindProperty(const FName SubStructProperty, const FName PropertyInSubStruct)
+{
+	if (const FStructProperty* StructProperty = FindFProperty<FStructProperty>(RootStruct::StaticStruct(),
+		SubStructProperty))
+	{
+		return FindFProperty<FProperty>(StructProperty->Struct, PropertyInSubStruct);
+	}
+	return nullptr;
+}
+
+/*template <typename RootStruct, typename SubStruct, typename... PropertyTypes>
+TSet<const FProperty*> UBSGameModeValidator::FindProperties(SubStruct RootStruct::* SubStructMember,
+	PropertyTypes SubStruct::*... PropertiesInSubStruct)
+{
+	TSet<const FProperty*> FoundProperties;
+	// Expand the parameter pack and use FindProperty for each property
+	((FoundProperties.Add(FindProperty(SubStructMember, PropertiesInSubStruct))), ...);
+	return FoundProperties;
+}*/
