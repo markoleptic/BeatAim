@@ -6,11 +6,13 @@
 #include "BSGameModeInterface.h"
 #include "HttpRequestInterface.h"
 #include "Blueprint/UserWidget.h"
+#include "GameModes/CustomGameModeStartWidget.h"
 #include "Utilities/BSCarouselNavBar.h"
 #include "Utilities/BSWidgetInterface.h"
 #include "Utilities/GameModeTransitionState.h"
 #include "GameModeMenuWidget.generated.h"
 
+struct FStartWidgetProperties;
 class UBSGameModeValidator;
 class UCommonWidgetCarousel;
 class UBSVerticalBox;
@@ -76,8 +78,10 @@ class USERINTERFACE_API UGameModeMenuWidget : public UUserWidget, public IBSWidg
 	virtual void NativePreConstruct() override;
 	virtual void NativeDestruct() override;
 	virtual UTooltipWidget* ConstructTooltipWidget() override { return nullptr; }
-	TArray<FBSConfig> LoadCustomGameModesWrapper();
 	void HandlePropertyChanged(const TSet<const FProperty*>& Properties);
+	void HandleStartWidgetPropertyChanged(FStartWidgetProperties& Properties);
+	UCustomGameModeStartWidget* GetCurrentStartWidget() const;
+	UCustomGameModeStartWidget* GetNotCurrentStartWidget() const;
 
 public:
 	/** Returns BSConfig. */
@@ -135,7 +139,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	TObjectPtr<UPropertyViewWidget> CustomGameModesWidget_PropertyView;
 	UPROPERTY()
-	TObjectPtr<UCustomGameModeWidget> CustomGameModesWidget_Current;
+	TObjectPtr<UCustomGameModeWidget> CurrentCustomGameModesWidget;
+	UPROPERTY()
+	TObjectPtr<UCustomGameModeWidget> NotCurrentCustomGameModesWidget;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
@@ -190,16 +196,6 @@ protected:
 	UBSCarouselNavBar* CarouselNavBar_CreatorProperty;
 
 private:
-	/** Binds all widget delegates to functions. */
-	void BindAllDelegates();
-
-	/** Sets button defaults and default enabled states. */
-	void SetupButtons();
-
-	/** Finds the associated default game mode, sets the StartWidgetProperties for both CustomGameModesWidgets, and
-	 *  calls PopulateGameModeOptions. */
-	void InitCustomGameModesWidgetOptions(const EBaseGameMode& BaseGameMode, const EGameModeDifficulty& Difficulty);
-
 	/** Initializes all Default Game Mode Menu Options found in Box_DefaultGameModesOptions. */
 	void InitDefaultGameModesWidgets();
 
@@ -221,7 +217,6 @@ private:
 
 	/** Changes the Save and Start Button states depending on what is selected in ComboBox_GameModeName and
 	 *  TextBox_CustomGameModeName. */
-	UFUNCTION()
 	void UpdateSaveStartButtonStates();
 
 	/** Checks to see if SelectedGameMode is valid, Binds to ScreenFadeToBlackFinish, and ends the game mode. */
@@ -276,9 +271,6 @@ private:
 	 * game mode if confirmed. */
 	void OnButtonClicked_ClearRLHistory();
 
-	/** Called when the GameModeTemplate selected option changes in either CustomGameModeWidget. */
-	void OnRequestGameModeTemplateUpdate(const FString& InGameMode, const EGameModeDifficulty& Difficulty);
-
 	/** Synchronizes properties like CustomGameModeName between CreatorView and PropertyView. */
 	void SynchronizeStartWidgets();
 
@@ -293,6 +285,10 @@ private:
 
 	/** Restarts the game mode preview. */
 	void RefreshGameModePreview();
+
+	void RefreshGameModes();
+
+	void SetBSConfig(const FBSConfig& InConfig);
 
 	/** The BaseGameMode for a selected Preset Game Mode. */
 	EBaseGameMode PresetSelection_PresetGameMode;

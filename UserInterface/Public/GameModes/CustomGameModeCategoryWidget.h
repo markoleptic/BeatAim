@@ -33,46 +33,19 @@ protected:
 	virtual void NativeDestruct() override;
 
 public:
-	/** Sets BSConfig, sets the pointer to next widget in linked list, and calls UpdateOptionsFromConfig. */
+	/** Sets BSConfig, sets the pointer to next widget in linked list. */
 	virtual void InitComponent(const TSharedPtr<FBSConfig>& InConfig);
 
-	/** Sets all custom game mode option values using the BSConfig pointer. Only changes the values if different.
-	 *  Only called during transitions. */
-	virtual void UpdateOptionsFromConfig()
-	{
-	};
+	/** Sets all custom game mode option values using BSConfig. */
+	virtual void UpdateOptionsFromConfig();
 
+	virtual void HandlePropertyValidation(const FValidationResult& ValidationResult);
 
-	TDelegate<void(const TSet<const FProperty*>&)> OnPropertyChanged;
-
-	virtual void HandlePropertyValidation(const FValidationResult& ValidationResult) // = 0
-	{
-	};
-
-	/** Broadcast when a caution/warning tooltip needed to be added, removed, or updated. Helps synchronize
-	 *  caution/warnings across different components. */
-	//TMulticastDelegate<void()> RequestComponentUpdate;
-
-	/** Broadcast when a widget wants to refresh the preview after a change to the config. */
-	//TMulticastDelegate<void()> RequestGameModePreviewUpdate;
-
-	/** Returns whether Init has been called. */
-	//bool IsInitialized() const { return bIsInitialized; }
-
-	/** Checks all custom game mode options for validity by calling UpdateWarningTooltips and broadcasts
-	 *  RequestComponentUpdate if any are not valid. Should be called anytime an option is changed. */
-	//virtual void UpdateAllOptionsValid();
-
-	/** Returns the struct containing info about the number of caution and warnings current present. */
-	//FCustomGameModeCategoryInfo* GetCustomGameModeCategoryInfo() { return &CustomGameModeCategoryInfo; }
-
-	/** Returns the index set during initialization. */
-	//int32 GetIndex() const { return Index; }
-
-	/** Returns true if the widget should be indexed on the carousel. */
-	//bool ShouldIndexOnCarousel() const { return bIndexOnCarousel; }
-
+	/** @return the game mode category the widget represents. */
 	EGameModeCategory GetGameModeCategory() const { return GameModeCategory; }
+
+	/** Executed when a property is changed by the user. */
+	TDelegate<void(const TSet<const FProperty*>&)> OnPropertyChanged;
 
 protected:
 	/** Adds a GameModeCategoryTagWidget for each matching GameplayTag on the Menu Option widget. */
@@ -103,24 +76,6 @@ protected:
 	static bool UpdateValuesIfDifferent(const UToggleableSingleRangeInputWidget* Widget, const bool bIsChecked,
 		const float Value);
 
-	/** Iterates through all MenuOptionWidgets, calling UpdateAllWarningTooltips on each. Iterates through each
-	 *  widget's TooltipWarningData, checking if any changed from the update. If so, the tooltip is updated.
-	 *  Calls UpdateCustomGameModeCategoryInfo when finished. Returns false if any tooltips required an update. */
-	//bool UpdateWarningTooltips();
-
-	/** Iterates through all MenuOptionWidgets to sum the total of Warning and Caution tooltips visible.
-	 *  Updates CustomGameModeCategoryInfo struct. */
-	//void UpdateCustomGameModeCategoryInfo();
-
-	float GetMinRequiredHorizontalSpread() const;
-	float GetMinRequiredVerticalSpread() const;
-	float GetMaxTargetDiameter() const;
-	int32 GetMaxAllowedNumHorizontalTargets() const;
-	int32 GetMaxAllowedNumVerticalTargets() const;
-	float GetMaxAllowedHorizontalSpacing() const;
-	float GetMaxAllowedVerticalSpacing() const;
-	float GetMaxAllowedTargetScale() const;
-
 	/** Set's the widget's enabled state and adds a tooltip for the entire widget if a Key is provided,
 	 *  otherwise the tooltip will be cleared. */
 	void SetMenuOptionEnabledStateAndAddTooltip(UMenuOptionWidget* Widget, const EMenuOptionEnabledState State,
@@ -134,11 +89,6 @@ protected:
 	/** Shared pointer to the game mode config inside GameModesWidget. */
 	TSharedPtr<FBSConfig> BSConfig;
 
-	/** Index used for parent widgets. */
-	//int32 Index = -1;
-
-	/** Struct containing info about NumWarning & NumCaution tooltips. */
-	//FCustomGameModeCategoryInfo CustomGameModeCategoryInfo;
 	TMap<const FProperty*, TWeakObjectPtr<UMenuOptionWidget>> PropertyMap;
 
 	UPROPERTY()

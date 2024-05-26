@@ -133,7 +133,7 @@ void UCustomGameModeSpawnAreaWidget::UpdateOptionsFromConfig()
 
 void UCustomGameModeSpawnAreaWidget::SetupWarningTooltipCallbacks()
 {
-	SliderTextBoxOption_NumHorizontalGridTargets->AddDynamicWarningTooltipData(
+	/*SliderTextBoxOption_NumHorizontalGridTargets->AddDynamicWarningTooltipData(
 		FTooltipData("Invalid_Grid_NumHorizontalTargets", ETooltipImageType::Warning),
 		"Invalid_Grid_NumHorizontalTargets_Fallback", MinValue_NumHorizontalGridTargets).BindLambda([this]()
 	{
@@ -176,7 +176,7 @@ void UCustomGameModeSpawnAreaWidget::SetupWarningTooltipCallbacks()
 	{
 		return BSConfig->TargetConfig.BoxBounds.X <= 0.f && BSConfig->TargetConfig.MovingTargetDirectionMode ==
 			EMovingTargetDirectionMode::ForwardOnly;
-	});
+	});*/
 }
 
 void UCustomGameModeSpawnAreaWidget::UpdateDependentOptions_TargetDistributionPolicy()

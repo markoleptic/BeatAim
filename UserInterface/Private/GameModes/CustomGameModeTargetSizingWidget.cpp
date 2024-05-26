@@ -104,14 +104,14 @@ void UCustomGameModeTargetSizingWidget::UpdateOptionsFromConfig()
 
 void UCustomGameModeTargetSizingWidget::SetupWarningTooltipCallbacks()
 {
-	MenuOption_TargetScale->AddDynamicWarningTooltipData(
+	/*MenuOption_TargetScale->AddDynamicWarningTooltipData(
 		FTooltipData("Invalid_Grid_MaxSpawnedTargetScale", ETooltipImageType::Warning),
 		"Invalid_Grid_MaxSpawnedTargetScale_Fallback", Constants::MinValue_TargetScale, 2).BindLambda([this]()
 	{
 		const float Max = FMath::Max(BSConfig->TargetConfig.MaxSpawnedTargetScale,
 			BSConfig->TargetConfig.MinSpawnedTargetScale);
 		return FDynamicTooltipState(Max, GetMaxAllowedTargetScale());
-	});
+	});*/
 }
 
 void UCustomGameModeTargetSizingWidget::UpdateDependentOptions_TargetActivationResponses(

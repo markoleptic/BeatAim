@@ -20,6 +20,23 @@ UCustomGameModeStartWidget* UCustomGameModeWidget::GetStartWidget() const
 void UCustomGameModeWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	WidgetTree->ForEachWidget([&](UWidget* Widget)
+	{
+		if (UCustomGameModeCategoryWidget* Component = Cast<UCustomGameModeCategoryWidget>(Widget))
+		{
+			//const bool bIndexOnCarousel = Component->ShouldIndexOnCarousel();
+			//Component->InitComponent(InConfig, bIndexOnCarousel ? Index : -1);
+			//Component->RequestComponentUpdate.AddUObject(this, &ThisClass::OnRequestComponentUpdate);
+			//Component->RequestGameModePreviewUpdate.AddUObject(this, &ThisClass::OnRequestGameModePreviewUpdate);
+			Component->OnPropertyChanged.BindUObject(this, &UCustomGameModeWidget::HandlePropertyChanged);
+			GameModeCategoryWidgetMap.Add(Component->GetGameModeCategory(), Component);
+			/*ChildWidgetValidityMap.FindOrAdd(Component) = Component->GetCustomGameModeCategoryInfo();
+			if (bIndexOnCarousel)
+			{
+				Index++;
+			}*/
+		}
+	});
 	//Widget_Start->RequestGameModeTemplateUpdate.AddUObject(this, &ThisClass::OnRequestGameModeTemplateUpdate);
 	//Widget_Start->OnCustomGameModeNameChanged.AddUObject(this, &ThisClass::OnStartWidget_CustomGameModeNameChanged);
 }
@@ -27,7 +44,6 @@ void UCustomGameModeWidget::NativeConstruct()
 void UCustomGameModeWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
-	//BSConfig = nullptr;
 }
 
 void UCustomGameModeWidget::HandlePropertyChanged(const TSet<const FProperty*>& Properties)
@@ -38,28 +54,11 @@ void UCustomGameModeWidget::HandlePropertyChanged(const TSet<const FProperty*>& 
 void UCustomGameModeWidget::Init(const TSharedPtr<FBSConfig>& InConfig,
 	const TObjectPtr<UBSGameModeDataAsset> InGameModeDataAsset)
 {
-	//BSConfig = InConfig;
 	GameModeDataAsset = InGameModeDataAsset;
-	//int32 Index = 0;
-
-	WidgetTree->ForEachWidget([&](UWidget* Widget)
+	for (const auto [EGameModeCategory, Widget] : GameModeCategoryWidgetMap)
 	{
-		if (UCustomGameModeCategoryWidget* Component = Cast<UCustomGameModeCategoryWidget>(Widget))
-		{
-			//const bool bIndexOnCarousel = Component->ShouldIndexOnCarousel();
-			//Component->InitComponent(InConfig, bIndexOnCarousel ? Index : -1);
-			//Component->RequestComponentUpdate.AddUObject(this, &ThisClass::OnRequestComponentUpdate);
-			//Component->RequestGameModePreviewUpdate.AddUObject(this, &ThisClass::OnRequestGameModePreviewUpdate);
-			Component->OnPropertyChanged.BindUObject(this, &UCustomGameModeWidget::HandlePropertyChanged);
-			Component->InitComponent(InConfig);
-			GameModeCategoryWidgetMap.Add(Component->GetGameModeCategory(), Component);
-			/*ChildWidgetValidityMap.FindOrAdd(Component) = Component->GetCustomGameModeCategoryInfo();
-			if (bIndexOnCarousel)
-			{
-				Index++;
-			}*/
-		}
-	});
+		Widget->InitComponent(InConfig);
+	}
 	UpdateOptionsFromConfig();
 }
 

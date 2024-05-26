@@ -9,34 +9,6 @@
 class UTextInputWidget;
 class UCheckBoxWidget;
 class UComboBoxWidget;
-struct FBS_DefiningConfig;
-
-template <typename DelegateType, typename ObjectType, typename FunctionType>
-class TSignalBlocker
-{
-public:
-	TSignalBlocker(DelegateType& InDelegate, ObjectType* InObject, FunctionType InFunctionType) : Delegate(InDelegate),
-		Object(InObject), Function(InFunctionType)
-	{
-		bWasDelegateBound = Delegate.IsBound();
-		if (bWasDelegateBound)
-		{
-			Delegate.RemoveDynamic(Object, Function);
-		}
-	}
-
-	~TSignalBlocker()
-	{
-		Delegate.AddDynamic(Object, Function);
-	}
-
-private:
-	DelegateType& Delegate;
-	ObjectType* Object;
-	FunctionType Function;
-	bool bWasDelegateBound;
-};
-
 
 USTRUCT()
 struct USERINTERFACE_API FStartWidgetProperties
@@ -63,23 +35,10 @@ struct USERINTERFACE_API FStartWidgetProperties
 
 	FORCEINLINE bool operator==(const FStartWidgetProperties& Other) const
 	{
-		if (bUseTemplateChecked == Other.bUseTemplateChecked)
-		{
-			if (bIsPreset == Other.bIsPreset && bIsCustom == Other.bIsCustom)
-			{
-				if (NewCustomGameModeName.Equals(Other.NewCustomGameModeName, ESearchCase::CaseSensitive))
-				{
-					if (GameModeName.Equals(Other.NewCustomGameModeName, ESearchCase::CaseSensitive))
-					{
-						if (Difficulty.Equals(Other.Difficulty))
-						{
-							return true;
-						}
-					}
-				}
-			}
-		}
-		return false;
+		return bUseTemplateChecked == Other.bUseTemplateChecked && bIsPreset == Other.bIsPreset && bIsCustom == Other.
+			bIsCustom && GameModeName.Equals(Other.NewCustomGameModeName, ESearchCase::CaseSensitive) && Difficulty.
+			Equals(Other.Difficulty) && NewCustomGameModeName.Equals(Other.NewCustomGameModeName,
+				ESearchCase::CaseSensitive);
 	}
 };
 
@@ -90,45 +49,21 @@ class USERINTERFACE_API UCustomGameModeStartWidget : public UCustomGameModeCateg
 
 public:
 	UCustomGameModeStartWidget();
-	/** Broadcast when the user changes the template checkbox, template combo box, or difficulty combo box. */
-	//FRequestGameModeTemplateUpdate RequestGameModeTemplateUpdate;
 
-	/** Broadcast when the user changes the EditableTextBoxOption_CustomGameModeName. */
-	//FRequestButtonStateUpdate OnCustomGameModeNameChanged;
+	/** @return reference to static properties that define a custom game mode start widget. */
+	static FStartWidgetProperties& GetProperties();
 
-	/** Returns the value of EditableTextBoxOption_CustomGameModeName. */
-	//FString GetNewCustomGameModeName() const;
+	/** Updates widgets using static StartWidgetProperties. */
+	void RefreshProperties() const;
 
-	/** Returns the options for a start widget since they're not all shared with BSConfig pointer. */
-	FStartWidgetProperties GetStartWidgetProperties() const;
+	/** Clears all game mode combo box options and repopulates. */
+	void RefreshGameModes(const TArray<FBSConfig>& CustomGameModes) const;
 
-	/** Sets the value of EditableTextBoxOption_CustomGameModeName. */
-	//void SetNewCustomGameModeName(const FString& InCustomGameModeName) const;
-
-	/** Sets the options for a start widget since they're not all shared with BSConfig pointer. */
-	void SetStartWidgetProperties(const FStartWidgetProperties& InProperties);
-
-	/** Updates the Difficulty ComboBox selection if different from BSConfig, or if none selected with Preset.
-	 *  Returns true if the selection was changed. */
-	//bool UpdateDifficultySelection(const EGameModeDifficulty& Difficulty) const;
-
-	/** Updates the Difficulty ComboBox visibility based on the type of game mode. Returns true if the visibility
-	 *  was changed. */
-	//bool UpdateDifficultyVisibility() const;
-
-	/** Updates the GameModeTemplate ComboBox visibility based on the type of game mode and the checkbox.
-	 *  Returns true if the visibility was changed. */
-	//bool UpdateGameModeTemplateVisibility() const;
-
-	/** Clears all GameModeTemplate options and repopulates. */
-	void RefreshGameModeTemplateComboBoxOptions(const TArray<FBSConfig>& CustomGameModes) const;
-
-	TDelegate<void(const FStartWidgetProperties&)> OnStartWidgetPropertyChanged;
+	/** Executed when a property is changed by a user. */
+	static TDelegate<void(FStartWidgetProperties&)> OnStartWidgetPropertyChanged;
 
 protected:
 	virtual void NativeConstruct() override;
-	//virtual void UpdateAllOptionsValid() override;
-	//virtual void UpdateOptionsFromConfig() override;
 
 	UFUNCTION()
 	void OnCheckStateChanged_UseTemplate(const bool bChecked);
@@ -148,5 +83,5 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UTextInputWidget* EditableTextBoxOption_CustomGameModeName;
 
-	FStartWidgetProperties StartWidgetProperties;
+	static FStartWidgetProperties StartWidgetProperties;
 };
