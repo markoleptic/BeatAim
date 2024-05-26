@@ -25,9 +25,8 @@ private:
 
 protected:
 	virtual void NativeConstruct() override;
-	//virtual void UpdateAllOptionsValid() override;
+
 	virtual void UpdateOptionsFromConfig() override;
-	void SetupWarningTooltipCallbacks();
 
 	/** Updates options that depend on the value selection of RecentTargetMemoryPolicy. */
 	void UpdateDependentOptions_RecentTargetMemoryPolicy(const ERecentTargetMemoryPolicy InRecentTargetMemoryPolicy);
@@ -46,19 +45,24 @@ protected:
 	void OnCheckStateChanged_EnableAI(const bool bChecked);
 
 	void OnSliderTextBoxValueChanged(USingleRangeInputWidget* Widget, const float Value);
+
 	void OnSliderTextBoxCheckBoxOptionChanged(UToggleableSingleRangeInputWidget* Widget, const bool bChecked,
 		const float Value);
 
 	UFUNCTION()
 	void OnSelectionChanged_RecentTargetMemoryPolicy(const TArray<FString>& Selected,
 		const ESelectInfo::Type SelectionType);
+
 	UFUNCTION()
 	void OnSelectionChanged_DamageType(const TArray<FString>& Selected, const ESelectInfo::Type SelectionType);
+
 	UFUNCTION()
 	void OnSelectionChanged_HyperParameterMode(const TArray<FString>& Selected, const ESelectInfo::Type SelectionType);
 
 	FString GetComboBoxEntryTooltipStringTableKey_TargetActivationSelectionPolicy(const FString& EnumString);
+
 	FString GetComboBoxEntryTooltipStringTableKey_DamageType(const FString& EnumString);
+
 	FString GetComboBoxEntryTooltipStringTableKey_HyperParameterMode(const FString& EnumString);
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))

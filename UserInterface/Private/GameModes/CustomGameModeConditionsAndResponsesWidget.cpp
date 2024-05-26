@@ -86,7 +86,6 @@ void UCustomGameModeConditionsAndResponsesWidget::NativeConstruct()
 	ComboBoxOption_TargetDestructionConditions->SortAddOptionsAndSetEnumType<ETargetDestructionCondition>(Options);
 	Options.Empty();
 
-	SetupWarningTooltipCallbacks();
 	UpdateBrushColors();
 }
 
@@ -109,47 +108,6 @@ void UCustomGameModeConditionsAndResponsesWidget::UpdateOptionsFromConfig()
 
 	UpdateBrushColors();
 }
-
-void UCustomGameModeConditionsAndResponsesWidget::SetupWarningTooltipCallbacks()
-{
-	ComboBoxOption_TargetSpawnResponses->AddWarningTooltipData(FTooltipData("Invalid_Velocity_MTDM_None",
-		ETooltipImageType::Caution)).BindLambda([this]()
-	{
-		return BSConfig->TargetConfig.TargetSpawnResponses.Contains(ETargetSpawnResponse::ChangeVelocity) && BSConfig->
-			TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None;
-	});
-	ComboBoxOption_TargetSpawnResponses->AddWarningTooltipData(FTooltipData("Invalid_Direction_MTDM_None",
-		ETooltipImageType::Caution)).BindLambda([this]()
-	{
-		return BSConfig->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && BSConfig->
-			TargetConfig.TargetSpawnResponses.Contains(ETargetSpawnResponse::ChangeDirection);
-	});
-	ComboBoxOption_TargetDeactivationResponses->AddWarningTooltipData(FTooltipData("Invalid_Velocity_MTDM_None",
-		ETooltipImageType::Caution)).BindLambda([this]()
-	{
-		return BSConfig->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && BSConfig->
-			TargetConfig.TargetDeactivationResponses.Contains(ETargetDeactivationResponse::ChangeVelocity);
-	});
-	ComboBoxOption_TargetDeactivationResponses->AddWarningTooltipData(FTooltipData("Invalid_Direction_MTDM_None",
-		ETooltipImageType::Caution)).BindLambda([this]()
-	{
-		return BSConfig->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && BSConfig->
-			TargetConfig.TargetDeactivationResponses.Contains(ETargetDeactivationResponse::ChangeDirection);
-	});
-	ComboBoxOption_TargetActivationResponses->AddWarningTooltipData(FTooltipData("Invalid_Velocity_MTDM_None",
-		ETooltipImageType::Caution)).BindLambda([this]()
-	{
-		return BSConfig->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && BSConfig->
-			TargetConfig.TargetActivationResponses.Contains(ETargetActivationResponse::ChangeVelocity);
-	});
-	ComboBoxOption_TargetActivationResponses->AddWarningTooltipData(FTooltipData("Invalid_Direction_MTDM_None",
-		ETooltipImageType::Caution)).BindLambda([this]()
-	{
-		return BSConfig->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && BSConfig->
-			TargetConfig.TargetActivationResponses.Contains(ETargetActivationResponse::ChangeDirection);
-	});
-}
-
 
 void UCustomGameModeConditionsAndResponsesWidget::UpdateDependentOptions_TargetDeactivationResponses(
 	const TArray<ETargetDeactivationResponse>& Responses)
@@ -185,8 +143,11 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetActiv
 	}
 
 	UpdateDependentOptions_TargetActivationResponses(BSConfig->TargetConfig.TargetActivationResponses);
+	OnPropertyChanged.Execute({
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetActivationResponses))
+	});
 	UpdateBrushColors();
-	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetSpawnResponses(
@@ -208,8 +169,11 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetSpawn
 	}
 
 	UpdateDependentOptions_TargetSpawnResponses(BSConfig->TargetConfig.TargetSpawnResponses);
+	OnPropertyChanged.Execute({
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetSpawnResponses))
+	});
 	UpdateBrushColors();
-	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDeactivationConditions(
@@ -229,9 +193,11 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDeact
 		BSConfig->TargetConfig.TargetDeactivationConditions = GetEnumArrayFromStringArray_FromTagMap<
 			ETargetDeactivationCondition>(Selected);
 	}
-
+	OnPropertyChanged.Execute({
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDeactivationConditions))
+	});
 	UpdateBrushColors();
-	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDeactivationResponses(
@@ -251,10 +217,12 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDeact
 		BSConfig->TargetConfig.TargetDeactivationResponses = GetEnumArrayFromStringArray_FromTagMap<
 			ETargetDeactivationResponse>(Selected);
 	}
-
 	UpdateDependentOptions_TargetDeactivationResponses(BSConfig->TargetConfig.TargetDeactivationResponses);
+	OnPropertyChanged.Execute({
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDeactivationResponses))
+	});
 	UpdateBrushColors();
-	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDestructionConditions(
@@ -264,7 +232,6 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDestr
 	{
 		return;
 	}
-
 	if (Selected.IsEmpty())
 	{
 		BSConfig->TargetConfig.TargetDestructionConditions.Empty();
@@ -275,8 +242,11 @@ void UCustomGameModeConditionsAndResponsesWidget::OnSelectionChanged_TargetDestr
 			ETargetDestructionCondition>(Selected);
 	}
 
+	OnPropertyChanged.Execute({
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDestructionConditions))
+	});
 	UpdateBrushColors();
-	//UpdateAllOptionsValid();
 }
 
 FString UCustomGameModeConditionsAndResponsesWidget::GetComboBoxEntryTooltipStringTableKey_TargetSpawnResponses(

@@ -213,38 +213,38 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 	// MovingTargetDirectionMode & Target Spawn Responses
 	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, TargetSpawnResponses}, EGameModeWarningType::Caution,
 		SpawnVelocityLambda);
-	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None"), ""});
+	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None_2"), ""});
 	AddValidationCheckToProperty(TargetSpawnResponsesPtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None"), ""});
 	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, TargetSpawnResponses}, EGameModeWarningType::Caution,
 		SpawnDirectionLambda);
-	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None"), ""});
+	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None_2"), ""});
 	AddValidationCheckToProperty(TargetSpawnResponsesPtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None"), ""});
 
 	// MovingTargetDirectionMode & Target Activation Responses
 	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, TargetActivationResponses},
 		EGameModeWarningType::Caution, ActivationVelocityLambda);
-	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None"), ""});
+	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None_2"), ""});
 	AddValidationCheckToProperty(TargetActivationResponsesPtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None"), ""});
 	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, TargetActivationResponses},
 		EGameModeWarningType::Caution, ActivationDirectionLambda);
-	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None"), ""});
+	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None_2"), ""});
 	AddValidationCheckToProperty(TargetActivationResponsesPtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None"), ""});
 
 	// MovingTargetDirectionMode & Target Deactivation Responses
 	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, TargetActivationResponses},
 		EGameModeWarningType::Caution, DeactivationVelocityLambda);
-	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None"), ""});
+	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None_2"), ""});
 	AddValidationCheckToProperty(TargetDeactivationResponsesPtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None"), ""});
 	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, TargetDeactivationResponses},
 		EGameModeWarningType::Caution, DeactivationDirectionLambda);
-	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None"), ""});
+	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None_2"), ""});
 	AddValidationCheckToProperty(TargetDeactivationResponsesPtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None"), ""});
 
 	// MovingTargetDirectionMode & Box Bounds
 	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, BoxBounds}, EGameModeWarningType::Caution,
 		BoxBoundsLambda);
 	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr,
-		{TEXT("Caution_ZeroForwardDistance_MTDM_ForwardOnly_2"), ""});
+		{TEXT("Caution_ZeroForwardDistance_MTDM_ForwardOnly"), ""});
 	AddValidationCheckToProperty(BoxBoundsPtr, CheckPtr, {TEXT("Caution_ZeroForwardDistance_MTDM_ForwardOnly_2"), ""});
 
 	const FProperty* NumHorizontalGridTargets = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
@@ -262,6 +262,8 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MinSpawnedTargetScale));
 	const FProperty* MaxSpawnedTargetScale = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxSpawnedTargetScale));
+	const FProperty* TargetDamageType = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDamageType));
 
 	auto NumHorizontalGridTargetsLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{
@@ -379,6 +381,30 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 		EGameModeWarningType::Warning, TargetDistributionPolicyLambda);
 	AddValidationCheckToProperty(TargetDistributionPolicyPtr, CheckPtr, {TEXT("Invalid_HeadshotHeightOnly_AI"), ""});
 	AddValidationCheckToProperty(EnableReinforcementLearningPtr, CheckPtr, {TEXT("Invalid_HeadshotHeightOnly_AI"), ""});
+
+	FValidationPropertyPtr TargetDamageTypePtr = CreateValidationProperty(TargetDamageType,
+		EGameModeCategory::SpawnArea);
+
+	auto InvalidTrackingAILambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	{
+		return !(Config->AIConfig.bEnableReinforcementLearning && Config->TargetConfig.TargetDamageType ==
+			ETargetDamageType::Tracking);
+	};
+	auto InvalidHeadshotAILambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	{
+		return !(Config->AIConfig.bEnableReinforcementLearning && Config->TargetConfig.TargetDistributionPolicy ==
+			ETargetDistributionPolicy::HeadshotHeightOnly);
+	};
+
+	CheckPtr = CreateValidationCheck({EnableReinforcementLearning, TargetDamageType}, EGameModeWarningType::Warning,
+		InvalidTrackingAILambda);
+	AddValidationCheckToProperty(EnableReinforcementLearningPtr, CheckPtr, {TEXT("Invalid_Tracking_AI"), ""});
+	AddValidationCheckToProperty(TargetDamageTypePtr, CheckPtr, {TEXT("Invalid_Tracking_AI"), ""});
+
+	CheckPtr = CreateValidationCheck({EnableReinforcementLearning, TargetDistributionPolicy},
+		EGameModeWarningType::Warning, InvalidHeadshotAILambda);
+	AddValidationCheckToProperty(EnableReinforcementLearningPtr, CheckPtr, {TEXT("Invalid_HeadshotHeightOnly_AI"), ""});
+	AddValidationCheckToProperty(TargetDistributionPolicyPtr, CheckPtr, {TEXT("Invalid_HeadshotHeightOnly_AI"), ""});
 }
 
 FValidationCheckPtr UBSGameModeValidator::FPrivate::CreateValidationCheck(TSet<const FProperty*>&& InvolvedProperties,
@@ -519,10 +545,10 @@ FValidationResult UBSGameModeValidator::Validate(const TSharedPtr<FBSConfig>& In
 {
 	FValidationResult Result;
 
-	if (const FValidationPropertyPtr* ValidationProperty = Impl->ValidationProperties.Find(
+	if (const FValidationPropertyPtr& ValidationProperty = FindValidationProperty(
 		FindProperty<FBSConfig>(SubStructName, PropertyName)))
 	{
-		for (const FValidationCheckPtr& Check : (*ValidationProperty)->Checks)
+		for (const FValidationCheckPtr& Check : ValidationProperty->Checks)
 		{
 			TArray<int32> Values;
 			const bool bResult = Check->ValidationDelegate.Execute(InConfig, Values);
@@ -552,9 +578,9 @@ FValidationResult UBSGameModeValidator::Validate(const TSharedPtr<FBSConfig>& In
 	FValidationResult Result;
 	for (const FProperty* Property : Properties)
 	{
-		if (const FValidationPropertyPtr* ValidationProperty = Impl->ValidationProperties.Find(Property))
+		if (const FValidationPropertyPtr& ValidationProperty = FindValidationProperty(Property))
 		{
-			for (const FValidationCheckPtr& Check : (*ValidationProperty)->Checks)
+			for (const FValidationCheckPtr& Check : ValidationProperty->Checks)
 			{
 				TArray<int32> Values;
 				const bool bResult = Check->ValidationDelegate.Execute(InConfig, Values);
@@ -583,4 +609,13 @@ FValidationResult UBSGameModeValidator::Validate(const TSharedPtr<FBSConfig>& In
 const FProperty* UBSGameModeValidator::FindBSConfigProperty(const FName SubStructName, const FName PropertyName)
 {
 	return FindProperty<FBSConfig>(SubStructName, PropertyName);
+}
+
+FValidationPropertyPtr UBSGameModeValidator::FindValidationProperty(const FProperty* Property) const
+{
+	if (const FValidationPropertyPtr* Found = Impl->ValidationProperties.Find(Property))
+	{
+		return *Found;
+	}
+	return nullptr;
 }

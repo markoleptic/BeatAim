@@ -267,6 +267,12 @@ public:
 	 */
 	static const FProperty* FindBSConfigProperty(const FName SubStructName, const FName PropertyName);
 
+	/** Finds a validation property based on a BSConfig FProperty.
+	 *  @param Property the property to look for.
+	 *	@return a validation property pointer if found, otherwise null.
+	 */
+	FValidationPropertyPtr FindValidationProperty(const FProperty* Property) const;
+
 private:
 	class FPrivate;
 	TPimplPtr<FPrivate> Impl;

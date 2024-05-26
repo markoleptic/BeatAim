@@ -20,10 +20,10 @@ class USERINTERFACE_API UCustomGameModeActivationWidget : public UCustomGameMode
 
 protected:
 	UCustomGameModeActivationWidget();
+
 	virtual void NativeConstruct() override;
-	//virtual void UpdateAllOptionsValid() override;
+
 	virtual void UpdateOptionsFromConfig() override;
-	void SetupWarningTooltipCallbacks();
 
 	/** Updates options that depend on the value selection of TargetActivationResponses. */
 	void UpdateDependentOptions_TargetActivationResponses(const TArray<ETargetActivationResponse>& InResponses,

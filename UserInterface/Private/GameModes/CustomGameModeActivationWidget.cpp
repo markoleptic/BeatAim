@@ -54,7 +54,6 @@ void UCustomGameModeActivationWidget::NativeConstruct()
 		ETargetActivationSelectionPolicy>(Options);
 	Options.Empty();
 
-	SetupWarningTooltipCallbacks();
 	UpdateBrushColors();
 }
 
@@ -80,10 +79,6 @@ void UCustomGameModeActivationWidget::UpdateOptionsFromConfig()
 	UpdateDependentOptions_TargetDistributionPolicy(BSConfig->TargetConfig.TargetDistributionPolicy);
 
 	UpdateBrushColors();
-}
-
-void UCustomGameModeActivationWidget::SetupWarningTooltipCallbacks()
-{
 }
 
 void UCustomGameModeActivationWidget::UpdateDependentOptions_TargetActivationResponses(
@@ -117,7 +112,10 @@ void UCustomGameModeActivationWidget::UpdateDependentOptions_TargetDistributionP
 void UCustomGameModeActivationWidget::OnCheckStateChanged_AllowActivationWhileActivated(const bool bChecked)
 {
 	BSConfig->TargetConfig.bAllowActivationWhileActivated = bChecked;
-	//UpdateAllOptionsValid();
+	OnPropertyChanged.Execute({
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bAllowActivationWhileActivated))
+	});
 }
 
 void UCustomGameModeActivationWidget::OnSliderTextBoxValueChanged(USingleRangeInputWidget* Widget, const float Value)
@@ -125,8 +123,11 @@ void UCustomGameModeActivationWidget::OnSliderTextBoxValueChanged(USingleRangeIn
 	if (Widget == SliderTextBoxOption_MaxNumActivatedTargetsAtOnce)
 	{
 		BSConfig->TargetConfig.MaxNumActivatedTargetsAtOnce = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxNumActivatedTargetsAtOnce))
+		});
 	}
-	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeActivationWidget::OnMinMaxMenuOptionChanged(UDualRangeInputWidget* Widget, const bool bChecked,
@@ -136,9 +137,14 @@ void UCustomGameModeActivationWidget::OnMinMaxMenuOptionChanged(UDualRangeInputW
 	{
 		BSConfig->TargetConfig.MinNumTargetsToActivateAtOnce = MinOrConstant;
 		BSConfig->TargetConfig.MaxNumTargetsToActivateAtOnce = bChecked ? MinOrConstant : Max;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MinNumTargetsToActivateAtOnce)),
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxNumTargetsToActivateAtOnce))
+		});
 	}
 	UpdateBrushColors();
-	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeActivationWidget::OnSelectionChanged_TargetActivationSelectionPolicy(
@@ -151,7 +157,10 @@ void UCustomGameModeActivationWidget::OnSelectionChanged_TargetActivationSelecti
 
 	BSConfig->TargetConfig.TargetActivationSelectionPolicy = GetEnumFromString_FromTagMap<
 		ETargetActivationSelectionPolicy>(Selected[0]);
-	//UpdateAllOptionsValid();
+	OnPropertyChanged.Execute({
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetActivationSelectionPolicy))
+	});
 }
 
 FString UCustomGameModeActivationWidget::GetComboBoxEntryTooltipStringTableKey_TargetActivationSelectionPolicy(

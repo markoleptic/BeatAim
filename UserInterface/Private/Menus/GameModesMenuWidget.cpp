@@ -978,8 +978,22 @@ void UGameModeMenuWidget::SetBSConfig(const FBSConfig& InConfig)
 
 void UGameModeMenuWidget::HandlePropertyChanged(const TSet<const FProperty*>& Properties)
 {
+	for (const FProperty* Prop : Properties)
+	{
+		if (const FValidationPropertyPtr& PropertyPtr = GameModeValidator->FindValidationProperty(Prop))
+		{
+			UE_LOG(LogTemp, Display, TEXT("Property Changed: %s"), *PropertyPtr->Property->GetName());
+		}
+	}
+
 	if (Properties.Contains(GameModeValidator->FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, FloorDistance))))
+	{
+		RefreshGameModePreview();
+	}
+
+	if (Properties.Contains(GameModeValidator->FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDistributionPolicy))))
 	{
 		RefreshGameModePreview();
 	}

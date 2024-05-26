@@ -3,6 +3,7 @@
 
 #include "GameModes/CustomGameModeMovementWidget.h"
 #include "BSGameModeConfig/BSConfig.h"
+#include "BSGameModeConfig/BSGameModeValidator.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "MenuOptions/DualRangeInputWidget.h"
 #include "Utilities/ComboBox/BSComboBoxString.h"
@@ -42,14 +43,8 @@ void UCustomGameModeMovementWidget::NativeConstruct()
 	SetMenuOptionEnabledStateAndAddTooltip(MenuOption_ActivatedTargetVelocity, EMenuOptionEnabledState::Enabled);
 	SetMenuOptionEnabledStateAndAddTooltip(MenuOption_DeactivatedTargetVelocity, EMenuOptionEnabledState::Enabled);
 
-	SetupWarningTooltipCallbacks();
 	UpdateBrushColors();
 }
-
-/*void UCustomGameModeMovementWidget::UpdateAllOptionsValid()
-{
-	Super::UpdateAllOptionsValid();
-}*/
 
 void UCustomGameModeMovementWidget::UpdateOptionsFromConfig()
 {
@@ -77,32 +72,6 @@ void UCustomGameModeMovementWidget::UpdateOptionsFromConfig()
 		bConstantDeactivatedSpeed);
 
 	UpdateBrushColors();
-}
-
-void UCustomGameModeMovementWidget::SetupWarningTooltipCallbacks()
-{
-	ComboBoxOption_MovingTargetDirectionMode->AddWarningTooltipData(FTooltipData("Invalid_Velocity_MTDM_None_2",
-		ETooltipImageType::Caution)).BindLambda([this]()
-	{
-		return BSConfig->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && (BSConfig->
-			TargetConfig.TargetSpawnResponses.Contains(ETargetSpawnResponse::ChangeVelocity) || BSConfig->TargetConfig.
-			TargetActivationResponses.Contains(ETargetActivationResponse::ChangeVelocity) || BSConfig->TargetConfig.
-			TargetDeactivationResponses.Contains(ETargetDeactivationResponse::ChangeVelocity));
-	});
-	ComboBoxOption_MovingTargetDirectionMode->AddWarningTooltipData(FTooltipData("Invalid_Direction_MTDM_None_2",
-		ETooltipImageType::Caution)).BindLambda([this]()
-	{
-		return BSConfig->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && (BSConfig->
-			TargetConfig.TargetActivationResponses.Contains(ETargetActivationResponse::ChangeDirection) || BSConfig->
-			TargetConfig.TargetDeactivationResponses.Contains(ETargetDeactivationResponse::ChangeDirection) || BSConfig
-			->TargetConfig.TargetSpawnResponses.Contains(ETargetSpawnResponse::ChangeVelocity));
-	});
-	ComboBoxOption_MovingTargetDirectionMode->AddWarningTooltipData(
-		FTooltipData("Caution_ZeroForwardDistance_MTDM_ForwardOnly", ETooltipImageType::Caution)).BindLambda([this]()
-	{
-		return BSConfig->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::ForwardOnly && BSConfig->
-			TargetConfig.BoxBounds.X <= 0.f;
-	});
 }
 
 void UCustomGameModeMovementWidget::UpdateDependentOptions_SpawnResponses(const TArray<ETargetSpawnResponse>& Responses,
@@ -157,7 +126,10 @@ void UCustomGameModeMovementWidget::OnSelectionChanged_MovingTargetDirectionMode
 
 	BSConfig->TargetConfig.MovingTargetDirectionMode = GetEnumFromString_FromTagMap<
 		EMovingTargetDirectionMode>(Selected[0]);
-	//UpdateAllOptionsValid();
+	OnPropertyChanged.Execute({
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MovingTargetDirectionMode))
+	});
 }
 
 void UCustomGameModeMovementWidget::OnMinMaxMenuOptionChanged(UDualRangeInputWidget* Widget, const bool bChecked,
@@ -167,19 +139,36 @@ void UCustomGameModeMovementWidget::OnMinMaxMenuOptionChanged(UDualRangeInputWid
 	{
 		BSConfig->TargetConfig.MinSpawnedTargetSpeed = MinOrConstant;
 		BSConfig->TargetConfig.MaxSpawnedTargetSpeed = bChecked ? MinOrConstant : Max;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MinSpawnedTargetSpeed)),
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxSpawnedTargetSpeed))
+		});
 	}
 	else if (Widget == MenuOption_ActivatedTargetVelocity)
 	{
 		BSConfig->TargetConfig.MinActivatedTargetSpeed = MinOrConstant;
 		BSConfig->TargetConfig.MaxActivatedTargetSpeed = bChecked ? MinOrConstant : Max;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MinActivatedTargetSpeed)),
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxActivatedTargetSpeed))
+		});
 	}
 	else if (Widget == MenuOption_DeactivatedTargetVelocity)
 	{
 		BSConfig->TargetConfig.MinDeactivatedTargetSpeed = MinOrConstant;
 		BSConfig->TargetConfig.MaxDeactivatedTargetSpeed = bChecked ? MinOrConstant : Max;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MinDeactivatedTargetSpeed)),
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxDeactivatedTargetSpeed))
+		});
 	}
 	UpdateBrushColors();
-	//UpdateAllOptionsValid();
 }
 
 FString UCustomGameModeMovementWidget::GetComboBoxEntryTooltipStringTableKey_MovingTargetDirectionMode(

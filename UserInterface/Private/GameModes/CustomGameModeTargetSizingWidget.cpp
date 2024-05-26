@@ -74,7 +74,6 @@ void UCustomGameModeTargetSizingWidget::NativeConstruct()
 	SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_DeactivatedTargetScaleMultiplier,
 		EMenuOptionEnabledState::Enabled);
 
-	SetupWarningTooltipCallbacks();
 	UpdateBrushColors();
 }
 
@@ -100,18 +99,6 @@ void UCustomGameModeTargetSizingWidget::UpdateOptionsFromConfig()
 	UpdateDependentOptions_ConsecutiveTargetScalePolicy(BSConfig->TargetConfig.ConsecutiveTargetScalePolicy);
 
 	UpdateBrushColors();
-}
-
-void UCustomGameModeTargetSizingWidget::SetupWarningTooltipCallbacks()
-{
-	/*MenuOption_TargetScale->AddDynamicWarningTooltipData(
-		FTooltipData("Invalid_Grid_MaxSpawnedTargetScale", ETooltipImageType::Warning),
-		"Invalid_Grid_MaxSpawnedTargetScale_Fallback", Constants::MinValue_TargetScale, 2).BindLambda([this]()
-	{
-		const float Max = FMath::Max(BSConfig->TargetConfig.MaxSpawnedTargetScale,
-			BSConfig->TargetConfig.MinSpawnedTargetScale);
-		return FDynamicTooltipState(Max, GetMaxAllowedTargetScale());
-	});*/
 }
 
 void UCustomGameModeTargetSizingWidget::UpdateDependentOptions_TargetActivationResponses(
@@ -176,24 +163,43 @@ void UCustomGameModeTargetSizingWidget::OnSliderTextBoxValueChanged(USingleRange
 	if (Widget == SliderTextBoxOption_DeactivatedTargetScaleMultiplier)
 	{
 		BSConfig->TargetConfig.ConsecutiveChargeScaleMultiplier = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, ConsecutiveChargeScaleMultiplier))
+		});
 	}
 	else if (Widget == SliderTextBoxOption_StartThreshold)
 	{
 		BSConfig->DynamicTargetScaling.StartThreshold = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicTargetScaling),
+				GET_MEMBER_NAME_CHECKED(FBS_Dynamic, StartThreshold))
+		});
 	}
 	else if (Widget == SliderTextBoxOption_EndThreshold)
 	{
 		BSConfig->DynamicTargetScaling.EndThreshold = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicTargetScaling),
+				GET_MEMBER_NAME_CHECKED(FBS_Dynamic, EndThreshold))
+		});
 	}
 	else if (Widget == SliderTextBoxOption_DecrementAmount)
 	{
 		BSConfig->DynamicTargetScaling.DecrementAmount = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicTargetScaling),
+				GET_MEMBER_NAME_CHECKED(FBS_Dynamic, DecrementAmount))
+		});
 	}
 	else if (Widget == SliderTextBoxOption_LifetimeTargetScaleMultiplier)
 	{
 		BSConfig->TargetConfig.LifetimeTargetScaleMultiplier = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, LifetimeTargetScaleMultiplier))
+		});
 	}
-	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeTargetSizingWidget::OnMinMaxMenuOptionChanged(UDualRangeInputWidget* Widget, const bool bChecked,
@@ -228,9 +234,14 @@ void UCustomGameModeTargetSizingWidget::OnMinMaxMenuOptionChanged(UDualRangeInpu
 				GetStringFromEnum_FromTagMap(BSConfig->TargetConfig.ConsecutiveTargetScalePolicy));
 			UpdateDependentOptions_ConsecutiveTargetScalePolicy(BSConfig->TargetConfig.ConsecutiveTargetScalePolicy);
 		}
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MinSpawnedTargetScale)),
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxSpawnedTargetScale))
+		});
 	}
 	UpdateBrushColors();
-	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeTargetSizingWidget::OnSelectionChanged_ConsecutiveTargetScalePolicy(const TArray<FString>& Selected,
@@ -255,8 +266,16 @@ void UCustomGameModeTargetSizingWidget::OnSelectionChanged_ConsecutiveTargetScal
 		BSConfig->TargetConfig.MinSpawnedTargetScale = MenuOption_TargetScale->GetMinSliderValue(true);
 		BSConfig->TargetConfig.MaxSpawnedTargetScale = MenuOption_TargetScale->GetMaxSliderValue(true);
 	}
+	OnPropertyChanged.Execute({
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, ConsecutiveTargetScalePolicy)),
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MinSpawnedTargetScale)),
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxSpawnedTargetScale))
+	});
+
 	UpdateBrushColors();
-	//UpdateAllOptionsValid();
 }
 
 FString UCustomGameModeTargetSizingWidget::GetComboBoxEntryTooltipStringTableKey_ConsecutiveTargetScalePolicy(

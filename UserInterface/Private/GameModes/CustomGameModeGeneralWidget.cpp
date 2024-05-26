@@ -126,7 +126,6 @@ void UCustomGameModeGeneralWidget::NativeConstruct()
 	SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_DeactivationHealthLostThreshold,
 		EMenuOptionEnabledState::Enabled);
 
-	SetupWarningTooltipCallbacks();
 	UpdateBrushColors();
 }
 
@@ -162,30 +161,6 @@ void UCustomGameModeGeneralWidget::UpdateOptionsFromConfig()
 	UpdateDependentOptions_DeactivationConditions(BSConfig->TargetConfig.TargetDeactivationConditions);
 
 	UpdateBrushColors();
-}
-
-void UCustomGameModeGeneralWidget::SetupWarningTooltipCallbacks()
-{
-	CheckBoxOption_EnableAI->AddWarningTooltipData(FTooltipData("Invalid_HeadshotHeightOnly_AI",
-		ETooltipImageType::Warning)).BindLambda([this]()
-	{
-		return BSConfig->TargetConfig.TargetDistributionPolicy == ETargetDistributionPolicy::Grid && BSConfig->AIConfig.
-			bEnableReinforcementLearning && BSConfig->TargetConfig.TargetDistributionPolicy ==
-			ETargetDistributionPolicy::HeadshotHeightOnly;
-	});
-	CheckBoxOption_EnableAI->AddWarningTooltipData(FTooltipData("Invalid_Tracking_AI", ETooltipImageType::Warning)).
-	                         BindLambda([this]()
-	                         {
-		                         return BSConfig->TargetConfig.TargetDistributionPolicy ==
-			                         ETargetDistributionPolicy::Grid && BSConfig->AIConfig.bEnableReinforcementLearning
-			                         && BSConfig->TargetConfig.TargetDamageType == ETargetDamageType::Tracking;
-	                         });
-	ComboBoxOption_DamageType->AddWarningTooltipData(FTooltipData("Invalid_Tracking_AI", ETooltipImageType::Warning)).
-	                           BindLambda([this]()
-	                           {
-		                           return BSConfig->AIConfig.bEnableReinforcementLearning && BSConfig->TargetConfig.
-			                           TargetDamageType == ETargetDamageType::Tracking;
-	                           });
 }
 
 void UCustomGameModeGeneralWidget::UpdateDependentOptions_RecentTargetMemoryPolicy(
@@ -284,9 +259,11 @@ void UCustomGameModeGeneralWidget::OnCheckStateChanged_EnableAI(const bool bChec
 	BSConfig->AIConfig.bEnableReinforcementLearning = bChecked;
 	UpdateDependentOptions_EnableAI(BSConfig->AIConfig.bEnableReinforcementLearning,
 		BSConfig->AIConfig.HyperParameterMode);
-
+	OnPropertyChanged.Execute({
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, AIConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_AIConfig, bEnableReinforcementLearning))
+	});
 	UpdateBrushColors();
-	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeGeneralWidget::OnSliderTextBoxValueChanged(USingleRangeInputWidget* Widget, const float Value)
@@ -294,40 +271,75 @@ void UCustomGameModeGeneralWidget::OnSliderTextBoxValueChanged(USingleRangeInput
 	if (Widget == SliderTextBoxOption_SpawnBeatDelay)
 	{
 		BSConfig->TargetConfig.SpawnBeatDelay = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, SpawnBeatDelay))
+		});
 	}
 	else if (Widget == SliderTextBoxOption_TargetSpawnCD)
 	{
 		BSConfig->TargetConfig.TargetSpawnCD = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetSpawnCD))
+		});
 	}
 	else if (Widget == SliderTextBoxOption_MaxNumRecentTargets)
 	{
 		BSConfig->TargetConfig.MaxNumRecentTargets = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxNumRecentTargets))
+		});
 	}
 	else if (Widget == SliderTextBoxOption_RecentTargetTimeLength)
 	{
 		BSConfig->TargetConfig.RecentTargetTimeLength = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, RecentTargetTimeLength))
+		});
 	}
 	else if (Widget == SliderTextBoxOption_Alpha)
 	{
 		BSConfig->AIConfig.Alpha = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, AIConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_AIConfig, Alpha))
+		});
 	}
 	else if (Widget == SliderTextBoxOption_Epsilon)
 	{
 		BSConfig->AIConfig.Epsilon = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, AIConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_AIConfig, Epsilon))
+		});
 	}
 	else if (Widget == SliderTextBoxOption_Gamma)
 	{
 		BSConfig->AIConfig.Gamma = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, AIConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_AIConfig, Gamma))
+		});
 	}
 	else if (Widget == SliderTextBoxOption_ExpirationHealthPenalty)
 	{
 		BSConfig->TargetConfig.ExpirationHealthPenalty = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, ExpirationHealthPenalty))
+		});
 	}
 	else if (Widget == SliderTextBoxOption_DeactivationHealthLostThreshold)
 	{
 		BSConfig->TargetConfig.DeactivationHealthLostThreshold = Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, DeactivationHealthLostThreshold))
+		});
 	}
-	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeGeneralWidget::OnSliderTextBoxCheckBoxOptionChanged(UToggleableSingleRangeInputWidget* Widget,
@@ -336,12 +348,19 @@ void UCustomGameModeGeneralWidget::OnSliderTextBoxCheckBoxOptionChanged(UTogglea
 	if (Widget == MenuOption_TargetHealth)
 	{
 		BSConfig->TargetConfig.MaxHealth = bChecked ? -1.f : Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxHealth))
+		});
 	}
 	else if (Widget == MenuOption_TargetLifespan)
 	{
 		BSConfig->TargetConfig.TargetMaxLifeSpan = bChecked ? -1.f : Value;
+		OnPropertyChanged.Execute({
+			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetMaxLifeSpan))
+		});
 	}
-	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeGeneralWidget::OnSelectionChanged_RecentTargetMemoryPolicy(const TArray<FString>& Selected,
@@ -355,8 +374,11 @@ void UCustomGameModeGeneralWidget::OnSelectionChanged_RecentTargetMemoryPolicy(c
 	BSConfig->TargetConfig.RecentTargetMemoryPolicy = GetEnumFromString_FromTagMap<
 		ERecentTargetMemoryPolicy>(Selected[0]);
 	UpdateDependentOptions_RecentTargetMemoryPolicy(BSConfig->TargetConfig.RecentTargetMemoryPolicy);
+	OnPropertyChanged.Execute({
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, RecentTargetMemoryPolicy))
+	});
 	UpdateBrushColors();
-	//UpdateAllOptionsValid();
 }
 
 void UCustomGameModeGeneralWidget::OnSelectionChanged_DamageType(const TArray<FString>& Selected,
@@ -368,7 +390,10 @@ void UCustomGameModeGeneralWidget::OnSelectionChanged_DamageType(const TArray<FS
 	}
 
 	BSConfig->TargetConfig.TargetDamageType = GetEnumFromString_FromTagMap<ETargetDamageType>(Selected[0]);
-	//UpdateAllOptionsValid();
+	OnPropertyChanged.Execute({
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDamageType))
+	});
 }
 
 void UCustomGameModeGeneralWidget::OnSelectionChanged_HyperParameterMode(const TArray<FString>& Selected,
@@ -383,9 +408,12 @@ void UCustomGameModeGeneralWidget::OnSelectionChanged_HyperParameterMode(const T
 		EReinforcementLearningHyperParameterMode>(Selected[0]);
 	UpdateDependentOptions_EnableAI(BSConfig->AIConfig.bEnableReinforcementLearning,
 		BSConfig->AIConfig.HyperParameterMode);
+	OnPropertyChanged.Execute({
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, AIConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_AIConfig, HyperParameterMode))
+	});
 
 	UpdateBrushColors();
-	//UpdateAllOptionsValid();
 }
 
 FString UCustomGameModeGeneralWidget::GetComboBoxEntryTooltipStringTableKey_HyperParameterMode(
