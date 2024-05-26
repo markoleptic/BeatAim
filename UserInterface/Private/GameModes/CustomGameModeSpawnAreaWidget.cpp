@@ -105,7 +105,6 @@ void UCustomGameModeSpawnAreaWidget::NativeConstruct()
 	SliderTextBoxOption_EndThreshold->SetVisibility(ESlateVisibility::Collapsed);
 	SliderTextBoxOption_DecrementAmount->SetVisibility(ESlateVisibility::Collapsed);
 
-	SetupWarningTooltipCallbacks();
 	UpdateBrushColors();
 }
 
@@ -129,54 +128,6 @@ void UCustomGameModeSpawnAreaWidget::UpdateOptionsFromConfig()
 	UpdateDependentOption_BoundsScalingPolicy();
 
 	UpdateBrushColors();
-}
-
-void UCustomGameModeSpawnAreaWidget::SetupWarningTooltipCallbacks()
-{
-	/*SliderTextBoxOption_NumHorizontalGridTargets->AddDynamicWarningTooltipData(
-		FTooltipData("Invalid_Grid_NumHorizontalTargets", ETooltipImageType::Warning),
-		"Invalid_Grid_NumHorizontalTargets_Fallback", MinValue_NumHorizontalGridTargets).BindLambda([this]()
-	{
-		return FDynamicTooltipState(BSConfig->GridConfig.NumHorizontalGridTargets, GetMaxAllowedNumHorizontalTargets(),
-			!SliderTextBoxOption_NumHorizontalGridTargets->IsVisible());
-	});
-	SliderTextBoxOption_NumVerticalGridTargets->AddDynamicWarningTooltipData(
-		FTooltipData("Invalid_Grid_NumVerticalTargets", ETooltipImageType::Warning),
-		"Invalid_Grid_NumVerticalTargets_Fallback", MinValue_NumVerticalGridTargets).BindLambda([this]()
-	{
-		return FDynamicTooltipState(BSConfig->GridConfig.NumVerticalGridTargets, GetMaxAllowedNumVerticalTargets(),
-			!SliderTextBoxOption_NumVerticalGridTargets->IsVisible());
-	});
-
-	SliderTextBoxOption_HorizontalSpacing->AddDynamicWarningTooltipData(
-		FTooltipData("Invalid_Grid_HorizontalSpacing", ETooltipImageType::Warning),
-		"Invalid_Grid_HorizontalSpacing_Fallback", MinValue_HorizontalGridSpacing).BindLambda([this]()
-	{
-		return FDynamicTooltipState(BSConfig->GridConfig.GridSpacing.X, GetMaxAllowedHorizontalSpacing(),
-			!SliderTextBoxOption_HorizontalSpacing->IsVisible());
-	});
-
-	SliderTextBoxOption_VerticalSpacing->AddDynamicWarningTooltipData(
-		FTooltipData("Invalid_Grid_VerticalSpacing", ETooltipImageType::Warning),
-		"Invalid_Grid_VerticalSpacing_Fallback", MinValue_VerticalGridSpacing).BindLambda([this]()
-	{
-		return FDynamicTooltipState(BSConfig->GridConfig.GridSpacing.Y, GetMaxAllowedVerticalSpacing(),
-			!SliderTextBoxOption_VerticalSpacing->IsVisible());
-	});
-
-	ComboBoxOption_TargetDistributionPolicy->AddWarningTooltipData(FTooltipData("Invalid_HeadshotHeightOnly_AI",
-		ETooltipImageType::Warning)).BindLambda([this]()
-	{
-		return BSConfig->TargetConfig.TargetDistributionPolicy == ETargetDistributionPolicy::HeadshotHeightOnly &&
-			BSConfig->AIConfig.bEnableReinforcementLearning;
-	});
-
-	MenuOption_ForwardSpread->AddWarningTooltipData(FTooltipData("Caution_ZeroForwardDistance_MTDM_ForwardOnly_2",
-		ETooltipImageType::Caution)).BindLambda([this]()
-	{
-		return BSConfig->TargetConfig.BoxBounds.X <= 0.f && BSConfig->TargetConfig.MovingTargetDirectionMode ==
-			EMovingTargetDirectionMode::ForwardOnly;
-	});*/
 }
 
 void UCustomGameModeSpawnAreaWidget::UpdateDependentOptions_TargetDistributionPolicy()

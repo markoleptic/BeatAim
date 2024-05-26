@@ -47,9 +47,7 @@ public:
 
 protected:
 	virtual void NativeConstruct() override;
-	//virtual void UpdateAllOptionsValid() override;
 	virtual void UpdateOptionsFromConfig() override;
-	void SetupWarningTooltipCallbacks();
 	void UpdateDependentOptions_TargetDistributionPolicy();
 	void UpdateSpread();
 	void UpdateSpreadWidgetState(UDualRangeInputWidget* Widget, const bool bTracking, const bool bHeadShotHeightOnly,

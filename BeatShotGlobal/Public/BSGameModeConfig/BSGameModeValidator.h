@@ -35,7 +35,9 @@ struct BEATSHOTGLOBAL_API FValidationCheck
 	TSet<const FProperty*> Dependents;
 	EGameModeWarningType WarningType;
 	FString StringTableKey;
-	TDelegate<bool(const TSharedPtr<FBSConfig>&)> ValidationDelegate;
+	FString DynamicStringTableKey;
+	/** Must return true in order to validate successfully. */
+	TDelegate<bool(const TSharedPtr<FBSConfig>&, TArray<int32>&)> ValidationDelegate;
 };
 
 /** A property containing one or multiple validation checks. */
@@ -114,13 +116,18 @@ struct BEATSHOTGLOBAL_API FValidationCheckResult
 	bool bSuccess;
 	EGameModeWarningType WarningType;
 	FString StringTableKey;
+	TArray<int32> CalculatedValues;
+
 	FValidationCheckResult() = default;
 
-	FValidationCheckResult(const bool Success, const FValidationCheck& InValidationCheck) : bSuccess(Success),
-		WarningType(InValidationCheck.WarningType), StringTableKey(InValidationCheck.StringTableKey)
+	FValidationCheckResult(const bool Success, const FValidationCheck& InValidationCheck, TArray<int32> Values) :
+		bSuccess(Success), WarningType(InValidationCheck.WarningType), StringTableKey(InValidationCheck.StringTableKey),
+		CalculatedValues(MoveTemp(Values))
 	{
 	}
 };
+
+using FValidationResultMap = TMap<EGameModeCategory, TMap<EGameModeWarningType, TArray<FValidationCheckResult>>>;
 
 USTRUCT()
 struct BEATSHOTGLOBAL_API FValidationResult
@@ -134,12 +141,12 @@ struct BEATSHOTGLOBAL_API FValidationResult
 	void AddValidationCheckResult(const FValidationCheckResult& Check, EGameModeCategory GameModeCategory);
 
 
-	const TMap<EGameModeCategory, TMap<EGameModeWarningType, TArray<FValidationCheckResult>>>& GetSucceeded() const;
-	const TMap<EGameModeCategory, TMap<EGameModeWarningType, TArray<FValidationCheckResult>>>& GetFailed() const;
+	const FValidationResultMap& GetSucceeded() const;
+	const FValidationResultMap& GetFailed() const;
 
 private:
-	TMap<EGameModeCategory, TMap<EGameModeWarningType, TArray<FValidationCheckResult>>> SucceededValidationCheckResults;
-	TMap<EGameModeCategory, TMap<EGameModeWarningType, TArray<FValidationCheckResult>>> FailedValidationCheckResults;
+	FValidationResultMap SucceededValidationCheckResults;
+	FValidationResultMap FailedValidationCheckResults;
 };
 
 /** Validates a BSConfig. */
