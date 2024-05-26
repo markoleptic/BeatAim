@@ -6,8 +6,17 @@
 #include "UObject/Object.h"
 #include "BSGameModeValidator.generated.h"
 
+struct FValidationProperty;
+struct FValidationCheck;
 struct FValidationCheckResult;
 struct FBSConfig;
+enum class EGameModeCategory : uint8;
+enum class EGameModeWarningType : uint8;
+
+using FValidationPropertyPtr = TSharedPtr<FValidationProperty>;
+using FValidationCheckPtr = TSharedPtr<FValidationCheck>;
+using FValidationResultMap = TMap<EGameModeWarningType, TArray<FValidationCheckResult>>;
+
 DECLARE_DELEGATE_RetVal_OneParam(bool, FValidationDelegate, const TSharedPtr<FBSConfig>&);
 
 UENUM(BlueprintType)
@@ -15,7 +24,6 @@ enum class EGameModeWarningType: uint8
 {
 	None, Caution, Warning, Error
 };
-
 
 UENUM(BlueprintType)
 enum class EGameModeCategory : uint8
@@ -28,19 +36,80 @@ USTRUCT()
 struct BEATSHOTGLOBAL_API FValidationCheck
 {
 	GENERATED_BODY()
-	FValidationCheck() = default;
-	FValidationCheck(TSet<const FProperty*>&& InProperties, EGameModeWarningType InWarningType,
-		const FString& InStringTableKey);
 
-	TSet<const FProperty*> Dependents;
+	FValidationCheck(): WarningType(EGameModeWarningType::None), Id(GId++)
+	{
+	}
+
+	explicit FValidationCheck(TSet<const FProperty*>&& InProperties, const EGameModeWarningType InWarningType) :
+		InvolvedProperties(MoveTemp(InProperties)), WarningType(InWarningType), Id(GId++)
+	{
+	}
+
+	/** All properties involved in the calculation of the validation result. */
+	TSet<const FProperty*> InvolvedProperties;
+
+	/** The type of warning associated with the validation check. */
 	EGameModeWarningType WarningType;
-	FString StringTableKey;
-	FString DynamicStringTableKey;
+
 	/** Must return true in order to validate successfully. */
 	TDelegate<bool(const TSharedPtr<FBSConfig>&, TArray<int32>&)> ValidationDelegate;
+
+	int32 Id;
+	static int32 GId;
+
+	FORCEINLINE bool operator ==(const FValidationCheck& Other) const
+	{
+		return Id == Other.Id;
+	}
+
+	FORCEINLINE bool operator <(const FValidationCheck& Other) const
+	{
+		return Id < Other.Id;
+	}
+
+	friend FORCEINLINE uint32 GetTypeHash(const FValidationCheck& Object)
+	{
+		return GetTypeHash(Object.Id);
+	}
 };
 
-/** A property containing one or multiple validation checks. */
+/** Specific data associated with an FValidationProperty and an FValidationCheck. */
+USTRUCT()
+struct BEATSHOTGLOBAL_API FUniqueValidationCheckData
+{
+	GENERATED_BODY()
+
+	FUniqueValidationCheckData() = default;
+
+	FUniqueValidationCheckData(const FString& InStringTableKey, const FString& InDynamicStringTableKey) :
+		StringTableKey(InStringTableKey), DynamicStringTableKey(InDynamicStringTableKey)
+	{
+	}
+
+	/** The string table key to find tooltip text from if validation fails. Also serves as backup if Dynamic. */
+	FString StringTableKey;
+
+	/** The dynamic string table key to find tooltip text from if validation fails. */
+	FString DynamicStringTableKey;
+
+	FORCEINLINE bool operator ==(const FUniqueValidationCheckData& Other) const
+	{
+		return StringTableKey == Other.StringTableKey && DynamicStringTableKey == Other.DynamicStringTableKey;
+	}
+
+	FORCEINLINE bool operator <(const FUniqueValidationCheckData& Other) const
+	{
+		return StringTableKey < Other.StringTableKey;
+	}
+
+	friend FORCEINLINE uint32 GetTypeHash(const FUniqueValidationCheckData& Object)
+	{
+		return GetTypeHash(Object.StringTableKey);
+	}
+};
+
+/** A property containing any number of validation checks. */
 USTRUCT()
 struct BEATSHOTGLOBAL_API FValidationProperty
 {
@@ -52,35 +121,33 @@ struct BEATSHOTGLOBAL_API FValidationProperty
 	{
 	}
 
-	void AddCheck(const FValidationCheck& Check);
-
-	/** Execute all validation checks for this property.
-	 *  @param Config configuration to use for executing validation delegates.
-	 *  @return a set of validation check results for each check executed.
+	/** Adds a pointer to a validation check involving this property to its stored checks, and adds data unique to this
+	 *  property and check to its stored check data.
+	 *  @param Check validation check to associate with this property.
+	 *  @param Data unique data to associate with this property and the validation check.
 	 */
-	TArray<FValidationCheckResult> ExecuteAll(const TSharedPtr<FBSConfig>& Config) const;
+	void AddCheck(const FValidationCheckPtr& Check, const FUniqueValidationCheckData& Data);
 
-	/** Execute validation checks involving only those found in Properties.
-	 *  @param Properties only look for validation checks with these as dependents.
-	 *  @param Config configuration to use for executing validation delegates.
-	 *  @return a set of validation check results for each check executed.
-	 */
-	TArray<FValidationCheckResult> Execute(const TSet<const FProperty*>& Properties,
-		const TSharedPtr<FBSConfig>& Config) const;
-
+	/** The single property this validation property represents. */
 	const FProperty* Property;
-	TMap<const FProperty*, TSet<int32>> PropertyMap;
-	EGameModeCategory GameModeCategory;
-	TArray<FValidationCheck> ValidationChecks;
 
-	FORCEINLINE bool operator ==(const FValidationProperty* Other) const
+	/** The game mode category this property falls under. Used to sync with user interface. */
+	EGameModeCategory GameModeCategory;
+
+	/** An array of pointers to all validation checks that involve this property. */
+	TSet<FValidationCheckPtr> Checks;
+
+	/** Maps each validation check to unique validation check data for this property. */
+	TMap<FValidationCheckPtr, FUniqueValidationCheckData> CheckData;
+
+	FORCEINLINE bool operator ==(const FValidationProperty& Other) const
 	{
-		return Property == Other->Property;
+		return Property == Other.Property;
 	}
 
-	FORCEINLINE bool operator <(const FValidationProperty* Other) const
+	FORCEINLINE bool operator <(const FValidationProperty& Other) const
 	{
-		return GameModeCategory < Other->GameModeCategory;
+		return GameModeCategory < Other.GameModeCategory;
 	}
 
 	friend FORCEINLINE uint32 GetTypeHash(const FValidationProperty& Object)
@@ -89,11 +156,12 @@ struct BEATSHOTGLOBAL_API FValidationProperty
 	}
 };
 
-struct FValidationPropertyKeyFuncs : BaseKeyFuncs<FValidationProperty, const FProperty*, false>
+/** Struct used to allow efficient retrieval of validation properties in TSets using the FProperty as a key. */
+struct FValidationPropertyKeyFuncs : BaseKeyFuncs<FValidationPropertyPtr, const FProperty*, false>
 {
-	static const FProperty* GetSetKey(const FValidationProperty& Element)
+	static const FProperty* GetSetKey(const FValidationPropertyPtr& Element)
 	{
-		return Element.Property;
+		return Element->Property;
 	}
 
 	static bool Matches(const FProperty* A, const FProperty* B)
@@ -113,21 +181,34 @@ struct BEATSHOTGLOBAL_API FValidationCheckResult
 {
 	GENERATED_BODY()
 
+	/** What the validation function returned. */
 	bool bSuccess;
+
+	/** The type of warning associated with the validation check. */
 	EGameModeWarningType WarningType;
-	FString StringTableKey;
+
+	/** Calculated values from the validation function. */
 	TArray<int32> CalculatedValues;
+
+	/** All properties involved in the calculation of this validation check result. */
+	TSet<const FProperty*> InvolvedProperties;
+
+	/** Maps each involved property to their property data unique to the validation check. */
+	TMap<const FProperty*, FUniqueValidationCheckData> PropertyData;
 
 	FValidationCheckResult() = default;
 
-	FValidationCheckResult(const bool Success, const FValidationCheck& InValidationCheck, TArray<int32> Values) :
-		bSuccess(Success), WarningType(InValidationCheck.WarningType), StringTableKey(InValidationCheck.StringTableKey),
-		CalculatedValues(MoveTemp(Values))
+	FValidationCheckResult(const bool Success, const FValidationCheckPtr& InValidationCheck, TArray<int32>&& Values,
+		TMap<const FProperty*, FUniqueValidationCheckData>&& Data) : bSuccess(Success),
+		                                                             WarningType(InValidationCheck->WarningType),
+		                                                             CalculatedValues(MoveTemp(Values)),
+		                                                             InvolvedProperties(
+			                                                             InValidationCheck->InvolvedProperties),
+		                                                             PropertyData(MoveTemp(Data))
 	{
 	}
 };
 
-using FValidationResultMap = TMap<EGameModeCategory, TMap<EGameModeWarningType, TArray<FValidationCheckResult>>>;
 
 USTRUCT()
 struct BEATSHOTGLOBAL_API FValidationResult
@@ -138,7 +219,7 @@ struct BEATSHOTGLOBAL_API FValidationResult
 	{
 	}
 
-	void AddValidationCheckResult(const FValidationCheckResult& Check, EGameModeCategory GameModeCategory);
+	void AddValidationCheckResult(FValidationCheckResult&& Check);
 
 
 	const FValidationResultMap& GetSucceeded() const;

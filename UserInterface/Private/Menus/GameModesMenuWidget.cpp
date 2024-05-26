@@ -987,51 +987,9 @@ void UGameModeMenuWidget::HandlePropertyChanged(const TSet<const FProperty*>& Pr
 	const FValidationResult Result = GameModeValidator->Validate(BSConfig, Properties);
 	for (const auto& [Key, Value] : Result.GetSucceeded())
 	{
-		switch (Key)
-		{
-		case EGameModeCategory::None:
-			break;
-		case EGameModeCategory::Start:
-			break;
-		case EGameModeCategory::General:
-			break;
-		case EGameModeCategory::SpawnArea:
-			break;
-		case EGameModeCategory::TargetSpawning:
-			break;
-		case EGameModeCategory::TargetActivation:
-			break;
-		case EGameModeCategory::TargetBehavior:
-			break;
-		case EGameModeCategory::TargetSizing:
-			break;
-		case EGameModeCategory::Preview:
-			break;
-		}
 	}
 	for (const auto& [Key, Value] : Result.GetFailed())
 	{
-		switch (Key)
-		{
-		case EGameModeCategory::None:
-			break;
-		case EGameModeCategory::Start:
-			break;
-		case EGameModeCategory::General:
-			break;
-		case EGameModeCategory::SpawnArea:
-			break;
-		case EGameModeCategory::TargetSpawning:
-			break;
-		case EGameModeCategory::TargetActivation:
-			break;
-		case EGameModeCategory::TargetBehavior:
-			break;
-		case EGameModeCategory::TargetSizing:
-			break;
-		case EGameModeCategory::Preview:
-			break;
-		}
 	}
 }
 

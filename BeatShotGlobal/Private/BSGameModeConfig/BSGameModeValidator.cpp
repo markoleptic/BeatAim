@@ -27,66 +27,23 @@ namespace
 /* -- FValidationCheck -- */
 /* ---------------------- */
 
-FValidationCheck::FValidationCheck(TSet<const FProperty*>&& InProperties, const EGameModeWarningType InWarningType,
-	const FString& InStringTableKey): Dependents(MoveTemp(InProperties)), WarningType(InWarningType),
-	                                  StringTableKey(InStringTableKey)
+int32 FValidationCheck::GId = 0;
+
+void FValidationProperty::AddCheck(const FValidationCheckPtr& Check, const FUniqueValidationCheckData& Data)
 {
+	Checks.Add(Check);
+	CheckData.Add(Check, Data);
 }
 
-void FValidationProperty::AddCheck(const FValidationCheck& Check)
-{
-	const int32 Index = ValidationChecks.Add(Check);
-	for (const auto& Dependent : Check.Dependents)
-	{
-		PropertyMap[Dependent].Add(Index);
-	}
-}
-
-TArray<FValidationCheckResult> FValidationProperty::ExecuteAll(const TSharedPtr<FBSConfig>& Config) const
-{
-	TArray<FValidationCheckResult> Out;
-	for (const FValidationCheck& Check : ValidationChecks)
-	{
-		TArray<int32> Values;
-		const bool bResult = Check.ValidationDelegate.Execute(Config, Values);
-		Out.Emplace(bResult, Check, Values);
-	}
-	return Out;
-}
-
-TArray<FValidationCheckResult> FValidationProperty::Execute(const TSet<const FProperty*>& Properties,
-	const TSharedPtr<FBSConfig>& Config) const
-{
-	TArray<FValidationCheckResult> Out;
-	TSet<int32> ValidationCheckIndices;
-
-	for (const auto& Prop : Properties)
-	{
-		if (const TSet<int32>* Found = PropertyMap.Find(Prop))
-		{
-			ValidationCheckIndices.Append(*Found);
-		}
-	}
-
-	for (const int32 CheckIndex : ValidationCheckIndices)
-	{
-		TArray<int32> Values;
-		const bool bResult = ValidationChecks[CheckIndex].ValidationDelegate.Execute(Config, Values);
-		Out.Emplace(bResult, ValidationChecks[CheckIndex], Values);
-	}
-	return Out;
-}
-
-void FValidationResult::AddValidationCheckResult(const FValidationCheckResult& Check,
-	const EGameModeCategory GameModeCategory)
+void FValidationResult::AddValidationCheckResult(FValidationCheckResult&& Check)
 {
 	if (Check.bSuccess)
 	{
-		SucceededValidationCheckResults[GameModeCategory][Check.WarningType].Emplace(Check);
+		SucceededValidationCheckResults[Check.WarningType].Add(MoveTemp(Check));
 	}
 	else
 	{
-		FailedValidationCheckResults[GameModeCategory][Check.WarningType].Emplace(Check);
+		FailedValidationCheckResults[Check.WarningType].Add(MoveTemp(Check));
 	}
 }
 
@@ -111,7 +68,14 @@ public:
 
 	void SetupValidationChecks();
 
-	void AddValidationProperty(const FValidationProperty& InValidationProperty);
+	FValidationPropertyPtr CreateValidationProperty(const FProperty* InProperty,
+		const EGameModeCategory InGameModeCategory);
+
+	static FValidationCheckPtr CreateValidationCheck(TSet<const FProperty*>&& InvolvedProperties,
+		EGameModeWarningType WarningType, TFunction<bool(const TSharedPtr<FBSConfig>&, TArray<int32>&)> Lambda);
+
+	static void AddValidationCheckToProperty(const FValidationPropertyPtr& PropPtr, const FValidationCheckPtr& CheckPtr,
+		const FUniqueValidationCheckData& Data);
 
 	static float GetMinRequiredHorizontalSpread(const TSharedPtr<FBSConfig>& Config);
 
@@ -129,7 +93,7 @@ public:
 
 	static float GetMaxAllowedTargetScale(const TSharedPtr<FBSConfig>& Config);
 
-	TSet<FValidationProperty, FValidationPropertyKeyFuncs> ValidationProperties;
+	TSet<FValidationPropertyPtr, FValidationPropertyKeyFuncs> ValidationProperties;
 };
 
 UBSGameModeValidator::FPrivate::FPrivate()
@@ -139,30 +103,52 @@ UBSGameModeValidator::FPrivate::FPrivate()
 
 void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 {
-	const FProperty* BatchSpawningProperty = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+	FValidationCheckPtr CheckPtr = nullptr;
+
+	const FProperty* BatchSpawning = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bUseBatchSpawning));
-	const FProperty* SpawnEveryOtherTargetInCenterProperty = FindProperty<FBSConfig>(
+	const FProperty* SpawnEveryOtherTargetInCenter = FindProperty<FBSConfig>(
 		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig), GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bUseBatchSpawning));
+	const FProperty* AllowSpawnWithoutActivation = FindProperty<FBSConfig>(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bAllowSpawnWithoutActivation));
 
-	FValidationProperty Prop(SpawnEveryOtherTargetInCenterProperty, EGameModeCategory::TargetSpawning);
-	FValidationCheck Check({BatchSpawningProperty}, EGameModeWarningType::Warning,
-		TEXT("Invalid_SpawnEveryOtherTargetInCenter_BatchSpawning"));
-	Check.ValidationDelegate.BindLambda([](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto SpawnEveryOtherAndBatchLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{
 		return !(Config->TargetConfig.bSpawnEveryOtherTargetInCenter && Config->TargetConfig.bUseBatchSpawning);
-	});
-	Prop.AddCheck(MoveTemp(Check));
-	AddValidationProperty(MoveTemp(Prop));
-
-	Prop = FValidationProperty(BatchSpawningProperty, EGameModeCategory::TargetSpawning);
-	Check = FValidationCheck({SpawnEveryOtherTargetInCenterProperty}, EGameModeWarningType::Warning,
-		TEXT("Invalid_SpawnEveryOtherTargetInCenter_BatchSpawning"));
-	Check.ValidationDelegate.BindLambda([](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	};
+	auto SpawnEveryOtherAndAllowSpawnLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{
-		return !(Config->TargetConfig.bSpawnEveryOtherTargetInCenter && Config->TargetConfig.bUseBatchSpawning);
+		return !(Config->TargetConfig.bSpawnEveryOtherTargetInCenter && Config->TargetConfig.
+			bAllowSpawnWithoutActivation);
+	};
+
+	FValidationPropertyPtr SpawnEveryOtherTargetInCenterPtr = CreateValidationProperty(SpawnEveryOtherTargetInCenter,
+		EGameModeCategory::TargetSpawning);
+	FValidationPropertyPtr BatchSpawningPtr =
+		CreateValidationProperty(BatchSpawning, EGameModeCategory::TargetSpawning);
+	FValidationPropertyPtr AllowSpawnWithoutActivationPtr = CreateValidationProperty(AllowSpawnWithoutActivation,
+		EGameModeCategory::TargetSpawning);
+
+	// SpawnEveryOtherTargetInCenter & BatchSpawning checks
+	CheckPtr = CreateValidationCheck({SpawnEveryOtherTargetInCenter, BatchSpawning}, EGameModeWarningType::Warning,
+		SpawnEveryOtherAndBatchLambda);
+	AddValidationCheckToProperty(SpawnEveryOtherTargetInCenterPtr, CheckPtr, {
+		TEXT("Invalid_SpawnEveryOtherTargetInCenter_BatchSpawning"), ""
 	});
-	Prop.AddCheck(MoveTemp(Check));
-	AddValidationProperty(MoveTemp(Prop));
+	AddValidationCheckToProperty(BatchSpawningPtr, CheckPtr, {
+		TEXT("Invalid_SpawnEveryOtherTargetInCenter_BatchSpawning2"), ""
+	});
+
+	// SpawnEveryOtherTargetInCenter & AllowSpawnWithoutActivation checks
+	CheckPtr = CreateValidationCheck({SpawnEveryOtherTargetInCenter, AllowSpawnWithoutActivation},
+		EGameModeWarningType::Warning, SpawnEveryOtherAndAllowSpawnLambda);
+	AddValidationCheckToProperty(SpawnEveryOtherTargetInCenterPtr, CheckPtr, {
+		TEXT("Invalid_SpawnEveryOtherTargetInCenter_AllowSpawnWithoutActivation"), ""
+	});
+	AddValidationCheckToProperty(AllowSpawnWithoutActivationPtr, CheckPtr, {
+		TEXT("Invalid_SpawnEveryOtherTargetInCenter_AllowSpawnWithoutActivation2"), ""
+	});
 
 	const FProperty* MovingTargetDirectionMode = FindProperty<FBSConfig>(
 		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
@@ -178,63 +164,88 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 	const FProperty* BoxBounds = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoxBounds));
 
-	Prop = FValidationProperty(MovingTargetDirectionMode, EGameModeCategory::TargetBehavior);
-	Check = FValidationCheck({TargetSpawnResponses}, EGameModeWarningType::Caution, TEXT("Invalid_Velocity_MTDM_None"));
-	Check.ValidationDelegate.BindLambda([](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto SpawnVelocityLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{
 		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && Config->
 			TargetConfig.TargetSpawnResponses.Contains(ETargetSpawnResponse::ChangeVelocity));
-	});
-	Prop.AddCheck(MoveTemp(Check));
-	Check = FValidationCheck({TargetSpawnResponses}, EGameModeWarningType::Caution,
-		TEXT("Invalid_Direction_MTDM_None"));
-	Check.ValidationDelegate.BindLambda([](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	};
+	auto SpawnDirectionLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{
 		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && Config->
 			TargetConfig.TargetSpawnResponses.Contains(ETargetSpawnResponse::ChangeDirection));
-	});
-	Prop.AddCheck(MoveTemp(Check));
-	Check = FValidationCheck({TargetActivationResponses}, EGameModeWarningType::Caution,
-		TEXT("Invalid_Velocity_MTDM_None"));
-	Check.ValidationDelegate.BindLambda([](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	};
+	auto ActivationVelocityLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{
 		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && Config->
 			TargetConfig.TargetActivationResponses.Contains(ETargetActivationResponse::ChangeVelocity));
-	});
-	Prop.AddCheck(MoveTemp(Check));
-	Check = FValidationCheck({TargetActivationResponses}, EGameModeWarningType::Caution,
-		TEXT("Invalid_Direction_MTDM_None"));
-	Check.ValidationDelegate.BindLambda([](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	};
+	auto ActivationDirectionLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{
 		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && Config->
 			TargetConfig.TargetActivationResponses.Contains(ETargetActivationResponse::ChangeDirection));
-	});
-	Prop.AddCheck(MoveTemp(Check));
-	Check = FValidationCheck({TargetDeactivationResponses}, EGameModeWarningType::Caution,
-		TEXT("Invalid_Velocity_MTDM_None"));
-	Check.ValidationDelegate.BindLambda([](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	};
+	auto DeactivationVelocityLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{
 		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && Config->
 			TargetConfig.TargetDeactivationResponses.Contains(ETargetDeactivationResponse::ChangeVelocity));
-	});
-	Prop.AddCheck(MoveTemp(Check));
-	Check = FValidationCheck({TargetDeactivationResponses}, EGameModeWarningType::Caution,
-		TEXT("Invalid_Direction_MTDM_None"));
-	Check.ValidationDelegate.BindLambda([](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	};
+	auto DeactivationDirectionLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{
 		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && Config->
 			TargetConfig.TargetDeactivationResponses.Contains(ETargetDeactivationResponse::ChangeDirection));
-	});
-	Prop.AddCheck(MoveTemp(Check));
-	Check = FValidationCheck({BoxBounds}, EGameModeWarningType::Caution,
-		TEXT("Caution_ZeroForwardDistance_MTDM_ForwardOnly_2"));
-	Check.ValidationDelegate.BindLambda([](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	};
+	auto BoxBoundsLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{
 		return !(Config->TargetConfig.BoxBounds.X <= 0.f && Config->TargetConfig.MovingTargetDirectionMode ==
 			EMovingTargetDirectionMode::ForwardOnly);
-	});
-	Prop.AddCheck(MoveTemp(Check));
-	AddValidationProperty(MoveTemp(Prop));
+	};
+
+	FValidationPropertyPtr MovingTargetDirectionModePtr = CreateValidationProperty(MovingTargetDirectionMode,
+		EGameModeCategory::TargetBehavior);
+	FValidationPropertyPtr TargetSpawnResponsesPtr = CreateValidationProperty(TargetSpawnResponses,
+		EGameModeCategory::TargetBehavior);
+	FValidationPropertyPtr TargetActivationResponsesPtr = CreateValidationProperty(TargetActivationResponses,
+		EGameModeCategory::TargetBehavior);
+	FValidationPropertyPtr TargetDeactivationResponsesPtr = CreateValidationProperty(TargetDeactivationResponses,
+		EGameModeCategory::TargetBehavior);
+	FValidationPropertyPtr BoxBoundsPtr = CreateValidationProperty(BoxBounds, EGameModeCategory::SpawnArea);
+
+	// MovingTargetDirectionMode & Target Spawn Responses
+	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, TargetSpawnResponses}, EGameModeWarningType::Caution,
+		SpawnVelocityLambda);
+	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None"), ""});
+	AddValidationCheckToProperty(TargetSpawnResponsesPtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None"), ""});
+	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, TargetSpawnResponses}, EGameModeWarningType::Caution,
+		SpawnDirectionLambda);
+	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None"), ""});
+	AddValidationCheckToProperty(TargetSpawnResponsesPtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None"), ""});
+
+	// MovingTargetDirectionMode & Target Activation Responses
+	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, TargetActivationResponses},
+		EGameModeWarningType::Caution, ActivationVelocityLambda);
+	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None"), ""});
+	AddValidationCheckToProperty(TargetActivationResponsesPtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None"), ""});
+	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, TargetActivationResponses},
+		EGameModeWarningType::Caution, ActivationDirectionLambda);
+	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None"), ""});
+	AddValidationCheckToProperty(TargetActivationResponsesPtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None"), ""});
+
+	// MovingTargetDirectionMode & Target Deactivation Responses
+	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, TargetActivationResponses},
+		EGameModeWarningType::Caution, DeactivationVelocityLambda);
+	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None"), ""});
+	AddValidationCheckToProperty(TargetDeactivationResponsesPtr, CheckPtr, {TEXT("Invalid_Velocity_MTDM_None"), ""});
+	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, TargetDeactivationResponses},
+		EGameModeWarningType::Caution, DeactivationDirectionLambda);
+	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None"), ""});
+	AddValidationCheckToProperty(TargetDeactivationResponsesPtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None"), ""});
+
+	// MovingTargetDirectionMode & Box Bounds
+	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, BoxBounds}, EGameModeWarningType::Caution,
+		BoxBoundsLambda);
+	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr,
+		{TEXT("Caution_ZeroForwardDistance_MTDM_ForwardOnly_2"), ""});
+	AddValidationCheckToProperty(BoxBoundsPtr, CheckPtr, {TEXT("Caution_ZeroForwardDistance_MTDM_ForwardOnly_2"), ""});
 
 	const FProperty* NumHorizontalGridTargets = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
 		GET_MEMBER_NAME_CHECKED(FBS_GridConfig, NumHorizontalGridTargets));
@@ -252,95 +263,144 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 	const FProperty* MaxSpawnedTargetScale = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxSpawnedTargetScale));
 
-	Prop = FValidationProperty(NumHorizontalGridTargets, EGameModeCategory::SpawnArea);
-	Check = FValidationCheck({TargetDistributionPolicy, GridSpacing, MinSpawnedTargetScale, MaxSpawnedTargetScale},
-		EGameModeWarningType::Warning, TEXT("Invalid_Grid_NumHorizontalTargets_Fallback"));
-	Check.ValidationDelegate.BindLambda([](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto NumHorizontalGridTargetsLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	{
+		if (Config->TargetConfig.TargetDistributionPolicy != ETargetDistributionPolicy::Grid)
+		{
+			return true;
+		}
+		Values = {Config->GridConfig.NumHorizontalGridTargets, GetMaxAllowedNumHorizontalTargets(Config)};
+		return Values[0] <= Values[1];
+	};
+	auto NumVerticalGridTargetsLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	{
+		if (Config->TargetConfig.TargetDistributionPolicy != ETargetDistributionPolicy::Grid)
+		{
+			return true;
+		}
+		Values = {Config->GridConfig.NumVerticalGridTargets, GetMaxAllowedNumVerticalTargets(Config)};
+		return Values[0] <= Values[1];
+	};
+	auto GridSpacingHorizontalLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{
 		if (Config->TargetConfig.TargetDistributionPolicy != ETargetDistributionPolicy::Grid)
 		{
 			return true;
 		}
 		Values = {
-			Config->GridConfig.NumHorizontalGridTargets,
-			Config->GridConfig.NumHorizontalGridTargets <= GetMaxAllowedNumHorizontalTargets(Config)
+			static_cast<int32>(Config->GridConfig.GridSpacing.X),
+			static_cast<int32>(GetMaxAllowedHorizontalSpacing(Config))
 		};
 		return Values[0] <= Values[1];
-	});
-	Check.DynamicStringTableKey = TEXT("Invalid_Grid_NumHorizontalTargets");
-	Prop.AddCheck(MoveTemp(Check));
-	AddValidationProperty(MoveTemp(Prop));
-
-	Prop = FValidationProperty(NumVerticalGridTargets, EGameModeCategory::SpawnArea);
-	Check = FValidationCheck({TargetDistributionPolicy, GridSpacing, MinSpawnedTargetScale, MaxSpawnedTargetScale},
-		EGameModeWarningType::Warning, TEXT("Invalid_Grid_NumVerticalTargets_Fallback"));
-	Check.ValidationDelegate.BindLambda([](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	};
+	auto GridSpacingVerticalLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{
 		if (Config->TargetConfig.TargetDistributionPolicy != ETargetDistributionPolicy::Grid)
 		{
 			return true;
 		}
 		Values = {
-			Config->GridConfig.NumVerticalGridTargets,
-			Config->GridConfig.NumVerticalGridTargets <= GetMaxAllowedNumVerticalTargets(Config)
+			static_cast<int32>(Config->GridConfig.GridSpacing.Y),
+			static_cast<int32>(GetMaxAllowedVerticalSpacing(Config))
 		};
 		return Values[0] <= Values[1];
-	});
-	Check.DynamicStringTableKey = TEXT("Invalid_Grid_NumVerticalTargets");
-	Prop.AddCheck(MoveTemp(Check));
-	AddValidationProperty(MoveTemp(Prop));
-
-	Prop = FValidationProperty(GridSpacing, EGameModeCategory::SpawnArea);
-	Check = FValidationCheck(
-		{TargetDistributionPolicy, NumHorizontalGridTargets, MinSpawnedTargetScale, MaxSpawnedTargetScale},
-		EGameModeWarningType::Warning, TEXT("Invalid_Grid_HorizontalSpacing_Fallback"));
-	Check.ValidationDelegate.BindLambda([](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
-	{
-		if (Config->TargetConfig.TargetDistributionPolicy != ETargetDistributionPolicy::Grid)
-		{
-			return true;
-		}
-		Values = {
-			Config->GridConfig.GridSpacing.X, Config->GridConfig.GridSpacing.X <= GetMaxAllowedHorizontalSpacing(Config)
-		};
-		return Values[0] <= Values[1];
-	});
-	Check.DynamicStringTableKey = TEXT("Invalid_Grid_HorizontalSpacing");
-	Prop.AddCheck(MoveTemp(Check));
-
-	Check = FValidationCheck(
-		{TargetDistributionPolicy, NumVerticalGridTargets, MinSpawnedTargetScale, MaxSpawnedTargetScale},
-		EGameModeWarningType::Warning, TEXT("Invalid_Grid_VerticalSpacing_Fallback"));
-	Check.ValidationDelegate.BindLambda([](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
-	{
-		if (Config->TargetConfig.TargetDistributionPolicy != ETargetDistributionPolicy::Grid)
-		{
-			return true;
-		}
-		Values = {
-			Config->GridConfig.GridSpacing.Y, Config->GridConfig.GridSpacing.Y <= GetMaxAllowedVerticalSpacing(Config)
-		};
-		return Values[0] <= Values[1];
-	});
-	Check.DynamicStringTableKey = TEXT("Invalid_Grid_VerticalSpacing");
-	Prop.AddCheck(MoveTemp(Check));
-	AddValidationProperty(MoveTemp(Prop));
-
-	Prop = FValidationProperty(TargetDistributionPolicy, EGameModeCategory::SpawnArea);
-	Check = FValidationCheck({EnableReinforcementLearning}, EGameModeWarningType::Warning,
-		TEXT("Invalid_HeadshotHeightOnly_AI"));
-	Check.ValidationDelegate.BindLambda([](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	};
+	auto TargetDistributionPolicyLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{
 		return !(Config->TargetConfig.TargetDistributionPolicy == ETargetDistributionPolicy::HeadshotHeightOnly &&
 			Config->AIConfig.bEnableReinforcementLearning);
+	};
+
+	FValidationPropertyPtr TargetDistributionPolicyPtr = CreateValidationProperty(TargetDistributionPolicy,
+		EGameModeCategory::SpawnArea);
+	FValidationPropertyPtr NumHorizontalGridTargetsPtr = CreateValidationProperty(NumHorizontalGridTargets,
+		EGameModeCategory::SpawnArea);
+	FValidationPropertyPtr NumVerticalGridTargetsPtr = CreateValidationProperty(NumVerticalGridTargets,
+		EGameModeCategory::SpawnArea);
+	FValidationPropertyPtr MinSpawnedTargetScalePtr = CreateValidationProperty(MinSpawnedTargetScale,
+		EGameModeCategory::SpawnArea);
+	FValidationPropertyPtr MaxSpawnedTargetScalePtr = CreateValidationProperty(MaxSpawnedTargetScale,
+		EGameModeCategory::SpawnArea);
+	FValidationPropertyPtr GridSpacingPtr = CreateValidationProperty(GridSpacing, EGameModeCategory::SpawnArea);
+
+	// NumHorizontalGridTargets checks
+	CheckPtr = CreateValidationCheck(
+		{TargetDistributionPolicy, NumHorizontalGridTargets, GridSpacing, MinSpawnedTargetScale, MaxSpawnedTargetScale},
+		EGameModeWarningType::Warning, NumHorizontalGridTargetsLambda);
+	AddValidationCheckToProperty(NumHorizontalGridTargetsPtr, CheckPtr, {
+		TEXT("Invalid_Grid_NumHorizontalTargets_Fallback"), TEXT("Invalid_Grid_NumHorizontalTargets")
 	});
-	Prop.AddCheck(MoveTemp(Check));
-	AddValidationProperty(MoveTemp(Prop));
+	AddValidationCheckToProperty(TargetDistributionPolicyPtr, CheckPtr, {"", ""});
+	AddValidationCheckToProperty(GridSpacingPtr, CheckPtr, {"", ""});
+	AddValidationCheckToProperty(MinSpawnedTargetScalePtr, CheckPtr, {"", ""});
+	AddValidationCheckToProperty(MaxSpawnedTargetScalePtr, CheckPtr, {"", ""});
+
+	// NumVerticalGridTargets checks
+	CheckPtr = CreateValidationCheck({
+		TargetDistributionPolicy, NumVerticalGridTargets, GridSpacing, MinSpawnedTargetScale, MaxSpawnedTargetScale
+	}, EGameModeWarningType::Warning, NumVerticalGridTargetsLambda);
+	AddValidationCheckToProperty(NumVerticalGridTargetsPtr, CheckPtr, {
+		TEXT("Invalid_Grid_NumVerticalTargets_Fallback"), TEXT("Invalid_Grid_NumVerticalTargets")
+	});
+	AddValidationCheckToProperty(TargetDistributionPolicyPtr, CheckPtr, {"", ""});
+	AddValidationCheckToProperty(GridSpacingPtr, CheckPtr, {"", ""});
+	AddValidationCheckToProperty(MinSpawnedTargetScalePtr, CheckPtr, {"", ""});
+	AddValidationCheckToProperty(MaxSpawnedTargetScalePtr, CheckPtr, {"", ""});
+
+	// HorizontalSpacing checks
+	CheckPtr = CreateValidationCheck({
+		TargetDistributionPolicy, NumHorizontalGridTargets, GridSpacing, MinSpawnedTargetScale, MaxSpawnedTargetScale
+	}, EGameModeWarningType::Warning, GridSpacingHorizontalLambda);
+	AddValidationCheckToProperty(NumHorizontalGridTargetsPtr, CheckPtr, {
+		TEXT("Invalid_Grid_HorizontalSpacing_Fallback"), TEXT("Invalid_Grid_HorizontalSpacing")
+	});
+	AddValidationCheckToProperty(TargetDistributionPolicyPtr, CheckPtr, {"", ""});
+	AddValidationCheckToProperty(GridSpacingPtr, CheckPtr, {"", ""});
+	AddValidationCheckToProperty(MinSpawnedTargetScalePtr, CheckPtr, {"", ""});
+	AddValidationCheckToProperty(MaxSpawnedTargetScalePtr, CheckPtr, {"", ""});
+
+	// VerticalSpacing checks
+	CheckPtr = CreateValidationCheck({
+		TargetDistributionPolicy, NumVerticalGridTargets, GridSpacing, MinSpawnedTargetScale, MaxSpawnedTargetScale
+	}, EGameModeWarningType::Warning, GridSpacingVerticalLambda);
+	AddValidationCheckToProperty(NumVerticalGridTargetsPtr, CheckPtr, {
+		TEXT("Invalid_Grid_VerticalSpacing_Fallback"), TEXT("Invalid_Grid_VerticalSpacing")
+	});
+	AddValidationCheckToProperty(TargetDistributionPolicyPtr, CheckPtr, {"", ""});
+	AddValidationCheckToProperty(GridSpacingPtr, CheckPtr, {"", ""});
+	AddValidationCheckToProperty(MinSpawnedTargetScalePtr, CheckPtr, {"", ""});
+	AddValidationCheckToProperty(MaxSpawnedTargetScalePtr, CheckPtr, {"", ""});
+
+	FValidationPropertyPtr EnableReinforcementLearningPtr = CreateValidationProperty(EnableReinforcementLearning,
+		EGameModeCategory::SpawnArea);
+
+	// TargetDistributionPolicy checks
+	CheckPtr = CreateValidationCheck({TargetDistributionPolicy, EnableReinforcementLearning},
+		EGameModeWarningType::Warning, TargetDistributionPolicyLambda);
+	AddValidationCheckToProperty(TargetDistributionPolicyPtr, CheckPtr, {TEXT("Invalid_HeadshotHeightOnly_AI"), ""});
+	AddValidationCheckToProperty(EnableReinforcementLearningPtr, CheckPtr, {TEXT("Invalid_HeadshotHeightOnly_AI"), ""});
 }
 
-void UBSGameModeValidator::FPrivate::AddValidationProperty(const FValidationProperty& InValidationProperty)
+FValidationCheckPtr UBSGameModeValidator::FPrivate::CreateValidationCheck(TSet<const FProperty*>&& InvolvedProperties,
+	const EGameModeWarningType WarningType, TFunction<bool(const TSharedPtr<FBSConfig>&, TArray<int32>&)> Lambda)
 {
-	ValidationProperties.Add(InValidationProperty);
+	TSharedPtr<FValidationCheck> Check = MakeShareable(new FValidationCheck(MoveTemp(InvolvedProperties), WarningType));
+	Check->ValidationDelegate.BindLambda(Lambda);
+	return Check;
+}
+
+FValidationPropertyPtr UBSGameModeValidator::FPrivate::CreateValidationProperty(const FProperty* InProperty,
+	const EGameModeCategory InGameModeCategory)
+{
+	FValidationPropertyPtr PropertyPtr = MakeShareable(new FValidationProperty(InProperty, InGameModeCategory));
+	ValidationProperties.Add(PropertyPtr);
+	return PropertyPtr;
+}
+
+void UBSGameModeValidator::FPrivate::AddValidationCheckToProperty(const FValidationPropertyPtr& PropPtr,
+	const FValidationCheckPtr& CheckPtr, const FUniqueValidationCheckData& Data)
+{
+	PropPtr->AddCheck(CheckPtr, Data);
 }
 
 float UBSGameModeValidator::FPrivate::GetMinRequiredHorizontalSpread(const TSharedPtr<FBSConfig>& Config)
@@ -428,11 +488,27 @@ UBSGameModeValidator::UBSGameModeValidator() : Impl(MakePimpl<FPrivate>())
 FValidationResult UBSGameModeValidator::Validate(const TSharedPtr<FBSConfig>& InConfig) const
 {
 	FValidationResult Result;
-	for (const FValidationProperty& ValidationProperty : Impl->ValidationProperties)
+	for (const FValidationPropertyPtr& ValidationProperty : Impl->ValidationProperties)
 	{
-		for (const FValidationCheckResult& Elem : ValidationProperty.ExecuteAll(InConfig))
+		for (const FValidationCheckPtr& Check : ValidationProperty->Checks)
 		{
-			Result.AddValidationCheckResult(Elem, ValidationProperty.GameModeCategory);
+			TArray<int32> Values;
+			const bool bResult = Check->ValidationDelegate.Execute(InConfig, Values);
+
+			TMap<const FProperty*, FUniqueValidationCheckData> PropertyData;
+			for (const FProperty* Property : Check->InvolvedProperties)
+			{
+				if (const FValidationPropertyPtr* FoundPtr = Impl->ValidationProperties.Find(Property))
+				{
+					if (const FUniqueValidationCheckData* FoundData = (*FoundPtr)->CheckData.Find(Check))
+					{
+						PropertyData.Add(Property, *FoundData);
+					}
+				}
+			}
+
+			Result.AddValidationCheckResult(FValidationCheckResult(bResult, Check, MoveTemp(Values),
+				MoveTemp(PropertyData)));
 		}
 	}
 	return Result;
@@ -443,12 +519,28 @@ FValidationResult UBSGameModeValidator::Validate(const TSharedPtr<FBSConfig>& In
 {
 	FValidationResult Result;
 
-	if (const FValidationProperty* ValidationProperty = Impl->ValidationProperties.Find(
+	if (const FValidationPropertyPtr* ValidationProperty = Impl->ValidationProperties.Find(
 		FindProperty<FBSConfig>(SubStructName, PropertyName)))
 	{
-		for (const FValidationCheckResult& Elem : ValidationProperty->ExecuteAll(InConfig))
+		for (const FValidationCheckPtr& Check : (*ValidationProperty)->Checks)
 		{
-			Result.AddValidationCheckResult(Elem, ValidationProperty->GameModeCategory);
+			TArray<int32> Values;
+			const bool bResult = Check->ValidationDelegate.Execute(InConfig, Values);
+
+			TMap<const FProperty*, FUniqueValidationCheckData> PropertyData;
+			for (const FProperty* InvolvedProperty : Check->InvolvedProperties)
+			{
+				if (const FValidationPropertyPtr* FoundPtr = Impl->ValidationProperties.Find(InvolvedProperty))
+				{
+					if (const FUniqueValidationCheckData* FoundData = (*FoundPtr)->CheckData.Find(Check))
+					{
+						PropertyData.Add(InvolvedProperty, *FoundData);
+					}
+				}
+			}
+
+			Result.AddValidationCheckResult(FValidationCheckResult(bResult, Check, MoveTemp(Values),
+				MoveTemp(PropertyData)));
 		}
 	}
 	return Result;
@@ -460,11 +552,27 @@ FValidationResult UBSGameModeValidator::Validate(const TSharedPtr<FBSConfig>& In
 	FValidationResult Result;
 	for (const FProperty* Property : Properties)
 	{
-		if (const FValidationProperty* ValidationProperty = Impl->ValidationProperties.Find(Property))
+		if (const FValidationPropertyPtr* ValidationProperty = Impl->ValidationProperties.Find(Property))
 		{
-			for (const FValidationCheckResult& Elem : ValidationProperty->ExecuteAll(InConfig))
+			for (const FValidationCheckPtr& Check : (*ValidationProperty)->Checks)
 			{
-				Result.AddValidationCheckResult(Elem, ValidationProperty->GameModeCategory);
+				TArray<int32> Values;
+				const bool bResult = Check->ValidationDelegate.Execute(InConfig, Values);
+
+				TMap<const FProperty*, FUniqueValidationCheckData> PropertyData;
+				for (const FProperty* InvolvedProperty : Check->InvolvedProperties)
+				{
+					if (const FValidationPropertyPtr* FoundPtr = Impl->ValidationProperties.Find(InvolvedProperty))
+					{
+						if (const FUniqueValidationCheckData* FoundData = (*FoundPtr)->CheckData.Find(Check))
+						{
+							PropertyData.Add(InvolvedProperty, *FoundData);
+						}
+					}
+				}
+
+				Result.AddValidationCheckResult(FValidationCheckResult(bResult, Check, MoveTemp(Values),
+					MoveTemp(PropertyData)));
 			}
 		}
 	}

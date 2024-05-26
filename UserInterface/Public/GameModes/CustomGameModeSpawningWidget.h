@@ -23,8 +23,6 @@ protected:
 
 	virtual void UpdateOptionsFromConfig() override;
 
-	void SetupWarningTooltipCallbacks();
-
 	void UpdateDependentOptions_TargetSpawningPolicy(const ETargetSpawningPolicy& InTargetSpawningPolicy);
 
 	UFUNCTION()

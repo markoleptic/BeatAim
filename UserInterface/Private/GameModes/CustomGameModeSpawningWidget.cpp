@@ -85,7 +85,6 @@ void UCustomGameModeSpawningWidget::NativeConstruct()
 	SliderTextBoxOption_NumUpfrontTargetsToSpawn->SetVisibility(ESlateVisibility::Collapsed);
 	SliderTextBoxOption_NumRuntimeTargetsToSpawn->SetVisibility(ESlateVisibility::Collapsed);
 
-	SetupWarningTooltipCallbacks();
 	UpdateBrushColors();
 }
 
@@ -114,36 +113,6 @@ void UCustomGameModeSpawningWidget::UpdateOptionsFromConfig()
 	UpdateDependentOptions_TargetSpawningPolicy(BSConfig->TargetConfig.TargetSpawningPolicy);
 
 	UpdateBrushColors();
-}
-
-void UCustomGameModeSpawningWidget::SetupWarningTooltipCallbacks()
-{
-	CheckBoxOption_SpawnEveryOtherTargetInCenter->AddWarningTooltipData(
-		FTooltipData("Invalid_SpawnEveryOtherTargetInCenter_BatchSpawning", ETooltipImageType::Warning)).BindLambda(
-		[this]()
-		{
-			return BSConfig->TargetConfig.bSpawnEveryOtherTargetInCenter && BSConfig->TargetConfig.bUseBatchSpawning;
-		});
-	CheckBoxOption_SpawnEveryOtherTargetInCenter->AddWarningTooltipData(
-		FTooltipData("Invalid_SpawnEveryOtherTargetInCenter_AllowSpawnWithoutActivation",
-			ETooltipImageType::Warning)).BindLambda([this]()
-	{
-		return BSConfig->TargetConfig.bSpawnEveryOtherTargetInCenter && BSConfig->TargetConfig.
-			bAllowSpawnWithoutActivation;
-	});
-	CheckBoxOption_BatchSpawning->AddWarningTooltipData(
-		FTooltipData("Invalid_SpawnEveryOtherTargetInCenter_BatchSpawning2", ETooltipImageType::Warning)).BindLambda(
-		[this]()
-		{
-			return BSConfig->TargetConfig.bSpawnEveryOtherTargetInCenter && BSConfig->TargetConfig.bUseBatchSpawning;
-		});
-	CheckBoxOption_AllowSpawnWithoutActivation->AddWarningTooltipData(
-		FTooltipData("Invalid_SpawnEveryOtherTargetInCenter_AllowSpawnWithoutActivation2",
-			ETooltipImageType::Warning)).BindLambda([this]()
-	{
-		return BSConfig->TargetConfig.bSpawnEveryOtherTargetInCenter && BSConfig->TargetConfig.
-			bAllowSpawnWithoutActivation;
-	});
 }
 
 void UCustomGameModeSpawningWidget::UpdateDependentOptions_TargetSpawningPolicy(
