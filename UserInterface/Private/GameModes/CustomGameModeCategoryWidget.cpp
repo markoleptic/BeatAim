@@ -5,6 +5,7 @@
 #include "Blueprint/WidgetTree.h"
 #include "BSConstants.h"
 #include "BSGameModeConfig/BSConfig.h"
+#include "BSGameModeConfig/BSGameModeValidator.h"
 #include "Components/CheckBox.h"
 #include "Components/EditableTextBox.h"
 #include "Mappings/GameModeCategoryTagMap.h"
@@ -17,6 +18,8 @@
 #include "Utilities/GameModeCategoryTagWidget.h"
 #include "Utilities/TooltipWidget.h"
 #include "Utilities/ComboBox/BSComboBoxString.h"
+
+TMap<const FProperty*, TWeakObjectPtr<UMenuOptionWidget>> PropertyMenuOptionWidgetMap;
 
 void UCustomGameModeCategoryWidget::NativeConstruct()
 {
@@ -64,6 +67,36 @@ void UCustomGameModeCategoryWidget::UpdateOptionsFromConfig()
 
 void UCustomGameModeCategoryWidget::HandlePropertyValidation(const FValidationResult& ValidationResult)
 {
+}
+
+void UCustomGameModeCategoryWidget::UpdateMenuOptionTooltips(const FProperty* Property,
+	const FUniqueValidationCheckData Data, const TArray<int32>& CalculatedValues)
+{
+	// TODO: Update Tooltips
+	/*bool bAllClean = true;
+	for (const TWeakObjectPtr<UMenuOptionWidget>& Widget : MenuOptionWidgets)
+	{
+		Widget->UpdateAllWarningTooltips();
+		TArray<FTooltipData>& TooltipData = Widget->GetTooltipWarningData();
+		for (FTooltipData& Data : TooltipData)
+		{
+			if (Data.IsDirty())
+			{
+				bAllClean = false;
+				if (Data.ShouldShowTooltipImage())
+				{
+					Widget->ConstructTooltipWarningImageIfNeeded(Data);
+					SetupTooltip(Data);
+				}
+				else
+				{
+					Data.RemoveTooltipImage();
+				}
+				Data.SetIsClean(true);
+			}
+		}
+	}*/
+	//UpdateCustomGameModeCategoryInfo();
 }
 
 void UCustomGameModeCategoryWidget::AddGameModeCategoryTagWidgets(UMenuOptionWidget* MenuOptionWidget)

@@ -23,9 +23,9 @@ void UBSSettingCategoryWidget::InitSettingCategoryWidget()
 		{
 			if (MenuOption->ShouldShowTooltip())
 			{
-				if (UTooltipImage* TooltipImage = MenuOption->GetTooltipImage())
+				if (UTooltipIcon* TooltipIcon = MenuOption->GetTooltipIcon())
 				{
-					SetupTooltip(TooltipImage, MenuOption->GetTooltipImageText());
+					SetupTooltip(TooltipIcon, MenuOption->GetTooltipIconText());
 				}
 			}
 		}

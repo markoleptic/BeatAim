@@ -15,7 +15,6 @@ enum class EGameModeWarningType : uint8;
 
 using FValidationPropertyPtr = TSharedPtr<FValidationProperty>;
 using FValidationCheckPtr = TSharedPtr<FValidationCheck>;
-using FValidationResultMap = TMap<EGameModeWarningType, TArray<FValidationCheckResult>>;
 
 DECLARE_DELEGATE_RetVal_OneParam(bool, FValidationDelegate, const TSharedPtr<FBSConfig>&);
 
@@ -196,7 +195,10 @@ struct BEATSHOTGLOBAL_API FValidationCheckResult
 	/** Maps each involved property to their property data unique to the validation check. */
 	TMap<const FProperty*, FUniqueValidationCheckData> PropertyData;
 
-	FValidationCheckResult() = default;
+
+	FValidationCheckResult() : bSuccess(false), WarningType(EGameModeWarningType::None), Id(GId++)
+	{
+	}
 
 	FValidationCheckResult(const bool Success, const FValidationCheckPtr& InValidationCheck, TArray<int32>&& Values,
 		TMap<const FProperty*, FUniqueValidationCheckData>&& Data) : bSuccess(Success),
@@ -204,9 +206,28 @@ struct BEATSHOTGLOBAL_API FValidationCheckResult
 		                                                             CalculatedValues(MoveTemp(Values)),
 		                                                             InvolvedProperties(
 			                                                             InValidationCheck->InvolvedProperties),
-		                                                             PropertyData(MoveTemp(Data))
+		                                                             PropertyData(MoveTemp(Data)), Id(GId++)
 	{
 	}
+
+	FORCEINLINE bool operator ==(const FValidationCheckResult& Other) const
+	{
+		return Id == Other.Id;
+	}
+
+	FORCEINLINE bool operator <(const FValidationCheckResult& Other) const
+	{
+		return Id < Other.Id;
+	}
+
+	friend FORCEINLINE uint32 GetTypeHash(const FValidationCheckResult& Object)
+	{
+		return GetTypeHash(Object.Id);
+	}
+
+private:
+	int32 Id;
+	static int32 GId;
 };
 
 
@@ -222,12 +243,12 @@ struct BEATSHOTGLOBAL_API FValidationResult
 	void AddValidationCheckResult(FValidationCheckResult&& Check);
 
 
-	const FValidationResultMap& GetSucceeded() const;
-	const FValidationResultMap& GetFailed() const;
+	const TSet<FValidationCheckResult>& GetSucceeded() const;
+	const TSet<FValidationCheckResult>& GetFailed() const;
 
 private:
-	FValidationResultMap SucceededValidationCheckResults;
-	FValidationResultMap FailedValidationCheckResults;
+	TSet<FValidationCheckResult> SucceededValidationCheckResults;
+	TSet<FValidationCheckResult> FailedValidationCheckResults;
 };
 
 /** Validates a BSConfig. */

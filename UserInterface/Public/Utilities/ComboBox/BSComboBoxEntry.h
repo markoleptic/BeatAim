@@ -8,7 +8,7 @@
 
 class UBorder;
 class UTextBlock;
-class UTooltipImage;
+class UTooltipIcon;
 class UMenuOptionStyle;
 
 /** Simple class used for ComboBox entries. Allows for tooltips to be added to entries. */
@@ -36,7 +36,7 @@ protected:
 
 	/** The image to the left of the text, that will display a tooltip when hovered. */
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	UTooltipImage* TooltipImage;
+	UTooltipIcon* TooltipIcon;
 
 	/** The main text of the entry. */
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
@@ -47,7 +47,7 @@ protected:
 	UBorder* Background;
 
 	/** Whether to always hide the tooltip image. */
-	mutable bool bAlwaysHideTooltipImage = false;
+	mutable bool bAlwaysHideTooltipIcon = false;
 
 public:
 	/** Sets the main text of the entry. */
@@ -55,19 +55,19 @@ public:
 
 	FText GetEntryText() const;
 
-	/** Returns the TooltipImage. */
-	UTooltipImage* GetTooltipImage() const { return TooltipImage; }
+	/** Returns the TooltipIcon. */
+	UTooltipIcon* GetTooltipIcon() const { return TooltipIcon; }
 
 	/** Returns the string form of the main entry text. */
 	FString GetEntryTextAsString() const;
 
-	/** Shows or hides the TooltipImage */
-	void SetTooltipImageVisibility(const bool bIsVisible) const;
+	/** Shows or hides the TooltipIcon */
+	void SetTooltipIconVisibility(const bool bIsVisible) const;
 
-	/** Sets whether to always hide the tooltip image. */
-	void SetAlwaysHideTooltipImage(const bool bShouldAlwaysHideTooltipImage) const
+	/** Sets whether to always hide the TooltipIcon. */
+	void SetAlwaysHideTooltipIcon(const bool bShouldAlwaysHide) const
 	{
-		bAlwaysHideTooltipImage = bShouldAlwaysHideTooltipImage;
+		bAlwaysHideTooltipIcon = bShouldAlwaysHide;
 	}
 
 	/** Sets the Brush tint for the Border. */

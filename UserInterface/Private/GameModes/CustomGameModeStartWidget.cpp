@@ -135,6 +135,7 @@ void UCustomGameModeStartWidget::OnSelectionChanged_GameModeTemplates(const TArr
 		return;
 	}
 	StartWidgetProperties.GameModeName = Selected[0];
+	StartWidgetProperties.bGameModeNameChanged = true;
 	OnStartWidgetPropertyChanged.Execute(StartWidgetProperties);
 }
 
@@ -146,5 +147,6 @@ void UCustomGameModeStartWidget::OnSelectionChanged_GameModeDifficulty(const TAr
 		return;
 	}
 	StartWidgetProperties.Difficulty = Selected[0];
+	StartWidgetProperties.bDifficultyChanged = true;
 	OnStartWidgetPropertyChanged.Execute(StartWidgetProperties);
 }

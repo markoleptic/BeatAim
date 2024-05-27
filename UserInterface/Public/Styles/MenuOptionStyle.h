@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include "Utilities/TooltipImage.h"
 #include "MenuOptionStyle.generated.h"
+
+class UTooltipIcon;
 
 /** Defines styles used in MenuOptionWidgets. */
 UCLASS(Abstract, Blueprintable, BlueprintType)
@@ -26,13 +27,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MenuOptionStyle|Alignment")
 	TEnumAsByte<EHorizontalAlignment> HorizontalAlignment_TagWidget = HAlign_Right;
 
-	/** The class used for Tooltip Warnings. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MenuOptionStyle|Classes")
-	TSubclassOf<UTooltipImage> TooltipWarningImageClass;
-
-	/** The class used for Tooltip Cautions. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MenuOptionStyle|Classes")
-	TSubclassOf<UTooltipImage> TooltipCautionImageClass;
+	/** Class to use for tooltip icons. */
+	UPROPERTY(EditDefaultsOnly, Category="MenuOptionStyle|Tooltip")
+	TSubclassOf<UTooltipIcon> TooltipIconClass;
 
 	/** The font applied to the DescriptionText. Also applied to ComboBoxes. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MenuOptionStyle|Fonts")

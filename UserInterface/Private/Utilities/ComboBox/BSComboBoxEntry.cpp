@@ -6,7 +6,7 @@
 #include "Components/TextBlock.h"
 #include "Styles/MenuOptionStyle.h"
 #include "Utilities/BSWidgetInterface.h"
-#include "Utilities/TooltipImage.h"
+#include "Utilities/TooltipIcon.h"
 
 void UBSComboBoxEntry::NativePreConstruct()
 {
@@ -39,15 +39,15 @@ FText UBSComboBoxEntry::GetEntryText() const
 	return TextBlock_Entry->GetText();
 }
 
-void UBSComboBoxEntry::SetTooltipImageVisibility(const bool bIsVisible) const
+void UBSComboBoxEntry::SetTooltipIconVisibility(const bool bIsVisible) const
 {
-	if (bIsVisible && !bAlwaysHideTooltipImage)
+	if (bIsVisible && !bAlwaysHideTooltipIcon)
 	{
-		TooltipImage->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		TooltipIcon->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	}
 	else
 	{
-		TooltipImage->SetVisibility(ESlateVisibility::Collapsed);
+		TooltipIcon->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
 

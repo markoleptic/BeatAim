@@ -247,7 +247,7 @@ public:
 	/** Sets the text for the Entry and tooltip text, and binds to the OnHovered event in the TooltipImage. This can be
 	 *  called by classes that bind to OnGenerateWidgetEvent to customize the entry text and tooltip text, and if needed
 	 *  further modify the Entry. */
-	void InitializeComboBoxEntry(const UBSComboBoxEntry* Entry, const FText& EntryText, const bool bShowTooltipImage,
+	void InitializeComboBoxEntry(const UBSComboBoxEntry* Entry, const FText& EntryText, const bool bShowTooltipIcon,
 		const FText& TooltipText = FText()) const;
 
 #if WITH_EDITOR

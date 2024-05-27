@@ -21,7 +21,7 @@ class UCustomGameModeWidget;
 class UPropertyViewWidget;
 class UCreatorViewWidget;
 class UGameModeSharingWidget;
-class UTooltipImage;
+class UTooltipIcon;
 class UAudioSelectWidget;
 class UHorizontalBox;
 class USavedTextWidget;
@@ -112,7 +112,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "GameModesWidget|Classes|AudioSelect")
 	TSubclassOf<UAudioSelectWidget> AudioSelectClass;
 	UPROPERTY(EditDefaultsOnly, Category = "GameModesWidget|Classes|Tooltip")
-	TSubclassOf<UTooltipImage> WarningEMarkClass;
+	TSubclassOf<UTooltipIcon> WarningEMarkClass;
 	UPROPERTY(EditDefaultsOnly, Category = "GameModesWidget|Classes|Custom Game Modes")
 	TSubclassOf<UGameModeSharingWidget> GameModeSharingClass;
 	UPROPERTY(EditDefaultsOnly, Category = "GameModesWidget|Classes|Tooltip")
@@ -123,7 +123,7 @@ protected:
 	TMap<EBaseGameMode, FDefaultGameModeParams> DefaultGameModesParams;
 
 	UPROPERTY()
-	TObjectPtr<UTooltipImage> TooltipWarningImage_EnableAI;
+	TObjectPtr<UTooltipIcon> TooltipWarningImage_EnableAI;
 	UPROPERTY()
 	TObjectPtr<UPopupMessageWidget> PopupMessageWidget;
 	UPROPERTY()

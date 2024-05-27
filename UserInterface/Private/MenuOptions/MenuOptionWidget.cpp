@@ -12,7 +12,7 @@
 #include "Styles/MenuOptionStyle.h"
 #include "Utilities/BSWidgetInterface.h"
 #include "Utilities/GameModeCategoryTagWidget.h"
-#include "Utilities/TooltipImage.h"
+#include "Utilities/TooltipIcon.h"
 
 
 void UMenuOptionWidget::NativePreConstruct()
@@ -20,7 +20,7 @@ void UMenuOptionWidget::NativePreConstruct()
 	Super::NativePreConstruct();
 
 	SetIndentLevel(IndentLevel);
-	SetShowTooltipImage(bShowTooltipImage);
+	SetShowTooltipIcon(bShowTooltipIcon);
 	SetShowCheckBoxLock(bShowCheckBoxLock);
 	SetDescriptionText(DescriptionText);
 	SetTooltipText(DescriptionTooltipText);
@@ -36,7 +36,7 @@ void UMenuOptionWidget::NativeConstruct()
 		CheckBox_Lock->OnCheckStateChanged.AddUniqueDynamic(this, &ThisClass::OnCheckBox_LockStateChanged);
 	}
 	SetIndentLevel(IndentLevel);
-	SetShowTooltipImage(bShowTooltipImage);
+	SetShowTooltipIcon(bShowTooltipIcon);
 	SetShowCheckBoxLock(bShowCheckBoxLock);
 	SetDescriptionText(DescriptionText);
 	SetTooltipText(DescriptionTooltipText);
@@ -115,9 +115,9 @@ void UMenuOptionWidget::SetIndentLevel(const int32 Value)
 	IndentLevel = Value;
 }
 
-void UMenuOptionWidget::SetShowTooltipImage(const bool bShow)
+void UMenuOptionWidget::SetShowTooltipIcon(const bool bShow)
 {
-	bShowTooltipImage = bShow;
+	bShowTooltipIcon = bShow;
 
 	if (!DescriptionTooltip)
 	{
@@ -165,7 +165,7 @@ void UMenuOptionWidget::SetTooltipText(const FText& InText)
 	DescriptionTooltipText = InText;
 }
 
-UTooltipImage* UMenuOptionWidget::GetTooltipImage() const
+UTooltipIcon* UMenuOptionWidget::GetTooltipIcon() const
 {
 	return DescriptionTooltip;
 }
@@ -200,107 +200,22 @@ void UMenuOptionWidget::OnCheckBox_LockStateChanged(const bool bChecked)
 	}
 }
 
-FUpdateTooltipState& UMenuOptionWidget::AddWarningTooltipData(const FTooltipData& InTooltipData)
+void UMenuOptionWidget::AddTooltipIcon(FTooltipData& Data)
 {
-	const int32 Index = WarningTooltipData.Add(InTooltipData);
-	return WarningTooltipData[Index].UpdateTooltipState;
-}
+	UTooltipIcon* TooltipIcon = CreateWidget<UTooltipIcon>(this, MenuOptionStyle->TooltipIconClass);
+	TooltipIcon->SetTooltipIconType(Data.TooltipIconType);
 
-FUpdateDynamicTooltipState& UMenuOptionWidget::AddDynamicWarningTooltipData(const FTooltipData& InTooltipData,
-	const FString& FallbackStringTableKey, const float InMin, const int32 InPrecision)
-{
-	const int32 Index = WarningTooltipData.Add(InTooltipData);
-	WarningTooltipData[Index].SetDynamicData(InMin, FallbackStringTableKey, InPrecision);
-	return WarningTooltipData[Index].UpdateDynamicTooltipState;
-}
-
-void UMenuOptionWidget::ConstructTooltipWarningImageIfNeeded(FTooltipData& InTooltipData)
-{
-	if (InTooltipData.TooltipImage.IsValid())
-	{
-		return;
-	}
-
-	UTooltipImage* NewTooltipImage;
-	switch (InTooltipData.TooltipType)
-	{
-	case ETooltipImageType::Caution:
-		NewTooltipImage = CreateWidget<UTooltipImage>(this, MenuOptionStyle->TooltipCautionImageClass);
-		break;
-	case ETooltipImageType::Warning:
-		NewTooltipImage = CreateWidget<UTooltipImage>(this, MenuOptionStyle->TooltipWarningImageClass);
-		break;
-	case ETooltipImageType::Default: default:
-		NewTooltipImage = CreateWidget<UTooltipImage>(this, MenuOptionStyle->TooltipWarningImageClass);
-		break;
-	}
-	UHorizontalBoxSlot* HorizontalBoxSlot = TooltipBox->AddChildToHorizontalBox(NewTooltipImage);
+	UHorizontalBoxSlot* HorizontalBoxSlot = TooltipBox->AddChildToHorizontalBox(TooltipIcon);
 	HorizontalBoxSlot->SetHorizontalAlignment(HAlign_Right);
 	HorizontalBoxSlot->SetPadding(MenuOptionStyle->Padding_TooltipWarning);
 	HorizontalBoxSlot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
 
-	InTooltipData.TooltipImage = NewTooltipImage;
+	Data.TooltipIcon = TooltipIcon;
 }
 
-void UMenuOptionWidget::UpdateWarningTooltips()
+void UMenuOptionWidget::GetGameModeCategoryTags(FGameplayTagContainer& OutTags) const
 {
-	for (FTooltipData& Data : GetTooltipWarningData())
-	{
-		if (Data.UpdateTooltipState.IsBound())
-		{
-			Data.SetShouldShowTooltipImage(Data.UpdateTooltipState.Execute());
-		}
-		else
-		{
-			Data.SetShouldShowTooltipImage(false);
-		}
-	}
-}
-
-void UMenuOptionWidget::UpdateDynamicWarningTooltips()
-{
-	for (FTooltipData& Data : GetTooltipWarningData())
-	{
-		if (Data.IsDynamic() && Data.UpdateDynamicTooltipState.IsBound())
-		{
-			const FDynamicTooltipState State = Data.UpdateDynamicTooltipState.Execute();
-			Data.UpdateDynamicTooltipText(State);
-		}
-	}
-}
-
-void UMenuOptionWidget::UpdateAllWarningTooltips()
-{
-	UpdateWarningTooltips();
-	UpdateDynamicWarningTooltips();
-}
-
-int32 UMenuOptionWidget::GetNumberOfWarnings()
-{
-	int32 Num = 0;
-	for (FTooltipData& Data : WarningTooltipData)
-	{
-		if (Data.TooltipType == ETooltipImageType::Warning && Data.TooltipImage.IsValid() && Data.TooltipImage->
-			IsVisible())
-		{
-			Num++;
-		}
-	}
-	return Num;
-}
-
-int32 UMenuOptionWidget::GetNumberOfCautions()
-{
-	int32 Num = 0;
-	for (FTooltipData& Data : WarningTooltipData)
-	{
-		if (Data.TooltipType == ETooltipImageType::Caution && Data.TooltipImage.IsValid() && Data.TooltipImage->
-			IsVisible())
-		{
-			Num++;
-		}
-	}
-	return Num;
+	OutTags.AppendTags(GameModeCategoryTags);
 }
 
 void UMenuOptionWidget::AddGameModeCategoryTagWidgets(TArray<UGameModeCategoryTagWidget*>& InGameModeCategoryTagWidgets)

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TooltipImage.h"
+#include "TooltipIcon.h"
 #include "Components/PanelWidget.h"
 #include "UObject/Interface.h"
 #include "BSWidgetInterface.generated.h"
@@ -11,7 +11,7 @@
 class UBSComboBoxEntry;
 class UBSComboBoxString;
 class UButton;
-class UTooltipImage;
+class UTooltipIcon;
 class UTooltipWidget;
 class UEditableTextBox;
 class USlider;
@@ -57,15 +57,12 @@ public:
 	/** Returns TooltipWidget. */
 	virtual UTooltipWidget* GetTooltipWidget() const { return nullptr; }
 
-	/** Add tooltip text and bind the OnTooltipImageHovered function to a given TooltipImage. */
-	void SetupTooltip(UTooltipImage* TooltipImage, const FText& TooltipText, const bool bInAllowTextWrap = false);
-
-	/** Add InTooltipData and bind the OnTooltipImageHovered function to a given TooltipImage. */
-	void SetupTooltip(const FTooltipData& InTooltipData);
+	/** Add tooltip text and bind the OnTooltipIconHovered function to a given TooltipIcon. */
+	void SetupTooltip(UTooltipIcon* TooltipIcon, const FText& TooltipText, const bool bInAllowTextWrap = false);
 
 	/** All Tooltip Images are bound to this function. */
 	UFUNCTION()
-	virtual void OnTooltipImageHovered(UTooltipImage* TooltipImage, const FTooltipData& InTooltipData);
+	virtual void OnTooltipIconHovered(const FTooltipData& InTooltipData);
 
 	/** Override this function to use OnGenerateWidgetEvent and OnSelectionChanged_GenerateMultiSelectionItem. */
 	virtual UBSComboBoxEntry* ConstructComboBoxEntryWidget() { return nullptr; }

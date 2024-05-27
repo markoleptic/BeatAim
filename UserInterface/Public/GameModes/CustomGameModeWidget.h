@@ -66,8 +66,7 @@ class USERINTERFACE_API UCustomGameModeWidget : public UUserWidget
 
 public:
 	/** Sets the value of BSConfig and GameModeDataAsset. Calls InitComponent on all widgets in ChildWidgets array. */
-	virtual void Init(const TSharedPtr<FBSConfig>& InConfig,
-		const TObjectPtr<UBSGameModeDataAsset> InGameModeDataAsset);
+	virtual void Init(const TSharedPtr<FBSConfig>& InConfig);
 
 	/** Calls UpdateOptionsFromConfig on all widgets in ChildWidgets array and calls
 	 *  UpdateAllChildWidgetOptionsValid. */
@@ -123,9 +122,6 @@ protected:
 
 	//UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	//TObjectPtr<UCustomGameModeStartWidget> Widget_Start;
-
-	UPROPERTY()
-	TObjectPtr<UBSGameModeDataAsset> GameModeDataAsset;
 
 	/** Pointer to Game Mode Config held in controlling GameModesWidget. */
 	//TSharedPtr<FBSConfig> BSConfig;

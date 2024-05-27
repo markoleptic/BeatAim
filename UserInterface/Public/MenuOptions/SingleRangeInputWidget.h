@@ -12,7 +12,7 @@ class UEditableTextBox;
 class USpacer;
 class UHorizontalBox;
 class USlider;
-class UTooltipImage;
+class UTooltipIcon;
 class UBSHorizontalBox;
 class USingleRangeInputWidget;
 

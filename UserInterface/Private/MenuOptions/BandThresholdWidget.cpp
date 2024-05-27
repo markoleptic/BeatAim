@@ -11,7 +11,7 @@ void UBandThresholdWidget::NativeConstruct()
 	OnSliderTextBoxValueChanged.AddUObject(this, &ThisClass::OnSliderTextBoxValueChanged_Threshold);
 	SetValues(Constants::MinValue_BandFrequencyThreshold, Constants::MaxValue_BandFrequencyThreshold,
 		Constants::SnapSize_BandFrequencyThreshold);
-	SetShowTooltipImage(false);
+	SetShowTooltipIcon(false);
 }
 
 void UBandThresholdWidget::SetDefaultValue(const float Value, const int32 ChannelIndex)

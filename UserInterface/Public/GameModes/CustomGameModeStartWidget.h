@@ -22,14 +22,11 @@ struct USERINTERFACE_API FStartWidgetProperties
 	FString Difficulty;
 	FString NewCustomGameModeName;
 
-	FStartWidgetProperties() : bUseTemplateChecked(false), bIsPreset(false), bIsCustom(false)
-	{
-	}
+	bool bGameModeNameChanged;
+	bool bDifficultyChanged;
 
-	FStartWidgetProperties(const bool bInUseTemplate, const bool bInIsPreset, const bool bInIsCustom,
-		const FString& InGameModeName, const FString& InDifficulty, const FString& InNewCustomGameModeName):
-		bUseTemplateChecked(bInUseTemplate), bIsPreset(bInIsPreset), bIsCustom(bInIsCustom),
-		GameModeName(InGameModeName), Difficulty(InDifficulty), NewCustomGameModeName(InNewCustomGameModeName)
+	FStartWidgetProperties() : bUseTemplateChecked(false), bIsPreset(false), bIsCustom(false),
+	                           bGameModeNameChanged(false), bDifficultyChanged(false)
 	{
 	}
 
@@ -83,5 +80,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UTextInputWidget* EditableTextBoxOption_CustomGameModeName;
 
+	/** Start widget properties shared between instances of this class. */
 	static FStartWidgetProperties StartWidgetProperties;
 };

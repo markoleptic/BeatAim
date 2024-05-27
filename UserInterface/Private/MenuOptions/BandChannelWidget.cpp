@@ -12,7 +12,7 @@
 void UBandChannelWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	SetShowTooltipImage(false);
+	SetShowTooltipIcon(false);
 	Value_BandChannelMin->OnTextCommitted.AddDynamic(this, &UBandChannelWidget::OnValueCommitted_Min);
 	Value_BandChannelMax->OnTextCommitted.AddDynamic(this, &UBandChannelWidget::OnValueCommitted_Max);
 }

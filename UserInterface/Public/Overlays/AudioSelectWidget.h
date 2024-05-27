@@ -18,7 +18,7 @@ class UPopupMessageWidget;
 class UBSButton;
 class UBorder;
 class UTextBlock;
-class UTooltipImage;
+class UTooltipIcon;
 class UTooltipWidget;
 class UCheckBox;
 class UEditableTextBox;
@@ -55,9 +55,9 @@ protected:
 	UPopupMessageWidget* PopupMessageWidget;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	UTooltipImage* QMark_PlaybackAudio;
+	UTooltipIcon* QMark_PlaybackAudio;
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	UTooltipImage* QMark_Input;
+	UTooltipIcon* QMark_Input;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UBSButton* Button_AudioFromFile;

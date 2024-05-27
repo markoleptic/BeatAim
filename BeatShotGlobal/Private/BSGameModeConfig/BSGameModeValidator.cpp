@@ -28,6 +28,7 @@ namespace
 /* ---------------------- */
 
 int32 FValidationCheck::GId = 0;
+int32 FValidationCheckResult::GId = 0;
 
 void FValidationProperty::AddCheck(const FValidationCheckPtr& Check, const FUniqueValidationCheckData& Data)
 {
@@ -39,20 +40,20 @@ void FValidationResult::AddValidationCheckResult(FValidationCheckResult&& Check)
 {
 	if (Check.bSuccess)
 	{
-		SucceededValidationCheckResults[Check.WarningType].Add(MoveTemp(Check));
+		SucceededValidationCheckResults.Add(MoveTemp(Check));
 	}
 	else
 	{
-		FailedValidationCheckResults[Check.WarningType].Add(MoveTemp(Check));
+		FailedValidationCheckResults.Add(MoveTemp(Check));
 	}
 }
 
-const FValidationResultMap& FValidationResult::GetSucceeded() const
+const TSet<FValidationCheckResult>& FValidationResult::GetSucceeded() const
 {
 	return SucceededValidationCheckResults;
 }
 
-const FValidationResultMap& FValidationResult::GetFailed() const
+const TSet<FValidationCheckResult>& FValidationResult::GetFailed() const
 {
 	return FailedValidationCheckResults;
 }

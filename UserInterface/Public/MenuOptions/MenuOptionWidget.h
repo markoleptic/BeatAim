@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
-#include "Utilities/TooltipImage.h"
+#include "Utilities/TooltipIcon.h"
 #include "MenuOptionWidget.generated.h"
 
 class UMenuOptionStyle;
@@ -64,7 +64,7 @@ public:
 	void SetIndentLevel(const int32 Value);
 
 	/** Toggles showing the TooltipImage. */
-	void SetShowTooltipImage(const bool bShow);
+	void SetShowTooltipIcon(const bool bShow);
 
 	/** Toggles showing the CheckBoxLock. */
 	void SetShowCheckBoxLock(const bool bShow);
@@ -72,14 +72,14 @@ public:
 	/** Sets the Description Text. */
 	void SetDescriptionText(const FText& InText);
 
-	/** Sets the TooltipImage Text. */
+	/** Sets the tooltip text associated with the tooltip icon. */
 	void SetTooltipText(const FText& InText);
 
-	/** Returns the TooltipImage. */
-	UTooltipImage* GetTooltipImage() const;
+	/** Returns the tooltip icon. */
+	UTooltipIcon* GetTooltipIcon() const;
 
-	/** Returns the TooltipImage Text. */
-	FText GetTooltipImageText() const { return DescriptionTooltipText; }
+	/** Returns the tooltip text associated with the tooltip icon. */
+	FText GetTooltipIconText() const { return DescriptionTooltipText; }
 
 	/** Returns true if locked. */
 	bool GetIsLocked() const;
@@ -87,64 +87,32 @@ public:
 	/** Sets the locked state. */
 	void SetIsLocked(const bool bLocked) const;
 
-	/** Returns value of bShowTooltipImage. */
-	bool ShouldShowTooltip() const { return bShowTooltipImage; }
+	/** Returns value of bShowTooltipIcon. */
+	bool ShouldShowTooltip() const { return bShowTooltipIcon; }
 
 	/** Broadcasts the new state of the lock and the index. */
 	FOnLockStateChanged OnLockStateChanged;
 
-	/** Adds a Warning Tooltip to TooltipData array. Returns update delegate. */
-	FUpdateTooltipState& AddWarningTooltipData(const FTooltipData& InTooltipData);
-
-	/** Adds a Dynamic Warning Tooltip to TooltipData array. Returns update delegate. */
-	FUpdateDynamicTooltipState& AddDynamicWarningTooltipData(const FTooltipData& InTooltipData,
-		const FString& FallbackStringTableKey, const float InMin, const int32 InPrecision = 0);
-
-	/** Calls UpdateWarningTooltips and UpdateDynamicWarningTooltips, which update the TooltipData by executing
-	 *  delegates on each FTooltipData struct. */
-	void UpdateAllWarningTooltips();
-
-	/** Creates a TooltipImage if the TooltipImage in InTooltipData is not valid. Adds the widget to TooltipBox. */
-	void ConstructTooltipWarningImageIfNeeded(FTooltipData& InTooltipData);
-
-	/** Returns by reference TooltipData array. This contains tooltip info for all Caution or Warning Tooltips. */
-	TArray<FTooltipData>& GetTooltipWarningData() { return WarningTooltipData; }
-
-	/** Returns number of visible Warning Tooltips. */
-	int32 GetNumberOfWarnings();
-
-	/** Returns number of visible Caution Tooltips. */
-	int32 GetNumberOfCautions();
-
 	/** Returns Game mode category tags associated with this menu option. */
-	void GetGameModeCategoryTags(FGameplayTagContainer& OutTags) const
-	{
-		return OutTags.AppendTags(GameModeCategoryTags);
-	}
+	void GetGameModeCategoryTags(FGameplayTagContainer& OutTags) const;
 
 	/** Adds the widget to Box_TagWidgets. */
 	void AddGameModeCategoryTagWidgets(TArray<UGameModeCategoryTagWidget*>& InGameModeCategoryTagWidgets);
 
 protected:
-	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
-	UHorizontalBox* Box_TagWidgets;
-
-	/** Executes UpdateTooltipState on each Warning Tooltip in TooltipData array. Calls SetShouldShowTooltipImage
-	 *  on result. */
-	void UpdateWarningTooltips();
-
-	/** Executes UpdateDynamicTooltipState on each Warning Tooltip in TooltipData array. Calls
-	 *  SetShouldShowTooltipImage on result. */
-	void UpdateDynamicWarningTooltips();
-
 	UFUNCTION()
 	void OnCheckBox_LockStateChanged(const bool bChecked);
+
+	void AddTooltipIcon(FTooltipData& Data);
+
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	UHorizontalBox* Box_TagWidgets;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UBSHorizontalBox* BSBox;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	UTooltipImage* DescriptionTooltip;
+	UTooltipIcon* DescriptionTooltip;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UHorizontalBox* TooltipBox;
@@ -184,7 +152,7 @@ protected:
 	bool bShowCheckBoxLock = false;
 
 	UPROPERTY(EditInstanceOnly, Category="MenuOptionWidget|Tooltip")
-	bool bShowTooltipImage = true;
+	bool bShowTooltipIcon = true;
 
 	/** Text to show on the tooltip. */
 	UPROPERTY(EditInstanceOnly, Category="MenuOptionWidget|Tooltip")
@@ -193,10 +161,6 @@ protected:
 	/** The categories this menu option represents. */
 	UPROPERTY(EditInstanceOnly, Category="MenuOptionWidget|GameModeCategoryTags")
 	FGameplayTagContainer GameModeCategoryTags;
-
-	/** Contains tooltip info for all Caution or Warning Tooltips. Size of array never changes after NativeConstruct
-	 *  has been called. */
-	TArray<FTooltipData> WarningTooltipData;
 
 	/** The custom enabled state of the menu option. */
 	EMenuOptionEnabledState MenuOptionEnabledState;

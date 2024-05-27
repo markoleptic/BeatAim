@@ -31,6 +31,7 @@ void UGameModeMenuWidget::NativeConstruct()
 	InitDefaultGameModesWidgets();
 
 	GameModeValidator = NewObject<UBSGameModeValidator>();
+	BSConfig = MakeShareable(new FBSConfig());
 
 	// Default Button Enabled States
 	Button_StartFromPreset->SetIsEnabled(false);
@@ -105,15 +106,16 @@ void UGameModeMenuWidget::NativeConstruct()
 	CurrentCustomGameModesWidget = CustomGameModesWidget_CreatorView;
 	NotCurrentCustomGameModesWidget = CustomGameModesWidget_PropertyView;
 
-	RefreshGameModes();
-
 	FBSConfig DefaultConfig;
 	FindPresetGameMode(EBaseGameMode::MultiBeat, EGameModeDifficulty::Normal, GameModeDataAsset.Get(), DefaultConfig);
-	PopulateGameModeOptions(DefaultConfig);
+	SetBSConfig(DefaultConfig);
 
-	// Initialize CustomGameModesWidgets
-	CurrentCustomGameModesWidget->Init(BSConfig, GameModeDataAsset);
-	NotCurrentCustomGameModesWidget->Init(BSConfig, GameModeDataAsset);
+	RefreshGameModes();
+
+	CurrentCustomGameModesWidget->Init(BSConfig);
+	NotCurrentCustomGameModesWidget->Init(BSConfig);
+
+	PopulateGameModeOptions(DefaultConfig);
 
 	Border_DifficultySelect->SetVisibility(ESlateVisibility::Collapsed);
 
@@ -151,7 +153,7 @@ void UGameModeMenuWidget::InitDefaultGameModesWidgets()
 		Widget->SetBaseGameMode(Pair.Key);
 		Widget->SetDescriptionText(Pair.Value.GameModeName);
 		Widget->SetAltDescriptionText(Pair.Value.AltDescriptionText);
-		Widget->SetShowTooltipImage(false);
+		Widget->SetShowTooltipIcon(false);
 		Temp.Add(Widget);
 		Box_DefaultGameModesOptions->AddChildToVerticalBox(Widget);
 	}
@@ -973,7 +975,7 @@ void UGameModeMenuWidget::RefreshGameModes()
 
 void UGameModeMenuWidget::SetBSConfig(const FBSConfig& InConfig)
 {
-	BSConfig = MakeShareable(new FBSConfig(InConfig));
+	*BSConfig = InConfig;
 }
 
 void UGameModeMenuWidget::HandlePropertyChanged(const TSet<const FProperty*>& Properties)
@@ -999,11 +1001,17 @@ void UGameModeMenuWidget::HandlePropertyChanged(const TSet<const FProperty*>& Pr
 	}
 
 	const FValidationResult Result = GameModeValidator->Validate(BSConfig, Properties);
-	for (const auto& [Key, Value] : Result.GetSucceeded())
+	for (const FValidationCheckResult& ValidationCheckResult : Result.GetSucceeded())
 	{
+		for (const auto& [Property, UniqueValidationCheckData] : ValidationCheckResult.PropertyData)
+		{
+		}
 	}
-	for (const auto& [Key, Value] : Result.GetFailed())
+	for (const FValidationCheckResult& ValidationCheckResult : Result.GetFailed())
 	{
+		for (const auto& [Property, UniqueValidationCheckData] : ValidationCheckResult.PropertyData)
+		{
+		}
 	}
 }
 
@@ -1065,7 +1073,8 @@ void UGameModeMenuWidget::HandleStartWidgetPropertyChanged(FStartWidgetPropertie
 		GetCurrentStartWidget()->RefreshProperties();
 	}
 
-	if (DefiningConfigCopy != BSConfig->DefiningConfig)
+	if (Properties.bGameModeNameChanged || Properties.bDifficultyChanged || DefiningConfigCopy != BSConfig->
+		DefiningConfig)
 	{
 		if (FBSConfig Found; (Properties.bIsPreset && FindPresetGameMode(BSConfig->DefiningConfig.BaseGameMode,
 			BSConfig->DefiningConfig.Difficulty, GameModeDataAsset.Get(),
@@ -1073,6 +1082,8 @@ void UGameModeMenuWidget::HandleStartWidgetPropertyChanged(FStartWidgetPropertie
 		{
 			PopulateGameModeOptions(Found);
 		}
+		Properties.bGameModeNameChanged = false;
+		Properties.bDifficultyChanged = false;
 	}
 
 	UpdateSaveStartButtonStates();

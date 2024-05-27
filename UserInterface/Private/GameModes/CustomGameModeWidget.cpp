@@ -51,10 +51,8 @@ void UCustomGameModeWidget::HandlePropertyChanged(const TSet<const FProperty*>& 
 	OnPropertyChanged.Execute(Properties);
 }
 
-void UCustomGameModeWidget::Init(const TSharedPtr<FBSConfig>& InConfig,
-	const TObjectPtr<UBSGameModeDataAsset> InGameModeDataAsset)
+void UCustomGameModeWidget::Init(const TSharedPtr<FBSConfig>& InConfig)
 {
-	GameModeDataAsset = InGameModeDataAsset;
 	for (const auto [EGameModeCategory, Widget] : GameModeCategoryWidgetMap)
 	{
 		Widget->InitComponent(InConfig);

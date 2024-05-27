@@ -7,7 +7,7 @@
 #include "Styling/UMGCoreStyle.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UObject/EditorObjectVersion.h"
-#include "Utilities/TooltipImage.h"
+#include "Utilities/TooltipIcon.h"
 #include "Utilities/TooltipWidget.h"
 #include "Utilities/ComboBox/BSComboBoxEntry.h"
 #include "Widgets/SNullWidget.h"
@@ -68,15 +68,15 @@ void UBSComboBoxString::PostLoad()
 }
 
 void UBSComboBoxString::InitializeComboBoxEntry(const UBSComboBoxEntry* Entry, const FText& EntryText,
-	const bool bShowTooltipImage, const FText& TooltipText) const
+	const bool bShowTooltipIcon, const FText& TooltipText) const
 {
 	Entry->SetEntryText(EntryText);
-	Entry->SetAlwaysHideTooltipImage(!bShowTooltipImage);
+	Entry->SetAlwaysHideTooltipIcon(!bShowTooltipIcon);
 
-	if (UTooltipImage* TooltipImage = Entry->GetTooltipImage())
+	if (UTooltipIcon* TooltipIcon = Entry->GetTooltipIcon())
 	{
-		TooltipImage->GetTooltipHoveredDelegate().AddDynamic(this, &ThisClass::OnTooltipImageHovered);
-		TooltipImage->SetupTooltipImage(TooltipText);
+		TooltipIcon->OnTooltipHovered.AddDynamic(this, &ThisClass::OnTooltipIconHovered);
+		TooltipIcon->SetTooltipText(TooltipText);
 	}
 }
 
@@ -182,7 +182,7 @@ TSharedRef<SWidget> UBSComboBoxString::HandleGenerateWidget(TSharedPtr<FString> 
 			if (const UBSComboBoxEntry* Entry = Cast<UBSComboBoxEntry>(Widget))
 			{
 				// Show the tooltip image if creating a combo box entry widget
-				Entry->SetTooltipImageVisibility(true);
+				Entry->SetTooltipIconVisibility(true);
 			}
 			return Widget->TakeWidget();
 		}
@@ -241,7 +241,7 @@ TSharedRef<SWidget> UBSComboBoxString::HandleSelectionChangedGenerateWidget(
 			if (const UBSComboBoxEntry* Entry = Cast<UBSComboBoxEntry>(Widget))
 			{
 				// Hide the tooltip image if creating the top "selection entry" widget
-				Entry->SetTooltipImageVisibility(false);
+				Entry->SetTooltipIconVisibility(false);
 			}
 			return Widget->TakeWidget();
 		}
