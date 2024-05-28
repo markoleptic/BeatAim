@@ -307,8 +307,8 @@ void UCustomGameModeCategoryWidget::SetMenuOptionEnabledStateAndAddTooltip(UMenu
 	Widget->SetMenuOptionEnabledState(State);
 	if (State == EMenuOptionEnabledState::DependentMissing && !Key.IsEmpty())
 	{
-		UTooltipWidget* TooltipWidget = ConstructTooltipWidget();
-		TooltipWidget->TooltipDescriptor->SetText(GetTooltipTextFromKey(Key));
+		UTooltipWidget* TooltipWidget = GetTooltipWidget();
+		GetTooltipWidget()->SetText(GetTooltipTextFromKey(Key));
 		Widget->SetToolTip(TooltipWidget);
 	}
 	else
@@ -328,8 +328,8 @@ void UCustomGameModeCategoryWidget::SetSubMenuOptionEnabledStateAndAddTooltip(UM
 
 	if (State == EMenuOptionEnabledState::DependentMissing && !Key.IsEmpty())
 	{
-		UTooltipWidget* TooltipWidget = ConstructTooltipWidget();
-		TooltipWidget->TooltipDescriptor->SetText(GetTooltipTextFromKey(Key));
+		UTooltipWidget* TooltipWidget = GetTooltipWidget();
+		TooltipWidget->SetText(GetTooltipTextFromKey(Key));
 		SubWidget->SetToolTip(TooltipWidget);
 	}
 	else

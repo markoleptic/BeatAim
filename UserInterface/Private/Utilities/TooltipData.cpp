@@ -2,6 +2,7 @@
 
 
 #include "Utilities/TooltipData.h"
+#include "Utilities/TooltipIcon.h"
 #include "Utilities/BSWidgetInterface.h"
 
 int32 FTooltipData::GId = 0;
@@ -13,6 +14,16 @@ FTooltipData::FTooltipData(): TooltipIconType(ETooltipIconType::Default), bAllow
 FTooltipData::FTooltipData(UTooltipIcon* InTooltipIcon): TooltipIconType(ETooltipIconType::Default),
                                                          TooltipIcon(InTooltipIcon), bAllowTextWrap(false), Id(GId++)
 {
+}
+
+FText FTooltipData::GetTooltipText() const
+{
+	return TooltipText;
+}
+
+bool FTooltipData::GetAllowTextWrap() const
+{
+	return bAllowTextWrap;
 }
 
 /*void FTooltipData::UpdateDynamicTooltipText(const FDynamicTooltipState& InUpdateData)

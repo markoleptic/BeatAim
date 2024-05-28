@@ -29,13 +29,17 @@ struct FTooltipData
 
 	explicit FTooltipData(UTooltipIcon* InTooltipIcon);
 
+	FText GetTooltipText() const;
+
+	bool GetAllowTextWrap() const;
+
 	ETooltipIconType TooltipIconType;
 
 	/** Weak pointer to the tooltip this data is for. */
 	UPROPERTY()
 	TWeakObjectPtr<UTooltipIcon> TooltipIcon;
 
-	/** The text to display on the TooltipImage. */
+	/** The text to display on the tooltip widget when a user hovers over the tooltip icon. */
 	FText TooltipText;
 
 	/** Whether to allow Auto Wrap text. */

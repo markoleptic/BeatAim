@@ -53,6 +53,8 @@ class BEATSHOT_API UBSGameInstance : public UGameInstance, public IBSPlayerSetti
 	/** Called when the game instance is started either normally or through PIE. */
 	virtual void OnStart() override;
 
+	virtual void Shutdown() override;
+
 public:
 	/** Handles game mode transitions initiated by Main Menu, Pause Menu, or Post Game Menu. */
 	void HandleGameModeTransition(const FGameModeTransitionState& NewGameModeTransitionState);

@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TooltipIcon.h"
 #include "Components/PanelWidget.h"
 #include "UObject/Interface.h"
 #include "BSWidgetInterface.generated.h"
 
+struct FTooltipData;
 class UBSComboBoxEntry;
 class UBSComboBoxString;
 class UButton;
@@ -51,18 +51,11 @@ public:
 	static void SetSliderAndEditableTextBoxValues(const float NewValue, UEditableTextBox* TextBoxToChange,
 		USlider* SliderToChange, const float GridSnapSize, const float Min, const float Max);
 
-	/** Override this function and then call SetupTooltip. */
-	virtual UTooltipWidget* ConstructTooltipWidget() = 0;
-
 	/** Returns TooltipWidget. */
-	virtual UTooltipWidget* GetTooltipWidget() const { return nullptr; }
+	static UTooltipWidget* GetTooltipWidget();
 
-	/** Add tooltip text and bind the OnTooltipIconHovered function to a given TooltipIcon. */
-	void SetupTooltip(UTooltipIcon* TooltipIcon, const FText& TooltipText, const bool bInAllowTextWrap = false);
-
-	/** All Tooltip Images are bound to this function. */
-	UFUNCTION()
-	virtual void OnTooltipIconHovered(const FTooltipData& InTooltipData);
+	/** Adds tooltip text and binds the OnTooltipIconHovered function to the static tooltip widget. */
+	static void SetupTooltip(UTooltipIcon* TooltipIcon, const FText& TooltipText, const bool bInAllowTextWrap = false);
 
 	/** Override this function to use OnGenerateWidgetEvent and OnSelectionChanged_GenerateMultiSelectionItem. */
 	virtual UBSComboBoxEntry* ConstructComboBoxEntryWidget() { return nullptr; }

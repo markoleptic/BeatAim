@@ -5,12 +5,10 @@
 #include "Blueprint/WidgetTree.h"
 #include "MenuOptions/MenuOptionWidget.h"
 #include "Utilities/BSVerticalBox.h"
-#include "Utilities/TooltipWidget.h"
 
 void UBSSettingCategoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	ActiveTooltipWidget = ConstructTooltipWidget();
 	InitSettingCategoryWidget();
 }
 
@@ -31,16 +29,6 @@ void UBSSettingCategoryWidget::InitSettingCategoryWidget()
 		}
 	});
 	UpdateBrushColors();
-}
-
-UTooltipWidget* UBSSettingCategoryWidget::ConstructTooltipWidget()
-{
-	return CreateWidget<UTooltipWidget>(this, TooltipWidgetClass);
-}
-
-UTooltipWidget* UBSSettingCategoryWidget::GetTooltipWidget() const
-{
-	return ActiveTooltipWidget;
 }
 
 void UBSSettingCategoryWidget::AddContainer(const TArray<TObjectPtr<UBSVerticalBox>>& InContainers)

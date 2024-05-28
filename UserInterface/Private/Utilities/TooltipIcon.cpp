@@ -7,20 +7,23 @@
 #include "Styles/MenuOptionStyle.h"
 #include "Utilities/BSWidgetInterface.h"
 
-/*UTooltipIcon::UTooltipIcon(): Button(nullptr), Image(nullptr), TooltipData(FTooltipData()),
-                              TooltipIconType(ETooltipIconType::Default)
+UTooltipIcon::UTooltipIcon(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer), Button(nullptr),
+                                                                          Image(nullptr),
+                                                                          TooltipData(FTooltipData(this)),
+                                                                          TooltipIconType(ETooltipIconType::Default)
 {
-}*/
+}
 
 void UTooltipIcon::NativePreConstruct()
 {
 	Super::NativePreConstruct();
+	SetTooltipIconType(TooltipIconType);
 }
 
 void UTooltipIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
-	TooltipData.TooltipIcon = this;
+	SetTooltipIconType(TooltipIconType);
 	Button->OnHovered.AddDynamic(this, &UTooltipIcon::HandleTooltipHovered);
 }
 
@@ -48,7 +51,7 @@ void UTooltipIcon::SetTooltipIconType(const ETooltipIconType Type)
 
 void UTooltipIcon::HandleTooltipHovered()
 {
-	OnTooltipHovered.Broadcast(TooltipData);
+	OnTooltipIconHovered.Broadcast(TooltipData);
 }
 
 void UTooltipIcon::SetTooltipText(const FText& InText, const bool bAllowTextWrap)

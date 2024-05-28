@@ -4,8 +4,8 @@
 #include "Utilities/BSWidgetInterface.h"
 #include "Components/EditableTextBox.h"
 #include "Components/Slider.h"
-#include "Components/TextBlock.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "Utilities/TooltipData.h"
 #include "Utilities/TooltipIcon.h"
 #include "Utilities/TooltipWidget.h"
 #include "Utilities/ComboBox/BSComboBoxEntry.h"
@@ -37,25 +37,6 @@ void IBSWidgetInterface::SetSliderAndEditableTextBoxValues(const float NewValue,
 	const float SnappedValue = FMath::GridSnap(ClampedValue, GridSnapSize);
 	TextBoxToChange->SetText(FText::AsNumber(SnappedValue));
 	SliderToChange->SetValue(SnappedValue);
-}
-
-void IBSWidgetInterface::OnTooltipIconHovered(const FTooltipData& InTooltipData)
-{
-	UTooltipWidget* TooltipWidget = GetTooltipWidget();
-	if (!TooltipWidget)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Invalid tooltip widget"));
-		return;
-	}
-	if (!InTooltipData.TooltipIcon.IsValid())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Invalid TooltipIcon."));
-		return;
-	}
-
-	TooltipWidget->TooltipDescriptor->SetText(InTooltipData.TooltipText);
-	TooltipWidget->TooltipDescriptor->SetAutoWrapText(InTooltipData.bAllowTextWrap);
-	InTooltipData.TooltipIcon->SetToolTip(TooltipWidget);
 }
 
 UWidget* IBSWidgetInterface::OnGenerateWidgetEvent(const UBSComboBoxString* ComboBoxString, FString Method)
@@ -122,6 +103,11 @@ FString IBSWidgetInterface::GetStringTableKeyFromComboBox(const UBSComboBoxStrin
 	return FString();
 }
 
+UTooltipWidget* IBSWidgetInterface::GetTooltipWidget()
+{
+	return UTooltipWidget::Get();
+}
+
 void IBSWidgetInterface::SetupTooltip(UTooltipIcon* TooltipIcon, const FText& TooltipText, const bool bInAllowTextWrap)
 {
 	if (!TooltipIcon)
@@ -133,9 +119,10 @@ void IBSWidgetInterface::SetupTooltip(UTooltipIcon* TooltipIcon, const FText& To
 		UE_LOG(LogTemp, Warning, TEXT("Empty Tooltip Text for %s."), *TooltipIcon->GetParent()->GetParent()->GetName());
 	}
 
+	UTooltipWidget* TooltipWidget = GetTooltipWidget();
 	TooltipIcon->SetTooltipText(TooltipText, bInAllowTextWrap);
-	if (!TooltipIcon->OnTooltipHovered.IsBound())
+	if (!TooltipIcon->OnTooltipIconHovered.IsBound())
 	{
-		TooltipIcon->OnTooltipHovered.AddDynamic(this, &IBSWidgetInterface::OnTooltipIconHovered);
+		TooltipIcon->OnTooltipIconHovered.AddDynamic(TooltipWidget, &UTooltipWidget::HandleTooltipIconHovered);
 	}
 }

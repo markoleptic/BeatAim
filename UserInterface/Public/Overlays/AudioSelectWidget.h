@@ -19,7 +19,6 @@ class UBSButton;
 class UBorder;
 class UTextBlock;
 class UTooltipIcon;
-class UTooltipWidget;
 class UCheckBox;
 class UEditableTextBox;
 class UWidgetAnimation;
@@ -33,8 +32,6 @@ class USERINTERFACE_API UAudioSelectWidget : public UUserWidget, public IBSPlaye
 	GENERATED_BODY()
 
 protected:
-	virtual UTooltipWidget* ConstructTooltipWidget() override;
-	virtual UTooltipWidget* GetTooltipWidget() const override;
 	virtual void NativeConstruct() override;
 
 public:
@@ -48,8 +45,6 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Audio Select Widget | Classes")
 	TSubclassOf<UPopupMessageWidget> PopupMessageClass;
-	UPROPERTY(EditDefaultsOnly, Category = "Audio Select Widget | Classes")
-	TSubclassOf<UTooltipWidget> TooltipWidgetClass;
 
 	UPROPERTY()
 	UPopupMessageWidget* PopupMessageWidget;

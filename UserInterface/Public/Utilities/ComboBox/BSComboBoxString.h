@@ -30,7 +30,6 @@ enum class ESelectionModeType : uint8
 };
 
 class UBSComboBoxEntry;
-class UTooltipWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSelectionChangedEvent, FString, SelectedItem, ESelectInfo::Type,
 	SelectionType);
@@ -61,9 +60,6 @@ class USERINTERFACE_API UBSComboBoxString : public UWidget, public IBSWidgetInte
 
 	UPROPERTY(EditDefaultsOnly, Category = "BSComboBoxString|Classes")
 	TSubclassOf<UBSComboBoxEntry> ComboboxEntryWidget;
-
-	UPROPERTY(EditDefaultsOnly, Category = "BSComboBoxString|Tooltip")
-	TSubclassOf<UTooltipWidget> TooltipWidgetClass;
 
 public:
 	TSubclassOf<UBSComboBoxEntry> GetComboboxEntryWidget() const { return ComboboxEntryWidget; }
@@ -247,8 +243,8 @@ public:
 	/** Sets the text for the Entry and tooltip text, and binds to the OnHovered event in the TooltipImage. This can be
 	 *  called by classes that bind to OnGenerateWidgetEvent to customize the entry text and tooltip text, and if needed
 	 *  further modify the Entry. */
-	void InitializeComboBoxEntry(const UBSComboBoxEntry* Entry, const FText& EntryText, const bool bShowTooltipIcon,
-		const FText& TooltipText = FText()) const;
+	static void InitializeComboBoxEntry(const UBSComboBoxEntry* Entry, const FText& EntryText,
+		const bool bShowTooltipIcon, const FText& TooltipText = FText());
 
 #if WITH_EDITOR
 	virtual const FText GetPaletteCategory() override;
@@ -256,11 +252,6 @@ public:
 
 protected:
 	UBSComboBoxString();
-
-	//~ Begin IBSWidgetInterface
-	virtual UTooltipWidget* ConstructTooltipWidget() override;
-	virtual UTooltipWidget* GetTooltipWidget() const override;
-	//~ End IBSWidgetInterface
 
 	/** Refresh ComboBoxContent with the correct widget/data when the selected option changes. */
 	void UpdateOrGenerateWidget(TSharedPtr<FString> Item);
@@ -313,7 +304,4 @@ protected:
 
 	/** An array of shared pointers to the current selected strings. */
 	TArray<TSharedPtr<FString>> CurrentlySelectedOptionPointers;
-
-	UPROPERTY()
-	UTooltipWidget* ActiveTooltipWidget;
 };

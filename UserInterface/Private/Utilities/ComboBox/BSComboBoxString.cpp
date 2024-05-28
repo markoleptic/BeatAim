@@ -8,7 +8,6 @@
 #include "UObject/ConstructorHelpers.h"
 #include "UObject/EditorObjectVersion.h"
 #include "Utilities/TooltipIcon.h"
-#include "Utilities/TooltipWidget.h"
 #include "Utilities/ComboBox/BSComboBoxEntry.h"
 #include "Widgets/SNullWidget.h"
 
@@ -68,15 +67,14 @@ void UBSComboBoxString::PostLoad()
 }
 
 void UBSComboBoxString::InitializeComboBoxEntry(const UBSComboBoxEntry* Entry, const FText& EntryText,
-	const bool bShowTooltipIcon, const FText& TooltipText) const
+	const bool bShowTooltipIcon, const FText& TooltipText)
 {
 	Entry->SetEntryText(EntryText);
 	Entry->SetAlwaysHideTooltipIcon(!bShowTooltipIcon);
 
 	if (UTooltipIcon* TooltipIcon = Entry->GetTooltipIcon())
 	{
-		TooltipIcon->OnTooltipHovered.AddDynamic(this, &ThisClass::OnTooltipIconHovered);
-		TooltipIcon->SetTooltipText(TooltipText);
+		SetupTooltip(TooltipIcon, TooltipText);
 	}
 }
 
@@ -153,16 +151,6 @@ UBSComboBoxString::UBSComboBoxString()
 		static ConstructorHelpers::FObjectFinder<UFont> RobotoFontObj(*UWidget::GetDefaultFontName());
 		Font = FSlateFontInfo(RobotoFontObj.Object, 16, FName("Bold"));
 	}
-}
-
-UTooltipWidget* UBSComboBoxString::ConstructTooltipWidget()
-{
-	return CreateWidget<UTooltipWidget>(this, TooltipWidgetClass);
-}
-
-UTooltipWidget* UBSComboBoxString::GetTooltipWidget() const
-{
-	return ActiveTooltipWidget;
 }
 
 void UBSComboBoxString::UpdateOrGenerateWidget(TSharedPtr<FString> Item)
@@ -271,8 +259,6 @@ void UBSComboBoxString::HandleOpening()
 
 TSharedRef<SWidget> UBSComboBoxString::RebuildWidget()
 {
-	ActiveTooltipWidget = ConstructTooltipWidget();
-
 	int32 InitialIndex = GetIndexOfOption(GetSelectedOption());
 
 	TSharedPtr<FString> CurrentOptionPtr;

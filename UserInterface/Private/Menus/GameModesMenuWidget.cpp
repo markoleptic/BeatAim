@@ -19,6 +19,7 @@
 #include "Overlays/AudioSelectWidget.h"
 #include "Overlays/GameModeSharingWidget.h"
 #include "SaveGames/SaveGamePlayerSettings.h"
+#include "Utilities/BSWidgetInterface.h"
 #include "Utilities/SavedTextWidget.h"
 #include "Utilities/Buttons/MenuButton.h"
 #include "Windows/WindowsPlatformApplicationMisc.h"
@@ -405,15 +406,15 @@ void UGameModeMenuWidget::OnButtonClicked_SaveCustom()
 	else if (DoesCustomGameModeExist())
 	{
 		PopupMessageWidget = CreateWidget<UPopupMessageWidget>(this, PopupMessageClass);
-		TArray<UBSButton*> Buttons = PopupMessageWidget->InitPopup(GetWidgetTextFromKey("GM_OverwritePopupTitle"),
-			FText::GetEmpty(), 2);
+		TArray<UBSButton*> Buttons = PopupMessageWidget->InitPopup(
+			IBSWidgetInterface::GetWidgetTextFromKey("GM_OverwritePopupTitle"), FText::GetEmpty(), 2);
 
-		Buttons[0]->SetButtonText(GetWidgetTextFromKey("GM_OverwriteCancel"));
+		Buttons[0]->SetButtonText(IBSWidgetInterface::GetWidgetTextFromKey("GM_OverwriteCancel"));
 		Buttons[0]->OnBSButtonPressed.AddLambda([this](const UBSButton* /*Button*/)
 		{
 			PopupMessageWidget->FadeOut();
 		});
-		Buttons[1]->SetButtonText(GetWidgetTextFromKey("GM_OverwriteConfirm"));
+		Buttons[1]->SetButtonText(IBSWidgetInterface::GetWidgetTextFromKey("GM_OverwriteConfirm"));
 		Buttons[1]->OnBSButtonPressed.AddLambda([this](const UBSButton* /*Button*/)
 		{
 			PopupMessageWidget->FadeOut();
@@ -515,16 +516,16 @@ void UGameModeMenuWidget::OnButtonClicked_StartFromCustom()
 	else if (DoesCustomGameModeExist())
 	{
 		PopupMessageWidget = CreateWidget<UPopupMessageWidget>(this, PopupMessageClass);
-		TArray<UBSButton*> Buttons = PopupMessageWidget->InitPopup(GetWidgetTextFromKey("GM_OverwritePopupTitle"),
-			FText::GetEmpty(), 2);
+		TArray<UBSButton*> Buttons = PopupMessageWidget->InitPopup(
+			IBSWidgetInterface::GetWidgetTextFromKey("GM_OverwritePopupTitle"), FText::GetEmpty(), 2);
 
-		Buttons[0]->SetButtonText(GetWidgetTextFromKey("GM_OverwriteCancel"));
+		Buttons[0]->SetButtonText(IBSWidgetInterface::GetWidgetTextFromKey("GM_OverwriteCancel"));
 		Buttons[0]->OnBSButtonPressed.AddLambda([this](const UBSButton* /*Button*/)
 		{
 			PopupMessageWidget->FadeOut();
 		});
 
-		Buttons[1]->SetButtonText(GetWidgetTextFromKey("GM_OverwriteConfirm"));
+		Buttons[1]->SetButtonText(IBSWidgetInterface::GetWidgetTextFromKey("GM_OverwriteConfirm"));
 		Buttons[1]->OnBSButtonPressed.AddLambda([this](const UBSButton* /*Button*/)
 		{
 			PopupMessageWidget->FadeOut();
@@ -689,10 +690,10 @@ void UGameModeMenuWidget::PopulateGameModeOptions(const FBSConfig& InConfig)
 	StartWidgetProperties.bUseTemplateChecked = true;
 	StartWidgetProperties.GameModeName = StartWidgetProperties.bIsCustom
 		? BSConfig->DefiningConfig.CustomGameModeName
-		: GetStringFromEnum(BSConfig->DefiningConfig.BaseGameMode);
+		: IBSWidgetInterface::GetStringFromEnum(BSConfig->DefiningConfig.BaseGameMode);
 	StartWidgetProperties.Difficulty = StartWidgetProperties.bIsCustom
 		? ""
-		: GetStringFromEnum(InConfig.DefiningConfig.Difficulty);
+		: IBSWidgetInterface::GetStringFromEnum(InConfig.DefiningConfig.Difficulty);
 	StartWidgetProperties.NewCustomGameModeName.Empty();
 
 	GetCurrentStartWidget()->RefreshProperties();
@@ -740,7 +741,7 @@ bool UGameModeMenuWidget::SaveCustomGameModeOptionsAndReselect(const FText& Succ
 	{
 		const TArray SavedText = {
 			FText::FromString(GameModeToSave.DefiningConfig.CustomGameModeName),
-			GetWidgetTextFromKey("GM_GameModeSavedText")
+			IBSWidgetInterface::GetWidgetTextFromKey("GM_GameModeSavedText")
 		};
 		SetAndPlaySavedText(FText::Join(FText::FromString(" "), SavedText));
 	}
@@ -894,16 +895,16 @@ bool UGameModeMenuWidget::DoesCustomGameModeExist()
 void UGameModeMenuWidget::ShowConfirmOverwriteMessage_Import(TSharedPtr<FBSConfig>& ImportedConfig)
 {
 	PopupMessageWidget = CreateWidget<UPopupMessageWidget>(this, PopupMessageClass);
-	TArray<UBSButton*> Buttons = PopupMessageWidget->InitPopup(GetWidgetTextFromKey("GM_OverwritePopupTitle"),
-		FText::GetEmpty(), 2);
+	TArray<UBSButton*> Buttons = PopupMessageWidget->InitPopup(
+		IBSWidgetInterface::GetWidgetTextFromKey("GM_OverwritePopupTitle"), FText::GetEmpty(), 2);
 
-	Buttons[0]->SetButtonText(GetWidgetTextFromKey("GM_OverwriteCancel"));
+	Buttons[0]->SetButtonText(IBSWidgetInterface::GetWidgetTextFromKey("GM_OverwriteCancel"));
 	Buttons[0]->OnBSButtonPressed.AddLambda([this](const UBSButton* /*Button*/)
 	{
 		PopupMessageWidget->FadeOut();
 	});
 
-	Buttons[1]->SetButtonText(GetWidgetTextFromKey("GM_OverwriteConfirm"));
+	Buttons[1]->SetButtonText(IBSWidgetInterface::GetWidgetTextFromKey("GM_OverwriteConfirm"));
 	Buttons[1]->OnBSButtonPressed.AddLambda([this, ImportedConfig](const UBSButton* /*Button*/)
 	{
 		PopupMessageWidget->FadeOut();
@@ -1028,11 +1029,13 @@ void UGameModeMenuWidget::HandleStartWidgetPropertyChanged(FStartWidgetPropertie
 			Properties.bIsCustom = false;
 			if (Properties.Difficulty.IsEmpty())
 			{
-				Properties.Difficulty = GetStringFromEnum(EGameModeDifficulty::Normal);
+				Properties.Difficulty = IBSWidgetInterface::GetStringFromEnum(EGameModeDifficulty::Normal);
 			}
-			BSConfig->DefiningConfig.BaseGameMode = GetEnumFromString<EBaseGameMode>(Properties.GameModeName);
+			BSConfig->DefiningConfig.BaseGameMode = IBSWidgetInterface::GetEnumFromString<EBaseGameMode>(
+				Properties.GameModeName);
 			BSConfig->DefiningConfig.GameModeType = EGameModeType::Preset;
-			BSConfig->DefiningConfig.Difficulty = GetEnumFromString<EGameModeDifficulty>(Properties.Difficulty);
+			BSConfig->DefiningConfig.Difficulty = IBSWidgetInterface::GetEnumFromString<EGameModeDifficulty>(
+				Properties.Difficulty);
 			BSConfig->DefiningConfig.CustomGameModeName.Empty();
 		}
 		else if (IsCustomGameMode(Properties.GameModeName))
@@ -1050,8 +1053,8 @@ void UGameModeMenuWidget::HandleStartWidgetPropertyChanged(FStartWidgetPropertie
 		{
 			Properties.bIsPreset = true;
 			Properties.bIsCustom = false;
-			Properties.GameModeName = GetStringFromEnum(EBaseGameMode::MultiBeat);
-			Properties.Difficulty = GetStringFromEnum(EGameModeDifficulty::Normal);
+			Properties.GameModeName = IBSWidgetInterface::GetStringFromEnum(EBaseGameMode::MultiBeat);
+			Properties.Difficulty = IBSWidgetInterface::GetStringFromEnum(EGameModeDifficulty::Normal);
 
 			BSConfig->DefiningConfig.BaseGameMode = EBaseGameMode::MultiBeat;
 			BSConfig->DefiningConfig.GameModeType = EGameModeType::Preset;

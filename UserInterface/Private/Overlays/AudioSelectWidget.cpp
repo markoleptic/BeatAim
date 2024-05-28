@@ -13,7 +13,6 @@
 #include "Overlays/PopupMessageWidget.h"
 #include "SaveGames/SaveGamePlayerScore.h"
 #include "SaveGames/SaveGamePlayerSettings.h"
-#include "Utilities/TooltipWidget.h"
 #include "Utilities/Buttons/BSButton.h"
 
 #define MAX_FILETYPES_STR 4096
@@ -21,21 +20,9 @@
 
 
 
-UTooltipWidget* UAudioSelectWidget::ConstructTooltipWidget()
-{
-	return CreateWidget<UTooltipWidget>(this, TooltipWidgetClass);
-}
-
-UTooltipWidget* UAudioSelectWidget::GetTooltipWidget() const
-{
-	return ActiveTooltipWidget;
-}
-
 void UAudioSelectWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	ActiveTooltipWidget = ConstructTooltipWidget();
 
 	NumberFormattingOptions.MinimumIntegralDigits = 2;
 	NumberFormattingOptions.MaximumIntegralDigits = 2;

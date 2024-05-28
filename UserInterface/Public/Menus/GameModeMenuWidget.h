@@ -8,7 +8,6 @@
 #include "Blueprint/UserWidget.h"
 #include "GameModes/CustomGameModeStartWidget.h"
 #include "Utilities/BSCarouselNavBar.h"
-#include "Utilities/BSWidgetInterface.h"
 #include "Utilities/GameModeTransitionState.h"
 #include "GameModeMenuWidget.generated.h"
 
@@ -69,15 +68,14 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameModeBreakingChange, const bool bIsGam
 /** The base widget for selecting or customizing a game mode. The custom portion is split into multiple
  *  SettingsCategoryWidgets. Includes a default game modes section. */
 UCLASS()
-class USERINTERFACE_API UGameModeMenuWidget : public UUserWidget, public IBSWidgetInterface,
-                                              public IHttpRequestInterface, public IBSGameModeInterface
+class USERINTERFACE_API UGameModeMenuWidget : public UUserWidget, public IHttpRequestInterface,
+                                              public IBSGameModeInterface
 {
 	GENERATED_BODY()
 
 	virtual void NativeConstruct() override;
 	virtual void NativePreConstruct() override;
 	virtual void NativeDestruct() override;
-	virtual UTooltipWidget* ConstructTooltipWidget() override { return nullptr; }
 	void HandlePropertyChanged(const TSet<const FProperty*>& Properties);
 	void HandleStartWidgetPropertyChanged(FStartWidgetProperties& Properties);
 	UCustomGameModeStartWidget* GetCurrentStartWidget() const;
@@ -115,8 +113,6 @@ protected:
 	TSubclassOf<UTooltipIcon> WarningEMarkClass;
 	UPROPERTY(EditDefaultsOnly, Category = "GameModesWidget|Classes|Custom Game Modes")
 	TSubclassOf<UGameModeSharingWidget> GameModeSharingClass;
-	UPROPERTY(EditDefaultsOnly, Category = "GameModesWidget|Classes|Tooltip")
-	TSubclassOf<UTooltipWidget> TooltipWidgetClass;
 	UPROPERTY(EditDefaultsOnly, Category = "GameModesWidget|DefaultGameModes")
 	TSubclassOf<UDefaultGameModeSelectWidget> DefaultGameModesWidgetClass;
 	UPROPERTY(EditDefaultsOnly, Category = "GameModesWidget|DefaultGameModes", meta=(ForceInlineRow))
