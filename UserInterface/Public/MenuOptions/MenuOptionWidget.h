@@ -103,7 +103,7 @@ protected:
 	UFUNCTION()
 	void OnCheckBox_LockStateChanged(const bool bChecked);
 
-	void AddTooltipIcon(FTooltipData& Data);
+	void AddTooltipIcon(ETooltipIconType Type);
 
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	UHorizontalBox* Box_TagWidgets;
@@ -164,4 +164,6 @@ protected:
 
 	/** The custom enabled state of the menu option. */
 	EMenuOptionEnabledState MenuOptionEnabledState;
+
+	TArray<TObjectPtr<UTooltipIcon>> DynamicTooltipIcons;
 };

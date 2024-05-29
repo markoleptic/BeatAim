@@ -200,17 +200,16 @@ void UMenuOptionWidget::OnCheckBox_LockStateChanged(const bool bChecked)
 	}
 }
 
-void UMenuOptionWidget::AddTooltipIcon(FTooltipData& Data)
+void UMenuOptionWidget::AddTooltipIcon(const ETooltipIconType Type)
 {
-	UTooltipIcon* TooltipIcon = CreateWidget<UTooltipIcon>(this, MenuOptionStyle->TooltipIconClass);
-	TooltipIcon->SetTooltipIconType(Data.TooltipIconType);
-
+	UTooltipIcon* TooltipIcon = UTooltipIcon::CreateTooltipIcon(this, Type);
 	UHorizontalBoxSlot* HorizontalBoxSlot = TooltipBox->AddChildToHorizontalBox(TooltipIcon);
 	HorizontalBoxSlot->SetHorizontalAlignment(HAlign_Right);
 	HorizontalBoxSlot->SetPadding(MenuOptionStyle->Padding_TooltipWarning);
 	HorizontalBoxSlot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
 
-	Data.TooltipIcon = TooltipIcon;
+	// TODO: Organize tooltip icons using some part of validation system.
+	DynamicTooltipIcons.Add(TooltipIcon);
 }
 
 void UMenuOptionWidget::GetGameModeCategoryTags(FGameplayTagContainer& OutTags) const

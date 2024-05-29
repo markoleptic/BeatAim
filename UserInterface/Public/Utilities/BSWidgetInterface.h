@@ -7,7 +7,6 @@
 #include "UObject/Interface.h"
 #include "BSWidgetInterface.generated.h"
 
-struct FTooltipData;
 class UBSComboBoxEntry;
 class UBSComboBoxString;
 class UButton;
@@ -43,19 +42,23 @@ class USERINTERFACE_API IBSWidgetInterface
 public:
 	/** Clamps NewTextValue, updates associated Slider value while rounding to the GridSnapSize. */
 	static float OnEditableTextBoxChanged(const FText& NewTextValue, UEditableTextBox* TextBoxToChange,
-		USlider* SliderToChange, const float GridSnapSize, const float Min, const float Max);
+		USlider* SliderToChange, float GridSnapSize, float Min, float Max);
 
 	/** Updates associated TextBoxToChange with result of rounding to the GridSnapSize. */
-	static float OnSliderChanged(const float NewValue, UEditableTextBox* TextBoxToChange, const float GridSnapSize);
+	static float OnSliderChanged(float NewValue, UEditableTextBox* TextBoxToChange, float GridSnapSize);
 
-	static void SetSliderAndEditableTextBoxValues(const float NewValue, UEditableTextBox* TextBoxToChange,
-		USlider* SliderToChange, const float GridSnapSize, const float Min, const float Max);
+	static void SetSliderAndEditableTextBoxValues(float NewValue, UEditableTextBox* TextBoxToChange,
+		USlider* SliderToChange, float GridSnapSize, float Min, float Max);
 
 	/** Returns TooltipWidget. */
 	static UTooltipWidget* GetTooltipWidget();
 
-	/** Adds tooltip text and binds the OnTooltipIconHovered function to the static tooltip widget. */
-	static void SetupTooltip(UTooltipIcon* TooltipIcon, const FText& TooltipText, const bool bInAllowTextWrap = false);
+	/** Simple tooltip setup that bypasses any text formatting in FTooltipData. 
+	 *  @param TooltipIcon icon to bind the OnTooltipIconHovered delegate to the static tooltip widget.
+	 *  @param TooltipText the text to move and store in the tooltip icon, and eventually show on the tooltip widget.
+	 *  @param bInAllowTextWrap whether to allow text wrapping in the tooltip widget.
+	 */
+	static void SetupTooltip(UTooltipIcon* TooltipIcon, FText&& TooltipText, bool bInAllowTextWrap = false);
 
 	/** Override this function to use OnGenerateWidgetEvent and OnSelectionChanged_GenerateMultiSelectionItem. */
 	virtual UBSComboBoxEntry* ConstructComboBoxEntryWidget() { return nullptr; }

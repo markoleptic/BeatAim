@@ -244,7 +244,7 @@ public:
 	 *  called by classes that bind to OnGenerateWidgetEvent to customize the entry text and tooltip text, and if needed
 	 *  further modify the Entry. */
 	static void InitializeComboBoxEntry(const UBSComboBoxEntry* Entry, const FText& EntryText,
-		const bool bShowTooltipIcon, const FText& TooltipText = FText());
+		const bool bShowTooltipIcon, FText&& TooltipText = FText());
 
 #if WITH_EDITOR
 	virtual const FText GetPaletteCategory() override;

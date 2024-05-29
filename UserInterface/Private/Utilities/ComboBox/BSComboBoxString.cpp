@@ -67,14 +67,14 @@ void UBSComboBoxString::PostLoad()
 }
 
 void UBSComboBoxString::InitializeComboBoxEntry(const UBSComboBoxEntry* Entry, const FText& EntryText,
-	const bool bShowTooltipIcon, const FText& TooltipText)
+	const bool bShowTooltipIcon, FText&& TooltipText)
 {
 	Entry->SetEntryText(EntryText);
 	Entry->SetAlwaysHideTooltipIcon(!bShowTooltipIcon);
 
 	if (UTooltipIcon* TooltipIcon = Entry->GetTooltipIcon())
 	{
-		SetupTooltip(TooltipIcon, TooltipText);
+		SetupTooltip(TooltipIcon, MoveTemp(TooltipText));
 	}
 }
 

@@ -3,30 +3,70 @@
 
 #include "Utilities/TooltipData.h"
 #include "Utilities/TooltipIcon.h"
-#include "Utilities/BSWidgetInterface.h"
 
-int32 FTooltipData::GId = 0;
+int32 UTooltipData::GId = 0;
 
-FTooltipData::FTooltipData(): TooltipIconType(ETooltipIconType::Default), bAllowTextWrap(false), Id(GId++)
+UTooltipData::UTooltipData(): Id(GId++), bAllowTextWrap(false)
 {
 }
 
-FTooltipData::FTooltipData(UTooltipIcon* InTooltipIcon): TooltipIconType(ETooltipIconType::Default),
-                                                         TooltipIcon(InTooltipIcon), bAllowTextWrap(false), Id(GId++)
-{
-}
-
-FText FTooltipData::GetTooltipText() const
+FText UTooltipData::GetTooltipText() const
 {
 	return TooltipText;
 }
 
-bool FTooltipData::GetAllowTextWrap() const
+bool UTooltipData::GetAllowTextWrap() const
 {
 	return bAllowTextWrap;
 }
 
-/*void FTooltipData::UpdateDynamicTooltipText(const FDynamicTooltipState& InUpdateData)
+TWeakObjectPtr<UTooltipIcon> UTooltipData::GetTooltipIcon() const
+{
+	return TooltipIcon;
+}
+
+void UTooltipData::SetTooltipIcon(const TWeakObjectPtr<UTooltipIcon>& InTooltipIcon)
+{
+	TooltipIcon = InTooltipIcon;
+}
+
+void UTooltipData::SetTooltipText(FText&& InTooltipText)
+{
+	TooltipText = std::move(InTooltipText);
+}
+
+void UTooltipData::SetAllowTextWrap(const bool InbAllowTextWrap)
+{
+	bAllowTextWrap = InbAllowTextWrap;
+}
+
+void UTooltipData::CreateFormattedText(const FText& InText)
+{
+	FormattedText = FTextFormat(InText);
+}
+
+template <typename... ArgTypes>
+void UTooltipData::SetFormattedTooltipText(ArgTypes&&... Args)
+{
+	TooltipText = FText::Format(FormattedText, MoveTemp(Args));
+}
+
+TArray<FString> UTooltipData::GetFormattedTextArgs() const
+{
+	TArray<FString> Junk;
+	FormattedText.GetFormatArgumentNames(Junk);
+	return Junk;
+}
+
+int32 UTooltipData::GetNumberOfFormattedTextArgs() const
+{
+	TArray<FString> Junk;
+	FormattedText.GetFormatArgumentNames(Junk);
+	return Junk.Num();
+}
+
+
+/*void UTooltipData::UpdateDynamicTooltipText(const FDynamicTooltipState& InUpdateData)
 {
 	if (!bIsDynamic)
 	{
@@ -71,10 +111,11 @@ bool FTooltipData::GetAllowTextWrap() const
 }*/
 
 
-void Func(const FText& StringTableText, const FTextFormat& StringTableTextFormat)
+void Func(const FText& StringTableText, FTextFormat& StringTableTextFormat)
 {
 	FNumberFormattingOptions Options = FNumberFormattingOptions();
-
+	FText Text;
+	FTextFormat txtfmt(Text);
 	TArray<FString> ArgNames;
 	StringTableTextFormat.GetFormatArgumentNames(ArgNames);
 	FFormatNamedArguments Args;

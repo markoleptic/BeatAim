@@ -51,7 +51,7 @@ UWidget* IBSWidgetInterface::OnGenerateWidgetEvent(const UBSComboBoxString* Comb
 
 	if (UBSComboBoxEntry* Entry = ConstructComboBoxEntryWidget())
 	{
-		ComboBoxString->InitializeComboBoxEntry(Entry, EntryText, bShowTooltipIcon, TooltipText);
+		ComboBoxString->InitializeComboBoxEntry(Entry, EntryText, bShowTooltipIcon, MoveTemp(TooltipText));
 		return Entry;
 	}
 	return nullptr;
@@ -90,7 +90,7 @@ UWidget* IBSWidgetInterface::OnSelectionChanged_GenerateMultiSelectionItem(const
 
 	if (UBSComboBoxEntry* Entry = ConstructComboBoxEntryWidget())
 	{
-		ComboBoxString->InitializeComboBoxEntry(Entry, EntryText, bShowTooltipIcon, TooltipText);
+		ComboBoxString->InitializeComboBoxEntry(Entry, EntryText, bShowTooltipIcon, MoveTemp(TooltipText));
 		return Entry;
 	}
 
@@ -108,7 +108,7 @@ UTooltipWidget* IBSWidgetInterface::GetTooltipWidget()
 	return UTooltipWidget::Get();
 }
 
-void IBSWidgetInterface::SetupTooltip(UTooltipIcon* TooltipIcon, const FText& TooltipText, const bool bInAllowTextWrap)
+void IBSWidgetInterface::SetupTooltip(UTooltipIcon* TooltipIcon, FText&& TooltipText, const bool bInAllowTextWrap)
 {
 	if (!TooltipIcon)
 	{
@@ -120,9 +120,9 @@ void IBSWidgetInterface::SetupTooltip(UTooltipIcon* TooltipIcon, const FText& To
 	}
 
 	UTooltipWidget* TooltipWidget = GetTooltipWidget();
-	TooltipIcon->SetTooltipText(TooltipText, bInAllowTextWrap);
+	TooltipIcon->SetTooltipText(MoveTemp(TooltipText), bInAllowTextWrap);
 	if (!TooltipIcon->OnTooltipIconHovered.IsBound())
 	{
-		TooltipIcon->OnTooltipIconHovered.AddDynamic(TooltipWidget, &UTooltipWidget::HandleTooltipIconHovered);
+		TooltipIcon->OnTooltipIconHovered.AddUObject(TooltipWidget, &UTooltipWidget::HandleTooltipIconHovered);
 	}
 }

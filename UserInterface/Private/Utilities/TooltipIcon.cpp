@@ -6,12 +6,14 @@
 #include "Components/Image.h"
 #include "Styles/MenuOptionStyle.h"
 #include "Utilities/BSWidgetInterface.h"
+#include "Utilities/TooltipData.h"
 
 UTooltipIcon::UTooltipIcon(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer), Button(nullptr),
                                                                           Image(nullptr),
-                                                                          TooltipData(FTooltipData(this)),
                                                                           TooltipIconType(ETooltipIconType::Default)
 {
+	TooltipData = MakeShareable(NewObject<UTooltipData>(this));
+	TooltipData->SetTooltipIcon(this);
 }
 
 void UTooltipIcon::NativePreConstruct()
@@ -25,6 +27,15 @@ void UTooltipIcon::NativeConstruct()
 	Super::NativeConstruct();
 	SetTooltipIconType(TooltipIconType);
 	Button->OnHovered.AddDynamic(this, &UTooltipIcon::HandleTooltipHovered);
+}
+
+void UTooltipIcon::BeginDestroy()
+{
+	Super::BeginDestroy();
+	if (TooltipData)
+	{
+		TooltipData.Reset();
+	}
 }
 
 UTooltipIcon* UTooltipIcon::CreateTooltipIcon(UUserWidget* InOwningObject, const ETooltipIconType Type)
@@ -54,8 +65,13 @@ void UTooltipIcon::HandleTooltipHovered()
 	OnTooltipIconHovered.Broadcast(TooltipData);
 }
 
-void UTooltipIcon::SetTooltipText(const FText& InText, const bool bAllowTextWrap)
+void UTooltipIcon::SetTooltipText(FText&& InText, const bool bAllowTextWrap) const
 {
-	TooltipData.TooltipText = InText;
-	TooltipData.bAllowTextWrap = bAllowTextWrap;
+	TooltipData->SetTooltipText(MoveTemp(InText));
+	TooltipData->SetAllowTextWrap(bAllowTextWrap);
+}
+
+TSharedPtr<UTooltipData> UTooltipIcon::GetTooltipData() const
+{
+	return TooltipData;
 }

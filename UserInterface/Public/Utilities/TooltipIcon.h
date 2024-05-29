@@ -4,15 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Utilities/TooltipData.h"
 #include "TooltipIcon.generated.h"
 
+class UTooltipData;
 class UImage;
 class UButton;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTooltipIconHovered, const FTooltipData&, TooltipData);
+/** The type of tooltip icon. */
+UENUM()
+enum class ETooltipIconType : uint8
+{
+	Default UMETA(DisplayName="Default"),
+	Caution UMETA(DisplayName="Caution"),
+	Warning UMETA(DisplayName="Warning"),
+};
 
-/** A button and image representing an icon that executes a delegate when hovered over. */
+ENUM_RANGE_BY_FIRST_AND_LAST(ETooltipIconType, ETooltipIconType::Default, ETooltipIconType::Warning);
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTooltipIconHovered, const TSharedPtr<UTooltipData>&);
+
+/** A button and image representing an icon that executes a delegate when hovered over. Stores the data it passes to
+ *  
+ */
 UCLASS()
 class USERINTERFACE_API UTooltipIcon : public UUserWidget
 {
@@ -23,6 +36,8 @@ protected:
 
 	virtual void NativeConstruct() override;
 
+	virtual void BeginDestroy() override;
+
 	/** Broadcasts OnTooltipHovered delegate. */
 	UFUNCTION()
 	void HandleTooltipHovered();
@@ -30,17 +45,31 @@ protected:
 public:
 	UTooltipIcon(const FObjectInitializer& ObjectInitializer);
 
-	/** Static creator function based. */
+	/** Creator function.
+	 *  @param InOwningObject the object to parent the tooltip icon to.
+	 *  @param Type the type of tooltip icon to create.
+	 *  @return new tooltip icon instance.
+	 */
 	static UTooltipIcon* CreateTooltipIcon(UUserWidget* InOwningObject, ETooltipIconType Type);
 
-	/** Modifies the appearance of the icon based on the type. */
+	/**
+	 * Modifies the appearance of the icon.
+	 * @param Type the type of tooltip icon, which dictates its appearance.
+	 */
 	void SetTooltipIconType(ETooltipIconType Type);
 
-	/** Sets the tooltip text that is accessed when the tooltip icon is hovered over. */
-	void SetTooltipText(const FText& InText, const bool bAllowTextWrap = false);
+	/**
+	 * Sets the tooltip text in TooltipData that is broadcast when the tooltip icon is hovered over.
+	 * @param InText text to move to the tooltip data tooltip text field.
+	 * @param bAllowTextWrap whether to allow text wrapping in the tooltip.
+	 */
+	void SetTooltipText(FText&& InText, const bool bAllowTextWrap = false) const;
 
 	/** Called when Button is hovered over, provides the tooltip data that should be displayed. */
 	FOnTooltipIconHovered OnTooltipIconHovered;
+
+	/** @return shared pointer of tooltip data. */
+	TSharedPtr<UTooltipData> GetTooltipData() const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
@@ -49,13 +78,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UImage* Image;
 
-	/** Data broadcast to the tooltip widget. */
-	UPROPERTY()
-	FTooltipData TooltipData;
+	/** Data that is broadcast to the tooltip widget. */
+	TSharedPtr<UTooltipData> TooltipData;
 
+	/** Maps each tooltip icon type to a brush. */
 	UPROPERTY(EditDefaultsOnly, Category="TooltipIcon")
 	TMap<ETooltipIconType, FSlateBrush> TooltipIconBrushMap;
 
+	/** The type of tooltip icon. This determines the appearance of the tooltip icon. */
 	UPROPERTY(EditAnywhere, Category = "TooltipIcon")
 	ETooltipIconType TooltipIconType;
 };
