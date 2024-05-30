@@ -33,7 +33,7 @@ int32 FValidationCheckResult::GId = 0;
 void FValidationProperty::AddCheck(const FValidationCheckPtr& Check, const FUniqueValidationCheckData& Data)
 {
 	Checks.Add(Check);
-	CheckData.Add(Check, Data);
+	CheckData.Add(Check, Data).WarningType = Check->WarningType;
 }
 
 void FValidationResult::AddValidationCheckResult(FValidationCheckResult&& Check)
@@ -48,12 +48,12 @@ void FValidationResult::AddValidationCheckResult(FValidationCheckResult&& Check)
 	}
 }
 
-const TSet<FValidationCheckResult>& FValidationResult::GetSucceeded() const
+TSet<FValidationCheckResult> FValidationResult::GetSucceeded() const
 {
 	return SucceededValidationCheckResults;
 }
 
-const TSet<FValidationCheckResult>& FValidationResult::GetFailed() const
+TSet<FValidationCheckResult> FValidationResult::GetFailed() const
 {
 	return FailedValidationCheckResults;
 }

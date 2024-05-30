@@ -7,6 +7,7 @@
 #include "Styles/MenuOptionStyle.h"
 #include "Utilities/BSWidgetInterface.h"
 #include "Utilities/TooltipData.h"
+#include "Utilities/TooltipWidget.h"
 
 UTooltipIcon::UTooltipIcon(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer), Button(nullptr),
                                                                           Image(nullptr),
@@ -44,6 +45,7 @@ UTooltipIcon* UTooltipIcon::CreateTooltipIcon(UUserWidget* InOwningObject, const
 	if (UTooltipIcon* Icon = CreateWidget<UTooltipIcon>(InOwningObject, MenuOptionStyle->TooltipIconClass))
 	{
 		Icon->SetTooltipIconType(Type);
+		Icon->OnTooltipIconHovered.AddUObject(UTooltipWidget::Get(), &UTooltipWidget::HandleTooltipIconHovered);
 		return Icon;
 	}
 	return nullptr;

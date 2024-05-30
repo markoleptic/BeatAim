@@ -19,7 +19,6 @@
 #include "Utilities/TooltipWidget.h"
 #include "Utilities/ComboBox/BSComboBoxString.h"
 
-TMap<const FProperty*, TWeakObjectPtr<UMenuOptionWidget>> PropertyMenuOptionWidgetMap;
 
 void UCustomGameModeCategoryWidget::NativeConstruct()
 {
@@ -65,38 +64,18 @@ void UCustomGameModeCategoryWidget::UpdateOptionsFromConfig()
 {
 }
 
-void UCustomGameModeCategoryWidget::HandlePropertyValidation(const FValidationResult& ValidationResult)
+void UCustomGameModeCategoryWidget::HandlePropertyValidation(TSet<FValidationCheckResult>& CheckResults)
 {
-}
-
-void UCustomGameModeCategoryWidget::UpdateMenuOptionTooltips(const FProperty* Property,
-	const FUniqueValidationCheckData Data, const TArray<int32>& CalculatedValues)
-{
-	// TODO: Update Tooltips
-	/*bool bAllClean = true;
-	for (const TWeakObjectPtr<UMenuOptionWidget>& Widget : MenuOptionWidgets)
+	for (auto& Elem : CheckResults)
 	{
-		Widget->UpdateAllWarningTooltips();
-		TArray<FTooltipData>& TooltipData = Widget->GetTooltipWarningData();
-		for (FTooltipData& Data : TooltipData)
+		for (auto& [Property, Data] : Elem.PropertyData)
 		{
-			if (Data.IsDirty())
+			if (const TWeakObjectPtr<UMenuOptionWidget>* Found = PropertyMenuOptionWidgetMap.Find(Property))
 			{
-				bAllClean = false;
-				if (Data.ShouldShowTooltipImage())
-				{
-					Widget->ConstructTooltipWarningImageIfNeeded(Data);
-					SetupTooltip(Data);
-				}
-				else
-				{
-					Data.RemoveTooltipImage();
-				}
-				Data.SetIsClean(true);
+				(*Found)->UpdateDynamicTooltipIcon(Elem.bSuccess, Data, Elem.CalculatedValues);
 			}
 		}
-	}*/
-	//UpdateCustomGameModeCategoryInfo();
+	}
 }
 
 void UCustomGameModeCategoryWidget::AddGameModeCategoryTagWidgets(UMenuOptionWidget* MenuOptionWidget)

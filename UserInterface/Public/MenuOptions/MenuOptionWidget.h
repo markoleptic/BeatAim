@@ -8,6 +8,7 @@
 #include "Utilities/TooltipIcon.h"
 #include "MenuOptionWidget.generated.h"
 
+struct FUniqueValidationCheckData;
 class UMenuOptionStyle;
 class UGameModeCategoryTagWidget;
 class UCheckBox;
@@ -99,11 +100,14 @@ public:
 	/** Adds the widget to Box_TagWidgets. */
 	void AddGameModeCategoryTagWidgets(TArray<UGameModeCategoryTagWidget*>& InGameModeCategoryTagWidgets);
 
+	void UpdateDynamicTooltipIcon(const bool bValidated, const FUniqueValidationCheckData& Data,
+		const TArray<int32>& CalculatedValues);
+
 protected:
 	UFUNCTION()
 	void OnCheckBox_LockStateChanged(const bool bChecked);
 
-	void AddTooltipIcon(ETooltipIconType Type);
+	void AddTooltipIcon(const FUniqueValidationCheckData& Data);
 
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	UHorizontalBox* Box_TagWidgets;
@@ -165,5 +169,5 @@ protected:
 	/** The custom enabled state of the menu option. */
 	EMenuOptionEnabledState MenuOptionEnabledState;
 
-	TArray<TObjectPtr<UTooltipIcon>> DynamicTooltipIcons;
+	TMap<FUniqueValidationCheckData, TObjectPtr<UTooltipIcon>> DynamicTooltipIcons;
 };

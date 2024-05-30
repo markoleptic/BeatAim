@@ -7,6 +7,7 @@
 #include "Utilities/BSSettingCategoryWidget.h"
 #include "CustomGameModeCategoryWidget.generated.h"
 
+struct FValidationCheckResult;
 struct FUniqueValidationCheckData;
 enum class EGameModeCategory : uint8;
 enum class EMenuOptionEnabledState : uint8;
@@ -40,10 +41,7 @@ public:
 	/** Sets all custom game mode option values using BSConfig. */
 	virtual void UpdateOptionsFromConfig();
 
-	virtual void HandlePropertyValidation(const FValidationResult& ValidationResult);
-
-	virtual void UpdateMenuOptionTooltips(const FProperty* Property, const FUniqueValidationCheckData Data,
-		const TArray<int32>& CalculatedValues);
+	virtual void HandlePropertyValidation(TSet<FValidationCheckResult>& CheckResults);
 
 	/** @return the game mode category the widget represents. */
 	EGameModeCategory GetGameModeCategory() const { return GameModeCategory; }

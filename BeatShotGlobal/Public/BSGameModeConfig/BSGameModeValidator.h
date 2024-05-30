@@ -82,7 +82,8 @@ struct BEATSHOTGLOBAL_API FUniqueValidationCheckData
 	FUniqueValidationCheckData() = default;
 
 	FUniqueValidationCheckData(const FString& InStringTableKey, const FString& InDynamicStringTableKey) :
-		StringTableKey(InStringTableKey), DynamicStringTableKey(InDynamicStringTableKey)
+		StringTableKey(InStringTableKey), DynamicStringTableKey(InDynamicStringTableKey),
+		WarningType(EGameModeWarningType::None)
 	{
 	}
 
@@ -91,6 +92,12 @@ struct BEATSHOTGLOBAL_API FUniqueValidationCheckData
 
 	/** The dynamic string table key to find tooltip text from if validation fails. */
 	FString DynamicStringTableKey;
+
+	/** The tooltip text populated from either one of the string table keys. */
+	FText TooltipText;
+
+	/** The type of warning associated with the validation check. */
+	EGameModeWarningType WarningType;
 
 	FORCEINLINE bool operator ==(const FUniqueValidationCheckData& Other) const
 	{
@@ -243,8 +250,8 @@ struct BEATSHOTGLOBAL_API FValidationResult
 	void AddValidationCheckResult(FValidationCheckResult&& Check);
 
 
-	const TSet<FValidationCheckResult>& GetSucceeded() const;
-	const TSet<FValidationCheckResult>& GetFailed() const;
+	TSet<FValidationCheckResult> GetSucceeded() const;
+	TSet<FValidationCheckResult> GetFailed() const;
 
 private:
 	TSet<FValidationCheckResult> SucceededValidationCheckResults;

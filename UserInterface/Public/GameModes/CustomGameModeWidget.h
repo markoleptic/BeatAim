@@ -95,6 +95,8 @@ public:
 
 	UCustomGameModeStartWidget* GetStartWidget() const;
 
+	TArray<TObjectPtr<UCustomGameModeCategoryWidget>> GetCustomGameModeCategoryWidgets() const;
+
 protected:
 	/** Adds child widgets to ChildWidgets array, binds to Widget_Start's RequestGameModeTemplateUpdate. */
 	virtual void NativeConstruct() override;

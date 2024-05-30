@@ -30,9 +30,9 @@ void UTooltipData::SetTooltipIcon(const TWeakObjectPtr<UTooltipIcon>& InTooltipI
 	TooltipIcon = InTooltipIcon;
 }
 
-void UTooltipData::SetTooltipText(FText&& InTooltipText)
+void UTooltipData::SetTooltipText(const FText& InTooltipText)
 {
-	TooltipText = std::move(InTooltipText);
+	TooltipText = InTooltipText;
 }
 
 void UTooltipData::SetAllowTextWrap(const bool InbAllowTextWrap)
@@ -46,9 +46,9 @@ void UTooltipData::CreateFormattedText(const FText& InText)
 }
 
 template <typename... ArgTypes>
-void UTooltipData::SetFormattedTooltipText(ArgTypes&&... Args)
+void UTooltipData::SetFormattedTooltipText(ArgTypes... Args)
 {
-	TooltipText = FText::Format(FormattedText, MoveTemp(Args));
+	TooltipText = FText::Format(FormattedText, Args);
 }
 
 TArray<FString> UTooltipData::GetFormattedTextArgs() const
@@ -63,6 +63,11 @@ int32 UTooltipData::GetNumberOfFormattedTextArgs() const
 	TArray<FString> Junk;
 	FormattedText.GetFormatArgumentNames(Junk);
 	return Junk.Num();
+}
+
+bool UTooltipData::HasFormattedText() const
+{
+	return FormattedText.IsValid();
 }
 
 

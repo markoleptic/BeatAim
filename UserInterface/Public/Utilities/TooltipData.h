@@ -34,7 +34,7 @@ public:
 	/** Sets the tooltip text variable directly, bypassing formatting.
 	 *  @param InTooltipText text to move and set.
 	 */
-	void SetTooltipText(FText&& InTooltipText);
+	void SetTooltipText(const FText& InTooltipText);
 
 	/** Sets whether text wrapping is allowed on the tooltip widget. 
 	 *  @param InbAllowTextWrap whether to allow.
@@ -52,13 +52,16 @@ public:
 	 * @param Args arguments to pass to the formatted text slots.
 	 */
 	template <typename... ArgTypes>
-	void SetFormattedTooltipText(ArgTypes&&... Args);
+	void SetFormattedTooltipText(ArgTypes... Args);
 
 	/** @return an array of argument names for formatted text. */
 	TArray<FString> GetFormattedTextArgs() const;
 
 	/** @return number of arguments for formatted text. */
 	int32 GetNumberOfFormattedTextArgs() const;
+
+	/** @return true if FormattedText has been compiled. */
+	bool HasFormattedText() const;
 
 private:
 	/** Unique ID for this tooltip */

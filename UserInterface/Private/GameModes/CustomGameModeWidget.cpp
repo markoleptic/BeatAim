@@ -17,6 +17,13 @@ UCustomGameModeStartWidget* UCustomGameModeWidget::GetStartWidget() const
 	return nullptr;
 }
 
+TArray<TObjectPtr<UCustomGameModeCategoryWidget>> UCustomGameModeWidget::GetCustomGameModeCategoryWidgets() const
+{
+	TArray<TObjectPtr<UCustomGameModeCategoryWidget>> Out;
+	GameModeCategoryWidgetMap.GenerateValueArray(Out);
+	return Out;
+}
+
 void UCustomGameModeWidget::NativeConstruct()
 {
 	Super::NativeConstruct();

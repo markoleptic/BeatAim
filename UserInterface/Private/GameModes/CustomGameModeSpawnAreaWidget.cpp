@@ -33,6 +33,46 @@ void UCustomGameModeSpawnAreaWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	PropertyMenuOptionWidgetMap.Add(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoxBounds.X)), MenuOption_ForwardSpread);
+	PropertyMenuOptionWidgetMap.Add(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoxBounds.Y)), MenuOption_HorizontalSpread);
+	PropertyMenuOptionWidgetMap.Add(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoxBounds.Z)), MenuOption_VerticalSpread);
+	PropertyMenuOptionWidgetMap.Add(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDistributionPolicy)),
+		ComboBoxOption_TargetDistributionPolicy);
+	PropertyMenuOptionWidgetMap.Add(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_GridConfig, NumHorizontalGridTargets)),
+		SliderTextBoxOption_NumHorizontalGridTargets);
+	PropertyMenuOptionWidgetMap.Add(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_GridConfig, NumVerticalGridTargets)),
+		SliderTextBoxOption_NumVerticalGridTargets);
+	PropertyMenuOptionWidgetMap.Add(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_GridConfig, GridSpacing.X)), SliderTextBoxOption_HorizontalSpacing);
+	PropertyMenuOptionWidgetMap.Add(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_GridConfig, GridSpacing.Y)), SliderTextBoxOption_VerticalSpacing);
+	PropertyMenuOptionWidgetMap.Add(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, FloorDistance)), SliderTextBoxOption_VerticalSpacing);
+	PropertyMenuOptionWidgetMap.Add(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicSpawnAreaScaling),
+			GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, StartThreshold)), SliderTextBoxOption_StartThreshold);
+	PropertyMenuOptionWidgetMap.Add(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicSpawnAreaScaling),
+			GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, EndThreshold)), SliderTextBoxOption_EndThreshold);
+	PropertyMenuOptionWidgetMap.Add(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicSpawnAreaScaling),
+			GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, DecrementAmount)), SliderTextBoxOption_DecrementAmount);
+
 	SliderTextBoxOption_NumHorizontalGridTargets->SetValues(MinValue_NumHorizontalGridTargets,
 		MaxValue_NumHorizontalGridTargets, SnapSize_NumHorizontalGridTargets);
 	SliderTextBoxOption_NumVerticalGridTargets->SetValues(MinValue_NumVerticalGridTargets,

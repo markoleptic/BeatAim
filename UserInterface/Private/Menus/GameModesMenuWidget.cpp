@@ -1002,17 +1002,32 @@ void UGameModeMenuWidget::HandlePropertyChanged(const TSet<const FProperty*>& Pr
 	}
 
 	const FValidationResult Result = GameModeValidator->Validate(BSConfig, Properties);
-	for (const FValidationCheckResult& ValidationCheckResult : Result.GetSucceeded())
+	TSet<FValidationCheckResult> Succeeded = Result.GetSucceeded();
+	TSet<FValidationCheckResult> Failed = Result.GetFailed();
+
+	auto UpdateTooltipText = [&](TSet<FValidationCheckResult>& CheckResults)
 	{
-		for (const auto& [Property, UniqueValidationCheckData] : ValidationCheckResult.PropertyData)
+		for (auto& Elem : CheckResults)
 		{
+			for (auto& [Property, Data] : Elem.PropertyData)
+			{
+				Data.TooltipText = Data.DynamicStringTableKey.IsEmpty()
+					? IBSWidgetInterface::GetTooltipTextFromKey(Data.StringTableKey)
+					: IBSWidgetInterface::GetTooltipTextFromKey(Data.DynamicStringTableKey);
+			}
 		}
+	};
+
+	UpdateTooltipText(Succeeded);
+	UpdateTooltipText(Failed);
+
+	for (auto Widget : CurrentCustomGameModesWidget->GetCustomGameModeCategoryWidgets())
+	{
+		Widget->HandlePropertyValidation(Succeeded);
 	}
-	for (const FValidationCheckResult& ValidationCheckResult : Result.GetFailed())
+	for (auto Widget : CurrentCustomGameModesWidget->GetCustomGameModeCategoryWidgets())
 	{
-		for (const auto& [Property, UniqueValidationCheckData] : ValidationCheckResult.PropertyData)
-		{
-		}
+		Widget->HandlePropertyValidation(Failed);
 	}
 }
 

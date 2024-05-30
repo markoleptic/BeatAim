@@ -2,6 +2,7 @@
 
 
 #include "MenuOptions/MenuOptionWidget.h"
+#include "BSGameModeConfig/BSGameModeValidator.h"
 #include "Components/BorderSlot.h"
 #include "Components/CheckBox.h"
 #include "Components/EditableTextBox.h"
@@ -12,6 +13,7 @@
 #include "Styles/MenuOptionStyle.h"
 #include "Utilities/BSWidgetInterface.h"
 #include "Utilities/GameModeCategoryTagWidget.h"
+#include "Utilities/TooltipData.h"
 #include "Utilities/TooltipIcon.h"
 
 
@@ -200,16 +202,37 @@ void UMenuOptionWidget::OnCheckBox_LockStateChanged(const bool bChecked)
 	}
 }
 
-void UMenuOptionWidget::AddTooltipIcon(const ETooltipIconType Type)
+void UMenuOptionWidget::AddTooltipIcon(const FUniqueValidationCheckData& Data)
 {
+	ETooltipIconType Type = ETooltipIconType::Default;
+	switch (Data.WarningType)
+	{
+	case EGameModeWarningType::None:
+		break;
+	case EGameModeWarningType::Caution:
+		Type = ETooltipIconType::Caution;
+		break;
+	case EGameModeWarningType::Warning:
+		Type = ETooltipIconType::Warning;
+		break;
+	case EGameModeWarningType::Error:
+		break;
+	}
 	UTooltipIcon* TooltipIcon = UTooltipIcon::CreateTooltipIcon(this, Type);
 	UHorizontalBoxSlot* HorizontalBoxSlot = TooltipBox->AddChildToHorizontalBox(TooltipIcon);
 	HorizontalBoxSlot->SetHorizontalAlignment(HAlign_Right);
 	HorizontalBoxSlot->SetPadding(MenuOptionStyle->Padding_TooltipWarning);
 	HorizontalBoxSlot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
+	if (!Data.DynamicStringTableKey.IsEmpty())
+	{
+		TooltipIcon->GetTooltipData()->CreateFormattedText(Data.TooltipText);
+	}
+	else
+	{
+		TooltipIcon->GetTooltipData()->SetTooltipText(Data.TooltipText);
+	}
 
-	// TODO: Organize tooltip icons using some part of validation system.
-	DynamicTooltipIcons.Add(TooltipIcon);
+	DynamicTooltipIcons.Add(Data, TooltipIcon);
 }
 
 void UMenuOptionWidget::GetGameModeCategoryTags(FGameplayTagContainer& OutTags) const
@@ -230,5 +253,30 @@ void UMenuOptionWidget::AddGameModeCategoryTagWidgets(TArray<UGameModeCategoryTa
 		BoxSlot->SetPadding(MenuOptionStyle->Padding_TagWidget);
 		BoxSlot->SetHorizontalAlignment(MenuOptionStyle->HorizontalAlignment_TagWidget);
 		BoxSlot->SetVerticalAlignment(MenuOptionStyle->VerticalAlignment_TagWidget);
+	}
+}
+
+void UMenuOptionWidget::UpdateDynamicTooltipIcon(const bool bValidated, const FUniqueValidationCheckData& Data,
+	const TArray<int32>& CalculatedValues)
+{
+	TObjectPtr<UTooltipIcon>* TooltipIcon = DynamicTooltipIcons.Find(Data);
+	if (bValidated && TooltipIcon)
+	{
+		DynamicTooltipIcons.Remove(Data);
+		(*TooltipIcon)->RemoveFromParent();
+	}
+	else if (!bValidated)
+	{
+		if (TooltipIcon)
+		{
+			if ((*TooltipIcon)->GetTooltipData()->HasFormattedText())
+			{
+				(*TooltipIcon)->GetTooltipData()->SetFormattedTooltipText(CalculatedValues);
+			}
+		}
+		else
+		{
+			AddTooltipIcon(Data);
+		}
 	}
 }
