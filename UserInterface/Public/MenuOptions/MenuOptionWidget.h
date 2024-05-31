@@ -100,6 +100,12 @@ public:
 	/** Adds the widget to Box_TagWidgets. */
 	void AddGameModeCategoryTagWidgets(TArray<UGameModeCategoryTagWidget*>& InGameModeCategoryTagWidgets);
 
+	/** Updates a tooltip icon that is only shown if a validation check failed.
+	 *  @param bValidated whether or not the validation check succeeded
+	 *  @param Data data that is unique per property per validation check
+	 *  @param CalculatedValues any values calculated during the validation check to populate formatted text with,
+	 *  if applicable.
+	 */
 	void UpdateDynamicTooltipIcon(const bool bValidated, const FUniqueValidationCheckData& Data,
 		const TArray<int32>& CalculatedValues);
 
@@ -107,6 +113,10 @@ protected:
 	UFUNCTION()
 	void OnCheckBox_LockStateChanged(const bool bChecked);
 
+	/**
+	 *  Creates a new tooltip icon unqiue to the validation check data and stores it.
+	 *  @param Data data that is unique per property per validation check
+	 */
 	void AddTooltipIcon(const FUniqueValidationCheckData& Data);
 
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
@@ -169,5 +179,5 @@ protected:
 	/** The custom enabled state of the menu option. */
 	EMenuOptionEnabledState MenuOptionEnabledState;
 
-	TMap<FUniqueValidationCheckData, TObjectPtr<UTooltipIcon>> DynamicTooltipIcons;
+	TMap<FString, TObjectPtr<UTooltipIcon>> DynamicTooltipIcons;
 };

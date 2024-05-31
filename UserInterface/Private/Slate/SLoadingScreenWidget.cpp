@@ -4,6 +4,7 @@
 #include "Slate/SLoadingScreenWidget.h"
 #include "Widgets/Images/SSpinningImage.h"
 
+
 int32 SLoadingScreenWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry,
 	const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId,
 	const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const

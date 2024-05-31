@@ -5,7 +5,6 @@
 #include "Components/EditableTextBox.h"
 #include "Components/Slider.h"
 #include "Kismet/KismetStringLibrary.h"
-#include "Utilities/TooltipData.h"
 #include "Utilities/TooltipIcon.h"
 #include "Utilities/TooltipWidget.h"
 #include "Utilities/ComboBox/BSComboBoxEntry.h"
@@ -108,7 +107,7 @@ UTooltipWidget* IBSWidgetInterface::GetTooltipWidget()
 	return UTooltipWidget::Get();
 }
 
-void IBSWidgetInterface::SetupTooltip(UTooltipIcon* TooltipIcon, FText&& TooltipText, const bool bInAllowTextWrap)
+void IBSWidgetInterface::SetupTooltip(UTooltipIcon* TooltipIcon, const FText& TooltipText, const bool bInAllowTextWrap)
 {
 	if (!TooltipIcon)
 	{
@@ -120,7 +119,7 @@ void IBSWidgetInterface::SetupTooltip(UTooltipIcon* TooltipIcon, FText&& Tooltip
 	}
 
 	UTooltipWidget* TooltipWidget = GetTooltipWidget();
-	TooltipIcon->SetTooltipText(MoveTemp(TooltipText), bInAllowTextWrap);
+	TooltipIcon->SetTooltipText(TooltipText, bInAllowTextWrap);
 	if (!TooltipIcon->OnTooltipIconHovered.IsBound())
 	{
 		TooltipIcon->OnTooltipIconHovered.AddUObject(TooltipWidget, &UTooltipWidget::HandleTooltipIconHovered);

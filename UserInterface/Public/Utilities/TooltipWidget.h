@@ -31,7 +31,7 @@ public:
 	void SetText(const FText& InText, const bool bAllowTextWrap = false) const;
 
 	/** Sets the text of the tooltip, and sets this as the tooltip of the tooltip icon. */
-	void HandleTooltipIconHovered(const TSharedPtr<UTooltipData>& InTooltipData);
+	void HandleTooltipIconHovered(const TObjectPtr<UTooltipData>& InTooltipData);
 
 	/** Removes the static tooltip widget from the root set, and marks as garbage. */
 	static void Cleanup();

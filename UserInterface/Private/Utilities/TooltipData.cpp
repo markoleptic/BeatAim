@@ -8,6 +8,7 @@ int32 UTooltipData::GId = 0;
 
 UTooltipData::UTooltipData(): Id(GId++), bAllowTextWrap(false)
 {
+	NumberFormattingOptions.SetAlwaysSign(true).SetRoundingMode(HalfFromZero).SetMaximumFractionalDigits(2);
 }
 
 FText UTooltipData::GetTooltipText() const
@@ -45,9 +46,14 @@ void UTooltipData::CreateFormattedText(const FText& InText)
 	FormattedText = FTextFormat(InText);
 }
 
-template <typename... ArgTypes>
-void UTooltipData::SetFormattedTooltipText(ArgTypes... Args)
+void UTooltipData::SetFormattedTooltipText(const TArray<int32>& CalculatedValues)
 {
+	TArray<FFormatArgumentValue> Args;
+	Args.Reserve(CalculatedValues.Num());
+	for (int i = 0; i < CalculatedValues.Num(); i++)
+	{
+		Args.Emplace(FText::AsNumber(CalculatedValues[i], &NumberFormattingOptions));
+	}
 	TooltipText = FText::Format(FormattedText, Args);
 }
 
@@ -68,62 +74,4 @@ int32 UTooltipData::GetNumberOfFormattedTextArgs() const
 bool UTooltipData::HasFormattedText() const
 {
 	return FormattedText.IsValid();
-}
-
-
-/*void UTooltipData::UpdateDynamicTooltipText(const FDynamicTooltipState& InUpdateData)
-{
-	if (!bIsDynamic)
-	{
-		return;
-	}
-	if (InUpdateData.Actual > InUpdateData.MaxAllowed && (!FMath::IsNearlyEqual(LastActual, InUpdateData.Actual) || !
-		FMath::IsNearlyEqual(LastMaxAllowed, InUpdateData.MaxAllowed)))
-	{
-		if (InUpdateData.MaxAllowed < DynamicTooltipData.MinAllowed)
-		{
-			TooltipText = DynamicTooltipData.FallbackText;
-		}
-		else
-		{
-			float NewValue;
-			if (DynamicTooltipData.Precision == 0)
-			{
-				NewValue = roundf(InUpdateData.MaxAllowed);
-			}
-			else
-			{
-				const float Multiplier = FMath::Pow(10.f, DynamicTooltipData.Precision);
-				NewValue = roundf(InUpdateData.MaxAllowed * Multiplier) / Multiplier;
-			}
-			TooltipText = FText::FromString(
-				DynamicTooltipData.TryChangeString + FString::SanitizeFloat(NewValue, 0) + ".");
-		}
-		bIsDirty = true;
-	}
-
-	LastActual = InUpdateData.Actual;
-	LastMaxAllowed = InUpdateData.MaxAllowed;
-
-	if (InUpdateData.bOverride)
-	{
-		SetShouldShowTooltipImage(false);
-	}
-	else
-	{
-		SetShouldShowTooltipImage(InUpdateData.Actual > InUpdateData.MaxAllowed);
-	}
-}*/
-
-
-void Func(const FText& StringTableText, FTextFormat& StringTableTextFormat)
-{
-	FNumberFormattingOptions Options = FNumberFormattingOptions();
-	FText Text;
-	FTextFormat txtfmt(Text);
-	TArray<FString> ArgNames;
-	StringTableTextFormat.GetFormatArgumentNames(ArgNames);
-	FFormatNamedArguments Args;
-
-	FText FormattedText = FText::Format(StringTableTextFormat, Args);
 }

@@ -21,7 +21,7 @@ enum class ETooltipIconType : uint8
 
 ENUM_RANGE_BY_FIRST_AND_LAST(ETooltipIconType, ETooltipIconType::Default, ETooltipIconType::Warning);
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnTooltipIconHovered, const TSharedPtr<UTooltipData>&);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTooltipIconHovered, const TObjectPtr<UTooltipData>&);
 
 /** A button and image representing an icon that executes a delegate when hovered over. Stores the data it passes to
  *  
@@ -36,7 +36,7 @@ protected:
 
 	virtual void NativeConstruct() override;
 
-	virtual void BeginDestroy() override;
+	virtual void PostInitProperties() override;
 
 	/** Broadcasts OnTooltipHovered delegate. */
 	UFUNCTION()
@@ -45,7 +45,7 @@ protected:
 public:
 	UTooltipIcon(const FObjectInitializer& ObjectInitializer);
 
-	/** Creator function.
+	/** Creator function. Binds its OnTooltipIconHovered delegate to the global static tooltip widget.
 	 *  @param InOwningObject the object to parent the tooltip icon to.
 	 *  @param Type the type of tooltip icon to create.
 	 *  @return new tooltip icon instance.
@@ -60,16 +60,16 @@ public:
 
 	/**
 	 * Sets the tooltip text in TooltipData that is broadcast when the tooltip icon is hovered over.
-	 * @param InText text to move to the tooltip data tooltip text field.
+	 * @param InText text to store in tooltip data tooltip text field.
 	 * @param bAllowTextWrap whether to allow text wrapping in the tooltip.
 	 */
-	void SetTooltipText(FText&& InText, const bool bAllowTextWrap = false) const;
+	void SetTooltipText(const FText& InText, const bool bAllowTextWrap = false);
 
 	/** Called when Button is hovered over, provides the tooltip data that should be displayed. */
 	FOnTooltipIconHovered OnTooltipIconHovered;
 
 	/** @return shared pointer of tooltip data. */
-	TSharedPtr<UTooltipData> GetTooltipData() const;
+	TObjectPtr<UTooltipData> GetTooltipData() const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
@@ -79,7 +79,7 @@ protected:
 	UImage* Image;
 
 	/** Data that is broadcast to the tooltip widget. */
-	TSharedPtr<UTooltipData> TooltipData;
+	TObjectPtr<UTooltipData> TooltipData;
 
 	/** Maps each tooltip icon type to a brush. */
 	UPROPERTY(EditDefaultsOnly, Category="TooltipIcon")

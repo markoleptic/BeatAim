@@ -8,7 +8,7 @@
 class UButton;
 class UTooltipIcon;
 
-/** Contains data for the tooltip of a widget. */
+/** Contains data for the tooltip of a widget, such as the text. */
 UCLASS()
 class UTooltipData : public UObject
 {
@@ -27,7 +27,7 @@ public:
 	TWeakObjectPtr<UTooltipIcon> GetTooltipIcon() const;
 
 	/** Sets the tooltip icon this data is for.
-	 *  @param InTooltipIcon 
+	 *  @param InTooltipIcon the tooltip icon.
 	 */
 	void SetTooltipIcon(const TWeakObjectPtr<UTooltipIcon>& InTooltipIcon);
 
@@ -49,10 +49,9 @@ public:
 
 	/**
 	 *  Sets the tooltip text using arguments.
-	 * @param Args arguments to pass to the formatted text slots.
+	 *  @param CalculatedValues arguments to pass to the formatted text slots.
 	 */
-	template <typename... ArgTypes>
-	void SetFormattedTooltipText(ArgTypes... Args);
+	void SetFormattedTooltipText(const TArray<int32>& CalculatedValues);
 
 	/** @return an array of argument names for formatted text. */
 	TArray<FString> GetFormattedTextArgs() const;
@@ -70,7 +69,7 @@ private:
 	/** Static next ID for this class. */
 	static int32 GId;
 
-	/** Weak pointer to the tooltip icon this data is for. */
+	/** Tooltip icon this data is for. */
 	UPROPERTY()
 	TWeakObjectPtr<UTooltipIcon> TooltipIcon;
 
@@ -82,6 +81,9 @@ private:
 
 	/** Whether text wrapping is allowed on the tooltip widget. */
 	bool bAllowTextWrap;
+
+	/** How to format number arguments for formatted text. */
+	FNumberFormattingOptions NumberFormattingOptions;
 
 public:
 	FORCEINLINE bool operator==(const UTooltipData& Other) const

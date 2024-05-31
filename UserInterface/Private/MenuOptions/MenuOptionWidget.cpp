@@ -232,7 +232,7 @@ void UMenuOptionWidget::AddTooltipIcon(const FUniqueValidationCheckData& Data)
 		TooltipIcon->GetTooltipData()->SetTooltipText(Data.TooltipText);
 	}
 
-	DynamicTooltipIcons.Add(Data, TooltipIcon);
+	DynamicTooltipIcons.Add(Data.StringTableKey, TooltipIcon);
 }
 
 void UMenuOptionWidget::GetGameModeCategoryTags(FGameplayTagContainer& OutTags) const
@@ -259,10 +259,10 @@ void UMenuOptionWidget::AddGameModeCategoryTagWidgets(TArray<UGameModeCategoryTa
 void UMenuOptionWidget::UpdateDynamicTooltipIcon(const bool bValidated, const FUniqueValidationCheckData& Data,
 	const TArray<int32>& CalculatedValues)
 {
-	TObjectPtr<UTooltipIcon>* TooltipIcon = DynamicTooltipIcons.Find(Data);
+	TObjectPtr<UTooltipIcon>* TooltipIcon = DynamicTooltipIcons.Find(Data.StringTableKey);
 	if (bValidated && TooltipIcon)
 	{
-		DynamicTooltipIcons.Remove(Data);
+		DynamicTooltipIcons.Remove(Data.StringTableKey);
 		(*TooltipIcon)->RemoveFromParent();
 	}
 	else if (!bValidated)

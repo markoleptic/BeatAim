@@ -55,10 +55,10 @@ public:
 
 	/** Simple tooltip setup that bypasses any text formatting in FTooltipData. 
 	 *  @param TooltipIcon icon to bind the OnTooltipIconHovered delegate to the static tooltip widget.
-	 *  @param TooltipText the text to move and store in the tooltip icon, and eventually show on the tooltip widget.
+	 *  @param TooltipText the text to store in the tooltip icon, and eventually show on the tooltip widget.
 	 *  @param bInAllowTextWrap whether to allow text wrapping in the tooltip widget.
 	 */
-	static void SetupTooltip(UTooltipIcon* TooltipIcon, FText&& TooltipText, bool bInAllowTextWrap = false);
+	static void SetupTooltip(UTooltipIcon* TooltipIcon, const FText& TooltipText, bool bInAllowTextWrap = false);
 
 	/** Override this function to use OnGenerateWidgetEvent and OnSelectionChanged_GenerateMultiSelectionItem. */
 	virtual UBSComboBoxEntry* ConstructComboBoxEntryWidget() { return nullptr; }

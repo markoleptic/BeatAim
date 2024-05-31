@@ -46,10 +46,13 @@ void UTooltipWidget::SetText(const FText& InText, const bool bAllowTextWrap) con
 	TooltipDescriptor->SetAutoWrapText(bAllowTextWrap);
 }
 
-void UTooltipWidget::HandleTooltipIconHovered(const TSharedPtr<UTooltipData>& InTooltipData)
+void UTooltipWidget::HandleTooltipIconHovered(const TObjectPtr<UTooltipData>& InTooltipData)
 {
 	SetText(InTooltipData->GetTooltipText(), InTooltipData->GetAllowTextWrap());
-	InTooltipData->GetTooltipIcon()->SetToolTip(this);
+	if (const TWeakObjectPtr<UTooltipIcon> TooltipIcon = InTooltipData->GetTooltipIcon(); TooltipIcon.IsValid())
+	{
+		TooltipIcon->SetToolTip(this);
+	}
 }
 
 void UTooltipWidget::Cleanup()
