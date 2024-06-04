@@ -202,7 +202,7 @@ void UMenuOptionWidget::OnCheckBox_LockStateChanged(const bool bChecked)
 	}
 }
 
-void UMenuOptionWidget::AddTooltipIcon(const FUniqueValidationCheckData& Data)
+UTooltipIcon* UMenuOptionWidget::AddTooltipIcon(const FUniqueValidationCheckData& Data)
 {
 	ETooltipIconType Type = ETooltipIconType::Default;
 	switch (Data.WarningType)
@@ -233,6 +233,7 @@ void UMenuOptionWidget::AddTooltipIcon(const FUniqueValidationCheckData& Data)
 	}
 
 	DynamicTooltipIcons.Add(Data.StringTableKey, TooltipIcon);
+	return TooltipIcon;
 }
 
 void UMenuOptionWidget::GetGameModeCategoryTags(FGameplayTagContainer& OutTags) const
@@ -259,24 +260,26 @@ void UMenuOptionWidget::AddGameModeCategoryTagWidgets(TArray<UGameModeCategoryTa
 void UMenuOptionWidget::UpdateDynamicTooltipIcon(const bool bValidated, const FUniqueValidationCheckData& Data,
 	const TArray<int32>& CalculatedValues)
 {
-	TObjectPtr<UTooltipIcon>* TooltipIcon = DynamicTooltipIcons.Find(Data.StringTableKey);
-	if (bValidated && TooltipIcon)
-	{
-		DynamicTooltipIcons.Remove(Data.StringTableKey);
-		(*TooltipIcon)->RemoveFromParent();
-	}
-	else if (!bValidated)
+	const TObjectPtr<UTooltipIcon>* TooltipIconPtr = DynamicTooltipIcons.Find(Data.StringTableKey);
+	TObjectPtr<UTooltipIcon> TooltipIcon = TooltipIconPtr ? TooltipIconPtr->Get() : nullptr;
+
+	if (bValidated)
 	{
 		if (TooltipIcon)
 		{
-			if ((*TooltipIcon)->GetTooltipData()->HasFormattedText())
-			{
-				(*TooltipIcon)->GetTooltipData()->SetFormattedTooltipText(CalculatedValues);
-			}
+			DynamicTooltipIcons.Remove(Data.StringTableKey);
+			TooltipIcon->RemoveFromParent();
 		}
-		else
+	}
+	else
+	{
+		if (!TooltipIcon)
 		{
-			AddTooltipIcon(Data);
+			TooltipIcon = AddTooltipIcon(Data);
+		}
+		if (TooltipIcon->GetTooltipData()->HasFormattedText())
+		{
+			TooltipIcon->GetTooltipData()->SetFormattedTooltipText(CalculatedValues);
 		}
 	}
 }

@@ -7,6 +7,7 @@
 #include "Utilities/BSSettingCategoryWidget.h"
 #include "CustomGameModeCategoryWidget.generated.h"
 
+struct FValidationCheckKeyFuncs;
 struct FValidationCheckResult;
 struct FUniqueValidationCheckData;
 enum class EGameModeCategory : uint8;
@@ -41,7 +42,7 @@ public:
 	/** Sets all custom game mode option values using BSConfig. */
 	virtual void UpdateOptionsFromConfig();
 
-	virtual void HandlePropertyValidation(TSet<FValidationCheckResult>& CheckResults);
+	virtual void HandlePropertyValidation(TSet<FValidationCheckResult, FValidationCheckKeyFuncs>& CheckResults);
 
 	/** @return the game mode category the widget represents. */
 	EGameModeCategory GetGameModeCategory() const { return GameModeCategory; }

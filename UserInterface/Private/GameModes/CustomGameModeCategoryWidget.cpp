@@ -64,13 +64,14 @@ void UCustomGameModeCategoryWidget::UpdateOptionsFromConfig()
 {
 }
 
-void UCustomGameModeCategoryWidget::HandlePropertyValidation(TSet<FValidationCheckResult>& CheckResults)
+void UCustomGameModeCategoryWidget::HandlePropertyValidation(
+	TSet<FValidationCheckResult, FValidationCheckKeyFuncs>& CheckResults)
 {
 	for (auto& Elem : CheckResults)
 	{
 		for (auto& [Property, Data] : Elem.PropertyData)
 		{
-			if (const TWeakObjectPtr<UMenuOptionWidget>* Found = PropertyMenuOptionWidgetMap.Find(Property))
+			if (const TWeakObjectPtr<UMenuOptionWidget>* Found = PropertyMenuOptionWidgetMap.Find(Property->Property))
 			{
 				(*Found)->UpdateDynamicTooltipIcon(Elem.bSuccess, Data, Elem.CalculatedValues);
 			}

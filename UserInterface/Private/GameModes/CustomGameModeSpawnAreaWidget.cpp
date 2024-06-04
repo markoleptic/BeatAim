@@ -54,6 +54,7 @@ void UCustomGameModeSpawnAreaWidget::NativeConstruct()
 		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
 			GET_MEMBER_NAME_CHECKED(FBS_GridConfig, NumVerticalGridTargets)),
 		SliderTextBoxOption_NumVerticalGridTargets);
+	// TODO: Add option to allow getting X, Y, Z properties from FVectors
 	PropertyMenuOptionWidgetMap.Add(
 		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
 			GET_MEMBER_NAME_CHECKED(FBS_GridConfig, GridSpacing.X)), SliderTextBoxOption_HorizontalSpacing);
@@ -62,7 +63,7 @@ void UCustomGameModeSpawnAreaWidget::NativeConstruct()
 			GET_MEMBER_NAME_CHECKED(FBS_GridConfig, GridSpacing.Y)), SliderTextBoxOption_VerticalSpacing);
 	PropertyMenuOptionWidgetMap.Add(
 		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
-			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, FloorDistance)), SliderTextBoxOption_VerticalSpacing);
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, FloorDistance)), SliderTextBoxOption_FloorDistance);
 	PropertyMenuOptionWidgetMap.Add(
 		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicSpawnAreaScaling),
 			GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, StartThreshold)), SliderTextBoxOption_StartThreshold);
@@ -257,7 +258,7 @@ void UCustomGameModeSpawnAreaWidget::OnSliderTextBoxValueChanged(USingleRangeInp
 		BSConfig->GridConfig.GridSpacing.X = Value;
 		OnPropertyChanged.Execute({
 			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
-				GET_MEMBER_NAME_CHECKED(FBS_GridConfig, GridSpacing))
+				GET_MEMBER_NAME_CHECKED(FBS_GridConfig, GridSpacing.X))
 		});
 	}
 	else if (Widget == SliderTextBoxOption_VerticalSpacing)
@@ -265,7 +266,7 @@ void UCustomGameModeSpawnAreaWidget::OnSliderTextBoxValueChanged(USingleRangeInp
 		BSConfig->GridConfig.GridSpacing.Y = Value;
 		OnPropertyChanged.Execute({
 			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
-				GET_MEMBER_NAME_CHECKED(FBS_GridConfig, GridSpacing))
+				GET_MEMBER_NAME_CHECKED(FBS_GridConfig, GridSpacing.Y))
 		});
 	}
 	else if (Widget == SliderTextBoxOption_FloorDistance)

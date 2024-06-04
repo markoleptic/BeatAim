@@ -116,8 +116,9 @@ protected:
 	/**
 	 *  Creates a new tooltip icon unqiue to the validation check data and stores it.
 	 *  @param Data data that is unique per property per validation check
+	 *  @return added tooltip icon.
 	 */
-	void AddTooltipIcon(const FUniqueValidationCheckData& Data);
+	UTooltipIcon* AddTooltipIcon(const FUniqueValidationCheckData& Data);
 
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	UHorizontalBox* Box_TagWidgets;

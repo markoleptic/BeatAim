@@ -300,4 +300,7 @@ private:
 
 	/** Whether the user has any Custom Game Modes saved. */
 	bool bCustomGameModesEmpty = true;
+
+	/** Properties that should refresh the game mode preview any time they are changed. */
+	TSet<const FProperty*> ForceRefreshProperties;
 };

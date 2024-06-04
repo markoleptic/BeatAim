@@ -34,6 +34,13 @@ void UGameModeMenuWidget::NativeConstruct()
 	GameModeValidator = NewObject<UBSGameModeValidator>();
 	BSConfig = MakeShareable(new FBSConfig());
 
+	ForceRefreshProperties = {
+		GameModeValidator->FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, FloorDistance)),
+		GameModeValidator->FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDistributionPolicy))
+	};
+
 	// Default Button Enabled States
 	Button_StartFromPreset->SetIsEnabled(false);
 	Button_CustomizeFromPreset->SetIsEnabled(false);
@@ -989,23 +996,16 @@ void UGameModeMenuWidget::HandlePropertyChanged(const TSet<const FProperty*>& Pr
 		}
 	}
 
-	if (Properties.Contains(GameModeValidator->FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
-		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, FloorDistance))))
-	{
-		RefreshGameModePreview();
-	}
-
-	if (Properties.Contains(GameModeValidator->FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
-		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDistributionPolicy))))
+	if (!Properties.Intersect(ForceRefreshProperties).IsEmpty())
 	{
 		RefreshGameModePreview();
 	}
 
 	const FValidationResult Result = GameModeValidator->Validate(BSConfig, Properties);
-	TSet<FValidationCheckResult> Succeeded = Result.GetSucceeded();
-	TSet<FValidationCheckResult> Failed = Result.GetFailed();
+	TSet<FValidationCheckResult, FValidationCheckKeyFuncs> Succeeded = Result.GetSucceeded();
+	TSet<FValidationCheckResult, FValidationCheckKeyFuncs> Failed = Result.GetFailed();
 
-	auto UpdateTooltipText = [&](TSet<FValidationCheckResult>& CheckResults)
+	auto UpdateTooltipText = [&](TSet<FValidationCheckResult, FValidationCheckKeyFuncs>& CheckResults)
 	{
 		for (auto& Elem : CheckResults)
 		{

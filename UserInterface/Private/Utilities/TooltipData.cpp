@@ -8,7 +8,7 @@ int32 UTooltipData::GId = 0;
 
 UTooltipData::UTooltipData(): Id(GId++), bAllowTextWrap(false)
 {
-	NumberFormattingOptions.SetAlwaysSign(true).SetRoundingMode(HalfFromZero).SetMaximumFractionalDigits(2);
+	NumberFormattingOptions.SetAlwaysSign(false).SetRoundingMode(HalfFromZero).SetMaximumFractionalDigits(2);
 }
 
 FText UTooltipData::GetTooltipText() const
@@ -48,27 +48,27 @@ void UTooltipData::CreateFormattedText(const FText& InText)
 
 void UTooltipData::SetFormattedTooltipText(const TArray<int32>& CalculatedValues)
 {
-	TArray<FFormatArgumentValue> Args;
+	FFormatNamedArguments Args;
 	Args.Reserve(CalculatedValues.Num());
 	for (int i = 0; i < CalculatedValues.Num(); i++)
 	{
-		Args.Emplace(FText::AsNumber(CalculatedValues[i], &NumberFormattingOptions));
+		Args.Emplace(TEXT("MaxAllowed"), FText::AsNumber(CalculatedValues[i], &NumberFormattingOptions));
 	}
 	TooltipText = FText::Format(FormattedText, Args);
 }
 
 TArray<FString> UTooltipData::GetFormattedTextArgs() const
 {
-	TArray<FString> Junk;
-	FormattedText.GetFormatArgumentNames(Junk);
-	return Junk;
+	TArray<FString> Names;
+	FormattedText.GetFormatArgumentNames(Names);
+	return Names;
 }
 
 int32 UTooltipData::GetNumberOfFormattedTextArgs() const
 {
-	TArray<FString> Junk;
-	FormattedText.GetFormatArgumentNames(Junk);
-	return Junk.Num();
+	TArray<FString> Names;
+	FormattedText.GetFormatArgumentNames(Names);
+	return Names.Num();
 }
 
 bool UTooltipData::HasFormattedText() const
