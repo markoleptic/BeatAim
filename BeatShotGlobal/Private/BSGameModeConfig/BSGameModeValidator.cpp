@@ -21,6 +21,75 @@ namespace
 		}
 		return nullptr;
 	}
+
+	/** Finds a nested property in RootStruct.
+	 *  @param SubStructName name of the inner struct.
+	 *  @param SubSubStructName name of the inner inner struct.
+	 *  @param PropertyName name of property to find.
+	 *	@return a property if found, otherwise null.
+	 */
+	template <typename RootStruct>
+	const FProperty* FindProperty(const FName SubStructName, const FName SubSubStructName, const FName PropertyName)
+	{
+		if (const FStructProperty* StructProperty = FindFProperty<FStructProperty>(RootStruct::StaticStruct(),
+			SubStructName))
+		{
+			if (const FStructProperty* SubStructProperty = FindFProperty<FStructProperty>(StructProperty->Struct,
+				SubSubStructName))
+			{
+				return FindFProperty<FProperty>(SubStructProperty->Struct, PropertyName);
+			}
+		}
+		return nullptr;
+	}
+
+	/** Creates a FPropertyHash object using the substruct and property found in RootStruct.
+	 *  @param SubStructName name of the inner struct.
+	 *  @param PropertyName name of property to find.
+	 *	@return a FPropertyHash object containing all properties leading to innermost property.
+	 */
+	template <typename RootStruct>
+	FPropertyHash CreatePropertyHash(const FName SubStructName, const FName PropertyName)
+	{
+		FPropertyHash Hash;
+		if (const FStructProperty* StructProperty = FindFProperty<FStructProperty>(RootStruct::StaticStruct(),
+			SubStructName))
+		{
+			Hash.Properties.Add(StructProperty);
+			if (const FProperty* Property = FindFProperty<FProperty>(StructProperty->Struct, PropertyName))
+			{
+				Hash.Properties.Add(Property);
+			}
+		}
+		return Hash;
+	}
+
+	/** Creates a FPropertyHash object using the substruct and property found in RootStruct.
+	 *  @param SubStructName name of the inner struct.
+	 *  @param SubSubStructName name of the inner inner struct.
+	 *  @param PropertyName name of property to find.
+	 *	@return a FPropertyHash object containing all properties leading to innermost property.
+	 */
+	template <typename RootStruct>
+	FPropertyHash CreatePropertyHash(const FName SubStructName, const FName SubSubStructName, const FName PropertyName)
+	{
+		FPropertyHash Hash;
+		if (const FStructProperty* StructProperty = FindFProperty<FStructProperty>(RootStruct::StaticStruct(),
+			SubStructName))
+		{
+			Hash.Properties.Add(StructProperty);
+			if (const FStructProperty* SubStructProperty = FindFProperty<FStructProperty>(StructProperty->Struct,
+				SubSubStructName))
+			{
+				Hash.Properties.Add(SubStructProperty);
+				if (const FProperty* Property = FindFProperty<FProperty>(SubStructProperty->Struct, PropertyName))
+				{
+					Hash.Properties.Add(Property);
+				}
+			}
+		}
+		return Hash;
+	}
 }
 
 /* ---------------------- */
@@ -79,10 +148,10 @@ public:
 
 	void SetupValidationChecks();
 
-	FValidationPropertyPtr CreateValidationProperty(const FProperty* InProperty,
+	FValidationPropertyPtr CreateValidationProperty(const FPropertyHash& InProperty,
 		const EGameModeCategory InGameModeCategory);
 
-	FValidationCheckPtr CreateValidationCheck(const TSet<const FProperty*>& InvolvedProperties,
+	FValidationCheckPtr CreateValidationCheck(const TSet<FPropertyHash>& InvolvedProperties,
 		EGameModeWarningType WarningType, TFunction<bool(const TSharedPtr<FBSConfig>&, TArray<int32>&)> Lambda);
 
 	static void AddValidationCheckToProperty(const FValidationPropertyPtr& PropPtr, const FValidationCheckPtr& CheckPtr,
@@ -118,46 +187,61 @@ UBSGameModeValidator::FPrivate::FPrivate()
 void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 {
 	FValidationCheckPtr CheckPtr = nullptr;
+	const FName TargetConfigName = GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig);
+	const FName GridConfigName = GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig);
+	const FName AIConfigName = GET_MEMBER_NAME_CHECKED(FBSConfig, AIConfig);
+	const FName DynamicSpawnAreaName = GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicSpawnAreaScaling);
+	const FName DynamicTargetName = GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicTargetScaling);
+	const FName BoxBoundsName = GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoxBounds);
+	const FName GridSpacingName = GET_MEMBER_NAME_CHECKED(FBS_GridConfig, GridSpacing);
 
-	const FProperty* BatchSpawning = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+	const FPropertyHash BatchSpawning = CreatePropertyHash<FBSConfig>(TargetConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bUseBatchSpawning));
-	const FProperty* SpawnEveryOtherTargetInCenter = FindProperty<FBSConfig>(
-		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig), GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bUseBatchSpawning));
-	const FProperty* AllowSpawnWithoutActivation = FindProperty<FBSConfig>(
-		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+	const FPropertyHash SpawnEveryOtherTargetInCenter = CreatePropertyHash<FBSConfig>(TargetConfigName,
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bUseBatchSpawning));
+	const FPropertyHash AllowSpawnWithoutActivation = CreatePropertyHash<FBSConfig>(TargetConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bAllowSpawnWithoutActivation));
-	const FProperty* MovingTargetDirectionMode = FindProperty<FBSConfig>(
-		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+	const FPropertyHash MovingTargetDirectionMode = CreatePropertyHash<FBSConfig>(TargetConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MovingTargetDirectionMode));
-	const FProperty* TargetSpawnResponses = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+	const FPropertyHash TargetSpawnResponses = CreatePropertyHash<FBSConfig>(TargetConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetSpawnResponses));
-	const FProperty* TargetActivationResponses = FindProperty<FBSConfig>(
-		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+	const FPropertyHash TargetActivationResponses = CreatePropertyHash<FBSConfig>(TargetConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetActivationResponses));
-	const FProperty* TargetDeactivationResponses = FindProperty<FBSConfig>(
-		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+	const FPropertyHash TargetDeactivationResponses = CreatePropertyHash<FBSConfig>(TargetConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDeactivationResponses));
-	const FProperty* BoxBounds = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
-		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoxBounds));
-	const FProperty* NumHorizontalGridTargets = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
+	const FPropertyHash BoxBounds = CreatePropertyHash<FBSConfig>(TargetConfigName, BoxBoundsName);
+	const FPropertyHash BoxBoundsX = CreatePropertyHash<FBSConfig>(TargetConfigName, BoxBoundsName,
+		GET_MEMBER_NAME_CHECKED(FVector, X));
+	const FPropertyHash BoxBoundsY = CreatePropertyHash<FBSConfig>(TargetConfigName, BoxBoundsName,
+		GET_MEMBER_NAME_CHECKED(FVector, Y));
+	const FPropertyHash BoxBoundsZ = CreatePropertyHash<FBSConfig>(TargetConfigName, BoxBoundsName,
+		GET_MEMBER_NAME_CHECKED(FVector, Z));
+	const FPropertyHash NumHorizontalGridTargets = CreatePropertyHash<FBSConfig>(GridConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_GridConfig, NumHorizontalGridTargets));
-	const FProperty* NumVerticalGridTargets = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
+	const FPropertyHash NumVerticalGridTargets = CreatePropertyHash<FBSConfig>(GridConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_GridConfig, NumVerticalGridTargets));
-	const FProperty* GridSpacingX = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
-		GET_MEMBER_NAME_CHECKED(FBS_GridConfig, GridSpacing.X));
-	const FProperty* GridSpacingY = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
-		GET_MEMBER_NAME_CHECKED(FBS_GridConfig, GridSpacing.Y));
-	const FProperty* TargetDistributionPolicy = FindProperty<FBSConfig>(
-		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+	const FPropertyHash GridSpacingX = CreatePropertyHash<FBSConfig>(GridConfigName, GridSpacingName,
+		GET_MEMBER_NAME_CHECKED(FVector2d, X));
+	const FPropertyHash GridSpacingY = CreatePropertyHash<FBSConfig>(GridConfigName, GridSpacingName,
+		GET_MEMBER_NAME_CHECKED(FVector2d, Y));
+	const FPropertyHash TargetDistributionPolicy = CreatePropertyHash<FBSConfig>(TargetConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDistributionPolicy));
-	const FProperty* EnableReinforcementLearning = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, AIConfig),
+	const FPropertyHash EnableReinforcementLearning = CreatePropertyHash<FBSConfig>(AIConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_AIConfig, bEnableReinforcementLearning));
-	const FProperty* MinSpawnedTargetScale = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+	const FPropertyHash MinSpawnedTargetScale = CreatePropertyHash<FBSConfig>(TargetConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MinSpawnedTargetScale));
-	const FProperty* MaxSpawnedTargetScale = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+	const FPropertyHash MaxSpawnedTargetScale = CreatePropertyHash<FBSConfig>(TargetConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxSpawnedTargetScale));
-	const FProperty* TargetDamageType = FindProperty<FBSConfig>(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+	const FPropertyHash TargetDamageType = CreatePropertyHash<FBSConfig>(TargetConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDamageType));
+	const FPropertyHash StartBounds = CreatePropertyHash<FBSConfig>(DynamicSpawnAreaName,
+		GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, StartBounds));
+	const FPropertyHash StartBoundsX = CreatePropertyHash<FBSConfig>(DynamicSpawnAreaName,
+		GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, StartBounds), GET_MEMBER_NAME_CHECKED(FVector, X));
+	const FPropertyHash StartBoundsY = CreatePropertyHash<FBSConfig>(DynamicSpawnAreaName,
+		GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, StartBounds), GET_MEMBER_NAME_CHECKED(FVector, Y));
+	const FPropertyHash StartBoundsZ = CreatePropertyHash<FBSConfig>(DynamicSpawnAreaName,
+		GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, StartBounds), GET_MEMBER_NAME_CHECKED(FVector, Z));
 
 	FValidationPropertyPtr SpawnEveryOtherTargetInCenterPtr = CreateValidationProperty(SpawnEveryOtherTargetInCenter,
 		EGameModeCategory::TargetSpawning);
@@ -174,6 +258,9 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 	FValidationPropertyPtr TargetDeactivationResponsesPtr = CreateValidationProperty(TargetDeactivationResponses,
 		EGameModeCategory::TargetBehavior);
 	FValidationPropertyPtr BoxBoundsPtr = CreateValidationProperty(BoxBounds, EGameModeCategory::SpawnArea);
+	FValidationPropertyPtr BoxBoundsXPtr = CreateValidationProperty(BoxBoundsX, EGameModeCategory::SpawnArea);
+	FValidationPropertyPtr BoxBoundsYPtr = CreateValidationProperty(BoxBoundsY, EGameModeCategory::SpawnArea);
+	FValidationPropertyPtr BoxBoundsZPtr = CreateValidationProperty(BoxBoundsZ, EGameModeCategory::SpawnArea);
 	FValidationPropertyPtr TargetDistributionPolicyPtr = CreateValidationProperty(TargetDistributionPolicy,
 		EGameModeCategory::SpawnArea);
 	FValidationPropertyPtr NumHorizontalGridTargetsPtr = CreateValidationProperty(NumHorizontalGridTargets,
@@ -286,11 +373,11 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 	AddValidationCheckToProperty(TargetDeactivationResponsesPtr, CheckPtr, {TEXT("Invalid_Direction_MTDM_None"), ""});
 
 	// MovingTargetDirectionMode & Box Bounds
-	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, BoxBounds}, EGameModeWarningType::Caution,
+	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, BoxBoundsX}, EGameModeWarningType::Caution,
 		BoxBoundsLambda);
 	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr,
 		{TEXT("Caution_ZeroForwardDistance_MTDM_ForwardOnly"), ""});
-	AddValidationCheckToProperty(BoxBoundsPtr, CheckPtr, {TEXT("Caution_ZeroForwardDistance_MTDM_ForwardOnly_2"), ""});
+	AddValidationCheckToProperty(BoxBoundsXPtr, CheckPtr, {TEXT("Caution_ZeroForwardDistance_MTDM_ForwardOnly_2"), ""});
 
 	auto NumHorizontalGridTargetsLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{
@@ -415,21 +502,20 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 	AddValidationCheckToProperty(TargetDistributionPolicyPtr, CheckPtr, {TEXT("Invalid_HeadshotHeightOnly_AI"), ""});
 }
 
-FValidationCheckPtr UBSGameModeValidator::FPrivate::CreateValidationCheck(
-	const TSet<const FProperty*>& InvolvedProperties, const EGameModeWarningType WarningType,
-	TFunction<bool(const TSharedPtr<FBSConfig>&, TArray<int32>&)> Lambda)
+FValidationCheckPtr UBSGameModeValidator::FPrivate::CreateValidationCheck(const TSet<FPropertyHash>& InvolvedProperties,
+	const EGameModeWarningType WarningType, TFunction<bool(const TSharedPtr<FBSConfig>&, TArray<int32>&)> Lambda)
 {
 	TSet<FValidationPropertyPtr> Properties;
-	for (const FProperty* Prop : InvolvedProperties)
+	for (const FPropertyHash& PropertyHash : InvolvedProperties)
 	{
-		Properties.Add(*ValidationProperties.Find(Prop));
+		Properties.Add(*ValidationProperties.Find(PropertyHash));
 	}
 	TSharedPtr<FValidationCheck> Check = MakeShareable(new FValidationCheck(MoveTemp(Properties), WarningType));
 	Check->ValidationDelegate.BindLambda(Lambda);
 	return Check;
 }
 
-FValidationPropertyPtr UBSGameModeValidator::FPrivate::CreateValidationProperty(const FProperty* InProperty,
+FValidationPropertyPtr UBSGameModeValidator::FPrivate::CreateValidationProperty(const FPropertyHash& InProperty,
 	const EGameModeCategory InGameModeCategory)
 {
 	FValidationPropertyPtr PropertyPtr = MakeShareable(new FValidationProperty(InProperty, InGameModeCategory));
@@ -566,7 +652,7 @@ FValidationResult UBSGameModeValidator::Validate(const TSharedPtr<FBSConfig>& In
 {
 	FValidationResult Result;
 	if (const FValidationPropertyPtr& ValidationProperty = FindValidationProperty(
-		FindProperty<FBSConfig>(SubStructName, PropertyName)))
+		CreatePropertyHash<FBSConfig>(SubStructName, PropertyName)))
 	{
 		Impl->ValidateCheckGroup(InConfig, ValidationProperty->Checks, Result);
 	}
@@ -574,12 +660,12 @@ FValidationResult UBSGameModeValidator::Validate(const TSharedPtr<FBSConfig>& In
 }
 
 FValidationResult UBSGameModeValidator::Validate(const TSharedPtr<FBSConfig>& InConfig,
-	const TSet<const FProperty*>& Properties) const
+	const TSet<FPropertyHash>& Properties) const
 {
 	FValidationResult Result;
-	for (const FProperty* Property : Properties)
+	for (const FPropertyHash& PropertyHash : Properties)
 	{
-		if (const FValidationPropertyPtr& ValidationProperty = FindValidationProperty(Property))
+		if (const FValidationPropertyPtr& ValidationProperty = FindValidationProperty(PropertyHash))
 		{
 			Impl->ValidateCheckGroup(InConfig, ValidationProperty->Checks, Result);
 		}
@@ -588,12 +674,18 @@ FValidationResult UBSGameModeValidator::Validate(const TSharedPtr<FBSConfig>& In
 	return Result;
 }
 
-const FProperty* UBSGameModeValidator::FindBSConfigProperty(const FName SubStructName, const FName PropertyName)
+FPropertyHash UBSGameModeValidator::FindBSConfigProperty(const FName SubStructName, const FName PropertyName)
 {
-	return FindProperty<FBSConfig>(SubStructName, PropertyName);
+	return CreatePropertyHash<FBSConfig>(SubStructName, PropertyName);
 }
 
-FValidationPropertyPtr UBSGameModeValidator::FindValidationProperty(const FProperty* Property) const
+FPropertyHash UBSGameModeValidator::FindBSConfigProperty(const FName SubStructName, const FName SubSubStructName,
+	const FName PropertyName)
+{
+	return CreatePropertyHash<FBSConfig>(SubStructName, SubSubStructName, PropertyName);
+}
+
+FValidationPropertyPtr UBSGameModeValidator::FindValidationProperty(const FPropertyHash& Property) const
 {
 	if (const FValidationPropertyPtr* Found = Impl->ValidationProperties.Find(Property))
 	{

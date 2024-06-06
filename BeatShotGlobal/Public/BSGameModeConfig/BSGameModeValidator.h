@@ -16,6 +16,29 @@ enum class EGameModeWarningType : uint8;
 using FValidationPropertyPtr = TSharedPtr<FValidationProperty>;
 using FValidationCheckPtr = TSharedPtr<FValidationCheck>;
 
+struct FPropertyHash
+{
+	FPropertyHash() = default;
+	~FPropertyHash() = default;
+
+	TArray<const FProperty*> Properties;
+
+	FORCEINLINE bool operator ==(const FPropertyHash& Other) const
+	{
+		return Properties == Other.Properties;
+	}
+
+	friend FORCEINLINE uint32 GetTypeHash(const FPropertyHash& Object)
+	{
+		uint32 Hash = 0;
+		for (const FProperty* Property : Object.Properties)
+		{
+			Hash = HashCombineFast(Hash, PointerHash(Property));
+		}
+		return Hash;
+	}
+};
+
 DECLARE_DELEGATE_RetVal_OneParam(bool, FValidationDelegate, const TSharedPtr<FBSConfig>&);
 
 UENUM(BlueprintType)
@@ -66,7 +89,7 @@ struct BEATSHOTGLOBAL_API FValidationCheck
 		uint32 Hash = GetTypeHash(Object.ValidationDelegate.GetHandle());
 		for (const auto Obj : Object.InvolvedProperties)
 		{
-			Hash = HashCombine(Hash, GetTypeHash(Obj));
+			Hash = HashCombineFast(Hash, GetTypeHash(Obj));
 		}
 		return Hash;
 	}
@@ -125,9 +148,13 @@ struct BEATSHOTGLOBAL_API FValidationProperty
 
 	FValidationProperty() = default;
 
-	explicit FValidationProperty(const FProperty* InProperty, const EGameModeCategory InGameModeCategory) :
-		Property(InProperty), GameModeCategory(InGameModeCategory)
+	explicit FValidationProperty(const FPropertyHash& InPropertyHash, const EGameModeCategory InGameModeCategory) :
+		Property(InPropertyHash), GameModeCategory(InGameModeCategory)
 	{
+		for (const FProperty* Prop : InPropertyHash.Properties)
+		{
+			PropertyName += Prop->GetFullName() + ".";
+		}
 	}
 
 	/** Adds a pointer to a validation check involving this property to its stored checks, and adds data unique to this
@@ -138,7 +165,9 @@ struct BEATSHOTGLOBAL_API FValidationProperty
 	void AddCheck(const FValidationCheckPtr& Check, const FUniqueValidationCheckData& Data);
 
 	/** The single property this validation property represents. */
-	const FProperty* Property;
+	FPropertyHash Property;
+
+	FString PropertyName;
 
 	/** The game mode category this property falls under. Used to sync with user interface. */
 	EGameModeCategory GameModeCategory;
@@ -161,26 +190,26 @@ struct BEATSHOTGLOBAL_API FValidationProperty
 
 	friend FORCEINLINE uint32 GetTypeHash(const FValidationProperty& Object)
 	{
-		return PointerHash(Object.Property);
+		return GetTypeHash(Object.Property);
 	}
 };
 
 /** Struct used to allow efficient retrieval of validation properties in TSets using FProperty as a key. */
-struct FValidationPropertyKeyFuncs : BaseKeyFuncs<FValidationPropertyPtr, const FProperty*, false>
+struct FValidationPropertyKeyFuncs : BaseKeyFuncs<FValidationPropertyPtr, FPropertyHash, false>
 {
-	static const FProperty* GetSetKey(const FValidationPropertyPtr& Element)
+	static FPropertyHash GetSetKey(const FValidationPropertyPtr& Element)
 	{
 		return Element->Property;
 	}
 
-	static bool Matches(const FProperty* A, const FProperty* B)
+	static bool Matches(const FPropertyHash& A, const FPropertyHash& B)
 	{
 		return A == B;
 	}
 
-	static uint32 GetKeyHash(const FProperty* Key)
+	static uint32 GetKeyHash(const FPropertyHash& Key)
 	{
-		return PointerHash(Key);
+		return GetTypeHash(Key);
 	}
 };
 
@@ -301,20 +330,29 @@ public:
 	 *  @param Properties a set of specific properties to validate.
 	 *	@return a validation result container object
 	 */
-	FValidationResult Validate(const TSharedPtr<FBSConfig>& InConfig, const TSet<const FProperty*>& Properties) const;
+	FValidationResult Validate(const TSharedPtr<FBSConfig>& InConfig, const TSet<FPropertyHash>& Properties) const;
 
 	/** Finds a property in BSConfig.
 	 *  @param SubStructName name of the inner struct.
 	 *  @param PropertyName name of property to find.
 	 *	@return a property if found, otherwise null.
 	 */
-	static const FProperty* FindBSConfigProperty(const FName SubStructName, const FName PropertyName);
+	static FPropertyHash FindBSConfigProperty(const FName SubStructName, const FName PropertyName);
+
+	/** Finds a property in BSConfig.
+	 *  @param SubStructName name of the inner struct.
+	 *  @param SubSubStructName name of the inner inner struct.
+	 *  @param PropertyName name of property to find.
+	 *	@return a property if found, otherwise null.
+	 */
+	static FPropertyHash FindBSConfigProperty(const FName SubStructName, const FName SubSubStructName,
+		const FName PropertyName);
 
 	/** Finds a validation property based on a BSConfig FProperty.
 	 *  @param Property the property to look for.
 	 *	@return a validation property pointer if found, otherwise null.
 	 */
-	FValidationPropertyPtr FindValidationProperty(const FProperty* Property) const;
+	FValidationPropertyPtr FindValidationProperty(const FPropertyHash& Property) const;
 
 private:
 	class FPrivate;

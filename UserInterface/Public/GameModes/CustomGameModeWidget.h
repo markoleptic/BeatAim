@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "BSGameModeConfig/BSGameModeValidator.h"
 #include "Menus/GameModeMenuWidget.h"
 #include "CustomGameModeWidget.generated.h"
 
@@ -91,7 +92,7 @@ public:
 	/** Clears all GameModeTemplate ComboBox options and repopulates. */
 	//void RefreshGameModeTemplateComboBoxOptions(const TArray<FBSConfig>& CustomGameModes) const;
 
-	TDelegate<void(const TSet<const FProperty*>&)> OnPropertyChanged;
+	TDelegate<void(const TSet<FPropertyHash>&)> OnPropertyChanged;
 
 	UCustomGameModeStartWidget* GetStartWidget() const;
 
@@ -101,7 +102,7 @@ protected:
 	/** Adds child widgets to ChildWidgets array, binds to Widget_Start's RequestGameModeTemplateUpdate. */
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
-	void HandlePropertyChanged(const TSet<const FProperty*>& Properties);
+	void HandlePropertyChanged(const TSet<FPropertyHash>& Properties);
 
 	/** Called any time Widget_Start broadcasts their RequestGameModeTemplateUpdate delegate. */
 	//virtual void OnRequestGameModeTemplateUpdate(const FString& InGameMode, const EGameModeDifficulty& Difficulty);

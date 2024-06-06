@@ -53,7 +53,7 @@ void UCustomGameModeWidget::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UCustomGameModeWidget::HandlePropertyChanged(const TSet<const FProperty*>& Properties)
+void UCustomGameModeWidget::HandlePropertyChanged(const TSet<FPropertyHash>& Properties)
 {
 	OnPropertyChanged.Execute(Properties);
 }

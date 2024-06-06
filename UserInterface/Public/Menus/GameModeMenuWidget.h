@@ -76,7 +76,7 @@ class USERINTERFACE_API UGameModeMenuWidget : public UUserWidget, public IHttpRe
 	virtual void NativeConstruct() override;
 	virtual void NativePreConstruct() override;
 	virtual void NativeDestruct() override;
-	void HandlePropertyChanged(const TSet<const FProperty*>& Properties);
+	void HandlePropertyChanged(const TSet<FPropertyHash>& Properties);
 	void HandleStartWidgetPropertyChanged(FStartWidgetProperties& Properties);
 	UCustomGameModeStartWidget* GetCurrentStartWidget() const;
 	UCustomGameModeStartWidget* GetNotCurrentStartWidget() const;
@@ -302,5 +302,5 @@ private:
 	bool bCustomGameModesEmpty = true;
 
 	/** Properties that should refresh the game mode preview any time they are changed. */
-	TSet<const FProperty*> ForceRefreshProperties;
+	TSet<FPropertyHash> ForceRefreshProperties;
 };

@@ -986,13 +986,13 @@ void UGameModeMenuWidget::SetBSConfig(const FBSConfig& InConfig)
 	*BSConfig = InConfig;
 }
 
-void UGameModeMenuWidget::HandlePropertyChanged(const TSet<const FProperty*>& Properties)
+void UGameModeMenuWidget::HandlePropertyChanged(const TSet<FPropertyHash>& Properties)
 {
-	for (const FProperty* Prop : Properties)
+	for (const FPropertyHash& Prop : Properties)
 	{
 		if (const FValidationPropertyPtr& PropertyPtr = GameModeValidator->FindValidationProperty(Prop))
 		{
-			UE_LOG(LogTemp, Display, TEXT("Property Changed: %s"), *PropertyPtr->Property->GetName());
+			UE_LOG(LogTemp, Display, TEXT("Property Changed: %s"), *PropertyPtr->PropertyName);
 		}
 	}
 
