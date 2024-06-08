@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TooltipData.h"
 #include "Blueprint/UserWidget.h"
 #include "TooltipIcon.generated.h"
 
@@ -21,7 +22,7 @@ enum class ETooltipIconType : uint8
 
 ENUM_RANGE_BY_FIRST_AND_LAST(ETooltipIconType, ETooltipIconType::Default, ETooltipIconType::Warning);
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnTooltipIconHovered, const TObjectPtr<UTooltipData>&);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTooltipIconHovered, const FTooltipData&);
 
 /** A button and image representing an icon that executes a delegate when hovered over. Stores the data it passes to
  *  
@@ -65,11 +66,14 @@ public:
 	 */
 	void SetTooltipText(const FText& InText, const bool bAllowTextWrap = false);
 
+	/** @return tooltip data. */
+	FTooltipData& GetTooltipData();
+
+	/** @return the type of tooltip icon. */
+	ETooltipIconType GetType() const;
+
 	/** Called when Button is hovered over, provides the tooltip data that should be displayed. */
 	FOnTooltipIconHovered OnTooltipIconHovered;
-
-	/** @return shared pointer of tooltip data. */
-	TObjectPtr<UTooltipData> GetTooltipData() const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
@@ -79,7 +83,7 @@ protected:
 	UImage* Image;
 
 	/** Data that is broadcast to the tooltip widget. */
-	TObjectPtr<UTooltipData> TooltipData;
+	FTooltipData TooltipData;
 
 	/** Maps each tooltip icon type to a brush. */
 	UPROPERTY(EditDefaultsOnly, Category="TooltipIcon")

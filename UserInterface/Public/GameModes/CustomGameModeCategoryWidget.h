@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BSGameModeConfig/BSGameModeValidator.h"
 #include "Mappings/EnumTagMap.h"
 #include "Utilities/BSSettingCategoryWidget.h"
 #include "CustomGameModeCategoryWidget.generated.h"
 
+enum class ETooltipIconType : uint8;
 struct FValidationCheckKeyFuncs;
 struct FValidationCheckResult;
 struct FUniqueValidationCheckData;
@@ -43,13 +43,19 @@ public:
 	/** Sets all custom game mode option values using BSConfig. */
 	virtual void UpdateOptionsFromConfig();
 
+	/** Creates or finds tooltip icons to display warnings and errors to the user.
+	 *  @param CheckResults The validation check results to iterate through.
+	 */
 	virtual void HandlePropertyValidation(TSet<FValidationCheckResult, FValidationCheckKeyFuncs>& CheckResults);
 
 	/** @return the game mode category the widget represents. */
 	EGameModeCategory GetGameModeCategory() const { return GameModeCategory; }
 
 	/** Executed when a property is changed by the user. */
-	TDelegate<void(const TSet<FPropertyHash>&)> OnPropertyChanged;
+	TDelegate<void(const TSet<uint32>&)> OnPropertyChanged;
+
+	/** @return the number tooltip icons of the specified type. */
+	int32 GetNumberOfDynamicTooltipIcons(ETooltipIconType Type);
 
 protected:
 	/** Adds a GameModeCategoryTagWidget for each matching GameplayTag on the Menu Option widget. */
@@ -93,7 +99,8 @@ protected:
 	/** Shared pointer to the game mode config inside GameModesWidget. */
 	TSharedPtr<FBSConfig> BSConfig;
 
-	TMap<FPropertyHash, TWeakObjectPtr<UMenuOptionWidget>> PropertyMenuOptionWidgetMap;
+	/** Stores menu options associated with properties in BSConfig. */
+	TMap<uint32, TWeakObjectPtr<UMenuOptionWidget>> PropertyMenuOptionWidgetMap;
 
 	UPROPERTY()
 	TArray<TWeakObjectPtr<UMenuOptionWidget>> MenuOptionWidgets;

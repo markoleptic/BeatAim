@@ -90,6 +90,54 @@ namespace
 		}
 		return Hash;
 	}
+
+	/** Creates a FPropertyHash object using the substruct and property found in RootStruct.
+	 *  @param SubStructName name of the inner struct.
+	 *  @param PropertyName name of property to find.
+	 *	@return a FPropertyHash object containing all properties leading to innermost property.
+	 */
+	template <typename RootStruct>
+	uint32 GetPropertyHash(const FName SubStructName, const FName PropertyName)
+	{
+		FPropertyHash Hash;
+		if (const FStructProperty* StructProperty = FindFProperty<FStructProperty>(RootStruct::StaticStruct(),
+			SubStructName))
+		{
+			Hash.Properties.Add(StructProperty);
+			if (const FProperty* Property = FindFProperty<FProperty>(StructProperty->Struct, PropertyName))
+			{
+				Hash.Properties.Add(Property);
+			}
+		}
+		return GetTypeHash(Hash);
+	}
+
+	/** Creates a FPropertyHash object using the substruct and property found in RootStruct.
+	 *  @param SubStructName name of the inner struct.
+	 *  @param SubSubStructName name of the inner inner struct.
+	 *  @param PropertyName name of property to find.
+	 *	@return a FPropertyHash object containing all properties leading to innermost property.
+	 */
+	template <typename RootStruct>
+	uint32 GetPropertyHash(const FName SubStructName, const FName SubSubStructName, const FName PropertyName)
+	{
+		FPropertyHash Hash;
+		if (const FStructProperty* StructProperty = FindFProperty<FStructProperty>(RootStruct::StaticStruct(),
+			SubStructName))
+		{
+			Hash.Properties.Add(StructProperty);
+			if (const FStructProperty* SubStructProperty = FindFProperty<FStructProperty>(StructProperty->Struct,
+				SubSubStructName))
+			{
+				Hash.Properties.Add(SubStructProperty);
+				if (const FProperty* Property = FindFProperty<FProperty>(SubStructProperty->Struct, PropertyName))
+				{
+					Hash.Properties.Add(Property);
+				}
+			}
+		}
+		return GetTypeHash(Hash);
+	}
 }
 
 /* ---------------------- */
@@ -508,14 +556,10 @@ FValidationCheckPtr UBSGameModeValidator::FPrivate::CreateValidationCheck(const 
 	TSet<FValidationPropertyPtr> Properties;
 	for (const FPropertyHash& PropertyHash : InvolvedProperties)
 	{
-		Properties.Add(*ValidationProperties.Find(PropertyHash));
+		Properties.Add(*ValidationProperties.Find(GetTypeHash(PropertyHash)));
 	}
 	TSharedPtr<FValidationCheck> Check = MakeShareable(new FValidationCheck(MoveTemp(Properties), WarningType));
 	Check->ValidationDelegate.BindLambda(Lambda);
-	for (const auto& elem : Check->InvolvedProperties)
-	{
-		UE_LOG(LogTemp, Display, TEXT("%s"), *elem->PropertyName);
-	}
 	return Check;
 }
 
@@ -657,7 +701,7 @@ FValidationResult UBSGameModeValidator::Validate(const TSharedPtr<FBSConfig>& In
 {
 	FValidationResult Result;
 	if (const FValidationPropertyPtr& ValidationProperty = FindValidationProperty(
-		CreatePropertyHash<FBSConfig>(SubStructName, PropertyName)))
+		GetPropertyHash<FBSConfig>(SubStructName, PropertyName)))
 	{
 		Impl->ValidateCheckGroup(InConfig, ValidationProperty->Checks, Result);
 	}
@@ -665,10 +709,10 @@ FValidationResult UBSGameModeValidator::Validate(const TSharedPtr<FBSConfig>& In
 }
 
 FValidationResult UBSGameModeValidator::Validate(const TSharedPtr<FBSConfig>& InConfig,
-	const TSet<FPropertyHash>& Properties) const
+	const TSet<uint32>& Properties) const
 {
 	FValidationResult Result;
-	for (const FPropertyHash& PropertyHash : Properties)
+	for (const uint32 PropertyHash : Properties)
 	{
 		if (const FValidationPropertyPtr& ValidationProperty = FindValidationProperty(PropertyHash))
 		{
@@ -679,20 +723,20 @@ FValidationResult UBSGameModeValidator::Validate(const TSharedPtr<FBSConfig>& In
 	return Result;
 }
 
-FPropertyHash UBSGameModeValidator::FindBSConfigProperty(const FName SubStructName, const FName PropertyName)
+uint32 UBSGameModeValidator::FindBSConfigProperty(const FName SubStructName, const FName PropertyName)
 {
-	return CreatePropertyHash<FBSConfig>(SubStructName, PropertyName);
+	return GetPropertyHash<FBSConfig>(SubStructName, PropertyName);
 }
 
-FPropertyHash UBSGameModeValidator::FindBSConfigProperty(const FName SubStructName, const FName SubSubStructName,
+uint32 UBSGameModeValidator::FindBSConfigProperty(const FName SubStructName, const FName SubSubStructName,
 	const FName PropertyName)
 {
-	return CreatePropertyHash<FBSConfig>(SubStructName, SubSubStructName, PropertyName);
+	return GetPropertyHash<FBSConfig>(SubStructName, SubSubStructName, PropertyName);
 }
 
-FValidationPropertyPtr UBSGameModeValidator::FindValidationProperty(const FPropertyHash& Property) const
+FValidationPropertyPtr UBSGameModeValidator::FindValidationProperty(const uint32 PropertyHash) const
 {
-	if (const FValidationPropertyPtr* Found = Impl->ValidationProperties.Find(Property))
+	if (const FValidationPropertyPtr* Found = Impl->ValidationProperties.Find(PropertyHash))
 	{
 		return *Found;
 	}

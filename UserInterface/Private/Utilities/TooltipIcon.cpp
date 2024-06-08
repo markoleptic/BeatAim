@@ -8,7 +8,7 @@
 #include "Utilities/TooltipWidget.h"
 
 UTooltipIcon::UTooltipIcon(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer), Button(nullptr),
-                                                                          Image(nullptr), TooltipData(nullptr),
+                                                                          Image(nullptr),
                                                                           TooltipIconType(ETooltipIconType::Default)
 {
 }
@@ -22,11 +22,6 @@ void UTooltipIcon::NativePreConstruct()
 void UTooltipIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
-	if (!TooltipData)
-	{
-		TooltipData = NewObject<UTooltipData>();
-		TooltipData->SetTooltipIcon(this);
-	}
 	SetTooltipIconType(TooltipIconType);
 	Button->OnHovered.AddDynamic(this, &UTooltipIcon::HandleTooltipHovered);
 }
@@ -34,6 +29,7 @@ void UTooltipIcon::NativeConstruct()
 void UTooltipIcon::PostInitProperties()
 {
 	Super::PostInitProperties();
+	TooltipData.SetTooltipIcon(this);
 }
 
 UTooltipIcon* UTooltipIcon::CreateTooltipIcon(UUserWidget* InOwningObject, const ETooltipIconType Type)
@@ -57,6 +53,7 @@ UTooltipIcon* UTooltipIcon::CreateTooltipIcon(UUserWidget* InOwningObject, const
 
 void UTooltipIcon::SetTooltipIconType(const ETooltipIconType Type)
 {
+	TooltipIconType = Type;
 	if (Image)
 	{
 		if (const FSlateBrush* Brush = TooltipIconBrushMap.Find(Type))
@@ -68,26 +65,21 @@ void UTooltipIcon::SetTooltipIconType(const ETooltipIconType Type)
 
 void UTooltipIcon::HandleTooltipHovered()
 {
-	if (!TooltipData)
-	{
-		TooltipData = NewObject<UTooltipData>();
-		TooltipData->SetTooltipIcon(this);
-	}
 	OnTooltipIconHovered.Broadcast(TooltipData);
 }
 
 void UTooltipIcon::SetTooltipText(const FText& InText, const bool bAllowTextWrap)
 {
-	if (!TooltipData)
-	{
-		TooltipData = NewObject<UTooltipData>();
-		TooltipData->SetTooltipIcon(this);
-	}
-	TooltipData->SetTooltipText(InText);
-	TooltipData->SetAllowTextWrap(bAllowTextWrap);
+	TooltipData.SetTooltipText(InText);
+	TooltipData.SetAllowTextWrap(bAllowTextWrap);
 }
 
-TObjectPtr<UTooltipData> UTooltipIcon::GetTooltipData() const
+FTooltipData& UTooltipIcon::GetTooltipData()
 {
 	return TooltipData;
+}
+
+ETooltipIconType UTooltipIcon::GetType() const
+{
+	return TooltipIconType;
 }

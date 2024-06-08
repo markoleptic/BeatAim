@@ -9,13 +9,13 @@ class UButton;
 class UTooltipIcon;
 
 /** Contains data for the tooltip of a widget, such as the text. */
-UCLASS()
-class UTooltipData : public UObject
+USTRUCT()
+struct FTooltipData
 {
 	GENERATED_BODY()
 
 public:
-	UTooltipData();
+	FTooltipData();
 
 	/** @return formatted tooltip text according to tooltip data. */
 	FText GetTooltipText() const;
@@ -24,12 +24,12 @@ public:
 	bool GetAllowTextWrap() const;
 
 	/** @return weak pointer to the tooltip icon this data is for. */
-	TWeakObjectPtr<UTooltipIcon> GetTooltipIcon() const;
+	TObjectPtr<UTooltipIcon> GetTooltipIcon() const;
 
 	/** Sets the tooltip icon this data is for.
 	 *  @param InTooltipIcon the tooltip icon.
 	 */
-	void SetTooltipIcon(const TWeakObjectPtr<UTooltipIcon>& InTooltipIcon);
+	void SetTooltipIcon(const TObjectPtr<UTooltipIcon>& InTooltipIcon);
 
 	/** Sets the tooltip text variable directly, bypassing formatting.
 	 *  @param InTooltipText text to move and set.
@@ -71,7 +71,7 @@ private:
 
 	/** Tooltip icon this data is for. */
 	UPROPERTY()
-	TWeakObjectPtr<UTooltipIcon> TooltipIcon;
+	TObjectPtr<UTooltipIcon> TooltipIcon;
 
 	/** The text to display on the tooltip widget when a user hovers over the tooltip icon. */
 	FText TooltipText;
@@ -86,12 +86,12 @@ private:
 	FNumberFormattingOptions NumberFormattingOptions;
 
 public:
-	FORCEINLINE bool operator==(const UTooltipData& Other) const
+	FORCEINLINE bool operator==(const FTooltipData& Other) const
 	{
 		return Id == Other.Id;
 	}
 
-	friend FORCEINLINE uint32 GetTypeHash(const UTooltipData& Value)
+	friend FORCEINLINE uint32 GetTypeHash(const FTooltipData& Value)
 	{
 		return GetTypeHash(Value.Id);
 	}

@@ -114,15 +114,6 @@ void UGameModeMenuWidget::NativeConstruct()
 	Carousel_CreatorProperty->SetActiveWidgetIndex(0);
 	CarouselNavBar_CreatorProperty->SetLinkedCarousel(Carousel_CreatorProperty);
 
-	//CustomGameModesWidget_PropertyView->RequestButtonStateUpdate.AddUObject(this,
-	//	&ThisClass::UpdateSaveStartButtonStates);
-	//CustomGameModesWidget_CreatorView->RequestButtonStateUpdate.AddUObject(this,
-	//	&ThisClass::UpdateSaveStartButtonStates);
-	//CustomGameModesWidget_PropertyView->OnGameModeBreakingChange.AddUObject(this,
-	//	&ThisClass::OnGameModeBreakingOptionPresentStateChanged);
-	//CustomGameModesWidget_CreatorView->OnGameModeBreakingChange.AddUObject(this,
-	//	&ThisClass::OnGameModeBreakingOptionPresentStateChanged);
-
 	CurrentCustomGameModesWidget = CustomGameModesWidget_CreatorView;
 	NotCurrentCustomGameModesWidget = CustomGameModesWidget_PropertyView;
 
@@ -721,6 +712,8 @@ void UGameModeMenuWidget::PopulateGameModeOptions(const FBSConfig& InConfig)
 	CurrentCustomGameModesWidget->UpdateOptionsFromConfig();
 	NotCurrentCustomGameModesWidget->UpdateOptionsFromConfig();
 
+	HandleValidation(GameModeValidator->Validate(BSConfig));
+
 	RefreshGameModePreview();
 }
 
@@ -779,7 +772,7 @@ void UGameModeMenuWidget::UpdateSaveStartButtonStates()
 {
 	//const bool bAllCustomGameModeOptionsValid = CurrentCustomGameModesWidget->GetAllNonStartChildWidgetOptionsValid();
 	const FStartWidgetProperties& Properties = UCustomGameModeStartWidget::GetProperties();
-	const bool bAllCustomGameModeOptionsValid = true;
+	const bool bAllCustomGameModeOptionsValid = bGameModeBreakingOptionPresent;
 	const bool bIsPresetMode = IsPresetGameMode(Properties.GameModeName);
 	const bool bIsCustomMode = IsCustomGameMode(Properties.GameModeName);
 	const bool bNewCustomGameModeNameEmpty = Properties.NewCustomGameModeName.IsEmpty();
@@ -998,11 +991,11 @@ void UGameModeMenuWidget::SetBSConfig(const FBSConfig& InConfig)
 	*BSConfig = InConfig;
 }
 
-void UGameModeMenuWidget::HandlePropertyChanged(const TSet<FPropertyHash>& Properties)
+void UGameModeMenuWidget::HandlePropertyChanged(const TSet<uint32>& Properties)
 {
-	for (const FPropertyHash& Prop : Properties)
+	for (const uint32 PropHash : Properties)
 	{
-		if (const FValidationPropertyPtr& PropertyPtr = GameModeValidator->FindValidationProperty(Prop))
+		if (const FValidationPropertyPtr& PropertyPtr = GameModeValidator->FindValidationProperty(PropHash))
 		{
 			UE_LOG(LogTemp, Display, TEXT("Property Changed: %s"), *PropertyPtr->PropertyName);
 		}
@@ -1013,18 +1006,29 @@ void UGameModeMenuWidget::HandlePropertyChanged(const TSet<FPropertyHash>& Prope
 		RefreshGameModePreview();
 	}
 
-	const FValidationResult Result = GameModeValidator->Validate(BSConfig, Properties);
+	HandleValidation(GameModeValidator->Validate(BSConfig, Properties));
+}
+
+void UGameModeMenuWidget::HandleValidation(const FValidationResult& Result)
+{
 	TSet<FValidationCheckResult, FValidationCheckKeyFuncs> Succeeded = Result.GetSucceeded();
 	TSet<FValidationCheckResult, FValidationCheckKeyFuncs> Failed = Result.GetFailed();
+	TMap<EGameModeCategory, TPair<int32, int32>> NotificationMap;
 
-	for (auto Widget : CurrentCustomGameModesWidget->GetCustomGameModeCategoryWidgets())
+	bool ContainsWarnings = false;
+	for (const auto& Widget : CurrentCustomGameModesWidget->GetCustomGameModeCategoryWidgets())
 	{
 		Widget->HandlePropertyValidation(Succeeded);
-	}
-	for (auto Widget : CurrentCustomGameModesWidget->GetCustomGameModeCategoryWidgets())
-	{
 		Widget->HandlePropertyValidation(Failed);
+		const int32 NumCautions = Widget->GetNumberOfDynamicTooltipIcons(ETooltipIconType::Caution);
+		const int32 NumWarnings = Widget->GetNumberOfDynamicTooltipIcons(ETooltipIconType::Warning);
+		ContainsWarnings = ContainsWarnings || NumWarnings > 0;
+		NotificationMap.Add(Widget->GetGameModeCategory(), {NumCautions, NumWarnings});
 	}
+
+	OnGameModeBreakingOptionPresentStateChanged(ContainsWarnings);
+	UpdateSaveStartButtonStates();
+	CustomGameModesWidget_CreatorView->UpdateNotificationIcons(NotificationMap);
 }
 
 void UGameModeMenuWidget::HandleStartWidgetPropertyChanged(FStartWidgetProperties& Properties)

@@ -4,7 +4,6 @@
 #include "GameModes/CreatorViewWidget.h"
 #include "CommonWidgetCarousel.h"
 #include "GameModes/CustomGameModeCategoryWidget.h"
-#include "GameModes/CustomGameModeStartWidget.h"
 #include "Utilities/BSCarouselNavBar.h"
 
 void UCreatorViewWidget::NativeConstruct()
@@ -18,21 +17,17 @@ void UCreatorViewWidget::NativeConstruct()
 
 void UCreatorViewWidget::OnCarouselWidgetIndexChanged(UCommonWidgetCarousel* InCarousel, const int32 NewIndex)
 {
-	UpdateOptionsFromConfig();
+	//UpdateOptionsFromConfig();
 }
 
-/*void UCreatorViewWidget::UpdateAllChildWidgetOptionsValid()
+void UCreatorViewWidget::UpdateNotificationIcons(const TMap<EGameModeCategory, TPair<int32, int32>>& IconMap)
 {
-	Super::UpdateAllChildWidgetOptionsValid();
-	for (const TPair<TObjectPtr<UCustomGameModeCategoryWidget>, FCustomGameModeCategoryInfo*>& ChildWidgetValidity :
-	     ChildWidgetValidityMap)
+	for (const auto& [Category, Pair] : IconMap)
 	{
-		// Widget_Start has a separate validity check
-		if (ChildWidgetValidity.Key.IsA<UCustomGameModeStartWidget>())
+		if (const TObjectPtr<UCustomGameModeCategoryWidget>* Widget = GameModeCategoryWidgetMap.Find(Category))
 		{
-			continue;
+			CarouselNavBar->UpdateNotifications(static_cast<int32>((*Widget)->GetGameModeCategory()) - 1, Pair.Key,
+				Pair.Value);
 		}
-		CarouselNavBar->UpdateNotifications(static_cast<int32>(ChildWidgetValidity.Key->GetGameModeCategory()) - 1, ChildWidgetValidity.Value->NumCautions,
-			ChildWidgetValidity.Value->NumWarnings);
 	}
-}*/
+}

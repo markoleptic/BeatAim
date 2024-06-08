@@ -152,7 +152,7 @@ struct BEATSHOTGLOBAL_API FValidationProperty
 	FValidationProperty() = default;
 
 	explicit FValidationProperty(const FPropertyHash& InPropertyHash, const EGameModeCategory InGameModeCategory) :
-		Property(InPropertyHash), GameModeCategory(InGameModeCategory)
+		Hash(GetTypeHash(InPropertyHash)), GameModeCategory(InGameModeCategory)
 	{
 		for (const FProperty* Prop : InPropertyHash.Properties)
 		{
@@ -167,8 +167,8 @@ struct BEATSHOTGLOBAL_API FValidationProperty
 	 */
 	void AddCheck(const FValidationCheckPtr& Check, const FUniqueValidationCheckData& Data);
 
-	/** The single property this validation property represents. */
-	FPropertyHash Property;
+	/** Unique has created from the FProperty this Validation Property represents. */
+	uint32 Hash;
 
 	/** Full property name constructed from the property's path. */
 	FString PropertyName;
@@ -184,7 +184,7 @@ struct BEATSHOTGLOBAL_API FValidationProperty
 
 	FORCEINLINE bool operator ==(const FValidationProperty& Other) const
 	{
-		return Property == Other.Property;
+		return Hash == Other.Hash;
 	}
 
 	FORCEINLINE bool operator <(const FValidationProperty& Other) const
@@ -194,26 +194,26 @@ struct BEATSHOTGLOBAL_API FValidationProperty
 
 	friend FORCEINLINE uint32 GetTypeHash(const FValidationProperty& Object)
 	{
-		return GetTypeHash(Object.Property);
+		return Object.Hash;
 	}
 };
 
 /** Struct used to allow efficient retrieval of validation properties in TSets using FProperty as a key. */
-struct FValidationPropertyKeyFuncs : BaseKeyFuncs<FValidationPropertyPtr, FPropertyHash, false>
+struct FValidationPropertyKeyFuncs : BaseKeyFuncs<FValidationPropertyPtr, uint32, false>
 {
-	static FPropertyHash GetSetKey(const FValidationPropertyPtr& Element)
+	static uint32 GetSetKey(const FValidationPropertyPtr& Element)
 	{
-		return Element->Property;
+		return Element->Hash;
 	}
 
-	static bool Matches(const FPropertyHash& A, const FPropertyHash& B)
+	static bool Matches(const uint32 A, const uint32 B)
 	{
 		return A == B;
 	}
 
-	static uint32 GetKeyHash(const FPropertyHash& Key)
+	static uint32 GetKeyHash(const uint32 Key)
 	{
-		return GetTypeHash(Key);
+		return Key;
 	}
 };
 
@@ -334,14 +334,14 @@ public:
 	 *  @param Properties a set of specific properties to validate.
 	 *	@return a validation result container object
 	 */
-	FValidationResult Validate(const TSharedPtr<FBSConfig>& InConfig, const TSet<FPropertyHash>& Properties) const;
+	FValidationResult Validate(const TSharedPtr<FBSConfig>& InConfig, const TSet<uint32>& Properties) const;
 
 	/** Finds a property in BSConfig.
 	 *  @param SubStructName name of the inner struct.
 	 *  @param PropertyName name of property to find.
 	 *	@return a property if found, otherwise null.
 	 */
-	static FPropertyHash FindBSConfigProperty(const FName SubStructName, const FName PropertyName);
+	static uint32 FindBSConfigProperty(const FName SubStructName, const FName PropertyName);
 
 	/** Finds a property in BSConfig.
 	 *  @param SubStructName name of the inner struct.
@@ -349,14 +349,14 @@ public:
 	 *  @param PropertyName name of property to find.
 	 *	@return a property if found, otherwise null.
 	 */
-	static FPropertyHash FindBSConfigProperty(const FName SubStructName, const FName SubSubStructName,
+	static uint32 FindBSConfigProperty(const FName SubStructName, const FName SubSubStructName,
 		const FName PropertyName);
 
 	/** Finds a validation property based on a BSConfig FProperty.
-	 *  @param Property the property to look for.
+	 *  @param PropertyHash the property to look for.
 	 *	@return a validation property pointer if found, otherwise null.
 	 */
-	FValidationPropertyPtr FindValidationProperty(const FPropertyHash& Property) const;
+	FValidationPropertyPtr FindValidationProperty(uint32 PropertyHash) const;
 
 	/** @return All validation properties. */
 	TSet<FValidationPropertyPtr, FValidationPropertyKeyFuncs>& GetValidationProperties() const;

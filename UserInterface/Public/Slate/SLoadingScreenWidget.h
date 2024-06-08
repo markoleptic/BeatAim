@@ -46,8 +46,6 @@ public:
 		FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle,
 		bool bParentEnabled) const override;
 
-	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
-
 	/** Begins fading the MainOverlay, revealing the black background. */
 	void SetLoadingScreenState(const ELoadingScreenState& InLoadingScreenState) const;
 

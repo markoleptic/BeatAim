@@ -24,10 +24,10 @@ protected:
 	UFUNCTION()
 	void OnCarouselWidgetIndexChanged(UCommonWidgetCarousel* InCarousel, const int32 NewIndex);
 
-	/** Calls UpdateAllOptionsValid for each child widget. */
-	//virtual void UpdateAllChildWidgetOptionsValid() override;
-
 public:
+	/** Updates icons on the carousel. */
+	void UpdateNotificationIcons(const TMap<EGameModeCategory, TPair<int32, int32>>& IconMap);
+
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UCustomGameModePreviewWidget* Widget_Preview;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))

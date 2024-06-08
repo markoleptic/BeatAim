@@ -22,10 +22,10 @@ void UMenuOptionWidget::NativePreConstruct()
 	Super::NativePreConstruct();
 
 	SetIndentLevel(IndentLevel);
-	SetShowTooltipIcon(bShowTooltipIcon);
+	SetShowTooltipIcon(bShowDescriptionTooltipIcon);
 	SetShowCheckBoxLock(bShowCheckBoxLock);
 	SetDescriptionText(DescriptionText);
-	SetTooltipText(DescriptionTooltipText);
+	SetDescriptionTooltipText(DescriptionTooltipText);
 
 	SetStyling();
 }
@@ -38,10 +38,10 @@ void UMenuOptionWidget::NativeConstruct()
 		CheckBox_Lock->OnCheckStateChanged.AddUniqueDynamic(this, &ThisClass::OnCheckBox_LockStateChanged);
 	}
 	SetIndentLevel(IndentLevel);
-	SetShowTooltipIcon(bShowTooltipIcon);
+	SetShowTooltipIcon(bShowDescriptionTooltipIcon);
 	SetShowCheckBoxLock(bShowCheckBoxLock);
 	SetDescriptionText(DescriptionText);
-	SetTooltipText(DescriptionTooltipText);
+	SetDescriptionTooltipText(DescriptionTooltipText);
 
 	SetStyling();
 }
@@ -119,7 +119,7 @@ void UMenuOptionWidget::SetIndentLevel(const int32 Value)
 
 void UMenuOptionWidget::SetShowTooltipIcon(const bool bShow)
 {
-	bShowTooltipIcon = bShow;
+	bShowDescriptionTooltipIcon = bShow;
 
 	if (!DescriptionTooltip)
 	{
@@ -162,12 +162,12 @@ void UMenuOptionWidget::SetDescriptionText(const FText& InText)
 	}
 }
 
-void UMenuOptionWidget::SetTooltipText(const FText& InText)
+void UMenuOptionWidget::SetDescriptionTooltipText(const FText& InText)
 {
 	DescriptionTooltipText = InText;
 }
 
-UTooltipIcon* UMenuOptionWidget::GetTooltipIcon() const
+UTooltipIcon* UMenuOptionWidget::GetDescriptionTooltipIcon() const
 {
 	return DescriptionTooltip;
 }
@@ -221,15 +221,15 @@ UTooltipIcon* UMenuOptionWidget::AddTooltipIcon(const FUniqueValidationCheckData
 	UTooltipIcon* TooltipIcon = UTooltipIcon::CreateTooltipIcon(this, Type);
 	UHorizontalBoxSlot* HorizontalBoxSlot = TooltipBox->AddChildToHorizontalBox(TooltipIcon);
 	HorizontalBoxSlot->SetHorizontalAlignment(HAlign_Right);
-	HorizontalBoxSlot->SetPadding(MenuOptionStyle->Padding_TooltipWarning);
+	HorizontalBoxSlot->SetPadding(MenuOptionStyle->Padding_DynamicTooltipIcons);
 	HorizontalBoxSlot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
 	if (!Data.DynamicStringTableKey.IsEmpty())
 	{
-		TooltipIcon->GetTooltipData()->CreateFormattedText(Data.TooltipText);
+		TooltipIcon->GetTooltipData().CreateFormattedText(Data.TooltipText);
 	}
 	else
 	{
-		TooltipIcon->GetTooltipData()->SetTooltipText(Data.TooltipText);
+		TooltipIcon->GetTooltipData().SetTooltipText(Data.TooltipText);
 	}
 
 	DynamicTooltipIcons.Add(GetTypeHash(Data), TooltipIcon);
@@ -277,9 +277,22 @@ void UMenuOptionWidget::UpdateDynamicTooltipIcon(const bool bValidated, const FU
 		{
 			TooltipIcon = AddTooltipIcon(Data);
 		}
-		if (TooltipIcon->GetTooltipData()->HasFormattedText())
+		if (TooltipIcon->GetTooltipData().HasFormattedText())
 		{
-			TooltipIcon->GetTooltipData()->SetFormattedTooltipText(CalculatedValues);
+			TooltipIcon->GetTooltipData().SetFormattedTooltipText(CalculatedValues);
 		}
 	}
+}
+
+int32 UMenuOptionWidget::GetNumberOfDynamicTooltipIcons(const ETooltipIconType Type)
+{
+	int32 Count = 0;
+	for (const auto& [Hash, TooltipIcon] : DynamicTooltipIcons)
+	{
+		if (TooltipIcon->GetType() == Type)
+		{
+			Count++;
+		}
+	}
+	return Count;
 }

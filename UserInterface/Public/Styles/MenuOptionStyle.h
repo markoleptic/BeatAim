@@ -61,7 +61,7 @@ public:
 
 	/** The padding used when placing a new Tooltip Warning/Caution. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MenuOptionStyle|Padding")
-	FMargin Padding_TooltipWarning = FMargin(10.f, 0.f, 0.f, 0.f);
+	FMargin Padding_DynamicTooltipIcons = FMargin(10.f, 0.f, 0.f, 0.f);
 
 	/** The padding used when placing a new GameModeCategoryTagWidget. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MenuOptionStyle|Padding")

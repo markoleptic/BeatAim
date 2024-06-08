@@ -3,7 +3,6 @@
 
 #include "GameModes/CustomGameModeCategoryWidget.h"
 #include "Blueprint/WidgetTree.h"
-#include "BSConstants.h"
 #include "BSGameModeConfig/BSConfig.h"
 #include "BSGameModeConfig/BSGameModeValidator.h"
 #include "Components/CheckBox.h"
@@ -47,14 +46,6 @@ void UCustomGameModeCategoryWidget::NativeDestruct()
 	BSConfig = nullptr;
 }
 
-/*void UCustomGameModeCategoryWidget::UpdateAllOptionsValid()
-{
-	if (!UpdateWarningTooltips())
-	{
-		RequestComponentUpdate.Broadcast();
-	}
-}*/
-
 void UCustomGameModeCategoryWidget::InitComponent(const TSharedPtr<FBSConfig>& InConfig)
 {
 	BSConfig = InConfig;
@@ -75,7 +66,7 @@ void UCustomGameModeCategoryWidget::HandlePropertyValidation(
 			{
 				continue;
 			}
-			if (const TWeakObjectPtr<UMenuOptionWidget>* Found = PropertyMenuOptionWidgetMap.Find(Property->Property))
+			if (const TWeakObjectPtr<UMenuOptionWidget>* Found = PropertyMenuOptionWidgetMap.Find(Property->Hash))
 			{
 				UE_LOG(LogTemp, Display, TEXT("Found widget %s for property %s"), *Found->Get()->GetName(),
 					*Property.Get()->PropertyName);
@@ -83,6 +74,16 @@ void UCustomGameModeCategoryWidget::HandlePropertyValidation(
 			}
 		}
 	}
+}
+
+int32 UCustomGameModeCategoryWidget::GetNumberOfDynamicTooltipIcons(const ETooltipIconType Type)
+{
+	int32 Count = 0;
+	for (const auto& [Hash, MenuOptionWidget] : PropertyMenuOptionWidgetMap)
+	{
+		Count += MenuOptionWidget->GetNumberOfDynamicTooltipIcons(Type);
+	}
+	return Count;
 }
 
 void UCustomGameModeCategoryWidget::AddGameModeCategoryTagWidgets(UMenuOptionWidget* MenuOptionWidget)
@@ -245,47 +246,6 @@ bool UCustomGameModeCategoryWidget::UpdateValuesIfDifferent(const UToggleableSin
 
 	return bDifferent;
 }
-
-/*bool UCustomGameModeCategoryWidget::UpdateWarningTooltips()
-{
-	bool bAllClean = true;
-	for (const TWeakObjectPtr<UMenuOptionWidget>& Widget : MenuOptionWidgets)
-	{
-		Widget->UpdateAllWarningTooltips();
-		TArray<FTooltipData>& TooltipData = Widget->GetTooltipWarningData();
-		for (FTooltipData& Data : TooltipData)
-		{
-			if (Data.IsDirty())
-			{
-				bAllClean = false;
-				if (Data.ShouldShowTooltipImage())
-				{
-					Widget->ConstructTooltipWarningImageIfNeeded(Data);
-					SetupTooltip(Data);
-				}
-				else
-				{
-					Data.RemoveTooltipImage();
-				}
-				Data.SetIsClean(true);
-			}
-		}
-	}
-	UpdateCustomGameModeCategoryInfo();
-	return bAllClean;
-}*/
-
-/*void UCustomGameModeCategoryWidget::UpdateCustomGameModeCategoryInfo()
-{
-	int32 NumWarnings = 0;
-	int32 NumCautions = 0;
-	for (const TWeakObjectPtr<UMenuOptionWidget>& Widget : MenuOptionWidgets)
-	{
-		NumWarnings += Widget->GetNumberOfWarnings();
-		NumCautions += Widget->GetNumberOfCautions();
-	}
-	CustomGameModeCategoryInfo.Update(NumCautions, NumWarnings);
-}*/
 
 void UCustomGameModeCategoryWidget::SetMenuOptionEnabledStateAndAddTooltip(UMenuOptionWidget* Widget,
 	const EMenuOptionEnabledState State, const FString& Key)

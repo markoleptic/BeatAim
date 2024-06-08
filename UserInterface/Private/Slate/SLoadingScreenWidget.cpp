@@ -14,11 +14,6 @@ int32 SLoadingScreenWidget::OnPaint(const FPaintArgs& Args, const FGeometry& All
 		bParentEnabled);
 }
 
-void SLoadingScreenWidget::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
-{
-	SCompoundWidget::Tick(AllottedGeometry, InCurrentTime, InDeltaTime);
-}
-
 void SLoadingScreenWidget::SetLoadingScreenState(const ELoadingScreenState& InLoadingScreenState) const
 {
 	if (LoadingScreenState == ELoadingScreenState::FadingIn && InLoadingScreenState == ELoadingScreenState::FadingOut &&

@@ -4,49 +4,49 @@
 #include "Utilities/TooltipData.h"
 #include "Utilities/TooltipIcon.h"
 
-int32 UTooltipData::GId = 0;
+int32 FTooltipData::GId = 0;
 
-UTooltipData::UTooltipData(): Id(GId++), bAllowTextWrap(false)
+FTooltipData::FTooltipData(): Id(GId++), bAllowTextWrap(false)
 {
 	NumberFormattingOptions.SetAlwaysSign(false).SetRoundingMode(HalfFromZero).SetMaximumFractionalDigits(2);
 }
 
-FText UTooltipData::GetTooltipText() const
+FText FTooltipData::GetTooltipText() const
 {
 	return TooltipText;
 }
 
-bool UTooltipData::GetAllowTextWrap() const
+bool FTooltipData::GetAllowTextWrap() const
 {
 	return bAllowTextWrap;
 }
 
-TWeakObjectPtr<UTooltipIcon> UTooltipData::GetTooltipIcon() const
+TObjectPtr<UTooltipIcon> FTooltipData::GetTooltipIcon() const
 {
 	return TooltipIcon;
 }
 
-void UTooltipData::SetTooltipIcon(const TWeakObjectPtr<UTooltipIcon>& InTooltipIcon)
+void FTooltipData::SetTooltipIcon(const TObjectPtr<UTooltipIcon>& InTooltipIcon)
 {
 	TooltipIcon = InTooltipIcon;
 }
 
-void UTooltipData::SetTooltipText(const FText& InTooltipText)
+void FTooltipData::SetTooltipText(const FText& InTooltipText)
 {
 	TooltipText = InTooltipText;
 }
 
-void UTooltipData::SetAllowTextWrap(const bool InbAllowTextWrap)
+void FTooltipData::SetAllowTextWrap(const bool InbAllowTextWrap)
 {
 	bAllowTextWrap = InbAllowTextWrap;
 }
 
-void UTooltipData::CreateFormattedText(const FText& InText)
+void FTooltipData::CreateFormattedText(const FText& InText)
 {
 	FormattedText = FTextFormat(InText);
 }
 
-void UTooltipData::SetFormattedTooltipText(const TArray<int32>& CalculatedValues)
+void FTooltipData::SetFormattedTooltipText(const TArray<int32>& CalculatedValues)
 {
 	FFormatNamedArguments Args;
 	Args.Reserve(CalculatedValues.Num());
@@ -57,21 +57,21 @@ void UTooltipData::SetFormattedTooltipText(const TArray<int32>& CalculatedValues
 	TooltipText = FText::Format(FormattedText, Args);
 }
 
-TArray<FString> UTooltipData::GetFormattedTextArgs() const
+TArray<FString> FTooltipData::GetFormattedTextArgs() const
 {
 	TArray<FString> Names;
 	FormattedText.GetFormatArgumentNames(Names);
 	return Names;
 }
 
-int32 UTooltipData::GetNumberOfFormattedTextArgs() const
+int32 FTooltipData::GetNumberOfFormattedTextArgs() const
 {
 	TArray<FString> Names;
 	FormattedText.GetFormatArgumentNames(Names);
 	return Names.Num();
 }
 
-bool UTooltipData::HasFormattedText() const
+bool FTooltipData::HasFormattedText() const
 {
 	return FormattedText.IsValid();
 }

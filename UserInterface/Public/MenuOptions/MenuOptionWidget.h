@@ -74,13 +74,13 @@ public:
 	void SetDescriptionText(const FText& InText);
 
 	/** Sets the tooltip text associated with the tooltip icon. */
-	void SetTooltipText(const FText& InText);
+	void SetDescriptionTooltipText(const FText& InText);
 
 	/** Returns the tooltip icon. */
-	UTooltipIcon* GetTooltipIcon() const;
+	UTooltipIcon* GetDescriptionTooltipIcon() const;
 
 	/** Returns the tooltip text associated with the tooltip icon. */
-	FText GetTooltipIconText() const { return DescriptionTooltipText; }
+	FText GetDescriptionTooltipIconText() const { return DescriptionTooltipText; }
 
 	/** Returns true if locked. */
 	bool GetIsLocked() const;
@@ -89,7 +89,7 @@ public:
 	void SetIsLocked(const bool bLocked) const;
 
 	/** Returns value of bShowTooltipIcon. */
-	bool ShouldShowTooltip() const { return bShowTooltipIcon; }
+	bool ShouldShowDescriptionTooltipIcon() const { return bShowDescriptionTooltipIcon; }
 
 	/** Broadcasts the new state of the lock and the index. */
 	FOnLockStateChanged OnLockStateChanged;
@@ -108,6 +108,9 @@ public:
 	 */
 	void UpdateDynamicTooltipIcon(const bool bValidated, const FUniqueValidationCheckData& Data,
 		const TArray<int32>& CalculatedValues);
+
+	/** @return the number tooltip icons of the specified type. */
+	int32 GetNumberOfDynamicTooltipIcons(ETooltipIconType Type);
 
 protected:
 	UFUNCTION()
@@ -167,7 +170,7 @@ protected:
 	bool bShowCheckBoxLock = false;
 
 	UPROPERTY(EditInstanceOnly, Category="MenuOptionWidget|Tooltip")
-	bool bShowTooltipIcon = true;
+	bool bShowDescriptionTooltipIcon = true;
 
 	/** Text to show on the tooltip. */
 	UPROPERTY(EditInstanceOnly, Category="MenuOptionWidget|Tooltip")
@@ -180,5 +183,6 @@ protected:
 	/** The custom enabled state of the menu option. */
 	EMenuOptionEnabledState MenuOptionEnabledState;
 
+	UPROPERTY()
 	TMap<uint32, TObjectPtr<UTooltipIcon>> DynamicTooltipIcons;
 };
