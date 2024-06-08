@@ -280,7 +280,6 @@ void UCustomGameModeSpawnAreaWidget::OnSliderTextBoxValueChanged(USingleRangeInp
 			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
 				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, FloorDistance))
 		});
-		//RequestGameModePreviewUpdate.Broadcast();
 	}
 	else if (Widget == SliderTextBoxOption_StartThreshold)
 	{

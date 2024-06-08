@@ -67,12 +67,18 @@ void UCustomGameModeCategoryWidget::UpdateOptionsFromConfig()
 void UCustomGameModeCategoryWidget::HandlePropertyValidation(
 	TSet<FValidationCheckResult, FValidationCheckKeyFuncs>& CheckResults)
 {
-	for (auto& Elem : CheckResults)
+	for (const auto& Elem : CheckResults)
 	{
-		for (auto& [Property, Data] : Elem.PropertyData)
+		for (const auto& [Property, Data] : Elem.PropertyData)
 		{
+			if (Data.IsEmpty())
+			{
+				continue;
+			}
 			if (const TWeakObjectPtr<UMenuOptionWidget>* Found = PropertyMenuOptionWidgetMap.Find(Property->Property))
 			{
+				UE_LOG(LogTemp, Display, TEXT("Found widget %s for property %s"), *Found->Get()->GetName(),
+					*Property.Get()->PropertyName);
 				(*Found)->UpdateDynamicTooltipIcon(Elem.bSuccess, Data, Elem.CalculatedValues);
 			}
 		}

@@ -19,11 +19,12 @@ void UBSSettingCategoryWidget::InitSettingCategoryWidget()
 	{
 		if (const auto MenuOption = Cast<UMenuOptionWidget>(Widget))
 		{
-			if (MenuOption->ShouldShowTooltip())
+			const FText Text = MenuOption->GetTooltipIconText();
+			if (MenuOption->ShouldShowTooltip() && !Text.IsEmpty())
 			{
 				if (UTooltipIcon* TooltipIcon = MenuOption->GetTooltipIcon())
 				{
-					SetupTooltip(TooltipIcon, MenuOption->GetTooltipIconText());
+					SetupTooltip(TooltipIcon, Text);
 				}
 			}
 		}

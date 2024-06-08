@@ -103,9 +103,9 @@ struct BEATSHOTGLOBAL_API FUniqueValidationCheckData
 
 	FUniqueValidationCheckData() = default;
 
-	FUniqueValidationCheckData(const FString& InStringTableKey, const FString& InDynamicStringTableKey) :
-		StringTableKey(InStringTableKey), DynamicStringTableKey(InDynamicStringTableKey),
-		WarningType(EGameModeWarningType::None)
+	FUniqueValidationCheckData(const FString& InStringTableKey, const FString& InDynamicStringTableKey,
+		const uint32 InHash) : StringTableKey(InStringTableKey), DynamicStringTableKey(InDynamicStringTableKey),
+		                       WarningType(EGameModeWarningType::None), Hash(InHash)
 	{
 	}
 
@@ -124,19 +124,22 @@ struct BEATSHOTGLOBAL_API FUniqueValidationCheckData
 	/** The type of warning associated with the validation check. */
 	EGameModeWarningType WarningType;
 
+	/** Unique has created from the FValidationPropertyPtr and FValidationCheckPtr. */
+	uint32 Hash;
+
 	FORCEINLINE bool operator ==(const FUniqueValidationCheckData& Other) const
 	{
-		return StringTableKey == Other.StringTableKey && DynamicStringTableKey == Other.DynamicStringTableKey;
+		return Hash == Other.Hash;
 	}
 
 	FORCEINLINE bool operator <(const FUniqueValidationCheckData& Other) const
 	{
-		return StringTableKey < Other.StringTableKey;
+		return Hash < Other.Hash;
 	}
 
 	friend FORCEINLINE uint32 GetTypeHash(const FUniqueValidationCheckData& Object)
 	{
-		return GetTypeHash(Object.StringTableKey);
+		return Object.Hash;
 	}
 };
 
@@ -167,6 +170,7 @@ struct BEATSHOTGLOBAL_API FValidationProperty
 	/** The single property this validation property represents. */
 	FPropertyHash Property;
 
+	/** Full property name constructed from the property's path. */
 	FString PropertyName;
 
 	/** The game mode category this property falls under. Used to sync with user interface. */
@@ -353,6 +357,9 @@ public:
 	 *	@return a validation property pointer if found, otherwise null.
 	 */
 	FValidationPropertyPtr FindValidationProperty(const FPropertyHash& Property) const;
+
+	/** @return All validation properties. */
+	TSet<FValidationPropertyPtr, FValidationPropertyKeyFuncs>& GetValidationProperties() const;
 
 private:
 	class FPrivate;

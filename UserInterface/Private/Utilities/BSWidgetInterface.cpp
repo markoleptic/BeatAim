@@ -50,7 +50,7 @@ UWidget* IBSWidgetInterface::OnGenerateWidgetEvent(const UBSComboBoxString* Comb
 
 	if (UBSComboBoxEntry* Entry = ConstructComboBoxEntryWidget())
 	{
-		ComboBoxString->InitializeComboBoxEntry(Entry, EntryText, bShowTooltipIcon, MoveTemp(TooltipText));
+		ComboBoxString->InitializeComboBoxEntry(Entry, EntryText, bShowTooltipIcon, TooltipText);
 		return Entry;
 	}
 	return nullptr;
@@ -115,7 +115,7 @@ void IBSWidgetInterface::SetupTooltip(UTooltipIcon* TooltipIcon, const FText& To
 	}
 	if (TooltipText.IsEmpty())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Empty Tooltip Text for %s."), *TooltipIcon->GetParent()->GetParent()->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("Empty Tooltip Text for %s."), *TooltipIcon->GetFullName());
 	}
 
 	UTooltipWidget* TooltipWidget = GetTooltipWidget();

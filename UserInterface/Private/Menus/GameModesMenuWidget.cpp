@@ -32,6 +32,18 @@ void UGameModeMenuWidget::NativeConstruct()
 	InitDefaultGameModesWidgets();
 
 	GameModeValidator = NewObject<UBSGameModeValidator>();
+	for (const FValidationPropertyPtr& Property : GameModeValidator->GetValidationProperties())
+	{
+		for (auto& [CheckPtr, CheckData] : Property->CheckData)
+		{
+			if (!CheckData.IsEmpty())
+			{
+				CheckData.TooltipText = CheckData.DynamicStringTableKey.IsEmpty()
+					? IBSWidgetInterface::GetTooltipTextFromKey(CheckData.StringTableKey)
+					: IBSWidgetInterface::GetTooltipTextFromKey(CheckData.DynamicStringTableKey);
+			}
+		}
+	}
 	BSConfig = MakeShareable(new FBSConfig());
 
 	ForceRefreshProperties = {
@@ -1004,22 +1016,6 @@ void UGameModeMenuWidget::HandlePropertyChanged(const TSet<FPropertyHash>& Prope
 	const FValidationResult Result = GameModeValidator->Validate(BSConfig, Properties);
 	TSet<FValidationCheckResult, FValidationCheckKeyFuncs> Succeeded = Result.GetSucceeded();
 	TSet<FValidationCheckResult, FValidationCheckKeyFuncs> Failed = Result.GetFailed();
-
-	auto UpdateTooltipText = [&](TSet<FValidationCheckResult, FValidationCheckKeyFuncs>& CheckResults)
-	{
-		for (auto& Elem : CheckResults)
-		{
-			for (auto& [Property, Data] : Elem.PropertyData)
-			{
-				Data.TooltipText = Data.DynamicStringTableKey.IsEmpty()
-					? IBSWidgetInterface::GetTooltipTextFromKey(Data.StringTableKey)
-					: IBSWidgetInterface::GetTooltipTextFromKey(Data.DynamicStringTableKey);
-			}
-		}
-	};
-
-	UpdateTooltipText(Succeeded);
-	UpdateTooltipText(Failed);
 
 	for (auto Widget : CurrentCustomGameModesWidget->GetCustomGameModeCategoryWidgets())
 	{

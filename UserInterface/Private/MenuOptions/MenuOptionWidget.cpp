@@ -232,7 +232,7 @@ UTooltipIcon* UMenuOptionWidget::AddTooltipIcon(const FUniqueValidationCheckData
 		TooltipIcon->GetTooltipData()->SetTooltipText(Data.TooltipText);
 	}
 
-	DynamicTooltipIcons.Add(Data.StringTableKey, TooltipIcon);
+	DynamicTooltipIcons.Add(GetTypeHash(Data), TooltipIcon);
 	return TooltipIcon;
 }
 
@@ -260,14 +260,14 @@ void UMenuOptionWidget::AddGameModeCategoryTagWidgets(TArray<UGameModeCategoryTa
 void UMenuOptionWidget::UpdateDynamicTooltipIcon(const bool bValidated, const FUniqueValidationCheckData& Data,
 	const TArray<int32>& CalculatedValues)
 {
-	const TObjectPtr<UTooltipIcon>* TooltipIconPtr = DynamicTooltipIcons.Find(Data.StringTableKey);
+	const TObjectPtr<UTooltipIcon>* TooltipIconPtr = DynamicTooltipIcons.Find(Data.Hash);
 	TObjectPtr<UTooltipIcon> TooltipIcon = TooltipIconPtr ? TooltipIconPtr->Get() : nullptr;
 
 	if (bValidated)
 	{
 		if (TooltipIcon)
 		{
-			DynamicTooltipIcons.Remove(Data.StringTableKey);
+			DynamicTooltipIcons.Remove(Data.Hash);
 			TooltipIcon->RemoveFromParent();
 		}
 	}

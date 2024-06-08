@@ -180,5 +180,5 @@ protected:
 	/** The custom enabled state of the menu option. */
 	EMenuOptionEnabledState MenuOptionEnabledState;
 
-	TMap<FString, TObjectPtr<UTooltipIcon>> DynamicTooltipIcons;
+	TMap<uint32, TObjectPtr<UTooltipIcon>> DynamicTooltipIcons;
 };
