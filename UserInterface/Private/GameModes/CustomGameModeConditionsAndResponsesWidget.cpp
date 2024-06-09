@@ -19,6 +19,26 @@ void UCustomGameModeConditionsAndResponsesWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetSpawnResponses)), ComboBoxOption_TargetSpawnResponses);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetActivationResponses)),
+		ComboBoxOption_TargetActivationResponses);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDeactivationConditions)),
+		ComboBoxOption_TargetDeactivationConditions);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDeactivationResponses)),
+		ComboBoxOption_TargetDeactivationResponses);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDestructionConditions)),
+		ComboBoxOption_TargetDestructionConditions);
+
 	ComboBoxOption_TargetSpawnResponses->ComboBox->OnSelectionChanged.AddUniqueDynamic(this,
 		&ThisClass::OnSelectionChanged_TargetSpawnResponses);
 	ComboBoxOption_TargetActivationResponses->ComboBox->OnSelectionChanged.AddUniqueDynamic(this,

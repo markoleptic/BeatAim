@@ -61,6 +61,8 @@ protected:
 	/** Adds a GameModeCategoryTagWidget for each matching GameplayTag on the Menu Option widget. */
 	void AddGameModeCategoryTagWidgets(UMenuOptionWidget* MenuOptionWidget);
 
+	void AssociatePropertyWithMenuOption(uint32 PropertyHash, UMenuOptionWidget* MenuOptionWidget);
+
 	/** Updates the slider and editable text box values if different from Value. */
 	static bool UpdateValueIfDifferent(const USingleRangeInputWidget* Widget, const float Value);
 
@@ -99,9 +101,6 @@ protected:
 	/** Shared pointer to the game mode config inside GameModesWidget. */
 	TSharedPtr<FBSConfig> BSConfig;
 
-	/** Stores menu options associated with properties in BSConfig. */
-	TMap<uint32, TWeakObjectPtr<UMenuOptionWidget>> PropertyMenuOptionWidgetMap;
-
 	UPROPERTY()
 	TArray<TWeakObjectPtr<UMenuOptionWidget>> MenuOptionWidgets;
 
@@ -132,6 +131,10 @@ protected:
 	/** Returns an array of enum values based on the string display names. Requires EnumTagMap .*/
 	template <typename T>
 	TArray<T> GetEnumArrayFromStringArray_FromTagMap(const TArray<FString>& InStringArray);
+
+private:
+	/** Stores menu options associated with properties in BSConfig. */
+	TMap<uint32, TWeakObjectPtr<UMenuOptionWidget>> PropertyMenuOptionWidgetMap;
 };
 
 template <typename T>

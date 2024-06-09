@@ -24,6 +24,22 @@ void UCustomGameModeActivationWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxNumActivatedTargetsAtOnce)),
+		SliderTextBoxOption_MaxNumActivatedTargetsAtOnce);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxNumTargetsAtOnce)), MenuOption_NumTargetsToActivateAtOnce);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bAllowActivationWhileActivated)),
+		CheckBoxOption_AllowActivationWhileActivated);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetActivationSelectionPolicy)),
+		ComboBoxOption_TargetActivationSelectionPolicy);
+
 	SliderTextBoxOption_MaxNumActivatedTargetsAtOnce->SetValues(Constants::MinValue_MaxNumActivatedTargetsAtOnce,
 		Constants::MaxValue_MaxNumActivatedTargetsAtOnce, Constants::SnapSize_MaxNumActivatedTargetsAtOnce);
 	MenuOption_NumTargetsToActivateAtOnce->SetValues(Constants::MinValue_MaxNumActivatedTargetsAtOnce,

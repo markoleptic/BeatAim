@@ -29,6 +29,40 @@ void UCustomGameModeSpawningWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxNumTargetsAtOnce)), SliderTextBoxOption_MaxNumTargetsAtOnce);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, NumUpfrontTargetsToSpawn)),
+		SliderTextBoxOption_NumUpfrontTargetsToSpawn);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, NumRuntimeTargetsToSpawn)),
+		SliderTextBoxOption_NumRuntimeTargetsToSpawn);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetSpawningPolicy)), ComboBoxOption_TargetSpawningPolicy);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, RuntimeTargetSpawningLocationSelectionMode)),
+		ComboBoxOption_RuntimeTargetSpawningLocationSelectionMode);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bAllowSpawnWithoutActivation)),
+		CheckBoxOption_AllowSpawnWithoutActivation);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bUseBatchSpawning)), CheckBoxOption_BatchSpawning);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bSpawnAtOriginWheneverPossible)),
+		CheckBoxOption_SpawnAtOriginWheneverPossible);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bSpawnEveryOtherTargetInCenter)),
+		CheckBoxOption_SpawnEveryOtherTargetInCenter);
+
 	SliderTextBoxOption_MaxNumTargetsAtOnce->SetValues(Constants::MinValue_MaxNumTargetsAtOnce,
 		Constants::MaxValue_MaxNumTargetsAtOnce, Constants::SnapSize_MaxNumTargetsAtOnce);
 	SliderTextBoxOption_NumUpfrontTargetsToSpawn->SetValues(Constants::MinValue_NumUpfrontTargetsToSpawn,
@@ -87,7 +121,6 @@ void UCustomGameModeSpawningWidget::NativeConstruct()
 
 	UpdateBrushColors();
 }
-
 
 void UCustomGameModeSpawningWidget::UpdateOptionsFromConfig()
 {

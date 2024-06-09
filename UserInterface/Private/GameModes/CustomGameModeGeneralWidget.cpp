@@ -36,6 +36,57 @@ void UCustomGameModeGeneralWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, SpawnBeatDelay)),
+		SliderTextBoxOption_SpawnBeatDelay);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetSpawnCD)),
+		SliderTextBoxOption_TargetSpawnCD);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxNumRecentTargets)), SliderTextBoxOption_MaxNumRecentTargets);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, RecentTargetTimeLength)), SliderTextBoxOption_RecentTargetTimeLength);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, ExpirationHealthPenalty)),
+		SliderTextBoxOption_ExpirationHealthPenalty);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, DeactivationHealthLostThreshold)),
+		SliderTextBoxOption_DeactivationHealthLostThreshold);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, AIConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_AIConfig, bEnableReinforcementLearning)), CheckBoxOption_EnableAI);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, AIConfig),GET_MEMBER_NAME_CHECKED(FBS_AIConfig, Alpha)),
+		SliderTextBoxOption_Alpha);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, AIConfig),GET_MEMBER_NAME_CHECKED(FBS_AIConfig, Epsilon)),
+		SliderTextBoxOption_Epsilon);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, AIConfig),GET_MEMBER_NAME_CHECKED(FBS_AIConfig, Gamma)),
+		SliderTextBoxOption_Gamma);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, AIConfig),GET_MEMBER_NAME_CHECKED(FBS_AIConfig, HyperParameterMode)),
+		ComboBoxOption_HyperParameterMode);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxHealth)),
+		MenuOption_TargetHealth);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetMaxLifeSpan)),
+		MenuOption_TargetLifespan);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, RecentTargetMemoryPolicy)), ComboBoxOption_RecentTargetMemoryPolicy);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDamageType)),
+		ComboBoxOption_DamageType);
+
 	SliderTextBoxOption_SpawnBeatDelay->SetValues(MinValue_PlayerDelay, MaxValue_PlayerDelay, SnapSize_PlayerDelay);
 	SliderTextBoxOption_TargetSpawnCD->
 		SetValues(MinValue_TargetSpawnCD, MaxValue_TargetSpawnCD, SnapSize_TargetSpawnCD);

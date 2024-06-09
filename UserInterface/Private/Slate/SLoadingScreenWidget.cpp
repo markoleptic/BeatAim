@@ -9,9 +9,10 @@ int32 SLoadingScreenWidget::OnPaint(const FPaintArgs& Args, const FGeometry& All
 	const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId,
 	const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
+	const int32 MaxLayerId = SCompoundWidget::OnPaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, LayerId,
+		InWidgetStyle, bParentEnabled);
 	SetMainOverlayRenderOpacity(Args.GetCurrentTime(), Args.GetDeltaTime());
-	return SCompoundWidget::OnPaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle,
-		bParentEnabled);
+	return MaxLayerId;
 }
 
 void SLoadingScreenWidget::SetLoadingScreenState(const ELoadingScreenState& InLoadingScreenState) const

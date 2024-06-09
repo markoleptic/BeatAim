@@ -112,6 +112,12 @@ void UCustomGameModeCategoryWidget::AddGameModeCategoryTagWidgets(UMenuOptionWid
 	}
 }
 
+void UCustomGameModeCategoryWidget::AssociatePropertyWithMenuOption(const uint32 PropertyHash,
+	UMenuOptionWidget* MenuOptionWidget)
+{
+	PropertyMenuOptionWidgetMap.Add(PropertyHash, MenuOptionWidget);
+}
+
 bool UCustomGameModeCategoryWidget::UpdateValueIfDifferent(const USingleRangeInputWidget* Widget, const float Value)
 {
 	if (FMath::IsNearlyEqual(Widget->GetSliderValue(), Value) && FMath::IsNearlyEqual(Widget->GetEditableTextBoxValue(),

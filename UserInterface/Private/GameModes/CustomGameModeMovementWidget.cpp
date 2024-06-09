@@ -12,6 +12,29 @@ void UCustomGameModeMovementWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MinSpawnedTargetSpeed)), MenuOption_SpawnedTargetVelocity);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxSpawnedTargetSpeed)), MenuOption_SpawnedTargetVelocity);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MinActivatedTargetSpeed)), MenuOption_ActivatedTargetVelocity);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxActivatedTargetSpeed)), MenuOption_ActivatedTargetVelocity);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MinDeactivatedTargetSpeed)), MenuOption_DeactivatedTargetVelocity);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxDeactivatedTargetSpeed)), MenuOption_DeactivatedTargetVelocity);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MovingTargetDirectionMode)),
+		ComboBoxOption_MovingTargetDirectionMode);
+
 	MenuOption_SpawnedTargetVelocity->SetValues(Constants::MinValue_TargetSpeed, Constants::MaxValue_TargetSpeed,
 		Constants::SnapSize_TargetSpeed);
 	MenuOption_ActivatedTargetVelocity->SetValues(Constants::MinValue_TargetSpeed, Constants::MaxValue_TargetSpeed,

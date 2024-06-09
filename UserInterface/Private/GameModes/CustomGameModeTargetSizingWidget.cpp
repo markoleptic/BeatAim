@@ -23,6 +23,34 @@ void UCustomGameModeTargetSizingWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MinSpawnedTargetScale)), MenuOption_TargetScale);
+	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxSpawnedTargetScale)), MenuOption_TargetScale);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicTargetScaling),
+			GET_MEMBER_NAME_CHECKED(FBS_Dynamic, StartThreshold)), SliderTextBoxOption_StartThreshold);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicTargetScaling),
+			GET_MEMBER_NAME_CHECKED(FBS_Dynamic, EndThreshold)), SliderTextBoxOption_EndThreshold);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicTargetScaling),
+			GET_MEMBER_NAME_CHECKED(FBS_Dynamic, DecrementAmount)), SliderTextBoxOption_DecrementAmount);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, LifetimeTargetScaleMultiplier)),
+		SliderTextBoxOption_LifetimeTargetScaleMultiplier);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, ConsecutiveChargeScaleMultiplier)),
+		SliderTextBoxOption_DeactivatedTargetScaleMultiplier);
+	AssociatePropertyWithMenuOption(
+		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, ConsecutiveTargetScalePolicy)),
+		ComboBoxOption_ConsecutiveTargetScalePolicy);
+
 	SliderTextBoxOption_DeactivatedTargetScaleMultiplier->SetValues(
 		Constants::MinValue_ConsecutiveChargeScaleMultiplier, Constants::MaxValue_ConsecutiveChargeScaleMultiplier,
 		Constants::SnapSize_ConsecutiveChargeScaleMultiplier);
