@@ -8,6 +8,14 @@
 #include "MenuOptions/DualRangeInputWidget.h"
 #include "Utilities/ComboBox/BSComboBoxString.h"
 
+UCustomGameModeMovementWidget::UCustomGameModeMovementWidget(): MenuOption_ActivatedTargetVelocity(nullptr),
+                                                                MenuOption_DeactivatedTargetVelocity(nullptr),
+                                                                MenuOption_SpawnedTargetVelocity(nullptr),
+                                                                ComboBoxOption_MovingTargetDirectionMode(nullptr)
+{
+	GameModeCategory = EGameModeCategory::TargetMovement;
+}
+
 void UCustomGameModeMovementWidget::NativeConstruct()
 {
 	Super::NativeConstruct();

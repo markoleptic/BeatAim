@@ -50,7 +50,8 @@ enum class EGameModeWarningType: uint8
 UENUM(BlueprintType)
 enum class EGameModeCategory : uint8
 {
-	None, Start, General, SpawnArea, TargetSpawning, TargetActivation, TargetBehavior, TargetSizing, Preview
+	None, Start, General, SpawnArea, TargetSpawning, TargetActivation, TargetBehavior, TargetMovement, TargetSizing,
+	Preview
 };
 
 /** A single validation check for a property. */

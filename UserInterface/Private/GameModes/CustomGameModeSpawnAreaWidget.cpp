@@ -228,14 +228,30 @@ void UCustomGameModeSpawnAreaWidget::UpdateDependentOption_BoundsScalingPolicy()
 		SliderTextBoxOption_StartThreshold->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		SliderTextBoxOption_EndThreshold->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		SliderTextBoxOption_DecrementAmount->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-		BSConfig->TargetConfig.BoundsScalingPolicy = EBoundsScalingPolicy::Dynamic;
+
+		if (BSConfig->TargetConfig.BoundsScalingPolicy != EBoundsScalingPolicy::Dynamic)
+		{
+			BSConfig->TargetConfig.BoundsScalingPolicy = EBoundsScalingPolicy::Dynamic;
+			OnPropertyChanged.Execute({
+				UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+					GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoundsScalingPolicy))
+			});
+		}
 	}
 	else
 	{
 		SliderTextBoxOption_StartThreshold->SetVisibility(ESlateVisibility::Collapsed);
 		SliderTextBoxOption_EndThreshold->SetVisibility(ESlateVisibility::Collapsed);
 		SliderTextBoxOption_DecrementAmount->SetVisibility(ESlateVisibility::Collapsed);
-		BSConfig->TargetConfig.BoundsScalingPolicy = EBoundsScalingPolicy::Static;
+
+		if (BSConfig->TargetConfig.BoundsScalingPolicy != EBoundsScalingPolicy::Static)
+		{
+			BSConfig->TargetConfig.BoundsScalingPolicy = EBoundsScalingPolicy::Static;
+			OnPropertyChanged.Execute({
+				UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+					GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoundsScalingPolicy))
+			});
+		}
 	}
 }
 
@@ -351,6 +367,7 @@ void UCustomGameModeSpawnAreaWidget::UpdateSpreadWidgetState(UDualRangeInputWidg
 	const bool bHeadShotHeightOnly, const bool bGrid)
 {
 	FSpreadWidgetState State(EMenuOptionEnabledState::Enabled);
+	TSet<uint32> ModifiedProperties;
 
 	if (Widget == MenuOption_ForwardSpread)
 	{
@@ -371,12 +388,13 @@ void UCustomGameModeSpawnAreaWidget::UpdateSpreadWidgetState(UDualRangeInputWidg
 			}
 			BSConfig->TargetConfig.BoxBounds.Z = MaxValue_VerticalSpread;
 			BSConfig->DynamicSpawnAreaScaling.StartBounds.Z = MaxValue_VerticalSpread;
-			OnPropertyChanged.Execute({
-				UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicSpawnAreaScaling),
-					GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, StartBounds), GET_MEMBER_NAME_CHECKED(FVector, Z)),
-				UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
-					GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoxBounds), GET_MEMBER_NAME_CHECKED(FVector, Z))
-			});
+
+			ModifiedProperties.Add(UBSGameModeValidator::FindBSConfigProperty(
+				GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicSpawnAreaScaling),
+				GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, StartBounds), GET_MEMBER_NAME_CHECKED(FVector, Z)));
+			ModifiedProperties.Add(UBSGameModeValidator::FindBSConfigProperty(
+				GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig), GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoxBounds),
+				GET_MEMBER_NAME_CHECKED(FVector, Z)));
 
 			State.MenuOptionEnabledState = EMenuOptionEnabledState::DependentMissing;
 			State.MenuOptionTooltipKey = "DM_VerticalSpread_Grid";
@@ -392,12 +410,12 @@ void UCustomGameModeSpawnAreaWidget::UpdateSpreadWidgetState(UDualRangeInputWidg
 			BSConfig->TargetConfig.BoxBounds.Z = HeadshotHeight_VerticalSpread;
 			BSConfig->DynamicSpawnAreaScaling.StartBounds.Z = HeadshotHeight_VerticalSpread;
 
-			OnPropertyChanged.Execute({
-				UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicSpawnAreaScaling),
-					GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, StartBounds), GET_MEMBER_NAME_CHECKED(FVector, Z)),
-				UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
-					GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoxBounds), GET_MEMBER_NAME_CHECKED(FVector, Z))
-			});
+			ModifiedProperties.Add(UBSGameModeValidator::FindBSConfigProperty(
+				GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicSpawnAreaScaling),
+				GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, StartBounds), GET_MEMBER_NAME_CHECKED(FVector, Z)));
+			ModifiedProperties.Add(UBSGameModeValidator::FindBSConfigProperty(
+				GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig), GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoxBounds),
+				GET_MEMBER_NAME_CHECKED(FVector, Z)));
 
 			State.MenuOptionEnabledState = EMenuOptionEnabledState::DependentMissing;
 			State.MenuOptionTooltipKey = "DM_VerticalSpread_HeadshotHeightOnly";
@@ -413,14 +431,12 @@ void UCustomGameModeSpawnAreaWidget::UpdateSpreadWidgetState(UDualRangeInputWidg
 				BSConfig->DynamicSpawnAreaScaling.StartBounds.Z = FMath::Max(
 					BSConfig->DynamicSpawnAreaScaling.StartBounds.Z, MinValue_VerticalSpread);
 
-				OnPropertyChanged.Execute({
-					UBSGameModeValidator::FindBSConfigProperty(
-						GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicSpawnAreaScaling),
-						GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, StartBounds),
-						GET_MEMBER_NAME_CHECKED(FVector, Z)),
-					UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
-						GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoxBounds), GET_MEMBER_NAME_CHECKED(FVector, Z))
-				});
+				ModifiedProperties.Add(UBSGameModeValidator::FindBSConfigProperty(
+					GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicSpawnAreaScaling),
+					GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, StartBounds), GET_MEMBER_NAME_CHECKED(FVector, Z)));
+				ModifiedProperties.Add(UBSGameModeValidator::FindBSConfigProperty(
+					GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+					GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoxBounds), GET_MEMBER_NAME_CHECKED(FVector, Z)));
 			}
 		}
 
@@ -437,12 +453,12 @@ void UCustomGameModeSpawnAreaWidget::UpdateSpreadWidgetState(UDualRangeInputWidg
 			BSConfig->TargetConfig.BoxBounds.Y = MaxValue_HorizontalSpread;
 			BSConfig->DynamicSpawnAreaScaling.StartBounds.Y = MaxValue_HorizontalSpread;
 
-			OnPropertyChanged.Execute({
-				UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicSpawnAreaScaling),
-					GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, StartBounds), GET_MEMBER_NAME_CHECKED(FVector, Y)),
-				UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
-					GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoxBounds), GET_MEMBER_NAME_CHECKED(FVector, Y))
-			});
+			ModifiedProperties.Add(UBSGameModeValidator::FindBSConfigProperty(
+				GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicSpawnAreaScaling),
+				GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, StartBounds), GET_MEMBER_NAME_CHECKED(FVector, Y)));
+			ModifiedProperties.Add(UBSGameModeValidator::FindBSConfigProperty(
+				GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig), GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, BoxBounds),
+				GET_MEMBER_NAME_CHECKED(FVector, Y)));
 
 			State.MenuOptionEnabledState = EMenuOptionEnabledState::DependentMissing;
 			State.MenuOptionTooltipKey = "DM_HorizontalSpread_Grid";
@@ -457,6 +473,11 @@ void UCustomGameModeSpawnAreaWidget::UpdateSpreadWidgetState(UDualRangeInputWidg
 	SetMenuOptionEnabledStateAndAddTooltip(Widget, State.MenuOptionEnabledState, State.MenuOptionTooltipKey);
 	SetSubMenuOptionEnabledStateAndAddTooltip(Widget, UCheckBox::StaticClass(), State.SubWidgetEnabledState,
 		State.SubWidgetTooltipKey);
+
+	if (!ModifiedProperties.IsEmpty())
+	{
+		OnPropertyChanged.Execute(ModifiedProperties);
+	}
 }
 
 void UCustomGameModeSpawnAreaWidget::OnSelectionChanged_TargetDistributionPolicy(const TArray<FString>& Selected,

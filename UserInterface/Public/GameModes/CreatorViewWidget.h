@@ -21,9 +21,6 @@ class USERINTERFACE_API UCreatorViewWidget : public UCustomGameModeWidget
 protected:
 	virtual void NativeConstruct() override;
 
-	UFUNCTION()
-	void OnCarouselWidgetIndexChanged(UCommonWidgetCarousel* InCarousel, const int32 NewIndex);
-
 public:
 	/** Updates icons on the carousel. */
 	void UpdateNotificationIcons(const TMap<EGameModeCategory, TPair<int32, int32>>& IconMap);
@@ -40,4 +37,6 @@ protected:
 	UCommonWidgetCarousel* Carousel;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UBSCarouselNavBar* CarouselNavBar;
+
+	TMap<EGameModeCategory, int32> GameModeCategoryWidgetIndexMap;
 };

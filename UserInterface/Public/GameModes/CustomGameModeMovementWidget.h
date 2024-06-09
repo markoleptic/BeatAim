@@ -15,6 +15,9 @@ class USERINTERFACE_API UCustomGameModeMovementWidget : public UCustomGameModeCa
 {
 	GENERATED_BODY()
 
+public:
+	UCustomGameModeMovementWidget();
+
 protected:
 	virtual void NativeConstruct() override;
 

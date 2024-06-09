@@ -24,7 +24,7 @@ public:
 	/** Calls UpdateOptionsFromConfig on all custom game mode category child widgets. */
 	void UpdateOptionsFromConfig();
 
-	/** Executed when a all custom game mode category child widget changes a property. */
+	/** Executed when any custom game mode category child widget changes a property. */
 	TDelegate<void(const TSet<uint32>&)> OnPropertyChanged;
 
 	/** @return the start widget for this custom game mode widget. */

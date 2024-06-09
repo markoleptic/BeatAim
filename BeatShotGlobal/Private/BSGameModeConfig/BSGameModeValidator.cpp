@@ -246,7 +246,7 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 	const FPropertyHash BatchSpawning = CreatePropertyHash<FBSConfig>(TargetConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bUseBatchSpawning));
 	const FPropertyHash SpawnEveryOtherTargetInCenter = CreatePropertyHash<FBSConfig>(TargetConfigName,
-		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bUseBatchSpawning));
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bSpawnEveryOtherTargetInCenter));
 	const FPropertyHash AllowSpawnWithoutActivation = CreatePropertyHash<FBSConfig>(TargetConfigName,
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bAllowSpawnWithoutActivation));
 	const FPropertyHash MovingTargetDirectionMode = CreatePropertyHash<FBSConfig>(TargetConfigName,
@@ -298,7 +298,7 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 	FValidationPropertyPtr AllowSpawnWithoutActivationPtr = CreateValidationProperty(AllowSpawnWithoutActivation,
 		EGameModeCategory::TargetSpawning);
 	FValidationPropertyPtr MovingTargetDirectionModePtr = CreateValidationProperty(MovingTargetDirectionMode,
-		EGameModeCategory::TargetBehavior);
+		EGameModeCategory::TargetMovement);
 	FValidationPropertyPtr TargetSpawnResponsesPtr = CreateValidationProperty(TargetSpawnResponses,
 		EGameModeCategory::TargetBehavior);
 	FValidationPropertyPtr TargetActivationResponsesPtr = CreateValidationProperty(TargetActivationResponses,
@@ -322,7 +322,7 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 	FValidationPropertyPtr GridSpacingXPtr = CreateValidationProperty(GridSpacingX, EGameModeCategory::SpawnArea);
 	FValidationPropertyPtr GridSpacingYPtr = CreateValidationProperty(GridSpacingY, EGameModeCategory::SpawnArea);
 	FValidationPropertyPtr EnableReinforcementLearningPtr = CreateValidationProperty(EnableReinforcementLearning,
-		EGameModeCategory::SpawnArea);
+		EGameModeCategory::General);
 
 	auto SpawnEveryOtherAndBatchLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
 	{

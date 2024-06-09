@@ -24,6 +24,11 @@ class USERINTERFACE_API USingleRangeInputWidget : public UMenuOptionWidget
 	GENERATED_BODY()
 
 public:
+	/** Sets the enabled state of the menu option. By default, this sets the enabled
+	 *  states of the two main horizontal boxes of a MenuOptionWidget, but subclasses may
+	 *  choose to modify this behavior.
+	 *  @param EnabledState the state to set the widget to.
+	 */
 	virtual void SetMenuOptionEnabledState(const EMenuOptionEnabledState EnabledState) override;
 
 	/** Sets the Min and Max values of the slider and sets the grid snap size. */

@@ -173,7 +173,7 @@ void UDualRangeInputWidget::SetMenuOptionEnabledState(const EMenuOptionEnabledSt
 	}
 }
 
-UWidget* UDualRangeInputWidget::SetSubMenuOptionEnabledState(const TSubclassOf<UWidget> SubWidget,
+UWidget* UDualRangeInputWidget::SetSubMenuOptionEnabledState(const TSubclassOf<UWidget>& SubWidget,
 	const EMenuOptionEnabledState State)
 {
 	if (SubWidget->GetDefaultObject()->IsA<UCheckBox>())

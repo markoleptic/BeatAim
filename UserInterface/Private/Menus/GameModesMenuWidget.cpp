@@ -42,6 +42,7 @@ void UGameModeMenuWidget::NativeConstruct()
 					? IBSWidgetInterface::GetTooltipTextFromKey(CheckData.StringTableKey)
 					: IBSWidgetInterface::GetTooltipTextFromKey(CheckData.DynamicStringTableKey);
 			}
+			UE_LOG(LogTemp, Display, TEXT("%s: %s"), *CheckData.StringTableKey, *CheckData.TooltipText.ToString());
 		}
 	}
 	BSConfig = MakeShareable(new FBSConfig());
@@ -1001,12 +1002,12 @@ void UGameModeMenuWidget::HandlePropertyChanged(const TSet<uint32>& Properties)
 		}
 	}
 
-	if (!Properties.Intersect(ForceRefreshProperties).IsEmpty())
+	HandleValidation(GameModeValidator->Validate(BSConfig, Properties));
+
+	if (!bGameModeBreakingOptionPresent && !Properties.Intersect(ForceRefreshProperties).IsEmpty())
 	{
 		RefreshGameModePreview();
 	}
-
-	HandleValidation(GameModeValidator->Validate(BSConfig, Properties));
 }
 
 void UGameModeMenuWidget::HandleValidation(const FValidationResult& Result)

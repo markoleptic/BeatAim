@@ -30,6 +30,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CarouselNavBar")
 	void SetLinkedCarousel(UCommonWidgetCarousel* CommonCarousel);
 
+	/** Updates the number of cautions/warnings on a carousel slot. Removes the notification if cautions and warnings
+	 *  are zero.
+	 *  @param Index Index of the widget to update notifications for.
+	 *  @param NumCautions the number of cautions that should be displayed.
+	 *  @param NumWarnings the number of warnings that should be displayed.
+	 */
 	void UpdateNotifications(const int32 Index, const int32 NumCautions, const int32 NumWarnings);
 
 	// UWidget interface

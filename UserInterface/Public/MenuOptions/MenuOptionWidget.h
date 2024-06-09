@@ -51,14 +51,21 @@ protected:
 	virtual void SetStyling();
 
 public:
-	/** Sets the custom enabled state of the menu option. */
-	virtual void SetMenuOptionEnabledState(const EMenuOptionEnabledState EnabledState);
+	/** Sets the enabled state of the menu option. By default, this sets the enabled
+	 *  states of the two main horizontal boxes of a MenuOptionWidget, but subclasses may
+	 *  choose to modify this behavior.
+	 *  @param EnabledState the state to set the widget to.
+	 */
+	virtual void SetMenuOptionEnabledState(EMenuOptionEnabledState EnabledState);
 
-	/** Sets the custom enabled state of the menu option. */
-	virtual UWidget* SetSubMenuOptionEnabledState(const TSubclassOf<UWidget> SubWidget,
-		const EMenuOptionEnabledState State) { return nullptr; }
+	/** Sets the enabled state of a specific widget type in a menu option widget.
+	 * @param SubWidget the specific widget type to enable/disable
+	 * @param State the state to set the sub-widget to.
+	 * @return nullptr by default, or the widget containing the sub-widget.
+	 */
+	virtual UWidget* SetSubMenuOptionEnabledState(const TSubclassOf<UWidget>& SubWidget, EMenuOptionEnabledState State);
 
-	/** Returns the custom enabled state of the menu option. */
+	/** @return the custom enabled state of the menu option. */
 	EMenuOptionEnabledState GetMenuOptionEnabledState() const { return MenuOptionEnabledState; }
 
 	/** Sets the left hand side indent, with each level increasing by 50. */

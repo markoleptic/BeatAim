@@ -10,24 +10,27 @@ void UCreatorViewWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	Carousel->OnCurrentPageIndexChanged.AddUniqueDynamic(this, &ThisClass::OnCarouselWidgetIndexChanged);
 	Carousel->SetActiveWidgetIndex(0);
 	CarouselNavBar->SetLinkedCarousel(Carousel);
-}
-
-void UCreatorViewWidget::OnCarouselWidgetIndexChanged(UCommonWidgetCarousel* InCarousel, const int32 NewIndex)
-{
-	//UpdateOptionsFromConfig();
+	for (int i = 0; i < Carousel->GetChildrenCount(); i++)
+	{
+		if (UWidget* Widget = Carousel->GetWidgetAtIndex(i))
+		{
+			if (const auto CategoryWidget = Cast<UCustomGameModeCategoryWidget>(Widget))
+			{
+				GameModeCategoryWidgetIndexMap.Add(CategoryWidget->GetGameModeCategory(), i);
+			}
+		}
+	}
 }
 
 void UCreatorViewWidget::UpdateNotificationIcons(const TMap<EGameModeCategory, TPair<int32, int32>>& IconMap)
 {
 	for (const auto& [Category, Pair] : IconMap)
 	{
-		if (const TObjectPtr<UCustomGameModeCategoryWidget>* Widget = GameModeCategoryWidgetMap.Find(Category))
+		if (const int32* Index = GameModeCategoryWidgetIndexMap.Find(Category))
 		{
-			CarouselNavBar->UpdateNotifications(static_cast<int32>((*Widget)->GetGameModeCategory()) - 1, Pair.Key,
-				Pair.Value);
+			CarouselNavBar->UpdateNotifications(*Index, Pair.Key, Pair.Value);
 		}
 	}
 }

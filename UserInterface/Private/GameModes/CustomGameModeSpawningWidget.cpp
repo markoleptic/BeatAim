@@ -151,6 +151,7 @@ void UCustomGameModeSpawningWidget::UpdateOptionsFromConfig()
 void UCustomGameModeSpawningWidget::UpdateDependentOptions_TargetSpawningPolicy(
 	const ETargetSpawningPolicy& InTargetSpawningPolicy)
 {
+	TSet<uint32> ModifiedProperties;
 	if (InTargetSpawningPolicy == ETargetSpawningPolicy::RuntimeOnly)
 	{
 		SetMenuOptionEnabledStateAndAddTooltip(CheckBoxOption_BatchSpawning, EMenuOptionEnabledState::Enabled);
@@ -175,6 +176,9 @@ void UCustomGameModeSpawningWidget::UpdateDependentOptions_TargetSpawningPolicy(
 				GetStringFromEnum_FromTagMap(BSConfig->TargetConfig.RuntimeTargetSpawningLocationSelectionMode));
 			SetMenuOptionEnabledStateAndAddTooltip(ComboBoxOption_RuntimeTargetSpawningLocationSelectionMode,
 				EMenuOptionEnabledState::DependentMissing, "DM_RuntimeTargetSpawningLocationSelectionMode_NonGrid");
+			ModifiedProperties.Add(UBSGameModeValidator::FindBSConfigProperty(
+				GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, RuntimeTargetSpawningLocationSelectionMode)));
 		}
 
 		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_MaxNumTargetsAtOnce,
@@ -185,6 +189,16 @@ void UCustomGameModeSpawningWidget::UpdateDependentOptions_TargetSpawningPolicy(
 		BSConfig->TargetConfig.bUseBatchSpawning = false;
 		BSConfig->TargetConfig.bSpawnEveryOtherTargetInCenter = false;
 		BSConfig->TargetConfig.bSpawnAtOriginWheneverPossible = false;
+
+		ModifiedProperties.Add(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bUseBatchSpawning)));
+		ModifiedProperties.Add(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bSpawnEveryOtherTargetInCenter)));
+		ModifiedProperties.Add(UBSGameModeValidator::FindBSConfigProperty(
+			GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, bSpawnAtOriginWheneverPossible)));
 
 		UpdateValueIfDifferent(CheckBoxOption_BatchSpawning, false);
 		UpdateValueIfDifferent(CheckBoxOption_SpawnAtOriginWheneverPossible, false);
@@ -220,6 +234,11 @@ void UCustomGameModeSpawningWidget::UpdateDependentOptions_TargetSpawningPolicy(
 			SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_MaxNumTargetsAtOnce,
 				EMenuOptionEnabledState::Enabled);
 		}
+	}
+
+	if (!ModifiedProperties.IsEmpty())
+	{
+		OnPropertyChanged.Execute(ModifiedProperties);
 	}
 }
 

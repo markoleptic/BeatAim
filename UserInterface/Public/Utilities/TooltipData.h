@@ -74,6 +74,7 @@ private:
 	TObjectPtr<UTooltipIcon> TooltipIcon;
 
 	/** The text to display on the tooltip widget when a user hovers over the tooltip icon. */
+	UPROPERTY()
 	FText TooltipText;
 
 	/** Cached formatted text expression. */

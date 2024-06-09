@@ -28,13 +28,20 @@ class USERINTERFACE_API UDualRangeInputWidget : public UMenuOptionWidget
 	GENERATED_BODY()
 
 public:
-	/** Set's the widget's enabled state and adds a tooltip for the entire widget if a Key is provided,
-	 *  otherwise the tooltip will be cleared. */
+	/** Sets the enabled state of the menu option. By default, this sets the enabled
+	 *  states of the two main horizontal boxes of a MenuOptionWidget, but subclasses may
+	 *  choose to modify this behavior.
+	 *  @param EnabledState the state to set the widget to.
+	 */
 	virtual void SetMenuOptionEnabledState(const EMenuOptionEnabledState EnabledState) override;
 
-	/** Sets the custom enabled state of the menu option. */
-	virtual UWidget* SetSubMenuOptionEnabledState(const TSubclassOf<UWidget> SubWidget,
-		const EMenuOptionEnabledState State) override;
+	/** Sets the custom enabled state of the menu option.
+	 *  @param SubWidget the specific widget type to enable/disable
+	 *  @param State the state to set the widget to.
+	 *  @return nullptr by default, or the widget containing the sub-widget.
+	 */
+	virtual UWidget* SetSubMenuOptionEnabledState(const TSubclassOf<UWidget>& SubWidget,
+		EMenuOptionEnabledState State) override;
 
 	/** Returns the value for the MinOrConstant slider. */
 	float GetMinSliderValue(const bool bClamped) const;

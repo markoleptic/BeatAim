@@ -83,6 +83,7 @@ protected:
 	UImage* Image;
 
 	/** Data that is broadcast to the tooltip widget. */
+	UPROPERTY()
 	FTooltipData TooltipData;
 
 	/** Maps each tooltip icon type to a brush. */

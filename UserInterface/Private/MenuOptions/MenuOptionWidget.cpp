@@ -112,6 +112,12 @@ void UMenuOptionWidget::SetMenuOptionEnabledState(const EMenuOptionEnabledState 
 	}
 }
 
+UWidget* UMenuOptionWidget::SetSubMenuOptionEnabledState(const TSubclassOf<UWidget>& SubWidget,
+	EMenuOptionEnabledState State)
+{
+	return nullptr;
+}
+
 void UMenuOptionWidget::SetIndentLevel(const int32 Value)
 {
 	IndentLevel = Value;
