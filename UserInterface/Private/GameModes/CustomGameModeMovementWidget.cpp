@@ -70,9 +70,9 @@ void UCustomGameModeMovementWidget::NativeConstruct()
 	ComboBoxOption_MovingTargetDirectionMode->SortAddOptionsAndSetEnumType<EMovingTargetDirectionMode>(Options);
 	Options.Empty();
 
-	SetMenuOptionEnabledStateAndAddTooltip(MenuOption_SpawnedTargetVelocity, EMenuOptionEnabledState::Enabled);
-	SetMenuOptionEnabledStateAndAddTooltip(MenuOption_ActivatedTargetVelocity, EMenuOptionEnabledState::Enabled);
-	SetMenuOptionEnabledStateAndAddTooltip(MenuOption_DeactivatedTargetVelocity, EMenuOptionEnabledState::Enabled);
+	MenuOption_SpawnedTargetVelocity->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
+	MenuOption_ActivatedTargetVelocity->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
+	MenuOption_DeactivatedTargetVelocity->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
 
 	UpdateBrushColors();
 }
@@ -110,12 +110,12 @@ void UCustomGameModeMovementWidget::UpdateDependentOptions_SpawnResponses(const 
 {
 	if (Responses.Contains(ETargetSpawnResponse::ChangeVelocity))
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(MenuOption_SpawnedTargetVelocity, EMenuOptionEnabledState::Enabled);
+		MenuOption_SpawnedTargetVelocity->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
 	}
 	else
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(MenuOption_SpawnedTargetVelocity,
-			EMenuOptionEnabledState::DependentMissing, "DM_SpawnedTargetVelocity");
+		MenuOption_SpawnedTargetVelocity->SetMenuOptionEnabledState(EMenuOptionEnabledState::DependentMissing,
+			GetTooltipTextFromKey("DM_SpawnedTargetVelocity"));
 	}
 }
 
@@ -124,12 +124,12 @@ void UCustomGameModeMovementWidget::UpdateDependentOptions_ActivationResponses(
 {
 	if (Responses.Contains(ETargetActivationResponse::ChangeVelocity))
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(MenuOption_ActivatedTargetVelocity, EMenuOptionEnabledState::Enabled);
+		MenuOption_ActivatedTargetVelocity->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
 	}
 	else
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(MenuOption_ActivatedTargetVelocity,
-			EMenuOptionEnabledState::DependentMissing, "DM_ActivatedTargetVelocity");
+		MenuOption_ActivatedTargetVelocity->SetMenuOptionEnabledState(EMenuOptionEnabledState::DependentMissing,
+			GetTooltipTextFromKey("DM_ActivatedTargetVelocity"));
 	}
 }
 
@@ -138,12 +138,12 @@ void UCustomGameModeMovementWidget::UpdateDependentOptions_DeactivationResponses
 {
 	if (Responses.Contains(ETargetDeactivationResponse::ChangeVelocity))
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(MenuOption_DeactivatedTargetVelocity, EMenuOptionEnabledState::Enabled);
+		MenuOption_DeactivatedTargetVelocity->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
 	}
 	else
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(MenuOption_DeactivatedTargetVelocity,
-			EMenuOptionEnabledState::DependentMissing, "DM_DeactivatedTargetVelocity");
+		MenuOption_DeactivatedTargetVelocity->SetMenuOptionEnabledState(EMenuOptionEnabledState::DependentMissing,
+			GetTooltipTextFromKey("DM_DeactivatedTargetVelocity"));
 	}
 }
 

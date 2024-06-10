@@ -24,11 +24,6 @@ void USingleRangeInputWidget::SetStyling()
 	}
 }
 
-void USingleRangeInputWidget::SetMenuOptionEnabledState(const EMenuOptionEnabledState EnabledState)
-{
-	Super::SetMenuOptionEnabledState(EnabledState);
-}
-
 void USingleRangeInputWidget::OnSliderChanged_Slider(const float Value)
 {
 	const float ClampedValue = IBSWidgetInterface::OnSliderChanged(Value, EditableTextBox, GridSnapSize);

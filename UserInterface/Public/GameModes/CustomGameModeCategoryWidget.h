@@ -10,7 +10,7 @@
 enum class ETooltipIconType : uint8;
 struct FValidationCheckKeyFuncs;
 struct FValidationCheckResult;
-struct FUniqueValidationCheckData;
+struct FValidationCheckData;
 enum class EGameModeCategory : uint8;
 enum class EMenuOptionEnabledState : uint8;
 struct FBSConfig;
@@ -66,24 +66,6 @@ protected:
 	 *  @param MenuOptionWidget the widget to associate the property with.
 	 */
 	void AssociatePropertyWithMenuOption(uint32 PropertyHash, UMenuOptionWidget* MenuOptionWidget);
-
-	/** Set's the widget's enabled state, optionally adding a tooltip to the entire widget.
-	 *  @param Widget the MenuOptionWidget to modify and optionally add a tooltip to.
-	 *  @param State the state to set the widget to.
-	 *  @param Key Adds a tooltip for the entire widget if provided, otherwise the tooltip will be cleared.
-	 */
-	void SetMenuOptionEnabledStateAndAddTooltip(UMenuOptionWidget* Widget, EMenuOptionEnabledState State,
-		const FString& Key = FString());
-
-	/** Set's the enabled state of a specific widget type in a menu option widget, optionally adding a tooltip to the
-	 *  entire widget.
-	 *  @param Widget the MenuOptionWidget to query for the sub-widget.
-	 *  @param SubWidgetClass the specific widget type class to enable/disable.
-	 *  @param State the state to set the sub-widget to.
-	 *  @param Key Adds a tooltip to the queried sub-widget if provided, otherwise the tooltip will be cleared.
-	 */
-	void SetSubMenuOptionEnabledStateAndAddTooltip(UMenuOptionWidget* Widget,
-		const TSubclassOf<UWidget>& SubWidgetClass, EMenuOptionEnabledState State, const FString& Key = FString());
 
 	/** Updates the slider and editable text box values if different from Value. */
 	static bool UpdateValueIfDifferent(const USingleRangeInputWidget* Widget, const float Value);

@@ -15,6 +15,7 @@
 #include "Utilities/GameModeCategoryTagWidget.h"
 #include "Utilities/TooltipData.h"
 #include "Utilities/TooltipIcon.h"
+#include "Utilities/TooltipWidget.h"
 
 
 void UMenuOptionWidget::NativePreConstruct()
@@ -92,9 +93,19 @@ void UMenuOptionWidget::SetStyling()
 	}
 }
 
-void UMenuOptionWidget::SetMenuOptionEnabledState(const EMenuOptionEnabledState EnabledState)
+void UMenuOptionWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	switch (EnabledState)
+	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+	if (!DependentMissingTooltipText.IsEmpty())
+	{
+		UTooltipWidget::Get()->SetText(DependentMissingTooltipText);
+	}
+}
+
+void UMenuOptionWidget::SetMenuOptionEnabledState(const EMenuOptionEnabledState State, const FText& TooltipText)
+{
+	MenuOptionEnabledState = State;
+	switch (State)
 	{
 	case EMenuOptionEnabledState::Enabled:
 		SetVisibility(ESlateVisibility::SelfHitTestInvisible);
@@ -110,12 +121,19 @@ void UMenuOptionWidget::SetMenuOptionEnabledState(const EMenuOptionEnabledState 
 		SetVisibility(ESlateVisibility::Collapsed);
 		break;
 	}
-}
 
-UWidget* UMenuOptionWidget::SetSubMenuOptionEnabledState(const TSubclassOf<UWidget>& SubWidget,
-	EMenuOptionEnabledState State)
-{
-	return nullptr;
+	if (State == EMenuOptionEnabledState::DependentMissing && !TooltipText.IsEmpty())
+	{
+		DependentMissingTooltipText = TooltipText;
+		UTooltipWidget* TooltipWidget = UTooltipWidget::Get();
+		TooltipWidget->SetText(DependentMissingTooltipText);
+		SetToolTip(TooltipWidget);
+	}
+	else
+	{
+		SetToolTip(nullptr);
+		DependentMissingTooltipText = FText();
+	}
 }
 
 void UMenuOptionWidget::SetIndentLevel(const int32 Value)
@@ -208,7 +226,7 @@ void UMenuOptionWidget::OnCheckBox_LockStateChanged(const bool bChecked)
 	}
 }
 
-UTooltipIcon* UMenuOptionWidget::AddTooltipIcon(const FUniqueValidationCheckData& Data)
+UTooltipIcon* UMenuOptionWidget::AddTooltipIcon(const FValidationCheckData& Data)
 {
 	ETooltipIconType Type = ETooltipIconType::Default;
 	switch (Data.WarningType)
@@ -263,7 +281,7 @@ void UMenuOptionWidget::AddGameModeCategoryTagWidgets(TArray<UGameModeCategoryTa
 	}
 }
 
-void UMenuOptionWidget::UpdateDynamicTooltipIcon(const bool bValidated, const FUniqueValidationCheckData& Data,
+void UMenuOptionWidget::UpdateDynamicTooltipIcon(const bool bValidated, const FValidationCheckData& Data,
 	const TArray<int32>& CalculatedValues)
 {
 	const TObjectPtr<UTooltipIcon>* TooltipIconPtr = DynamicTooltipIcons.Find(Data.Hash);

@@ -154,11 +154,11 @@ void UDualRangeInputWidget::SetConstantModeLocked(const bool bLock) const
 	CheckBox->SetIsEnabled(!bLock);
 }
 
-void UDualRangeInputWidget::SetMenuOptionEnabledState(const EMenuOptionEnabledState EnabledState)
+void UDualRangeInputWidget::SetMenuOptionEnabledState(const EMenuOptionEnabledState State, const FText& TooltipText)
 {
-	Super::SetMenuOptionEnabledState(EnabledState);
+	Super::SetMenuOptionEnabledState(State);
 
-	switch (EnabledState)
+	switch (State)
 	{
 	case EMenuOptionEnabledState::Enabled:
 		Box_Right_Min->SetIsEnabled(true);
@@ -171,27 +171,6 @@ void UDualRangeInputWidget::SetMenuOptionEnabledState(const EMenuOptionEnabledSt
 	case EMenuOptionEnabledState::Disabled:
 		break;
 	}
-}
-
-UWidget* UDualRangeInputWidget::SetSubMenuOptionEnabledState(const TSubclassOf<UWidget>& SubWidget,
-	const EMenuOptionEnabledState State)
-{
-	if (SubWidget->GetDefaultObject()->IsA<UCheckBox>())
-	{
-		switch (State)
-		{
-		case EMenuOptionEnabledState::Enabled:
-			CheckBox->SetIsEnabled(true);
-			break;
-		case EMenuOptionEnabledState::DependentMissing:
-			CheckBox->SetIsEnabled(false);
-			break;
-		case EMenuOptionEnabledState::Disabled:
-			break;
-		}
-		return Box_CheckBox_Tooltip;
-	}
-	return nullptr;
 }
 
 float UDualRangeInputWidget::GetMinSliderValue(const bool bClamped) const

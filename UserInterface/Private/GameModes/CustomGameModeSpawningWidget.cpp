@@ -154,18 +154,16 @@ void UCustomGameModeSpawningWidget::UpdateDependentOptions_TargetSpawningPolicy(
 	TSet<uint32> ModifiedProperties;
 	if (InTargetSpawningPolicy == ETargetSpawningPolicy::RuntimeOnly)
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(CheckBoxOption_BatchSpawning, EMenuOptionEnabledState::Enabled);
-		SetMenuOptionEnabledStateAndAddTooltip(CheckBoxOption_SpawnAtOriginWheneverPossible,
-			EMenuOptionEnabledState::Enabled);
-		SetMenuOptionEnabledStateAndAddTooltip(CheckBoxOption_SpawnEveryOtherTargetInCenter,
-			EMenuOptionEnabledState::Enabled);
+		CheckBoxOption_BatchSpawning->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
+		CheckBoxOption_SpawnAtOriginWheneverPossible->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
+		CheckBoxOption_SpawnEveryOtherTargetInCenter->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
 
 		SliderTextBoxOption_NumUpfrontTargetsToSpawn->SetVisibility(ESlateVisibility::Collapsed);
 		SliderTextBoxOption_NumRuntimeTargetsToSpawn->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
 		if (BSConfig->TargetConfig.TargetDistributionPolicy == ETargetDistributionPolicy::Grid)
 		{
-			SetMenuOptionEnabledStateAndAddTooltip(ComboBoxOption_RuntimeTargetSpawningLocationSelectionMode,
+			ComboBoxOption_RuntimeTargetSpawningLocationSelectionMode->SetMenuOptionEnabledState(
 				EMenuOptionEnabledState::Enabled);
 		}
 		else
@@ -174,15 +172,15 @@ void UCustomGameModeSpawningWidget::UpdateDependentOptions_TargetSpawningPolicy(
 				ERuntimeTargetSpawningLocationSelectionMode::Random;
 			ComboBoxOption_RuntimeTargetSpawningLocationSelectionMode->ComboBox->SetSelectedOption(
 				GetStringFromEnum_FromTagMap(BSConfig->TargetConfig.RuntimeTargetSpawningLocationSelectionMode));
-			SetMenuOptionEnabledStateAndAddTooltip(ComboBoxOption_RuntimeTargetSpawningLocationSelectionMode,
-				EMenuOptionEnabledState::DependentMissing, "DM_RuntimeTargetSpawningLocationSelectionMode_NonGrid");
+			ComboBoxOption_RuntimeTargetSpawningLocationSelectionMode->SetMenuOptionEnabledState(
+				EMenuOptionEnabledState::DependentMissing,
+				GetTooltipTextFromKey("DM_RuntimeTargetSpawningLocationSelectionMode_NonGrid"));
 			ModifiedProperties.Add(UBSGameModeValidator::FindBSConfigProperty(
 				GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
 				GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, RuntimeTargetSpawningLocationSelectionMode)));
 		}
 
-		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_MaxNumTargetsAtOnce,
-			EMenuOptionEnabledState::Enabled);
+		SliderTextBoxOption_MaxNumTargetsAtOnce->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
 	}
 	else if (InTargetSpawningPolicy == ETargetSpawningPolicy::UpfrontOnly)
 	{
@@ -204,35 +202,34 @@ void UCustomGameModeSpawningWidget::UpdateDependentOptions_TargetSpawningPolicy(
 		UpdateValueIfDifferent(CheckBoxOption_SpawnAtOriginWheneverPossible, false);
 		UpdateValueIfDifferent(CheckBoxOption_SpawnEveryOtherTargetInCenter, false);
 
-		SetMenuOptionEnabledStateAndAddTooltip(CheckBoxOption_BatchSpawning, EMenuOptionEnabledState::DependentMissing,
-			"DM_RuntimeTargetSpawningExclusive");
-		SetMenuOptionEnabledStateAndAddTooltip(CheckBoxOption_SpawnAtOriginWheneverPossible,
-			EMenuOptionEnabledState::DependentMissing, "DM_RuntimeTargetSpawningExclusive");
-		SetMenuOptionEnabledStateAndAddTooltip(CheckBoxOption_SpawnEveryOtherTargetInCenter,
-			EMenuOptionEnabledState::DependentMissing, "DM_RuntimeTargetSpawningExclusive");
+		CheckBoxOption_BatchSpawning->SetMenuOptionEnabledState(EMenuOptionEnabledState::DependentMissing,
+			GetTooltipTextFromKey("DM_RuntimeTargetSpawningExclusive"));
+		CheckBoxOption_SpawnAtOriginWheneverPossible->SetMenuOptionEnabledState(
+			EMenuOptionEnabledState::DependentMissing, GetTooltipTextFromKey("DM_RuntimeTargetSpawningExclusive"));
+		CheckBoxOption_SpawnEveryOtherTargetInCenter->SetMenuOptionEnabledState(
+			EMenuOptionEnabledState::DependentMissing, GetTooltipTextFromKey("DM_RuntimeTargetSpawningExclusive"));
 
 		SliderTextBoxOption_NumUpfrontTargetsToSpawn->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		SliderTextBoxOption_NumRuntimeTargetsToSpawn->SetVisibility(ESlateVisibility::Collapsed);
 
-		SetMenuOptionEnabledStateAndAddTooltip(ComboBoxOption_RuntimeTargetSpawningLocationSelectionMode,
-			EMenuOptionEnabledState::DependentMissing, "DM_RuntimeTargetSpawningExclusive");
+		ComboBoxOption_RuntimeTargetSpawningLocationSelectionMode->SetMenuOptionEnabledState(
+			EMenuOptionEnabledState::DependentMissing, GetTooltipTextFromKey("DM_RuntimeTargetSpawningExclusive"));
 
 		if (BSConfig->TargetConfig.TargetDistributionPolicy == ETargetDistributionPolicy::Grid)
 		{
 			SliderTextBoxOption_NumUpfrontTargetsToSpawn->SetValue(
 				BSConfig->GridConfig.NumHorizontalGridTargets * BSConfig->GridConfig.NumVerticalGridTargets);
-			SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_NumUpfrontTargetsToSpawn,
-				EMenuOptionEnabledState::DependentMissing, "DM_NumUpfrontTargetsToSpawn_Grid");
+			SliderTextBoxOption_NumUpfrontTargetsToSpawn->SetMenuOptionEnabledState(
+				EMenuOptionEnabledState::DependentMissing, GetTooltipTextFromKey("DM_NumUpfrontTargetsToSpawn_Grid"));
 			SliderTextBoxOption_MaxNumTargetsAtOnce->SetValue(-1.f);
-			SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_MaxNumTargetsAtOnce,
-				EMenuOptionEnabledState::DependentMissing, "DM_MaxNumTargetsAtOnce_Upfront_Grid");
+			SliderTextBoxOption_MaxNumTargetsAtOnce->SetMenuOptionEnabledState(
+				EMenuOptionEnabledState::DependentMissing,
+				GetTooltipTextFromKey("DM_MaxNumTargetsAtOnce_Upfront_Grid"));
 		}
 		else
 		{
-			SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_NumUpfrontTargetsToSpawn,
-				EMenuOptionEnabledState::Enabled);
-			SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_MaxNumTargetsAtOnce,
-				EMenuOptionEnabledState::Enabled);
+			SliderTextBoxOption_NumUpfrontTargetsToSpawn->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
+			SliderTextBoxOption_MaxNumTargetsAtOnce->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
 		}
 	}
 

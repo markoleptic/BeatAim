@@ -97,10 +97,8 @@ void UCustomGameModeTargetSizingWidget::NativeConstruct()
 	SliderTextBoxOption_EndThreshold->SetVisibility(ESlateVisibility::Collapsed);
 	SliderTextBoxOption_DecrementAmount->SetVisibility(ESlateVisibility::Collapsed);
 
-	SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_LifetimeTargetScaleMultiplier,
-		EMenuOptionEnabledState::Enabled);
-	SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_DeactivatedTargetScaleMultiplier,
-		EMenuOptionEnabledState::Enabled);
+	SliderTextBoxOption_LifetimeTargetScaleMultiplier->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
+	SliderTextBoxOption_DeactivatedTargetScaleMultiplier->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
 
 	UpdateBrushColors();
 }
@@ -134,13 +132,12 @@ void UCustomGameModeTargetSizingWidget::UpdateDependentOptions_TargetActivationR
 {
 	if (InResponses.Contains(ETargetActivationResponse::ApplyLifetimeTargetScaling))
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_LifetimeTargetScaleMultiplier,
-			EMenuOptionEnabledState::Enabled);
+		SliderTextBoxOption_LifetimeTargetScaleMultiplier->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
 	}
 	else
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_LifetimeTargetScaleMultiplier,
-			EMenuOptionEnabledState::DependentMissing, "DM_LifetimeTargetScaleMultiplier");
+		SliderTextBoxOption_LifetimeTargetScaleMultiplier->SetMenuOptionEnabledState(
+			EMenuOptionEnabledState::DependentMissing, GetTooltipTextFromKey("DM_LifetimeTargetScaleMultiplier"));
 	}
 }
 
@@ -149,13 +146,13 @@ void UCustomGameModeTargetSizingWidget::UpdateDependentOptions_TargetDeactivatio
 {
 	if (Responses.Contains(ETargetDeactivationResponse::ApplyDeactivatedTargetScaleMultiplier))
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_DeactivatedTargetScaleMultiplier,
+		SliderTextBoxOption_DeactivatedTargetScaleMultiplier->SetMenuOptionEnabledState(
 			EMenuOptionEnabledState::Enabled);
 	}
 	else
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_DeactivatedTargetScaleMultiplier,
-			EMenuOptionEnabledState::DependentMissing, "DM_DeactivatedTargetScaleMultiplier");
+		SliderTextBoxOption_DeactivatedTargetScaleMultiplier->SetMenuOptionEnabledState(
+			EMenuOptionEnabledState::DependentMissing, GetTooltipTextFromKey("DM_DeactivatedTargetScaleMultiplier"));
 	}
 }
 

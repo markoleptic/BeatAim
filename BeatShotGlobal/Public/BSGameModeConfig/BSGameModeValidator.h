@@ -96,19 +96,19 @@ struct BEATSHOTGLOBAL_API FValidationCheck
 	}
 };
 
-/** Specific data associated with an FValidationProperty and an FValidationCheck. */
+/** Specific data associated with a FValidationCheck and/or FValidationPropertyPtr. */
 USTRUCT()
-struct BEATSHOTGLOBAL_API FUniqueValidationCheckData
+struct BEATSHOTGLOBAL_API FValidationCheckData
 {
 	GENERATED_BODY()
 
-	FUniqueValidationCheckData() = default;
+	FValidationCheckData();
 
-	FUniqueValidationCheckData(const FString& InStringTableKey, const FString& InDynamicStringTableKey,
-		const uint32 InHash) : StringTableKey(InStringTableKey), DynamicStringTableKey(InDynamicStringTableKey),
-		                       WarningType(EGameModeWarningType::None), Hash(InHash)
-	{
-	}
+	FValidationCheckData(const FValidationPropertyPtr& PropPtr, const FValidationCheckPtr& CheckPtr,
+		const FString& InStringTableKey, const FString& InDynamicStringTableKey);
+
+	FValidationCheckData(const FValidationCheckPtr& CheckPtr, const FString& InStringTableKey,
+		const FString& InDynamicStringTableKey);
 
 	/** @return true if there is no relevant data. */
 	bool IsEmpty() const;
@@ -128,17 +128,17 @@ struct BEATSHOTGLOBAL_API FUniqueValidationCheckData
 	/** Unique has created from the FValidationPropertyPtr and FValidationCheckPtr. */
 	uint32 Hash;
 
-	FORCEINLINE bool operator ==(const FUniqueValidationCheckData& Other) const
+	FORCEINLINE bool operator ==(const FValidationCheckData& Other) const
 	{
 		return Hash == Other.Hash;
 	}
 
-	FORCEINLINE bool operator <(const FUniqueValidationCheckData& Other) const
+	FORCEINLINE bool operator <(const FValidationCheckData& Other) const
 	{
 		return Hash < Other.Hash;
 	}
 
-	friend FORCEINLINE uint32 GetTypeHash(const FUniqueValidationCheckData& Object)
+	friend FORCEINLINE uint32 GetTypeHash(const FValidationCheckData& Object)
 	{
 		return Object.Hash;
 	}
@@ -166,7 +166,7 @@ struct BEATSHOTGLOBAL_API FValidationProperty
 	 *  @param Check validation check to associate with this property.
 	 *  @param Data unique data to associate with this property and the validation check.
 	 */
-	void AddCheck(const FValidationCheckPtr& Check, const FUniqueValidationCheckData& Data);
+	void AddCheck(const FValidationCheckPtr& Check, const FValidationCheckData& Data);
 
 	/** Unique has created from the FProperty this Validation Property represents. */
 	uint32 Hash;
@@ -181,7 +181,7 @@ struct BEATSHOTGLOBAL_API FValidationProperty
 	TSet<FValidationCheckPtr> Checks;
 
 	/** Maps each validation check to unique validation check data for this property. */
-	TMap<FValidationCheckPtr, FUniqueValidationCheckData> CheckData;
+	TMap<FValidationCheckPtr, FValidationCheckData> CheckData;
 
 	FORCEINLINE bool operator ==(const FValidationProperty& Other) const
 	{
@@ -239,7 +239,7 @@ struct BEATSHOTGLOBAL_API FValidationCheckResult
 	TSet<FValidationPropertyPtr> InvolvedProperties;
 
 	/** Maps each involved property to their property data unique to the validation check. */
-	TMap<FValidationPropertyPtr, FUniqueValidationCheckData> PropertyData;
+	TMap<FValidationPropertyPtr, FValidationCheckData> PropertyData;
 
 
 	FValidationCheckResult() : bSuccess(false), WarningType(EGameModeWarningType::None)
@@ -247,13 +247,13 @@ struct BEATSHOTGLOBAL_API FValidationCheckResult
 	}
 
 	FValidationCheckResult(const bool Success, const FValidationCheckPtr& InValidationCheck, TArray<int32>&& Values,
-		TMap<FValidationPropertyPtr, FUniqueValidationCheckData>&& Data) : bSuccess(Success),
-		                                                                   ValidationCheckPtr(InValidationCheck),
-		                                                                   WarningType(InValidationCheck->WarningType),
-		                                                                   CalculatedValues(MoveTemp(Values)),
-		                                                                   InvolvedProperties(
-			                                                                   InValidationCheck->InvolvedProperties),
-		                                                                   PropertyData(MoveTemp(Data))
+		TMap<FValidationPropertyPtr, FValidationCheckData>&& Data) : bSuccess(Success),
+		                                                             ValidationCheckPtr(InValidationCheck),
+		                                                             WarningType(InValidationCheck->WarningType),
+		                                                             CalculatedValues(MoveTemp(Values)),
+		                                                             InvolvedProperties(
+			                                                             InValidationCheck->InvolvedProperties),
+		                                                             PropertyData(MoveTemp(Data))
 	{
 	}
 

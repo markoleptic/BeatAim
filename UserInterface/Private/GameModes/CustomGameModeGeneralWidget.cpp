@@ -174,8 +174,7 @@ void UCustomGameModeGeneralWidget::NativeConstruct()
 	SliderTextBoxOption_Epsilon->SetMenuOptionEnabledState(EMenuOptionEnabledState::Disabled);
 	SliderTextBoxOption_Gamma->SetMenuOptionEnabledState(EMenuOptionEnabledState::Disabled);
 	ComboBoxOption_HyperParameterMode->SetMenuOptionEnabledState(EMenuOptionEnabledState::Disabled);
-	SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_DeactivationHealthLostThreshold,
-		EMenuOptionEnabledState::Enabled);
+	SliderTextBoxOption_DeactivationHealthLostThreshold->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
 
 	UpdateBrushColors();
 }
@@ -240,13 +239,13 @@ void UCustomGameModeGeneralWidget::UpdateDependentOptions_DeactivationConditions
 {
 	if (Conditions.Contains(ETargetDeactivationCondition::OnSpecificHealthLost))
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_DeactivationHealthLostThreshold,
-			EMenuOptionEnabledState::Enabled);
+		SliderTextBoxOption_DeactivationHealthLostThreshold->
+			SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
 	}
 	else
 	{
-		SetMenuOptionEnabledStateAndAddTooltip(SliderTextBoxOption_DeactivationHealthLostThreshold,
-			EMenuOptionEnabledState::DependentMissing, "DM_DeactivationHealthLostThreshold");
+		SliderTextBoxOption_DeactivationHealthLostThreshold->SetMenuOptionEnabledState(
+			EMenuOptionEnabledState::DependentMissing, GetTooltipTextFromKey("DM_DeactivationHealthLostThreshold"));
 	}
 }
 

@@ -108,8 +108,7 @@ void UCustomGameModeActivationWidget::UpdateDependentOptions_TargetDistributionP
 	switch (Policy)
 	{
 	case ETargetDistributionPolicy::Grid:
-		SetMenuOptionEnabledStateAndAddTooltip(ComboBoxOption_TargetActivationSelectionPolicy,
-			EMenuOptionEnabledState::Enabled);
+		ComboBoxOption_TargetActivationSelectionPolicy->SetMenuOptionEnabledState(EMenuOptionEnabledState::Enabled);
 		ComboBoxOption_TargetActivationSelectionPolicy->ComboBox->SetIsEnabled(true);
 		break;
 	case ETargetDistributionPolicy::None:
@@ -119,8 +118,8 @@ void UCustomGameModeActivationWidget::UpdateDependentOptions_TargetDistributionP
 		BSConfig->TargetConfig.TargetActivationSelectionPolicy = ETargetActivationSelectionPolicy::Random;
 		UpdateValueIfDifferent(ComboBoxOption_TargetActivationSelectionPolicy,
 			GetStringFromEnum_FromTagMap(BSConfig->TargetConfig.TargetActivationSelectionPolicy));
-		SetMenuOptionEnabledStateAndAddTooltip(ComboBoxOption_TargetActivationSelectionPolicy,
-			EMenuOptionEnabledState::DependentMissing, "DM_ActivationSelectionPolicy_NonGrid");
+		ComboBoxOption_TargetActivationSelectionPolicy->SetMenuOptionEnabledState(
+			EMenuOptionEnabledState::DependentMissing, GetTooltipTextFromKey("DM_ActivationSelectionPolicy_NonGrid"));
 		break;
 	}
 }

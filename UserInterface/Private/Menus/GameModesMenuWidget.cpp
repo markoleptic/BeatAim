@@ -1015,7 +1015,6 @@ void UGameModeMenuWidget::HandleValidation(const FValidationResult& Result)
 	TSet<FValidationCheckResult, FValidationCheckKeyFuncs> Succeeded = Result.GetSucceeded();
 	TSet<FValidationCheckResult, FValidationCheckKeyFuncs> Failed = Result.GetFailed();
 	TMap<EGameModeCategory, TPair<int32, int32>> NotificationMap;
-
 	bool ContainsWarnings = false;
 	for (const auto& Widget : CurrentCustomGameModesWidget->GetCustomGameModeCategoryWidgets())
 	{

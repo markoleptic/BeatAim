@@ -3,7 +3,6 @@
 
 #include "GameModes/CustomGameModeSpawnAreaWidget.h"
 #include "BSGameModeConfig/BSGameModeValidator.h"
-#include "Components/CheckBox.h"
 #include "GameModes/CustomGameModeWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"
 #include "MenuOptions/DualRangeInputWidget.h"
@@ -373,8 +372,8 @@ void UCustomGameModeSpawnAreaWidget::UpdateSpreadWidgetState(UDualRangeInputWidg
 	{
 		if (bTracking)
 		{
-			State.SubWidgetEnabledState = EMenuOptionEnabledState::DependentMissing;
-			State.SubWidgetTooltipKey = "DM_ForwardSpread_Tracking";
+			State.MenuOptionEnabledState = EMenuOptionEnabledState::DependentMissing;
+			State.MenuOptionTooltipKey = "DM_ForwardSpread_Tracking";
 		}
 	}
 	else if (Widget == MenuOption_VerticalSpread)
@@ -442,8 +441,8 @@ void UCustomGameModeSpawnAreaWidget::UpdateSpreadWidgetState(UDualRangeInputWidg
 
 		if (bTracking)
 		{
-			State.SubWidgetEnabledState = EMenuOptionEnabledState::DependentMissing;
-			State.SubWidgetTooltipKey = "DM_VerticalSpread_Tracking";
+			State.MenuOptionEnabledState = EMenuOptionEnabledState::DependentMissing;
+			State.MenuOptionTooltipKey = "DM_VerticalSpread_Tracking";
 		}
 	}
 	else if (Widget == MenuOption_HorizontalSpread)
@@ -466,13 +465,12 @@ void UCustomGameModeSpawnAreaWidget::UpdateSpreadWidgetState(UDualRangeInputWidg
 
 		if (bTracking)
 		{
-			State.SubWidgetEnabledState = EMenuOptionEnabledState::DependentMissing;
-			State.SubWidgetTooltipKey = "DM_HorizontalSpread_Tracking";
+			State.MenuOptionEnabledState = EMenuOptionEnabledState::DependentMissing;
+			State.MenuOptionTooltipKey = "DM_HorizontalSpread_Tracking";
 		}
 	}
-	SetMenuOptionEnabledStateAndAddTooltip(Widget, State.MenuOptionEnabledState, State.MenuOptionTooltipKey);
-	SetSubMenuOptionEnabledStateAndAddTooltip(Widget, UCheckBox::StaticClass(), State.SubWidgetEnabledState,
-		State.SubWidgetTooltipKey);
+	Widget->SetMenuOptionEnabledState(State.MenuOptionEnabledState,
+		State.MenuOptionTooltipKey.IsEmpty() ? FText() : GetTooltipTextFromKey(State.MenuOptionTooltipKey));
 
 	if (!ModifiedProperties.IsEmpty())
 	{

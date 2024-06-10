@@ -8,7 +8,7 @@
 #include "Utilities/TooltipIcon.h"
 #include "MenuOptionWidget.generated.h"
 
-struct FUniqueValidationCheckData;
+struct FValidationCheckData;
 class UMenuOptionStyle;
 class UGameModeCategoryTagWidget;
 class UCheckBox;
@@ -49,21 +49,17 @@ protected:
 	virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
 	virtual void SetStyling();
+	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 public:
-	/** Sets the enabled state of the menu option. By default, this sets the enabled
-	 *  states of the two main horizontal boxes of a MenuOptionWidget, but subclasses may
-	 *  choose to modify this behavior.
-	 *  @param EnabledState the state to set the widget to.
+	/** Sets the enabled state of the menu option, optionally adding a tooltip to the entire widget. By default, this
+	 *  sets the enabled states of the two main horizontal boxes of a MenuOptionWidget, but subclasses may choose to
+	 *  modify this behavior.
+	 *  @param State the state to set the widget to.
+	 *  @param TooltipText text to add to a tooltip for the entire widget (if provided and State is DependentMissing).
+	 *  Otherwise, the tooltip will be cleared.
 	 */
-	virtual void SetMenuOptionEnabledState(EMenuOptionEnabledState EnabledState);
-
-	/** Sets the enabled state of a specific widget type in a menu option widget.
-	 * @param SubWidget the specific widget type to enable/disable
-	 * @param State the state to set the sub-widget to.
-	 * @return nullptr by default, or the widget containing the sub-widget.
-	 */
-	virtual UWidget* SetSubMenuOptionEnabledState(const TSubclassOf<UWidget>& SubWidget, EMenuOptionEnabledState State);
+	virtual void SetMenuOptionEnabledState(EMenuOptionEnabledState State, const FText& TooltipText = FText());
 
 	/** @return the custom enabled state of the menu option. */
 	EMenuOptionEnabledState GetMenuOptionEnabledState() const { return MenuOptionEnabledState; }
@@ -113,7 +109,7 @@ public:
 	 *  @param CalculatedValues any values calculated during the validation check to populate formatted text with,
 	 *  if applicable.
 	 */
-	void UpdateDynamicTooltipIcon(const bool bValidated, const FUniqueValidationCheckData& Data,
+	void UpdateDynamicTooltipIcon(const bool bValidated, const FValidationCheckData& Data,
 		const TArray<int32>& CalculatedValues);
 
 	/** @return the number tooltip icons of the specified type. */
@@ -124,11 +120,11 @@ protected:
 	void OnCheckBox_LockStateChanged(const bool bChecked);
 
 	/**
-	 *  Creates a new tooltip icon unqiue to the validation check data and stores it.
+	 *  Creates a new tooltip icon unique to the validation check data and stores it.
 	 *  @param Data data that is unique per property per validation check
 	 *  @return added tooltip icon.
 	 */
-	UTooltipIcon* AddTooltipIcon(const FUniqueValidationCheckData& Data);
+	UTooltipIcon* AddTooltipIcon(const FValidationCheckData& Data);
 
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	UHorizontalBox* Box_TagWidgets;
@@ -192,4 +188,7 @@ protected:
 
 	UPROPERTY()
 	TMap<uint32, TObjectPtr<UTooltipIcon>> DynamicTooltipIcons;
+
+	UPROPERTY()
+	FText DependentMissingTooltipText;
 };

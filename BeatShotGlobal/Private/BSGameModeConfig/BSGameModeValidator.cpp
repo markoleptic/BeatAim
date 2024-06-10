@@ -144,12 +144,34 @@ namespace
 /* -- FValidationCheck -- */
 /* ---------------------- */
 
-bool FUniqueValidationCheckData::IsEmpty() const
+FValidationCheckData::FValidationCheckData(): WarningType(EGameModeWarningType::None), Hash(0)
+{
+}
+
+FValidationCheckData::FValidationCheckData(const FValidationPropertyPtr& PropPtr, const FValidationCheckPtr& CheckPtr,
+	const FString& InStringTableKey, const FString& InDynamicStringTableKey) : StringTableKey(InStringTableKey),
+	                                                                           DynamicStringTableKey(
+		                                                                           InDynamicStringTableKey),
+	                                                                           WarningType(EGameModeWarningType::None),
+	                                                                           Hash(HashCombine(
+		                                                                           PointerHash(PropPtr.Get()),
+		                                                                           PointerHash(CheckPtr.Get())))
+{
+}
+
+FValidationCheckData::FValidationCheckData(const FValidationCheckPtr& CheckPtr, const FString& InStringTableKey,
+	const FString& InDynamicStringTableKey) : StringTableKey(InStringTableKey),
+	                                          DynamicStringTableKey(InDynamicStringTableKey),
+	                                          WarningType(EGameModeWarningType::None), Hash(PointerHash(CheckPtr.Get()))
+{
+}
+
+bool FValidationCheckData::IsEmpty() const
 {
 	return StringTableKey.IsEmpty() && DynamicStringTableKey.IsEmpty();
 }
 
-void FValidationProperty::AddCheck(const FValidationCheckPtr& Check, const FUniqueValidationCheckData& Data)
+void FValidationProperty::AddCheck(const FValidationCheckPtr& Check, const FValidationCheckData& Data)
 {
 	Checks.Add(Check);
 	if (!Data.IsEmpty())
@@ -204,6 +226,10 @@ public:
 
 	static void AddValidationCheckToProperty(const FValidationPropertyPtr& PropPtr, const FValidationCheckPtr& CheckPtr,
 		const FString& TooltipKey = FString(), const FString& DynamicTooltipKey = FString());
+
+	static void AddSharedValidationCheckToProperty(const FValidationPropertyPtr& PropPtr,
+		const FValidationCheckPtr& CheckPtr, const FString& TooltipKey = FString(),
+		const FString& DynamicTooltipKey = FString());
 
 	static float GetMinRequiredHorizontalSpread(const TSharedPtr<FBSConfig>& Config);
 
@@ -407,7 +433,7 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 	AddValidationCheckToProperty(TargetActivationResponsesPtr, CheckPtr, TEXT("Invalid_Direction_MTDM_None"));
 
 	// MovingTargetDirectionMode & Target Deactivation Responses
-	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, TargetActivationResponses},
+	CheckPtr = CreateValidationCheck({MovingTargetDirectionMode, TargetDeactivationResponses},
 		EGameModeWarningType::Caution, DeactivationVelocityLambda);
 	AddValidationCheckToProperty(MovingTargetDirectionModePtr, CheckPtr, TEXT("Invalid_Velocity_MTDM_None_2"));
 	AddValidationCheckToProperty(TargetDeactivationResponsesPtr, CheckPtr, TEXT("Invalid_Velocity_MTDM_None"));
@@ -571,11 +597,17 @@ FValidationPropertyPtr UBSGameModeValidator::FPrivate::CreateValidationProperty(
 	return PropertyPtr;
 }
 
+
 void UBSGameModeValidator::FPrivate::AddValidationCheckToProperty(const FValidationPropertyPtr& PropPtr,
 	const FValidationCheckPtr& CheckPtr, const FString& TooltipKey, const FString& DynamicTooltipKey)
 {
-	PropPtr->AddCheck(CheckPtr, FUniqueValidationCheckData(TooltipKey, DynamicTooltipKey,
-		HashCombine(PointerHash(PropPtr.Get()), PointerHash(CheckPtr.Get()))));
+	PropPtr->AddCheck(CheckPtr, FValidationCheckData(PropPtr, CheckPtr, TooltipKey, DynamicTooltipKey));
+}
+
+void UBSGameModeValidator::FPrivate::AddSharedValidationCheckToProperty(const FValidationPropertyPtr& PropPtr,
+	const FValidationCheckPtr& CheckPtr, const FString& TooltipKey, const FString& DynamicTooltipKey)
+{
+	PropPtr->AddCheck(CheckPtr, FValidationCheckData(CheckPtr, TooltipKey, DynamicTooltipKey));
 }
 
 float UBSGameModeValidator::FPrivate::GetMinRequiredHorizontalSpread(const TSharedPtr<FBSConfig>& Config)
@@ -664,10 +696,10 @@ void UBSGameModeValidator::FPrivate::ValidateCheckGroup(const TSharedPtr<FBSConf
 		TArray<int32> Values;
 		const bool bResult = Check->ValidationDelegate.Execute(Config, Values);
 
-		TMap<FValidationPropertyPtr, FUniqueValidationCheckData> PropertyData;
+		TMap<FValidationPropertyPtr, FValidationCheckData> PropertyData;
 		for (const FValidationPropertyPtr& InvolvedProperty : Check->InvolvedProperties)
 		{
-			if (const FUniqueValidationCheckData* FoundData = InvolvedProperty->CheckData.Find(Check))
+			if (const FValidationCheckData* FoundData = InvolvedProperty->CheckData.Find(Check))
 			{
 				PropertyData.Add(InvolvedProperty, *FoundData);
 			}
