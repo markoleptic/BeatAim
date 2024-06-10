@@ -47,13 +47,22 @@ public:
 
 protected:
 	virtual void NativeConstruct() override;
+
 	virtual void UpdateOptionsFromConfig() override;
+
+	virtual void HandleWatchedPropertyChanged(uint32 PropertyHash) override;
+
 	void UpdateDependentOptions_TargetDistributionPolicy();
+
 	void UpdateSpread();
+
 	void UpdateSpreadWidgetState(UDualRangeInputWidget* Widget, const bool bTracking, const bool bHeadShotHeightOnly,
 		const bool bGrid);
+
 	void UpdateDependentOption_BoundsScalingPolicy();
+
 	void OnSliderTextBoxValueChanged(USingleRangeInputWidget* Widget, const float Value);
+
 	void OnMinMaxValueChanged(UDualRangeInputWidget* Widget, const bool bChecked, const float Min, const float Max);
 
 	UFUNCTION()

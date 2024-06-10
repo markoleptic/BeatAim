@@ -51,6 +51,11 @@ void UCustomGameModeTargetSizingWidget::NativeConstruct()
 			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, ConsecutiveTargetScalePolicy)),
 		ComboBoxOption_ConsecutiveTargetScalePolicy);
 
+	AddWatchedProperty(UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetActivationResponses)));
+	AddWatchedProperty(UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDeactivationResponses)));
+
 	SliderTextBoxOption_DeactivatedTargetScaleMultiplier->SetValues(
 		Constants::MinValue_ConsecutiveChargeScaleMultiplier, Constants::MaxValue_ConsecutiveChargeScaleMultiplier,
 		Constants::SnapSize_ConsecutiveChargeScaleMultiplier);
@@ -120,11 +125,25 @@ void UCustomGameModeTargetSizingWidget::UpdateOptionsFromConfig()
 		GetStringFromEnum_FromTagMap(BSConfig->TargetConfig.ConsecutiveTargetScalePolicy));
 
 	UpdateDependentOptions_TargetActivationResponses(BSConfig->TargetConfig.TargetActivationResponses);
-	UpdateDependentOptions_TargetDeactivationResponses(BSConfig->TargetConfig.TargetDeactivationConditions,
-		BSConfig->TargetConfig.TargetDeactivationResponses);
+	UpdateDependentOptions_TargetDeactivationResponses(BSConfig->TargetConfig.TargetDeactivationResponses);
 	UpdateDependentOptions_ConsecutiveTargetScalePolicy(BSConfig->TargetConfig.ConsecutiveTargetScalePolicy);
 
 	UpdateBrushColors();
+}
+
+void UCustomGameModeTargetSizingWidget::HandleWatchedPropertyChanged(const uint32 PropertyHash)
+{
+	if (PropertyHash == UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetActivationResponses)))
+	{
+		UpdateDependentOptions_TargetActivationResponses(BSConfig->TargetConfig.TargetActivationResponses);
+	}
+	else if (PropertyHash == UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDeactivationResponses)))
+	{
+		UpdateDependentOptions_TargetDeactivationResponses(BSConfig->TargetConfig.TargetDeactivationResponses);
+	}
 }
 
 void UCustomGameModeTargetSizingWidget::UpdateDependentOptions_TargetActivationResponses(
@@ -142,9 +161,9 @@ void UCustomGameModeTargetSizingWidget::UpdateDependentOptions_TargetActivationR
 }
 
 void UCustomGameModeTargetSizingWidget::UpdateDependentOptions_TargetDeactivationResponses(
-	const TArray<ETargetDeactivationCondition>& Conditions, const TArray<ETargetDeactivationResponse>& Responses)
+	const TArray<ETargetDeactivationResponse>& InResponses)
 {
-	if (Responses.Contains(ETargetDeactivationResponse::ApplyDeactivatedTargetScaleMultiplier))
+	if (InResponses.Contains(ETargetDeactivationResponse::ApplyDeactivatedTargetScaleMultiplier))
 	{
 		SliderTextBoxOption_DeactivatedTargetScaleMultiplier->SetMenuOptionEnabledState(
 			EMenuOptionEnabledState::Enabled);

@@ -24,12 +24,13 @@ protected:
 
 	virtual void UpdateOptionsFromConfig() override;
 
+	virtual void HandleWatchedPropertyChanged(uint32 PropertyHash) override;
+
 	/** Updates options that depend on the value selection of TargetActivationResponses. */
 	void UpdateDependentOptions_TargetActivationResponses(const TArray<ETargetActivationResponse>& InResponses);
 
 	/** If Persistent, empties and disables Target Deactivation Responses Combo Box. */
-	void UpdateDependentOptions_TargetDeactivationResponses(const TArray<ETargetDeactivationCondition>& Conditions,
-		const TArray<ETargetDeactivationResponse>& Responses);
+	void UpdateDependentOptions_TargetDeactivationResponses(const TArray<ETargetDeactivationResponse>& InResponses);
 
 	/** Updates options that depend on the value selection of ConsecutiveTargetScalePolicy. */
 	void UpdateDependentOptions_ConsecutiveTargetScalePolicy(

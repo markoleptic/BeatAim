@@ -23,6 +23,8 @@ protected:
 
 	virtual void UpdateOptionsFromConfig() override;
 
+	virtual void HandleWatchedPropertyChanged(uint32 PropertyHash) override;
+
 	/** Updates options that depend on TargetSpawnResponses (and ConstantSpawnedTargetVelocity). */
 	void UpdateDependentOptions_SpawnResponses(const TArray<ETargetSpawnResponse>& Responses, const bool bConstant);
 

@@ -57,6 +57,14 @@ public:
 	/** @return the number tooltip icons of the specified type. */
 	int32 GetNumberOfDynamicTooltipIcons(ETooltipIconType Type);
 
+	/** @return properties that this widget is listening for changes to. */
+	TSet<uint32> GetWatchedProperties() const;
+
+	/** Called any time a watched property is changed.
+	 *  @param PropertyHash the property hashed using its unique properties (FProperty).
+	 */
+	virtual void HandleWatchedPropertyChanged(uint32 PropertyHash);
+
 protected:
 	/** Adds a GameModeCategoryTagWidget for each matching GameplayTag on the Menu Option widget. */
 	void AddGameModeCategoryTagWidgets(UMenuOptionWidget* MenuOptionWidget);
@@ -66,6 +74,11 @@ protected:
 	 *  @param MenuOptionWidget the widget to associate the property with.
 	 */
 	void AssociatePropertyWithMenuOption(uint32 PropertyHash, UMenuOptionWidget* MenuOptionWidget);
+
+	/** Registers a property that will trigger HandleWatchedPropertyChanged when changed.
+	 *  @param PropertyHash the property hashed using its unique properties (FProperty).
+	 */
+	void AddWatchedProperty(uint32 PropertyHash);
 
 	/** Updates the slider and editable text box values if different from Value. */
 	static bool UpdateValueIfDifferent(const USingleRangeInputWidget* Widget, const float Value);
@@ -129,6 +142,9 @@ protected:
 private:
 	/** Stores menu options associated with properties in BSConfig. */
 	TMap<uint32, TWeakObjectPtr<UMenuOptionWidget>> PropertyMenuOptionWidgetMap;
+
+	/** Stores properties that upon being changed, should notify this widget. */
+	TSet<uint32> WatchedProperties;
 };
 
 template <typename T>

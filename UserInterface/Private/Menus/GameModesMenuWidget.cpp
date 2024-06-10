@@ -771,9 +771,8 @@ bool UGameModeMenuWidget::SaveCustomGameModeOptionsAndReselect(const FText& Succ
 
 void UGameModeMenuWidget::UpdateSaveStartButtonStates()
 {
-	//const bool bAllCustomGameModeOptionsValid = CurrentCustomGameModesWidget->GetAllNonStartChildWidgetOptionsValid();
 	const FStartWidgetProperties& Properties = UCustomGameModeStartWidget::GetProperties();
-	const bool bAllCustomGameModeOptionsValid = bGameModeBreakingOptionPresent;
+	const bool bAllCustomGameModeOptionsValid = !bGameModeBreakingOptionPresent;
 	const bool bIsPresetMode = IsPresetGameMode(Properties.GameModeName);
 	const bool bIsCustomMode = IsCustomGameMode(Properties.GameModeName);
 	const bool bNewCustomGameModeNameEmpty = Properties.NewCustomGameModeName.IsEmpty();

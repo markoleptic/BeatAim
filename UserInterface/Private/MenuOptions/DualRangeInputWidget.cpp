@@ -156,7 +156,7 @@ void UDualRangeInputWidget::SetConstantModeLocked(const bool bLock) const
 
 void UDualRangeInputWidget::SetMenuOptionEnabledState(const EMenuOptionEnabledState State, const FText& TooltipText)
 {
-	Super::SetMenuOptionEnabledState(State);
+	Super::SetMenuOptionEnabledState(State, TooltipText);
 
 	switch (State)
 	{

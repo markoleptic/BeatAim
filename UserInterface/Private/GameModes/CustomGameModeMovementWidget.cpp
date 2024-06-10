@@ -43,6 +43,13 @@ void UCustomGameModeMovementWidget::NativeConstruct()
 			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MovingTargetDirectionMode)),
 		ComboBoxOption_MovingTargetDirectionMode);
 
+	AddWatchedProperty(UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetSpawnResponses)));
+	AddWatchedProperty(UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetActivationResponses)));
+	AddWatchedProperty(UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDeactivationResponses)));
+
 	MenuOption_SpawnedTargetVelocity->SetValues(Constants::MinValue_TargetSpeed, Constants::MaxValue_TargetSpeed,
 		Constants::SnapSize_TargetSpeed);
 	MenuOption_ActivatedTargetVelocity->SetValues(Constants::MinValue_TargetSpeed, Constants::MaxValue_TargetSpeed,
@@ -103,6 +110,35 @@ void UCustomGameModeMovementWidget::UpdateOptionsFromConfig()
 		bConstantDeactivatedSpeed);
 
 	UpdateBrushColors();
+}
+
+void UCustomGameModeMovementWidget::HandleWatchedPropertyChanged(const uint32 PropertyHash)
+{
+	if (PropertyHash == UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetSpawnResponses)))
+	{
+		const bool bConstantSpawnedSpeed = BSConfig->TargetConfig.MinSpawnedTargetSpeed == BSConfig->TargetConfig.
+			MaxSpawnedTargetSpeed;
+		UpdateDependentOptions_SpawnResponses(BSConfig->TargetConfig.TargetSpawnResponses, bConstantSpawnedSpeed);
+	}
+	else if (PropertyHash == UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetActivationResponses)))
+	{
+		const bool bConstantActivatedSpeed = BSConfig->TargetConfig.MinActivatedTargetSpeed == BSConfig->TargetConfig.
+			MaxActivatedTargetSpeed;
+		UpdateDependentOptions_ActivationResponses(BSConfig->TargetConfig.TargetActivationResponses,
+			bConstantActivatedSpeed);
+	}
+	else if (PropertyHash == UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDeactivationResponses)))
+	{
+		const bool bConstantDeactivatedSpeed = BSConfig->TargetConfig.MinDeactivatedTargetSpeed == BSConfig->
+			TargetConfig.MaxDeactivatedTargetSpeed;
+		UpdateDependentOptions_DeactivationResponses(BSConfig->TargetConfig.TargetDeactivationResponses,
+			bConstantDeactivatedSpeed);
+	}
 }
 
 void UCustomGameModeMovementWidget::UpdateDependentOptions_SpawnResponses(const TArray<ETargetSpawnResponse>& Responses,

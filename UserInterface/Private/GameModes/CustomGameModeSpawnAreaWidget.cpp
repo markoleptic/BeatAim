@@ -77,6 +77,9 @@ void UCustomGameModeSpawnAreaWidget::NativeConstruct()
 		UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, DynamicSpawnAreaScaling),
 			GET_MEMBER_NAME_CHECKED(FBS_Dynamic_SpawnArea, DecrementAmount)), SliderTextBoxOption_DecrementAmount);
 
+	AddWatchedProperty(UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDamageType)));
+
 	SliderTextBoxOption_NumHorizontalGridTargets->SetValues(MinValue_NumHorizontalGridTargets,
 		MaxValue_NumHorizontalGridTargets, SnapSize_NumHorizontalGridTargets);
 	SliderTextBoxOption_NumVerticalGridTargets->SetValues(MinValue_NumVerticalGridTargets,
@@ -172,6 +175,15 @@ void UCustomGameModeSpawnAreaWidget::UpdateOptionsFromConfig()
 	UpdateDependentOption_BoundsScalingPolicy();
 
 	UpdateBrushColors();
+}
+
+void UCustomGameModeSpawnAreaWidget::HandleWatchedPropertyChanged(const uint32 PropertyHash)
+{
+	if (PropertyHash == UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDamageType)))
+	{
+		UpdateSpread();
+	}
 }
 
 void UCustomGameModeSpawnAreaWidget::UpdateDependentOptions_TargetDistributionPolicy()

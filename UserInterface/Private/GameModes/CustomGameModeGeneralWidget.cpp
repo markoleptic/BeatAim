@@ -87,6 +87,11 @@ void UCustomGameModeGeneralWidget::NativeConstruct()
 			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDamageType)),
 		ComboBoxOption_DamageType);
 
+	AddWatchedProperty(UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, RecentTargetMemoryPolicy)));
+	AddWatchedProperty(UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDeactivationConditions)));
+
 	SliderTextBoxOption_SpawnBeatDelay->SetValues(MinValue_PlayerDelay, MaxValue_PlayerDelay, SnapSize_PlayerDelay);
 	SliderTextBoxOption_TargetSpawnCD->
 		SetValues(MinValue_TargetSpawnCD, MaxValue_TargetSpawnCD, SnapSize_TargetSpawnCD);
@@ -211,6 +216,21 @@ void UCustomGameModeGeneralWidget::UpdateOptionsFromConfig()
 	UpdateDependentOptions_DeactivationConditions(BSConfig->TargetConfig.TargetDeactivationConditions);
 
 	UpdateBrushColors();
+}
+
+void UCustomGameModeGeneralWidget::HandleWatchedPropertyChanged(const uint32 PropertyHash)
+{
+	if (PropertyHash == UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, RecentTargetMemoryPolicy)))
+	{
+		UpdateDependentOptions_RecentTargetMemoryPolicy(BSConfig->TargetConfig.RecentTargetMemoryPolicy);
+	}
+	else if (PropertyHash == UBSGameModeValidator::FindBSConfigProperty(
+		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDeactivationConditions)))
+	{
+		UpdateDependentOptions_DeactivationConditions(BSConfig->TargetConfig.TargetDeactivationConditions);
+	}
 }
 
 void UCustomGameModeGeneralWidget::UpdateDependentOptions_RecentTargetMemoryPolicy(

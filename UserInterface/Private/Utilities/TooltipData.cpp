@@ -33,7 +33,6 @@ void FTooltipData::SetTooltipIcon(const TObjectPtr<UTooltipIcon>& InTooltipIcon)
 
 void FTooltipData::SetTooltipText(const FText& InTooltipText)
 {
-	UE_LOG(LogTemp, Display, TEXT("New text: %s"), *InTooltipText.ToString());
 	TooltipText = InTooltipText;
 }
 

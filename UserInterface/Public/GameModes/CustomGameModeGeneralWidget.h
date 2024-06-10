@@ -28,6 +28,8 @@ protected:
 
 	virtual void UpdateOptionsFromConfig() override;
 
+	virtual void HandleWatchedPropertyChanged(uint32 PropertyHash) override;
+
 	/** Updates options that depend on the value selection of RecentTargetMemoryPolicy. */
 	void UpdateDependentOptions_RecentTargetMemoryPolicy(const ERecentTargetMemoryPolicy InRecentTargetMemoryPolicy);
 

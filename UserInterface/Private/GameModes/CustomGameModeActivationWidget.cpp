@@ -40,6 +40,9 @@ void UCustomGameModeActivationWidget::NativeConstruct()
 			GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetActivationSelectionPolicy)),
 		ComboBoxOption_TargetActivationSelectionPolicy);
 
+	AddWatchedProperty(UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDistributionPolicy)));
+
 	SliderTextBoxOption_MaxNumActivatedTargetsAtOnce->SetValues(Constants::MinValue_MaxNumActivatedTargetsAtOnce,
 		Constants::MaxValue_MaxNumActivatedTargetsAtOnce, Constants::SnapSize_MaxNumActivatedTargetsAtOnce);
 	MenuOption_NumTargetsToActivateAtOnce->SetValues(Constants::MinValue_MaxNumActivatedTargetsAtOnce,
@@ -95,6 +98,15 @@ void UCustomGameModeActivationWidget::UpdateOptionsFromConfig()
 	UpdateDependentOptions_TargetDistributionPolicy(BSConfig->TargetConfig.TargetDistributionPolicy);
 
 	UpdateBrushColors();
+}
+
+void UCustomGameModeActivationWidget::HandleWatchedPropertyChanged(const uint32 PropertyHash)
+{
+	if (PropertyHash == UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, TargetDistributionPolicy)))
+	{
+		UpdateDependentOptions_TargetDistributionPolicy(BSConfig->TargetConfig.TargetDistributionPolicy);
+	}
 }
 
 void UCustomGameModeActivationWidget::UpdateDependentOptions_TargetActivationResponses(

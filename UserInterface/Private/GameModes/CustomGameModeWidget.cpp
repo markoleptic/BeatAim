@@ -45,6 +45,14 @@ void UCustomGameModeWidget::NativeDestruct()
 void UCustomGameModeWidget::HandlePropertyChanged(const TSet<uint32>& Properties)
 {
 	OnPropertyChanged.Execute(Properties);
+
+	for (const auto [EGameModeCategory, Widget] : GameModeCategoryWidgetMap)
+	{
+		for (const uint32 PropertyHash : Properties.Intersect(Widget->GetWatchedProperties()))
+		{
+			Widget->HandleWatchedPropertyChanged(PropertyHash);
+		}
+	}
 }
 
 void UCustomGameModeWidget::Init(const TSharedPtr<FBSConfig>& InConfig)

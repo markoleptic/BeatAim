@@ -15,7 +15,6 @@
 #include "MenuOptions/TextInputWidget.h"
 #include "MenuOptions/ToggleableSingleRangeInputWidget.h"
 #include "Utilities/GameModeCategoryTagWidget.h"
-#include "Utilities/TooltipWidget.h"
 #include "Utilities/ComboBox/BSComboBoxString.h"
 
 
@@ -68,8 +67,6 @@ void UCustomGameModeCategoryWidget::HandlePropertyValidation(
 			}
 			if (const TWeakObjectPtr<UMenuOptionWidget>* Found = PropertyMenuOptionWidgetMap.Find(Property->Hash))
 			{
-				UE_LOG(LogTemp, Display, TEXT("Found widget %s for property %s"), *Found->Get()->GetName(),
-					*Property.Get()->PropertyName);
 				(*Found)->UpdateDynamicTooltipIcon(Elem.bSuccess, Data, Elem.CalculatedValues);
 			}
 		}
@@ -84,6 +81,15 @@ int32 UCustomGameModeCategoryWidget::GetNumberOfDynamicTooltipIcons(const EToolt
 		Count += MenuOptionWidget->GetNumberOfDynamicTooltipIcons(Type);
 	}
 	return Count;
+}
+
+TSet<uint32> UCustomGameModeCategoryWidget::GetWatchedProperties() const
+{
+	return WatchedProperties;
+}
+
+void UCustomGameModeCategoryWidget::HandleWatchedPropertyChanged(const uint32 PropertyHash)
+{
 }
 
 void UCustomGameModeCategoryWidget::AddGameModeCategoryTagWidgets(UMenuOptionWidget* MenuOptionWidget)
@@ -116,6 +122,11 @@ void UCustomGameModeCategoryWidget::AssociatePropertyWithMenuOption(const uint32
 	UMenuOptionWidget* MenuOptionWidget)
 {
 	PropertyMenuOptionWidgetMap.Add(PropertyHash, MenuOptionWidget);
+}
+
+void UCustomGameModeCategoryWidget::AddWatchedProperty(const uint32 PropertyHash)
+{
+	WatchedProperties.Add(PropertyHash);
 }
 
 bool UCustomGameModeCategoryWidget::UpdateValueIfDifferent(const USingleRangeInputWidget* Widget, const float Value)
