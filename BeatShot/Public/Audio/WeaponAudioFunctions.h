@@ -29,6 +29,6 @@ protected:
 		UCameraComponent* CameraComponent, const FVector& ListenerLocation, const FVector& HitLocation,
 		const int32 TapID, const float TravelDistance, const bool bHit);
 
-	static void GetSideReflectionAngles(const FVector& Origin, const FVector& Normal, const float TraceDistance,
+	static void GetSideReflectionAngles(const FVector& Origin, const FVector& Normal, const float InTraceDistance,
 		const FVector& Axis, FVector& OutAngleLeft, FVector& OutAngleRight);
 };

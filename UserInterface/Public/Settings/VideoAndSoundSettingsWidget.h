@@ -89,6 +89,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UComboBoxWidget* ComboBoxOption_DLSS_FrameGeneration;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UComboBoxWidget* ComboBoxOption_DLSS_RayReconstitution;
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UComboBoxWidget* ComboBoxOption_DLSS_SuperResolution;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	USingleRangeInputWidget* SliderTextBoxOption_DLSS_Sharpness;
@@ -174,6 +176,8 @@ private:
 	void OnSelectionChanged_FrameGeneration(const TArray<FString>& SelectedOptions, ESelectInfo::Type SelectionType);
 	UFUNCTION()
 	void OnSelectionChanged_SuperResolution(const TArray<FString>& SelectedOptions, ESelectInfo::Type SelectionType);
+	UFUNCTION()
+	void OnSelectionChanged_RayReconstitution(const TArray<FString>& SelectedOptions, ESelectInfo::Type SelectionType);
 	UFUNCTION()
 	void OnSelectionChanged_NIS_EnabledMode(const TArray<FString>& SelectedOptions, ESelectInfo::Type SelectionType);
 	UFUNCTION()

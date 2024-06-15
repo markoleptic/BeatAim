@@ -185,6 +185,7 @@ void UBSGameUserSettings::SetToBSDefaults()
 	DLSSMode = UDLSSMode::Auto;
 	NISMode = UNISMode::Off;
 	StreamlineReflexMode = UStreamlineReflexMode::Enabled;
+	bEnableRayReconstitution = true;
 	AntiAliasingMethod = AAM_TSR;
 	// bSoundControlBusMixLoaded = false;
 	// VideoSettingEnumMap = nullptr;
@@ -465,6 +466,10 @@ void UBSGameUserSettings::ApplyNvidiaSettings()
 	if (UStreamlineLibraryReflex::IsReflexSupported())
 	{
 		UStreamlineLibraryReflex::SetReflexMode(StreamlineReflexMode);
+	}
+	if (UDLSSLibrary::IsDLSSRRSupported())
+	{
+		UDLSSLibrary::EnableDLSSRR(bEnableRayReconstitution);
 	}
 	if (DLSSEnabledMode == EDLSSEnabledMode::On && NISEnabledMode == ENISEnabledMode::Off)
 	{
@@ -749,6 +754,11 @@ uint8 UBSGameUserSettings::GetStreamlineReflexMode() const
 	return static_cast<uint8>(StreamlineReflexMode);
 }
 
+bool UBSGameUserSettings::IsRayReconstitutionEnabled() const
+{
+	return bEnableRayReconstitution;
+}
+
 float UBSGameUserSettings::GetDLSSSharpness() const
 {
 	return DLSSSharpness;
@@ -879,6 +889,11 @@ void UBSGameUserSettings::SetNISMode(const uint8 InNISMode)
 void UBSGameUserSettings::SetStreamlineReflexMode(const uint8 InStreamlineReflexMode)
 {
 	StreamlineReflexMode = static_cast<UStreamlineReflexMode>(InStreamlineReflexMode);
+}
+
+void UBSGameUserSettings::SetRayReconstitutionEnabled(const bool Enable)
+{
+	bEnableRayReconstitution = Enable;
 }
 
 void UBSGameUserSettings::SetDLSSSharpness(const float InDLSSSharpness)

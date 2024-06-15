@@ -175,8 +175,8 @@ void UWeaponAudioFunctions::CalculateTapProperties(const FString& DebugString,
 }
 
 void UWeaponAudioFunctions::GetSideReflectionAngles(const FVector& Origin, const FVector& Normal,
-	const float TraceDistance, const FVector& Axis, FVector& OutAngleLeft, FVector& OutAngleRight)
+	const float InTraceDistance, const FVector& Axis, FVector& OutAngleLeft, FVector& OutAngleRight)
 {
-	OutAngleLeft = UKismetMathLibrary::RotateAngleAxis(Normal, 45.f, Axis) * TraceDistance + Origin;
-	OutAngleRight = UKismetMathLibrary::RotateAngleAxis(Normal, -45.f, Axis) * TraceDistance + Origin;
+	OutAngleLeft = UKismetMathLibrary::RotateAngleAxis(Normal, 45.f, Axis) * InTraceDistance + Origin;
+	OutAngleRight = UKismetMathLibrary::RotateAngleAxis(Normal, -45.f, Axis) * InTraceDistance + Origin;
 }

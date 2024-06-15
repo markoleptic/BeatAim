@@ -154,6 +154,8 @@ void UVideoAndSoundSettingsWidget::NativeConstruct()
 
 	Options = GameUserSettings->GetAvailableAudioDeviceNames();
 	ComboBoxOption_OutputAudioDevice->SortAndAddOptions(Options);
+	ComboBoxOption_DLSS_RayReconstitution->ComboBox->AddOption("Enabled");
+	ComboBoxOption_DLSS_RayReconstitution->ComboBox->AddOption("Disabled");
 
 	UpdateBrushColors();
 	InitializeVideoAndSoundSettings();
@@ -375,6 +377,19 @@ void UVideoAndSoundSettingsWidget::OnSelectionChanged_SuperResolution(const TArr
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to find DLSS Mode"));
 	}
+}
+
+void UVideoAndSoundSettingsWidget::OnSelectionChanged_RayReconstitution(const TArray<FString>& SelectedOptions,
+	ESelectInfo::Type SelectionType)
+{
+	if (SelectedOptions.Num() != 1 || SelectionType == ESelectInfo::Type::Direct)
+	{
+		return;
+	}
+
+	UBSGameUserSettings* GameUserSettings = UBSGameUserSettings::Get();
+	GameUserSettings->SetRayReconstitutionEnabled(SelectedOptions[0] == "Enabled");
+	GameUserSettings->ApplySettings(false);
 }
 
 void UVideoAndSoundSettingsWidget::OnSelectionChanged_NIS_EnabledMode(const TArray<FString>& SelectedOptions,
@@ -624,7 +639,9 @@ void UVideoAndSoundSettingsWidget::UpdateNvidiaSettings()
 	{
 		ComboBoxOption_Reflex->ComboBox->SetSelectedOption(*Found);
 	}
-
+	ComboBoxOption_DLSS_RayReconstitution->ComboBox->SetSelectedOption(GameUserSettings->IsRayReconstitutionEnabled()
+		? "Enabled"
+		: "Disabled");
 	CheckBoxOption_VSync->CheckBox->SetIsChecked(GameUserSettings->IsVSyncEnabled());
 	SliderTextBoxOption_DLSS_Sharpness->SetValue(GameUserSettings->GetDLSSSharpness());
 	SliderTextBoxOption_NIS_Sharpness->SetValue(GameUserSettings->GetNISSharpness());
@@ -646,6 +663,7 @@ void UVideoAndSoundSettingsWidget::HandleDLSSEnabledChanged(const bool bDLSSEnab
 		// Enable Settings that require DLSS to be on
 		ComboBoxOption_DLSS_FrameGeneration->ComboBox->SetIsEnabled(true);
 		ComboBoxOption_DLSS_SuperResolution->ComboBox->SetIsEnabled(true);
+		ComboBoxOption_DLSS_RayReconstitution->ComboBox->SetIsEnabled(true);
 		SliderTextBoxOption_DLSS_Sharpness->SetSliderAndTextBoxEnabledStates(true);
 
 		// Disable Settings that require DLSS to be off, or are forced to be on
@@ -666,6 +684,7 @@ void UVideoAndSoundSettingsWidget::HandleDLSSEnabledChanged(const bool bDLSSEnab
 		// Disable Settings that require DLSS to be on
 		ComboBoxOption_DLSS_FrameGeneration->ComboBox->SetIsEnabled(false);
 		ComboBoxOption_DLSS_SuperResolution->ComboBox->SetIsEnabled(false);
+		ComboBoxOption_DLSS_RayReconstitution->ComboBox->SetIsEnabled(false);
 		SliderTextBoxOption_DLSS_Sharpness->SetSliderAndTextBoxEnabledStates(false);
 		SliderTextBoxOption_DLSS_Sharpness->SetValue(0.f);
 

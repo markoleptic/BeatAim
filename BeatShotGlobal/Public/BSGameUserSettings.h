@@ -110,6 +110,7 @@ public:
 	uint8 GetDLSSMode() const;
 	uint8 GetNISMode() const;
 	uint8 GetStreamlineReflexMode() const;
+	bool IsRayReconstitutionEnabled() const;
 
 	float GetDLSSSharpness() const;
 	float GetNISSharpness() const;
@@ -201,6 +202,11 @@ public:
 	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
 	void SetStreamlineReflexMode(uint8 InStreamlineReflexMode);
+
+	/** Sets the value of bEnableRayReconstitution.\n
+	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
+	 *  Changes not automatically saved. */
+	void SetRayReconstitutionEnabled(bool Enable);
 
 	/** Sets the value of DLSSSharpness.\n
 	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
@@ -310,6 +316,10 @@ private:
 	/** Nvidia Streamline Reflex Mode. */
 	UPROPERTY(Config)
 	UStreamlineReflexMode StreamlineReflexMode;
+
+	/** Nvidia Ray Reconstitution. */
+	UPROPERTY(Config)
+	bool bEnableRayReconstitution;
 
 	/** Anti Aliasing Method. */
 	UPROPERTY(Config)
