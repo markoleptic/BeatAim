@@ -48,10 +48,12 @@ public:
 
 	/** Creator function. Binds its OnTooltipIconHovered delegate to the global static tooltip widget.
 	 *  @param InOwningObject the object to parent the tooltip icon to.
+	 *  @param TooltipIconClass the class to create.
 	 *  @param Type the type of tooltip icon to create.
 	 *  @return new tooltip icon instance.
 	 */
-	static UTooltipIcon* CreateTooltipIcon(UUserWidget* InOwningObject, ETooltipIconType Type);
+	static UTooltipIcon* CreateTooltipIcon(UUserWidget* InOwningObject,
+		const TSubclassOf<UUserWidget>& TooltipIconClass, ETooltipIconType Type);
 
 	/**
 	 * Modifies the appearance of the icon.

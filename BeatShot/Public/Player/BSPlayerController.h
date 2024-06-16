@@ -11,6 +11,7 @@
 #include "Target/ReinforcementLearningComponent.h"
 #include "BSPlayerController.generated.h"
 
+class UTooltipWidget;
 class UBSGameUserSettings;
 class AFloatingTextActor;
 class UQTableWidget;
@@ -40,6 +41,7 @@ class BEATSHOT_API ABSPlayerController : public APlayerController, public IHttpR
 	virtual void BeginPlay() override;
 	virtual void PreProcessInput(const float DeltaTime, const bool bGamePaused) override;
 	virtual void PostProcessInput(const float DeltaTime, const bool bGamePaused) override;
+	virtual void Destroyed() override;
 
 	/** Returns the player state. */
 	UFUNCTION(BlueprintCallable, Category = "BSPlayerController")
@@ -184,6 +186,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
 	TSubclassOf<AFloatingTextActor> FloatingTextActorClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
+	TSubclassOf<UTooltipWidget> TooltipClass;
 
 private:
 	/** Callback function for screen fade widget's OnFadeFromBlackFinish delegate. */

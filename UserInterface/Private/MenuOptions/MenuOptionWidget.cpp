@@ -242,7 +242,7 @@ UTooltipIcon* UMenuOptionWidget::AddTooltipIcon(const FValidationCheckData& Data
 	case EGameModeWarningType::Error:
 		break;
 	}
-	UTooltipIcon* TooltipIcon = UTooltipIcon::CreateTooltipIcon(this, Type);
+	UTooltipIcon* TooltipIcon = UTooltipIcon::CreateTooltipIcon(this, MenuOptionStyle->TooltipIconClass, Type);
 	UHorizontalBoxSlot* HorizontalBoxSlot = TooltipBox->AddChildToHorizontalBox(TooltipIcon);
 	HorizontalBoxSlot->SetHorizontalAlignment(HAlign_Right);
 	HorizontalBoxSlot->SetPadding(MenuOptionStyle->Padding_DynamicTooltipIcons);

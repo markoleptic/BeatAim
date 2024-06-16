@@ -222,7 +222,7 @@ public:
 		const EGameModeCategory InGameModeCategory);
 
 	FValidationCheckPtr CreateValidationCheck(const TSet<FPropertyHash>& InvolvedProperties,
-		EGameModeWarningType WarningType, TFunction<bool(const TSharedPtr<FBSConfig>&, TArray<int32>&)> Lambda);
+		EGameModeWarningType WarningType, TFunction<bool(const TSharedPtr<FBSConfig>&, TArray<float>&)> Lambda);
 
 	static void AddValidationCheckToProperty(const FValidationPropertyPtr& PropPtr, const FValidationCheckPtr& CheckPtr,
 		const FString& TooltipKey = FString(), const FString& DynamicTooltipKey = FString());
@@ -350,11 +350,11 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 	FValidationPropertyPtr EnableReinforcementLearningPtr = CreateValidationProperty(EnableReinforcementLearning,
 		EGameModeCategory::General);
 
-	auto SpawnEveryOtherAndBatchLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto SpawnEveryOtherAndBatchLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
 		return !(Config->TargetConfig.bSpawnEveryOtherTargetInCenter && Config->TargetConfig.bUseBatchSpawning);
 	};
-	auto SpawnEveryOtherAndAllowSpawnLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto SpawnEveryOtherAndAllowSpawnLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
 		return !(Config->TargetConfig.bSpawnEveryOtherTargetInCenter && Config->TargetConfig.
 			bAllowSpawnWithoutActivation);
@@ -376,37 +376,37 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 	AddValidationCheckToProperty(AllowSpawnWithoutActivationPtr, CheckPtr,
 		TEXT("Invalid_SpawnEveryOtherTargetInCenter_AllowSpawnWithoutActivation2"));
 
-	auto SpawnVelocityLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto SpawnVelocityLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
 		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && Config->
 			TargetConfig.TargetSpawnResponses.Contains(ETargetSpawnResponse::ChangeVelocity));
 	};
-	auto SpawnDirectionLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto SpawnDirectionLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
 		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && Config->
 			TargetConfig.TargetSpawnResponses.Contains(ETargetSpawnResponse::ChangeDirection));
 	};
-	auto ActivationVelocityLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto ActivationVelocityLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
 		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && Config->
 			TargetConfig.TargetActivationResponses.Contains(ETargetActivationResponse::ChangeVelocity));
 	};
-	auto ActivationDirectionLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto ActivationDirectionLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
 		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && Config->
 			TargetConfig.TargetActivationResponses.Contains(ETargetActivationResponse::ChangeDirection));
 	};
-	auto DeactivationVelocityLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto DeactivationVelocityLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
 		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && Config->
 			TargetConfig.TargetDeactivationResponses.Contains(ETargetDeactivationResponse::ChangeVelocity));
 	};
-	auto DeactivationDirectionLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto DeactivationDirectionLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
 		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && Config->
 			TargetConfig.TargetDeactivationResponses.Contains(ETargetDeactivationResponse::ChangeDirection));
 	};
-	auto BoxBoundsLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto BoxBoundsLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
 		return !(Config->TargetConfig.BoxBounds.X <= 0.f && Config->TargetConfig.MovingTargetDirectionMode ==
 			EMovingTargetDirectionMode::ForwardOnly);
@@ -449,54 +449,46 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 		TEXT("Caution_ZeroForwardDistance_MTDM_ForwardOnly"));
 	AddValidationCheckToProperty(BoxBoundsXPtr, CheckPtr, TEXT("Caution_ZeroForwardDistance_MTDM_ForwardOnly_2"));
 
-	auto NumHorizontalGridTargetsLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto GridTargetDistributionPolicyPrerequisite = [](const TSharedPtr<FBSConfig>& Config)
 	{
-		if (Config->TargetConfig.TargetDistributionPolicy != ETargetDistributionPolicy::Grid)
-		{
-			return true;
-		}
+		return Config->TargetConfig.TargetDistributionPolicy == ETargetDistributionPolicy::Grid;
+	};
+
+	auto NumHorizontalGridTargetsLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
+	{
 		Values.Add(GetMaxAllowedNumHorizontalTargets(Config));
 		return Values[0] >= Config->GridConfig.NumHorizontalGridTargets;
 	};
-	auto NumVerticalGridTargetsLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto NumVerticalGridTargetsLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
-		if (Config->TargetConfig.TargetDistributionPolicy != ETargetDistributionPolicy::Grid)
-		{
-			return true;
-		}
 		Values.Add(GetMaxAllowedNumVerticalTargets(Config));
 		return Values[0] >= Config->GridConfig.NumVerticalGridTargets;
 	};
-	auto GridSpacingHorizontalLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto GridSpacingHorizontalLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
-		if (Config->TargetConfig.TargetDistributionPolicy != ETargetDistributionPolicy::Grid)
-		{
-			return true;
-		}
 		Values.Add(static_cast<int32>(GetMaxAllowedHorizontalSpacing(Config)));
 		return Values[0] >= Config->GridConfig.GridSpacing.X;
 	};
-	auto GridSpacingVerticalLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto GridSpacingVerticalLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
-		if (Config->TargetConfig.TargetDistributionPolicy != ETargetDistributionPolicy::Grid)
-		{
-			return true;
-		}
 		Values.Add(static_cast<int32>(GetMaxAllowedVerticalSpacing(Config)));
 		return Values[0] >= Config->GridConfig.GridSpacing.Y;
 	};
-	auto TargetDistributionPolicyLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto TargetDistributionPolicyLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
 		return !(Config->TargetConfig.TargetDistributionPolicy == ETargetDistributionPolicy::HeadshotHeightOnly &&
 			Config->AIConfig.bEnableReinforcementLearning);
 	};
+	auto TargetSizeLambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
+	{
+		Values.Add(GetMaxAllowedTargetScale(Config));
+		return Values[0] >= Config->TargetConfig.MinSpawnedTargetScale;
+	};
 
 	// NumHorizontalGridTargets checks
 	CheckPtr = CreateValidationCheck(
-		{
-			TargetDistributionPolicy, NumHorizontalGridTargets, GridSpacingX, MinSpawnedTargetScale,
-			MaxSpawnedTargetScale
-		}, EGameModeWarningType::Warning, NumHorizontalGridTargetsLambda);
+		{NumHorizontalGridTargets, GridSpacingX, MinSpawnedTargetScale, MaxSpawnedTargetScale},
+		EGameModeWarningType::Warning, NumHorizontalGridTargetsLambda);
 	AddValidationCheckToProperty(NumHorizontalGridTargetsPtr, CheckPtr,
 		TEXT("Invalid_Grid_NumHorizontalTargets_Fallback"), TEXT("Invalid_Grid_NumHorizontalTargets"));
 	AddValidationCheckToProperty(TargetDistributionPolicyPtr, CheckPtr);
@@ -545,6 +537,10 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 		TEXT("Invalid_Grid_MaxSpawnedTargetScale_Fallback"), TEXT("Invalid_Grid_MaxSpawnedTargetScale"));
 	AddValidationCheckToProperty(MaxSpawnedTargetScalePtr, CheckPtr);
 
+	CheckPtr = CreateValidationCheck({
+		TargetDistributionPolicy, NumVerticalGridTargets, GridSpacingY, MinSpawnedTargetScale, MaxSpawnedTargetScale
+	}, EGameModeWarningType::Warning, GridSpacingVerticalLambda);
+
 	// TargetDistributionPolicy checks
 	CheckPtr = CreateValidationCheck({TargetDistributionPolicy, EnableReinforcementLearning},
 		EGameModeWarningType::Warning, TargetDistributionPolicyLambda);
@@ -554,12 +550,12 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 	FValidationPropertyPtr TargetDamageTypePtr = CreateValidationProperty(TargetDamageType,
 		EGameModeCategory::SpawnArea);
 
-	auto InvalidTrackingAILambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto InvalidTrackingAILambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
 		return !(Config->AIConfig.bEnableReinforcementLearning && Config->TargetConfig.TargetDamageType ==
 			ETargetDamageType::Tracking);
 	};
-	auto InvalidHeadshotAILambda = [](const TSharedPtr<FBSConfig>& Config, TArray<int32>& Values)
+	auto InvalidHeadshotAILambda = [](const TSharedPtr<FBSConfig>& Config, TArray<float>& Values)
 	{
 		return !(Config->AIConfig.bEnableReinforcementLearning && Config->TargetConfig.TargetDistributionPolicy ==
 			ETargetDistributionPolicy::HeadshotHeightOnly);
@@ -577,7 +573,7 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 }
 
 FValidationCheckPtr UBSGameModeValidator::FPrivate::CreateValidationCheck(const TSet<FPropertyHash>& InvolvedProperties,
-	const EGameModeWarningType WarningType, TFunction<bool(const TSharedPtr<FBSConfig>&, TArray<int32>&)> Lambda)
+	const EGameModeWarningType WarningType, TFunction<bool(const TSharedPtr<FBSConfig>&, TArray<float>&)> Lambda)
 {
 	TSet<FValidationPropertyPtr> Properties;
 	for (const FPropertyHash& PropertyHash : InvolvedProperties)
@@ -693,7 +689,7 @@ void UBSGameModeValidator::FPrivate::ValidateCheckGroup(const TSharedPtr<FBSConf
 		{
 			continue;
 		}
-		TArray<int32> Values;
+		TArray<float> Values;
 		const bool bResult = Check->ValidationDelegate.Execute(Config, Values);
 
 		TMap<FValidationPropertyPtr, FValidationCheckData> PropertyData;

@@ -32,17 +32,10 @@ void UTooltipIcon::PostInitProperties()
 	TooltipData.SetTooltipIcon(this);
 }
 
-UTooltipIcon* UTooltipIcon::CreateTooltipIcon(UUserWidget* InOwningObject, const ETooltipIconType Type)
+UTooltipIcon* UTooltipIcon::CreateTooltipIcon(UUserWidget* InOwningObject,
+	const TSubclassOf<UUserWidget>& TooltipIconClass, const ETooltipIconType Type)
 {
-	UObject* LoadedObject = StaticLoadObject(UObject::StaticClass(), nullptr,
-		TEXT("/Game/UserInterface/Utilities/Tooltips/WBP_TooltipIcon.WBP_TooltipIcon"));
-	const UBlueprint* Blueprint = Cast<UBlueprint>(LoadedObject);
-	if (!Blueprint || !Blueprint->GeneratedClass)
-	{
-		return nullptr;
-	}
-	const TSubclassOf<UUserWidget> WidgetClass = TSubclassOf<UUserWidget>(Blueprint->GeneratedClass);
-	if (UTooltipIcon* Icon = CreateWidget<UTooltipIcon>(InOwningObject, WidgetClass))
+	if (UTooltipIcon* Icon = CreateWidget<UTooltipIcon>(InOwningObject, TooltipIconClass))
 	{
 		Icon->SetTooltipIconType(Type);
 		Icon->OnTooltipIconHovered.AddUObject(UTooltipWidget::Get(), &UTooltipWidget::HandleTooltipIconHovered);

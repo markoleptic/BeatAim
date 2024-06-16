@@ -70,14 +70,14 @@ struct BEATSHOTGLOBAL_API FValidationCheck
 	}
 
 	/** All properties involved in the calculation of the validation result. */
+	// TODO: Remove and instead use property dependents
 	TSet<FValidationPropertyPtr> InvolvedProperties;
 
 	/** The type of warning associated with the validation check. */
 	EGameModeWarningType WarningType;
 
 	/** Must return true in order to validate successfully. */
-	TDelegate<bool(const TSharedPtr<FBSConfig>&, TArray<int32>&)> ValidationDelegate;
-
+	TDelegate<bool(const TSharedPtr<FBSConfig>&, TArray<float>&)> ValidationDelegate;
 
 	FORCEINLINE bool operator ==(const FValidationCheck& Other) const
 	{
@@ -177,10 +177,17 @@ struct BEATSHOTGLOBAL_API FValidationProperty
 	/** The game mode category this property falls under. Used to sync with user interface. */
 	EGameModeCategory GameModeCategory;
 
-	/** An array of pointers to all validation checks that involve this property. */
+	// TODO: Replace with ChecksAndPrerequisites and only store validation checks for this property
 	TSet<FValidationCheckPtr> Checks;
 
-	/** Maps each validation check to unique validation check data for this property. */
+	// TODO: Associate dependents with their specific validation check that makes them dependent on this property
+	TSet<FValidationPropertyPtr> Dependents;
+
+	/** The prerequisite must return true in order for the validation check to be executed, otherwise validation is
+	 *  skipped and marked as passing. */
+	TMap<FValidationCheckPtr, TDelegate<bool(const TSharedPtr<FBSConfig>&)>> ChecksAndPrerequisites;
+
+	// TODO: Remove and store directly in validation checks
 	TMap<FValidationCheckPtr, FValidationCheckData> CheckData;
 
 	FORCEINLINE bool operator ==(const FValidationProperty& Other) const
@@ -227,27 +234,30 @@ struct BEATSHOTGLOBAL_API FValidationCheckResult
 	/** What the validation function returned. */
 	bool bSuccess;
 
+	/** Whether the validation check bypassed validation due to failing prerequisites. */
+	bool bBypassed;
+
 	FValidationCheckPtr ValidationCheckPtr;
 
 	/** The type of warning associated with the validation check. */
 	EGameModeWarningType WarningType;
 
 	/** Calculated values from the validation function. */
-	TArray<int32> CalculatedValues;
+	TArray<float> CalculatedValues;
 
-	/** All properties involved in the calculation of this validation check result. */
+	// TODO: Remove, only one property per check
 	TSet<FValidationPropertyPtr> InvolvedProperties;
 
-	/** Maps each involved property to their property data unique to the validation check. */
+	// TODO: Remove, only one property per check
 	TMap<FValidationPropertyPtr, FValidationCheckData> PropertyData;
 
 
-	FValidationCheckResult() : bSuccess(false), WarningType(EGameModeWarningType::None)
+	FValidationCheckResult() : bSuccess(false), bBypassed(false), WarningType(EGameModeWarningType::None)
 	{
 	}
 
-	FValidationCheckResult(const bool Success, const FValidationCheckPtr& InValidationCheck, TArray<int32>&& Values,
-		TMap<FValidationPropertyPtr, FValidationCheckData>&& Data) : bSuccess(Success),
+	FValidationCheckResult(const bool Success, const FValidationCheckPtr& InValidationCheck, TArray<float>&& Values,
+		TMap<FValidationPropertyPtr, FValidationCheckData>&& Data) : bSuccess(Success), bBypassed(false),
 		                                                             ValidationCheckPtr(InValidationCheck),
 		                                                             WarningType(InValidationCheck->WarningType),
 		                                                             CalculatedValues(MoveTemp(Values)),

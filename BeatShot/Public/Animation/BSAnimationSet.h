@@ -65,6 +65,11 @@ struct FBSIdleAnimSet
 {
 	GENERATED_BODY()
 
+	FBSIdleAnimSet(): Idle(nullptr), CrouchIdle(nullptr), CrouchIdleStart(nullptr), CrouchIdleStop(nullptr),
+	                  LeftHandPoseOverride(nullptr), ArmIdlePoseOverride(nullptr)
+	{
+	}
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimSequence* Idle;
 
@@ -89,6 +94,11 @@ struct FBSAimingAnimSet
 {
 	GENERATED_BODY()
 
+	FBSAimingAnimSet(): IdleAimOffset(nullptr), RelaxedAimOffset(nullptr), HipFireOverridePose(nullptr),
+	                    HipFireCrouchOverridePose(nullptr)
+	{
+	}
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAimOffsetBlendSpace* IdleAimOffset;
 
@@ -106,6 +116,11 @@ USTRUCT(BlueprintType)
 struct FBSJumpingAnimSet
 {
 	GENERATED_BODY()
+
+	FBSJumpingAnimSet(): JumpStart(nullptr), JumpFallLoop(nullptr), JumpFallLand(nullptr), JumpApex(nullptr),
+	                     JumpStartLoop(nullptr), JumpRecoveryAdditive(nullptr)
+	{
+	}
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimSequence* JumpStart;

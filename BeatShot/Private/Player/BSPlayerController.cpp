@@ -30,6 +30,7 @@
 #include "Player/BSPlayerState.h"
 #include "System/SteamManager.h"
 #include "Transitions/ScreenFadeWidget.h"
+#include "Utilities/TooltipWidget.h"
 
 void ABSPlayerController::BeginPlay()
 {
@@ -63,6 +64,8 @@ void ABSPlayerController::BeginPlay()
 	}*/
 
 	UE_LOG(LogTemp, Warning, TEXT("PlayerController::BeginPlay"));
+
+	UTooltipWidget::InitializeTooltipWidget(TooltipClass);
 
 	const UBSLoadingScreenSettings* LoadingScreenSettings = GetDefault<UBSLoadingScreenSettings>();
 	ScreenFadeWidgetAnimationDuration = LoadingScreenSettings->ScreenFadeWidgetAnimationDuration;
@@ -108,6 +111,12 @@ void ABSPlayerController::PostProcessInput(const float DeltaTime, const bool bGa
 		return;
 	}
 	GetBSAbilitySystemComponent()->ProcessAbilityInput(DeltaTime, bGamePaused);
+}
+
+void ABSPlayerController::Destroyed()
+{
+	Super::Destroyed();
+	UTooltipWidget::Cleanup();
 }
 
 ABSPlayerState* ABSPlayerController::GetBSPlayerState() const

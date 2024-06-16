@@ -25,6 +25,10 @@ void FEnumTagPair::AddParentTags(const FGameplayTagContainer& InParentTags)
 	}
 }
 
+FEnumTagMapping::FEnumTagMapping(): Enum(nullptr)
+{
+}
+
 FEnumTagMapping::FEnumTagMapping(const UEnum* InEnum)
 {
 	Enum = InEnum;

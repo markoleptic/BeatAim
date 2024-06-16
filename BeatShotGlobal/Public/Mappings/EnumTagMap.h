@@ -56,7 +56,7 @@ struct BEATSHOTGLOBAL_API FEnumTagMapping
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (TitleProperty="{DisplayName}"))
 	TMap<uint8, FEnumTagPair> EnumTagPairs;
 
-	FEnumTagMapping() = default;
+	FEnumTagMapping();
 
 	explicit FEnumTagMapping(const UEnum* InEnum);
 

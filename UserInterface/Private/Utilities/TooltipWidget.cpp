@@ -20,10 +20,6 @@ UTooltipWidget::UTooltipWidget(const FObjectInitializer& ObjectInitializer) : Su
 
 UTooltipWidget* UTooltipWidget::Get()
 {
-	if (!TooltipWidget)
-	{
-		TooltipWidget = InitializeTooltipWidget();
-	}
 	return TooltipWidget;
 }
 
@@ -65,21 +61,13 @@ void UTooltipWidget::Cleanup()
 	}
 }
 
-UTooltipWidget* UTooltipWidget::InitializeTooltipWidget()
+UTooltipWidget* UTooltipWidget::InitializeTooltipWidget(const TSubclassOf<UTooltipWidget>& TooltipWidgetClass)
 {
 	if (!TooltipWidget)
 	{
-		UObject* LoadedObject = StaticLoadObject(UObject::StaticClass(), nullptr,
-			TEXT("/Game/UserInterface/Utilities/Tooltips/WBP_Tooltip.WBP_Tooltip"));
-		const UBlueprint* Blueprint = Cast<UBlueprint>(LoadedObject);
-		if (!Blueprint || !Blueprint->GeneratedClass)
+		if (GEngine && GEngine->GameViewport)
 		{
-			return nullptr;
-		}
-		const TSubclassOf<UUserWidget> WidgetClass = TSubclassOf<UUserWidget>(Blueprint->GeneratedClass);
-		if (GEngine && GEngine->GameViewport && WidgetClass)
-		{
-			TooltipWidget = CreateWidget<UTooltipWidget>(GEngine->GameViewport->GetWorld(), WidgetClass);
+			TooltipWidget = CreateWidget<UTooltipWidget>(GEngine->GameViewport->GetWorld(), TooltipWidgetClass);
 			TooltipWidget->AddToRoot();
 		}
 	}

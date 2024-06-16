@@ -17,7 +17,6 @@
 #include "Slate/SLoadingScreenWidget.h"
 #include "System/SteamManager.h"
 #include "Utilities/GameModeTransitionState.h"
-#include "Utilities/TooltipWidget.h"
 
 void UBSGameInstance::Init()
 {
@@ -141,7 +140,6 @@ void UBSGameInstance::OnStart()
 void UBSGameInstance::Shutdown()
 {
 	Super::Shutdown();
-	UTooltipWidget::Cleanup();
 }
 
 void UBSGameInstance::SetBSConfig(const FBSConfig& InConfig)

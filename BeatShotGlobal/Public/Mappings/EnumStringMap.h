@@ -49,7 +49,10 @@ struct BEATSHOTGLOBAL_API FEnumStringMapping
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (TitleProperty="{DisplayName}"))
 	TMap<uint8, FEnumStringPair> EnumStringPairs;
 
-	FEnumStringMapping() = default;
+	FEnumStringMapping(): Enum(nullptr)
+	{
+	}
+
 	virtual ~FEnumStringMapping() = default;
 
 	explicit FEnumStringMapping(const UEnum* InEnum)

@@ -56,7 +56,7 @@ void IHttpRequestInterface::RequestAccessToken(const FString RefreshToken,
 					const TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(
 						Response->GetContentAsString());
 					FJsonSerializer::Deserialize(JsonReader, JsonObject);
-					AccessTokenResponse->AccessToken = JsonObject->GetStringField("accessToken");
+					AccessTokenResponse->AccessToken = JsonObject->GetStringField(TEXT("accessToken"));
 				}
 				else
 				{
@@ -109,10 +109,10 @@ void IHttpRequestInterface::LoginUser(const FLoginPayload LoginPayload,
 				if (LoginResponse->HttpStatus >= 200 && LoginResponse->HttpStatus <= 300)
 				{
 					LoginResponse->OK = true;
-					LoginResponse->UserID = ResponseJsonObject->GetStringField("userID");
-					LoginResponse->DisplayName = ResponseJsonObject->GetStringField("displayName");
-					LoginResponse->AccessToken = ResponseJsonObject->GetStringField("accessToken");
-					LoginResponse->RefreshToken = Response->GetHeader("set-cookie");
+					LoginResponse->UserID = ResponseJsonObject->GetStringField(TEXT("userID"));
+					LoginResponse->DisplayName = ResponseJsonObject->GetStringField(TEXT("displayName"));
+					LoginResponse->AccessToken = ResponseJsonObject->GetStringField(TEXT("accessToken"));
+					LoginResponse->RefreshToken = Response->GetHeader(TEXT("set-cookie"));
 				}
 				else
 				{
@@ -273,7 +273,7 @@ void IHttpRequestInterface::DeleteScores(const FString CustomGameModeName, const
 					FJsonSerializer::Deserialize(JsonReader, ResponseJsonObject);
 
 					DeleteScoresResponse->NumRemoved = static_cast<int32>(ResponseJsonObject->GetNumberField(
-						"Number Removed"));
+						TEXT("Number Removed")));
 					UE_LOG(LogTemp, Display, TEXT("Successfully deleted scores from database."));
 				}
 				else
@@ -322,21 +322,21 @@ void IHttpRequestInterface::AuthenticateSteamUser(const FString AuthTicket,
 				if (SteamAuthTicketResponse->HttpStatus >= 200 && SteamAuthTicketResponse->HttpStatus <= 300)
 				{
 					SteamAuthTicketResponse->OK = true;
-					SteamAuthTicketResponse->Result = JsonObject->GetStringField("result");
-					SteamAuthTicketResponse->SteamID = JsonObject->GetStringField("steamid");
-					SteamAuthTicketResponse->OwnerSteamID = JsonObject->GetStringField("ownersteamid");
-					SteamAuthTicketResponse->VacBanned = JsonObject->GetBoolField("vacbanned");
-					SteamAuthTicketResponse->PublisherBanned = JsonObject->GetBoolField("publisherbanned");
-					SteamAuthTicketResponse->DisplayName = JsonObject->GetStringField("displayname");
-					SteamAuthTicketResponse->RefreshCookie = Response->GetHeader("set-cookie");
+					SteamAuthTicketResponse->Result = JsonObject->GetStringField(TEXT("result"));
+					SteamAuthTicketResponse->SteamID = JsonObject->GetStringField(TEXT("steamid"));
+					SteamAuthTicketResponse->OwnerSteamID = JsonObject->GetStringField(TEXT("ownersteamid"));
+					SteamAuthTicketResponse->VacBanned = JsonObject->GetBoolField(TEXT("vacbanned"));
+					SteamAuthTicketResponse->PublisherBanned = JsonObject->GetBoolField(TEXT("publisherbanned"));
+					SteamAuthTicketResponse->DisplayName = JsonObject->GetStringField(TEXT("displayname"));
+					SteamAuthTicketResponse->RefreshCookie = Response->GetHeader(TEXT("set-cookie"));
 				}
 				else
 				{
-					SteamAuthTicketResponse->ErrorCode = JsonObject->HasField("errorcode")
-						? JsonObject->GetStringField("errorcode")
+					SteamAuthTicketResponse->ErrorCode = JsonObject->HasField(TEXT("errorcode"))
+						? JsonObject->GetStringField(TEXT("errorcode"))
 						: "Unknown Error Code";
-					SteamAuthTicketResponse->ErrorDesc = JsonObject->HasField("errordesc")
-						? JsonObject->GetStringField("errordesc")
+					SteamAuthTicketResponse->ErrorDesc = JsonObject->HasField(TEXT("errordesc"))
+						? JsonObject->GetStringField(TEXT("errordesc"))
 						: "Unknown Error Description";
 				}
 			}

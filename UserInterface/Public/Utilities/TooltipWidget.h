@@ -37,13 +37,13 @@ public:
 	/** Removes the static tooltip widget from the root set, and marks as garbage. */
 	static void Cleanup();
 
+	/** Instantiates the static tooltip widget. */
+	static UTooltipWidget* InitializeTooltipWidget(const TSubclassOf<UTooltipWidget>& TooltipWidgetClass);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* TooltipDescriptor;
 
 private:
-	/** Instantiates the static tooltip widget. */
-	static UTooltipWidget* InitializeTooltipWidget();
-
 	static UTooltipWidget* TooltipWidget;
 };
