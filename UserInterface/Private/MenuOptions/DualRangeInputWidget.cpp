@@ -322,36 +322,14 @@ void UDualRangeInputWidget::OnSliderChanged_Max(const float Value)
 
 void UDualRangeInputWidget::OnTextCommitted_Min(const FText& Text, ETextCommit::Type CommitType)
 {
-	const float ClampedValue = IBSWidgetInterface::OnEditableTextBoxChanged(Text, EditableTextBox_Min, Slider_Min,
-		GridSnapSize, Slider_Min->GetMinValue(), Slider_Min->GetMaxValue());
-	if (IsInConstantMode())
-	{
-		if (bUseMinAsConstant)
-		{
-			OnMinMaxMenuOptionChanged.Broadcast(this, true, ClampedValue, ClampedValue);
-		}
-	}
-	else
-	{
-		OnMinMaxMenuOptionChanged.Broadcast(this, false, ClampedValue, GetMaxSliderValue(true));
-	}
+	IBSWidgetInterface::OnEditableTextBoxChanged(Text, EditableTextBox_Min, Slider_Min, GridSnapSize,
+		Slider_Min->GetMinValue(), Slider_Min->GetMaxValue());
 }
 
 void UDualRangeInputWidget::OnTextCommitted_Max(const FText& Text, ETextCommit::Type CommitType)
 {
-	const float ClampedValue = IBSWidgetInterface::OnEditableTextBoxChanged(Text, EditableTextBox_Max, Slider_Max,
-		GridSnapSize, Slider_Max->GetMinValue(), Slider_Max->GetMaxValue());
-	if (IsInConstantMode())
-	{
-		if (!bUseMinAsConstant)
-		{
-			OnMinMaxMenuOptionChanged.Broadcast(this, true, ClampedValue, ClampedValue);
-		}
-	}
-	else
-	{
-		OnMinMaxMenuOptionChanged.Broadcast(this, false, GetMinSliderValue(true), ClampedValue);
-	}
+	IBSWidgetInterface::OnEditableTextBoxChanged(Text, EditableTextBox_Max, Slider_Max, GridSnapSize,
+		Slider_Max->GetMinValue(), Slider_Max->GetMaxValue());
 }
 
 void UDualRangeInputWidget::OnCheckStateChanged_CheckBox(const bool bChecked)

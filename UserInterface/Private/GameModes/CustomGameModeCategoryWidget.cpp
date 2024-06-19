@@ -55,20 +55,18 @@ void UCustomGameModeCategoryWidget::UpdateOptionsFromConfig()
 }
 
 void UCustomGameModeCategoryWidget::HandlePropertyValidation(
-	TSet<FValidationCheckResult, FValidationCheckKeyFuncs>& CheckResults)
+	TSet<FValidationCheckResult, FValidationCheckResultKeyFuncs>& CheckResults)
 {
 	for (const auto& Elem : CheckResults)
 	{
-		for (const auto& [Property, Data] : Elem.PropertyData)
+		if (Elem.ValidationCheckPtr->ValidationCheckData.IsEmpty())
 		{
-			if (Data.IsEmpty())
-			{
-				continue;
-			}
-			if (const TWeakObjectPtr<UMenuOptionWidget>* Found = PropertyMenuOptionWidgetMap.Find(Property->Hash))
-			{
-				(*Found)->UpdateDynamicTooltipIcon(Elem.bSuccess, Data, Elem.CalculatedValues);
-			}
+			continue;
+		}
+		if (const TWeakObjectPtr<UMenuOptionWidget>* Found = PropertyMenuOptionWidgetMap.Find(Elem.OwningPropertyHash))
+		{
+			(*Found)->UpdateDynamicTooltipIcon(GetTypeHash(*Elem.ValidationCheckPtr.Get()), Elem.bSuccess,
+				Elem.ValidationCheckPtr->ValidationCheckData);
 		}
 	}
 }

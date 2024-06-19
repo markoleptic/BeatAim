@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "TooltipData.generated.h"
 
+struct FValidationCheckData;
 class UButton;
 class UTooltipIcon;
 
@@ -49,9 +50,9 @@ public:
 
 	/**
 	 *  Sets the tooltip text using arguments.
-	 *  @param CalculatedValues arguments to pass to the formatted text slots.
+	 *  @param Data data about the validation check
 	 */
-	void SetFormattedTooltipText(const TArray<int32>& CalculatedValues);
+	void SetFormattedTooltipText(const FValidationCheckData& Data);
 
 	/** @return an array of argument names for formatted text. */
 	TArray<FString> GetFormattedTextArgs() const;
@@ -82,9 +83,6 @@ private:
 
 	/** Whether text wrapping is allowed on the tooltip widget. */
 	bool bAllowTextWrap;
-
-	/** How to format number arguments for formatted text. */
-	FNumberFormattingOptions NumberFormattingOptions;
 
 public:
 	FORCEINLINE bool operator==(const FTooltipData& Other) const

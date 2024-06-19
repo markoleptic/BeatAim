@@ -8,7 +8,6 @@
 #include "Components/CheckBox.h"
 #include "Components/EditableTextBox.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "MenuOptions/CheckBoxWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"
@@ -770,22 +769,19 @@ void UVideoAndSoundSettingsWidget::OnCheckStateChanged_FPSCounter(const bool bIs
 
 void UVideoAndSoundSettingsWidget::OnTextCommitted_FPSLimitMenu(const FText& Text, ETextCommit::Type CommitType)
 {
-	const float FrameLimit = UKismetMathLibrary::GridSnap_Float(FCString::Atof(*Text.ToString()),
-		SnapSize_FrameRateLimit);
+	const float FrameLimit = FMath::GridSnap(FCString::Atof(*Text.ToString()), SnapSize_FrameRateLimit);
 	UBSGameUserSettings::Get()->SetFrameRateLimitMenu(FrameLimit);
 }
 
 void UVideoAndSoundSettingsWidget::OnTextCommitted_FPSLimitGame(const FText& Text, ETextCommit::Type CommitType)
 {
-	const float FrameLimit = UKismetMathLibrary::GridSnap_Float(FCString::Atof(*Text.ToString()),
-		SnapSize_FrameRateLimit);
+	const float FrameLimit = FMath::GridSnap(FCString::Atof(*Text.ToString()), SnapSize_FrameRateLimit);
 	UBSGameUserSettings::Get()->SetFrameRateLimitGame(FrameLimit);
 }
 
 void UVideoAndSoundSettingsWidget::OnTextCommitted_FPSLimitBackground(const FText& Text, ETextCommit::Type CommitType)
 {
-	const float FrameLimit = UKismetMathLibrary::GridSnap_Float(FCString::Atof(*Text.ToString()),
-		SnapSize_FrameRateLimit);
+	const float FrameLimit = FMath::GridSnap(FCString::Atof(*Text.ToString()), SnapSize_FrameRateLimit);
 	UBSGameUserSettings::Get()->SetFrameRateLimitBackground(FrameLimit);
 }
 

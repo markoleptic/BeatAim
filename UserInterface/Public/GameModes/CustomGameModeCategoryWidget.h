@@ -8,7 +8,7 @@
 #include "CustomGameModeCategoryWidget.generated.h"
 
 enum class ETooltipIconType : uint8;
-struct FValidationCheckKeyFuncs;
+struct FValidationCheckResultKeyFuncs;
 struct FValidationCheckResult;
 struct FValidationCheckData;
 enum class EGameModeCategory : uint8;
@@ -46,7 +46,7 @@ public:
 	/** Creates or finds tooltip icons to display warnings and errors to the user.
 	 *  @param CheckResults The validation check results to iterate through.
 	 */
-	virtual void HandlePropertyValidation(TSet<FValidationCheckResult, FValidationCheckKeyFuncs>& CheckResults);
+	virtual void HandlePropertyValidation(TSet<FValidationCheckResult, FValidationCheckResultKeyFuncs>& CheckResults);
 
 	/** @return the game mode category the widget represents. */
 	EGameModeCategory GetGameModeCategory() const { return GameModeCategory; }

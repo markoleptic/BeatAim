@@ -34,15 +34,24 @@ void UGameModeMenuWidget::NativeConstruct()
 	GameModeValidator = NewObject<UBSGameModeValidator>();
 	for (const FValidationPropertyPtr& Property : GameModeValidator->GetValidationProperties())
 	{
-		for (auto& [CheckPtr, CheckData] : Property->CheckData)
+		for (const FValidationCheckPtr& ValidationCheck : Property->ValidationChecks)
 		{
-			if (!CheckData.IsEmpty())
+			if (!ValidationCheck->ValidationCheckData.IsEmpty())
 			{
-				CheckData.TooltipText = CheckData.DynamicStringTableKey.IsEmpty()
-					? IBSWidgetInterface::GetTooltipTextFromKey(CheckData.StringTableKey)
-					: IBSWidgetInterface::GetTooltipTextFromKey(CheckData.DynamicStringTableKey);
+				if (!ValidationCheck->ValidationCheckData.StringTableKey.IsEmpty() && !ValidationCheck->
+					ValidationCheckData.DynamicStringTableKey.IsEmpty())
+				{
+					ValidationCheck->ValidationCheckData.FallbackTooltipText =
+						IBSWidgetInterface::GetTooltipTextFromKey(ValidationCheck->ValidationCheckData.StringTableKey);
+					ValidationCheck->ValidationCheckData.TooltipText = IBSWidgetInterface::GetTooltipTextFromKey(
+						ValidationCheck->ValidationCheckData.DynamicStringTableKey);
+				}
+				else
+				{
+					ValidationCheck->ValidationCheckData.TooltipText = IBSWidgetInterface::GetTooltipTextFromKey(
+						ValidationCheck->ValidationCheckData.StringTableKey);
+				}
 			}
-			UE_LOG(LogTemp, Display, TEXT("%s: %s"), *CheckData.StringTableKey, *CheckData.TooltipText.ToString());
 		}
 	}
 	BSConfig = MakeShareable(new FBSConfig());
@@ -1011,8 +1020,8 @@ void UGameModeMenuWidget::HandlePropertyChanged(const TSet<uint32>& Properties)
 
 void UGameModeMenuWidget::HandleValidation(const FValidationResult& Result)
 {
-	TSet<FValidationCheckResult, FValidationCheckKeyFuncs> Succeeded = Result.GetSucceeded();
-	TSet<FValidationCheckResult, FValidationCheckKeyFuncs> Failed = Result.GetFailed();
+	FValidationCheckResultSet Succeeded = Result.GetSucceeded();
+	FValidationCheckResultSet Failed = Result.GetFailed();
 	TMap<EGameModeCategory, TPair<int32, int32>> NotificationMap;
 	bool ContainsWarnings = false;
 	for (const auto& Widget : CurrentCustomGameModesWidget->GetCustomGameModeCategoryWidgets())

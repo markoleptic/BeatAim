@@ -104,13 +104,11 @@ public:
 	void AddGameModeCategoryTagWidgets(TArray<UGameModeCategoryTagWidget*>& InGameModeCategoryTagWidgets);
 
 	/** Updates a tooltip icon that is only shown if a validation check failed.
-	 *  @param bValidated whether or not the validation check succeeded
+	 *  @param Hash validation check hash
+	 *  @param bValidated whether the validation check succeeded
 	 *  @param Data data that is unique per property per validation check
-	 *  @param CalculatedValues any values calculated during the validation check to populate formatted text with,
-	 *  if applicable.
 	 */
-	void UpdateDynamicTooltipIcon(const bool bValidated, const FValidationCheckData& Data,
-		const TArray<int32>& CalculatedValues);
+	void UpdateDynamicTooltipIcon(int32 Hash, const bool bValidated, const FValidationCheckData& Data);
 
 	/** @return the number tooltip icons of the specified type. */
 	int32 GetNumberOfDynamicTooltipIcons(ETooltipIconType Type);
@@ -121,10 +119,11 @@ protected:
 
 	/**
 	 *  Creates a new tooltip icon unique to the validation check data and stores it.
+	 *  @param Hash the hash of the validation check
 	 *  @param Data data that is unique per property per validation check
 	 *  @return added tooltip icon.
 	 */
-	UTooltipIcon* AddTooltipIcon(const FValidationCheckData& Data);
+	UTooltipIcon* AddTooltipIcon(int32 Hash, const FValidationCheckData& Data);
 
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	UHorizontalBox* Box_TagWidgets;

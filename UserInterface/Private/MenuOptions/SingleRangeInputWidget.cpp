@@ -32,8 +32,8 @@ void USingleRangeInputWidget::OnSliderChanged_Slider(const float Value)
 
 void USingleRangeInputWidget::OnTextCommitted_EditableTextBox(const FText& Text, ETextCommit::Type CommitType)
 {
-	const float ClampedValue = IBSWidgetInterface::OnEditableTextBoxChanged(Text, EditableTextBox, Slider, GridSnapSize,
-		Slider->GetMinValue(), Slider->GetMaxValue());
+	IBSWidgetInterface::OnEditableTextBoxChanged(Text, EditableTextBox, Slider, GridSnapSize, Slider->GetMinValue(),
+		Slider->GetMaxValue());
 }
 
 void USingleRangeInputWidget::SetValues(const float Min, const float Max, const float SnapSize)

@@ -23,9 +23,9 @@ void UCustomGameModeTargetSizingWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
+	/*AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
 		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
-		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MinSpawnedTargetScale)), MenuOption_TargetScale);
+		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MinSpawnedTargetScale)), MenuOption_TargetScale);*/
 	AssociatePropertyWithMenuOption(UBSGameModeValidator::FindBSConfigProperty(
 		GET_MEMBER_NAME_CHECKED(FBSConfig, TargetConfig),
 		GET_MEMBER_NAME_CHECKED(FBS_TargetConfig, MaxSpawnedTargetScale)), MenuOption_TargetScale);

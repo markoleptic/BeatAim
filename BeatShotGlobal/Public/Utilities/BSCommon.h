@@ -1,6 +1,7 @@
 ﻿// Copyright 2022-2023 Markoleptic Games, SP. All Rights Reserved.
 
 #pragma once
+#include "CoreMinimal.h"
 
 namespace BSCommon
 {
@@ -19,6 +20,26 @@ namespace BSCommon
 	 */
 	template <typename T, typename... Args>
 	static bool And(const T& Actual, const Args&... Rest);
+
+	template <class T>
+	[[nodiscard]] static constexpr FORCEINLINE T GridSnapFromZero(T Location, int32 Grid)
+	{
+		return Grid == T{}
+			? Location
+			: Location > T{}
+			? ceil(Location / Grid) * Grid
+			: FMath::Floor(Location / Grid) * Grid;
+	}
+
+	template <class T>
+	[[nodiscard]] static constexpr FORCEINLINE T GridSnapToZero(T Location, int32 Grid)
+	{
+		return Grid == T{}
+			? Location
+			: Location > T{}
+			? FMath::Floor(Location / Grid) * Grid
+			: ceil(Location / Grid) * Grid;
+	}
 }
 
 

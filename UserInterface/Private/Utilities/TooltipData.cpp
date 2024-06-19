@@ -2,13 +2,14 @@
 
 
 #include "Utilities/TooltipData.h"
+#include "BSGameModeConfig/BSGameModeValidator.h"
+#include "Utilities/BSCommon.h"
 #include "Utilities/TooltipIcon.h"
 
 int32 FTooltipData::GId = 0;
 
 FTooltipData::FTooltipData(): Id(GId++), bAllowTextWrap(false)
 {
-	NumberFormattingOptions.SetAlwaysSign(false).SetRoundingMode(HalfFromZero).SetMaximumFractionalDigits(2);
 }
 
 FText FTooltipData::GetTooltipText() const
@@ -46,13 +47,44 @@ void FTooltipData::CreateFormattedText(const FText& InText)
 	FormattedText = FTextFormat(InText);
 }
 
-void FTooltipData::SetFormattedTooltipText(const TArray<int32>& CalculatedValues)
+void FTooltipData::SetFormattedTooltipText(const FValidationCheckData& Data)
 {
 	FFormatNamedArguments Args;
-	Args.Reserve(CalculatedValues.Num());
-	for (int i = 0; i < CalculatedValues.Num(); i++)
+	Args.Reserve(Data.CalculatedValues.Num());
+
+	if (Data.GridSnapSize > 0 && Data.bCalculatedValuesAreIntegers)
 	{
-		Args.Emplace(TEXT("MaxAllowed"), FText::AsNumber(CalculatedValues[i], &NumberFormattingOptions));
+		for (int i = 0; i < Data.CalculatedValues.Num(); i++)
+		{
+			Args.Emplace(TEXT("MaxAllowed"),
+				FText::AsNumber(
+					BSCommon::GridSnapToZero(static_cast<int32>(Data.CalculatedValues[i]), Data.GridSnapSize),
+					&Data.NumberFormattingOptions));
+		}
+	}
+	else if (Data.GridSnapSize > 0)
+	{
+		for (int i = 0; i < Data.CalculatedValues.Num(); i++)
+		{
+			Args.Emplace(TEXT("MaxAllowed"),
+				FText::AsNumber(BSCommon::GridSnapToZero(Data.CalculatedValues[i], Data.GridSnapSize),
+					&Data.NumberFormattingOptions));
+		}
+	}
+	else if (Data.bCalculatedValuesAreIntegers)
+	{
+		for (int i = 0; i < Data.CalculatedValues.Num(); i++)
+		{
+			Args.Emplace(TEXT("MaxAllowed"),
+				FText::AsNumber(static_cast<int32>(Data.CalculatedValues[i]), &Data.NumberFormattingOptions));
+		}
+	}
+	else
+	{
+		for (int i = 0; i < Data.CalculatedValues.Num(); i++)
+		{
+			Args.Emplace(TEXT("MaxAllowed"), FText::AsNumber(Data.CalculatedValues[i], &Data.NumberFormattingOptions));
+		}
 	}
 	TooltipText = FText::Format(FormattedText, Args);
 }

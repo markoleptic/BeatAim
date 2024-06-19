@@ -226,7 +226,7 @@ void UMenuOptionWidget::OnCheckBox_LockStateChanged(const bool bChecked)
 	}
 }
 
-UTooltipIcon* UMenuOptionWidget::AddTooltipIcon(const FValidationCheckData& Data)
+UTooltipIcon* UMenuOptionWidget::AddTooltipIcon(const int32 Hash, const FValidationCheckData& Data)
 {
 	ETooltipIconType Type = ETooltipIconType::Default;
 	switch (Data.WarningType)
@@ -256,7 +256,7 @@ UTooltipIcon* UMenuOptionWidget::AddTooltipIcon(const FValidationCheckData& Data
 		TooltipIcon->GetTooltipData().SetTooltipText(Data.TooltipText);
 	}
 
-	DynamicTooltipIcons.Add(GetTypeHash(Data), TooltipIcon);
+	DynamicTooltipIcons.Add(Hash, TooltipIcon);
 	return TooltipIcon;
 }
 
@@ -281,17 +281,17 @@ void UMenuOptionWidget::AddGameModeCategoryTagWidgets(TArray<UGameModeCategoryTa
 	}
 }
 
-void UMenuOptionWidget::UpdateDynamicTooltipIcon(const bool bValidated, const FValidationCheckData& Data,
-	const TArray<int32>& CalculatedValues)
+void UMenuOptionWidget::UpdateDynamicTooltipIcon(const int32 Hash, const bool bValidated,
+	const FValidationCheckData& Data)
 {
-	const TObjectPtr<UTooltipIcon>* TooltipIconPtr = DynamicTooltipIcons.Find(Data.Hash);
+	const TObjectPtr<UTooltipIcon>* TooltipIconPtr = DynamicTooltipIcons.Find(Hash);
 	TObjectPtr<UTooltipIcon> TooltipIcon = TooltipIconPtr ? TooltipIconPtr->Get() : nullptr;
 
 	if (bValidated)
 	{
 		if (TooltipIcon)
 		{
-			DynamicTooltipIcons.Remove(Data.Hash);
+			DynamicTooltipIcons.Remove(Hash);
 			TooltipIcon->RemoveFromParent();
 		}
 	}
@@ -299,11 +299,18 @@ void UMenuOptionWidget::UpdateDynamicTooltipIcon(const bool bValidated, const FV
 	{
 		if (!TooltipIcon)
 		{
-			TooltipIcon = AddTooltipIcon(Data);
+			TooltipIcon = AddTooltipIcon(Hash, Data);
 		}
 		if (TooltipIcon->GetTooltipData().HasFormattedText())
 		{
-			TooltipIcon->GetTooltipData().SetFormattedTooltipText(CalculatedValues);
+			if (Data.bRequireOtherPropertiesToBeChanged)
+			{
+				TooltipIcon->GetTooltipData().SetTooltipText(Data.FallbackTooltipText);
+			}
+			else
+			{
+				TooltipIcon->GetTooltipData().SetFormattedTooltipText(Data);
+			}
 		}
 	}
 }
