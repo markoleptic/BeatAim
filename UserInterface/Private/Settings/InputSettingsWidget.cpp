@@ -94,15 +94,15 @@ void UInputSettingsWidget::InitializeInputSettings(const TMap<FName, FKeyMapping
 			Widget->OnKeySelected.AddUObject(this, &ThisClass::OnKeySelected);
 			Widget->OnIsSelectingKey.AddUObject(this, &ThisClass::OnIsSelectingKey);
 			InputMappingWidgetMap.Add(Row.Key, Widget);
-			if (DisplayCategory.EqualTo(FText::FromString("Combat")))
+			if (DisplayCategory.EqualTo(GetWidgetTextFromKey("KM_Category_Combat")))
 			{
 				BSBox_Combat->AddChildToVerticalBox(Widget);
 			}
-			else if (DisplayCategory.EqualTo(FText::FromString("Movement")))
+			else if (DisplayCategory.EqualTo(GetWidgetTextFromKey("KM_Category_Movement")))
 			{
 				BSBox_Movement->AddChildToVerticalBox(Widget);
 			}
-			else if (DisplayCategory.EqualTo(FText::FromString("General")))
+			else if (DisplayCategory.EqualTo(GetWidgetTextFromKey("KM_Category_General")))
 			{
 				BSBox_General->AddChildToVerticalBox(Widget);
 			}

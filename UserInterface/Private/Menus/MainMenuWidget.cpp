@@ -192,25 +192,24 @@ void UMainMenuWidget::UpdateLoginState(const bool bSuccessfulLogin, const FStrin
 		return;
 	}
 
-
-	if (CurrentLoginMethod == ELoginMethod::Steam)
+	switch (CurrentLoginMethod)
 	{
-		TextBlock_SignInState->SetText(IBSWidgetInterface::GetWidgetTextFromKey("Login_SignedInSteam"));
-		// Only collapse login button if signed in through steam
+	case ELoginMethod::None:
+		TextBlock_SignInState->SetText(FText::FromString("Unhandled Login Method"));
 		Button_Login_Register->SetVisibility(ESlateVisibility::Collapsed);
-	}
-	else if (CurrentLoginMethod == ELoginMethod::Legacy)
-	{
+		UE_LOG(LogTemp, Warning, TEXT("Unhandled Login Method in Main Menu"));
+		break;
+	case ELoginMethod::Steam:
+		TextBlock_SignInState->SetText(IBSWidgetInterface::GetWidgetTextFromKey("Login_SignedInSteam"));
+	// Only collapse login button if signed in through steam
+		Button_Login_Register->SetVisibility(ESlateVisibility::Collapsed);
+		break;
+	case ELoginMethod::Legacy:
 		TextBlock_SignInState->SetText(IBSWidgetInterface::GetWidgetTextFromKey("Login_SignedInAs"));
 		Button_Login_Register->
 			SetButtonText(IBSWidgetInterface::GetWidgetTextFromKey("Login_Register_SteamButtonText"));
 		LoginWidget->SetIsLegacySignedIn(true);
-	}
-	else
-	{
-		TextBlock_SignInState->SetText(FText::FromString("Unhandled Login Method"));
-		Button_Login_Register->SetVisibility(ESlateVisibility::Collapsed);
-		UE_LOG(LogTemp, Warning, TEXT("Unhandled Login Method in Main Menu"));
+		break;
 	}
 
 	// Show username

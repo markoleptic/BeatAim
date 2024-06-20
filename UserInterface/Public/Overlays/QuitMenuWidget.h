@@ -167,10 +167,10 @@ private:
 	void SetShouldSaveScoresFalse() { bShouldSaveScores = false; }
 
 	UFUNCTION()
-	void SetSaveMenuTitleMainMenu() { TextBlock_SaveMenuTitle->SetText(FText::FromString("Quit to Main Menu")); }
+	void SetSaveMenuTitleMainMenu();
 
 	UFUNCTION()
-	void SetSaveMenuTitleDesktop() { TextBlock_SaveMenuTitle->SetText(FText::FromString("Quit to Desktop")); }
+	void SetSaveMenuTitleDesktop();
 
 	/** Whether to save scores, used as argument when calling EndGameMode() from DefaultGameMode. */
 	bool bShouldSaveScores;

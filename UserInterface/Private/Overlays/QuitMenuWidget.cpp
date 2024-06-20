@@ -2,6 +2,7 @@
 
 
 #include "Overlays/QuitMenuWidget.h"
+#include "Utilities/BSWidgetInterface.h"
 #include "Utilities/GameModeTransitionState.h"
 #include "Utilities/Buttons/BSButton.h"
 
@@ -149,6 +150,16 @@ void UQuitMenuWidget::CollapseWidget()
 {
 	SetVisibility(ESlateVisibility::Collapsed);
 	UnbindFromAnimationFinished(FadeOutBackgroundBlur, FadeOutWidgetDelegate);
+}
+
+void UQuitMenuWidget::SetSaveMenuTitleMainMenu()
+{
+	TextBlock_SaveMenuTitle->SetText(IBSWidgetInterface::GetWidgetTextFromKey("QM_QuitMainMenuButtonText"));
+}
+
+void UQuitMenuWidget::SetSaveMenuTitleDesktop()
+{
+	TextBlock_SaveMenuTitle->SetText(IBSWidgetInterface::GetWidgetTextFromKey("QM_QuitDesktopButtonText"));
 }
 
 void UQuitMenuWidget::InitializeExit()

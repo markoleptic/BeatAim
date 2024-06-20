@@ -85,6 +85,6 @@ private:
 	FWidgetAnimationDynamicEvent FadeOutResponseDelegate;
 
 	FText TitlePrefix;
-	FText BugReportTitle = FText::FromString("Bug Report: ");
-	FText FeedbackTitle = FText::FromString("Feedback: ");
+	FText BugReportTitle;
+	FText FeedbackTitle;
 };

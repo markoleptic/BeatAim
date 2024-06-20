@@ -855,7 +855,7 @@ void UVideoAndSoundSettingsWidget::OnButtonPressed_CancelVideoSettings(const UBS
 
 	PopupMessageWidget->FadeOut();
 
-	SavedTextWidget->SetSavedText(FText::FromString("Fullscreen Mode and Resolution Reset"));
+	SavedTextWidget->SetSavedText(GetWidgetTextFromKey("Video_FullscreenResolutionReset"));
 	SavedTextWidget->PlayFadeInFadeOut();
 }
 

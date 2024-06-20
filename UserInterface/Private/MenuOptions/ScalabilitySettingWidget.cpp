@@ -3,6 +3,7 @@
 
 #include "MenuOptions/ScalabilitySettingWidget.h"
 #include "Styles/MenuOptionStyle.h"
+#include "Utilities/BSWidgetInterface.h"
 #include "Utilities/Buttons/ScalabilitySettingButton.h"
 
 void UScalabilitySettingWidget::Init(const EVideoSettingType InVideoSettingType)
@@ -33,6 +34,11 @@ void UScalabilitySettingWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 
+	Button_0_Text = IBSWidgetInterface::GetWidgetTextFromKey("QualityButtonText_Low");
+	Button_1_Text = IBSWidgetInterface::GetWidgetTextFromKey("QualityButtonText_Medium");
+	Button_2_Text = IBSWidgetInterface::GetWidgetTextFromKey("QualityButtonText_High");
+	Button_3_Text = IBSWidgetInterface::GetWidgetTextFromKey("QualityButtonText_Epic");
+
 	Button_0->SetButtonText(Button_0_Text);
 	Button_1->SetButtonText(Button_1_Text);
 	Button_2->SetButtonText(Button_2_Text);
@@ -42,6 +48,11 @@ void UScalabilitySettingWidget::NativePreConstruct()
 void UScalabilitySettingWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	Button_0_Text = IBSWidgetInterface::GetWidgetTextFromKey("QualityButtonText_Low");
+	Button_1_Text = IBSWidgetInterface::GetWidgetTextFromKey("QualityButtonText_Medium");
+	Button_2_Text = IBSWidgetInterface::GetWidgetTextFromKey("QualityButtonText_High");
+	Button_3_Text = IBSWidgetInterface::GetWidgetTextFromKey("QualityButtonText_Epic");
 
 	Button_0->SetButtonText(Button_0_Text);
 	Button_1->SetButtonText(Button_1_Text);

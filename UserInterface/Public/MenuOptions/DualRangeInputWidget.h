@@ -157,10 +157,10 @@ protected:
 	UCheckBox* CheckBox;
 
 	UPROPERTY(EditInstanceOnly, Category = "DualRangeInputWidget")
-	FText MinText = FText::FromString("Min");
+	FText MinText;
 
 	UPROPERTY(EditInstanceOnly, Category = "DualRangeInputWidget")
-	FText MaxText = FText::FromString("Max");
+	FText MaxText;
 
 	UPROPERTY()
 	FText CheckBoxDependentMissingTooltipText;

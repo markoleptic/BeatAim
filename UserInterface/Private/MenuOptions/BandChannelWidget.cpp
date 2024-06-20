@@ -8,6 +8,7 @@
 #include "Components/TextBlock.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Styles/MenuOptionStyle.h"
+#include "Utilities/BSWidgetInterface.h"
 
 void UBandChannelWidget::NativeConstruct()
 {
@@ -58,9 +59,8 @@ void UBandChannelWidget::SetDefaultValues(const FVector2d Values, const int32 Ch
 	Value_BandChannelMin->SetText(FText::AsNumber(Values.X));
 	Value_BandChannelMax->SetText(FText::AsNumber(Values.Y));
 	const TArray ChannelNumber = {
-		FText::FromStringTable("/Game/StringTables/ST_Widgets.ST_Widgets", "AA_BandChannelText"),
-		FText::FromString(FString::FromInt(ChannelIndex + 1)),
-		FText::FromStringTable("/Game/StringTables/ST_Widgets.ST_Widgets", "AA_BandChannelUnit")
+		IBSWidgetInterface::GetWidgetTextFromKey("AA_BandChannelText"), FText::AsNumber(ChannelIndex + 1),
+		IBSWidgetInterface::GetWidgetTextFromKey("AA_BandChannelUnit")
 	};
 	TextBlock_Description->SetText(FText::Join(FText::FromString(" "), ChannelNumber));
 	Index = ChannelIndex;

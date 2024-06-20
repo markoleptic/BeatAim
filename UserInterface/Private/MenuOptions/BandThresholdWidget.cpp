@@ -4,6 +4,7 @@
 #include "MenuOptions/BandThresholdWidget.h"
 #include "BSConstants.h"
 #include "Components/TextBlock.h"
+#include "Utilities/BSWidgetInterface.h"
 
 void UBandThresholdWidget::NativeConstruct()
 {
@@ -18,8 +19,7 @@ void UBandThresholdWidget::SetDefaultValue(const float Value, const int32 Channe
 {
 	SetValue(Value);
 	const TArray ChannelNumber = {
-		FText::FromStringTable("/Game/StringTables/ST_Widgets.ST_Widgets", "AA_BandChannelText"),
-		FText::FromString(FString::FromInt(ChannelIndex + 1))
+		IBSWidgetInterface::GetWidgetTextFromKey("AA_BandChannelText"), FText::AsNumber(ChannelIndex + 1)
 	};
 	TextBlock_Description->SetText(FText::Join(FText::FromString(" "), ChannelNumber));
 	Index = ChannelIndex;

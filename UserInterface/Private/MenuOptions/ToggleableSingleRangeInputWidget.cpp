@@ -5,14 +5,15 @@
 #include "CommonTextBlock.h"
 #include "Components/CheckBox.h"
 #include "Components/EditableTextBox.h"
-#include "Components/HorizontalBox.h"
-#include "Components/HorizontalBoxSlot.h"
 #include "Components/Slider.h"
 #include "Styles/MenuOptionStyle.h"
+#include "Utilities/BSWidgetInterface.h"
 
 void UToggleableSingleRangeInputWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	CheckBoxText = IBSWidgetInterface::GetWidgetTextFromKey("ToggleableSingleRange_Infinite");
 
 	if (TextBlock_CheckBox)
 	{
@@ -25,6 +26,9 @@ void UToggleableSingleRangeInputWidget::NativeConstruct()
 void UToggleableSingleRangeInputWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
+
+	CheckBoxText = IBSWidgetInterface::GetWidgetTextFromKey("ToggleableSingleRange_Infinite");
+
 	if (TextBlock_CheckBox)
 	{
 		TextBlock_CheckBox->SetText(CheckBoxText);

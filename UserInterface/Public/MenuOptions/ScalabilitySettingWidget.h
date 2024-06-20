@@ -38,12 +38,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UScalabilitySettingButton* Button_3;
 
-	UPROPERTY(EditDefaultsOnly, Category="ScalabilitySettingWidget")
-	FText Button_0_Text = FText::FromString("Low");
-	UPROPERTY(EditDefaultsOnly, Category="ScalabilitySettingWidget")
-	FText Button_1_Text = FText::FromString("Medium");
-	UPROPERTY(EditDefaultsOnly, Category="ScalabilitySettingWidget")
-	FText Button_2_Text = FText::FromString("High");
-	UPROPERTY(EditDefaultsOnly, Category="ScalabilitySettingWidget")
-	FText Button_3_Text = FText::FromString("Ultra");
+	FText Button_0_Text;
+	FText Button_1_Text;
+	FText Button_2_Text;
+	FText Button_3_Text;
 };

@@ -12,6 +12,16 @@ enum class EBaseGameMode : uint8;
 enum class EGameModeDifficulty : uint8;
 struct FBSConfig;
 
+UENUM()
+enum class ECustomGameModeImportResult : uint8
+{
+	Success,
+	InvalidImportString,
+	DefaultGameMode,
+	EmptyCustomGameModeName,
+	Existing
+};
+
 UINTERFACE()
 class UBSGameModeInterface : public UInterface
 {
@@ -66,11 +76,11 @@ public:
 	/** Attempts to initialize a given config using the serialized json string. Returns true on success.
 	 *  @param InSerializedJsonString serialized json string
 	 *  @param OutConfig game mode configuration created from json string if successful
-	 *  @param OutFailureReason contains reason for failure if unsuccessful
-	 *  @return true if succeeded
+	 *  @param OutDecodeFailureReason contains reason for decode failure if decode failure
+	 *  @return the import result as an enum
 	 */
-	static bool ImportCustomGameMode(const FString& InSerializedJsonString, FBSConfig& OutConfig,
-		FText& OutFailureReason);
+	static ECustomGameModeImportResult ImportCustomGameMode(const FString& InSerializedJsonString, FBSConfig& OutConfig,
+		FText& OutDecodeFailureReason);
 
 	/** Creates a serialized Json object export string from an FBSConfig
 	 *  @param InConfig game mode configuration to create serialized json string from

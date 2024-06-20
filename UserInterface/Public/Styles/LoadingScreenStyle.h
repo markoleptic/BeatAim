@@ -57,11 +57,11 @@ struct USERINTERFACE_API FLoadingScreenStyle : public FSlateWidgetStyle
 
 	/** Left brand text. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Brand")
-	FText BrandTextLeft = FText::FromString("BEAT");
+	FText BrandTextLeft;
 
 	/** Right brand text. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Brand")
-	FText BrandTextRight = FText::FromString("SHOT");
+	FText BrandTextRight;
 
 	/** Padding for the overlay slot containing both logo and brand text. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="General")

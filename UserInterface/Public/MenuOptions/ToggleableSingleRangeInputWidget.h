@@ -47,5 +47,5 @@ protected:
 	UHorizontalBox* Box_CheckBox;
 
 	UPROPERTY(EditInstanceOnly, Category = "ToggleableSingleRangeInputWidget")
-	FText CheckBoxText = FText::FromString("Infinite?");
+	FText CheckBoxText;
 };

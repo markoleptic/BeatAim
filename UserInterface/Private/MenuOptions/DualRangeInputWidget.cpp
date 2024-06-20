@@ -18,6 +18,9 @@ void UDualRangeInputWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	MinText = IBSWidgetInterface::GetWidgetTextFromKey("G_Min");
+	MaxText = IBSWidgetInterface::GetWidgetTextFromKey("G_Max");
+
 	TextBlock_Max->SetText(MaxText);
 
 	Slider_Min->OnValueChanged.AddUniqueDynamic(this, &ThisClass::OnSliderChanged_Min);
@@ -30,6 +33,10 @@ void UDualRangeInputWidget::NativeConstruct()
 void UDualRangeInputWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
+
+	MinText = IBSWidgetInterface::GetWidgetTextFromKey("G_Min");
+	MaxText = IBSWidgetInterface::GetWidgetTextFromKey("G_Max");
+
 	if (TextBlock_Max)
 	{
 		TextBlock_Max->SetText(MaxText);

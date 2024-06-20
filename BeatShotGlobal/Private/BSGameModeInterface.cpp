@@ -113,36 +113,30 @@ bool IBSGameModeInterface::DoesCustomGameModeMatchConfig(const FString& CustomGa
 	return false;
 }
 
-bool IBSGameModeInterface::ImportCustomGameMode(const FString& InSerializedJsonString, FBSConfig& OutConfig,
-	FText& OutFailureReason)
+ECustomGameModeImportResult IBSGameModeInterface::ImportCustomGameMode(const FString& InSerializedJsonString,
+	FBSConfig& OutConfig, FText& OutDecodeFailureReason)
 {
-	if (!FBSConfig::DecodeFromString(InSerializedJsonString, OutConfig, &OutFailureReason))
+	if (!FBSConfig::DecodeFromString(InSerializedJsonString, OutConfig, &OutDecodeFailureReason))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to import custom game mode: %s"), *OutFailureReason.ToString());
-		OutFailureReason = FText::FromString("Invalid import string");
-		return false;
+		return ECustomGameModeImportResult::InvalidImportString;
 	}
 
 	if (IsPresetGameMode(OutConfig.DefiningConfig.CustomGameModeName) || OutConfig.DefiningConfig.GameModeType ==
 		EGameModeType::Preset)
 	{
-		OutFailureReason = FText::FromString("Default Game Modes cannot be imported");
-		return false;
+		return ECustomGameModeImportResult::DefaultGameMode;
 	}
 
 	if (OutConfig.DefiningConfig.CustomGameModeName.IsEmpty())
 	{
-		OutFailureReason = FText::FromString("Failed to import game mode with empty CustomGameModeName");
-		return false;
+		return ECustomGameModeImportResult::EmptyCustomGameModeName;
 	}
 
 	if (IsCustomGameMode(OutConfig.DefiningConfig.CustomGameModeName))
 	{
-		OutFailureReason = FText::FromString("Existing");
-		return false;
+		return ECustomGameModeImportResult::Existing;
 	}
-
-	return true;
+	return ECustomGameModeImportResult::Success;
 }
 
 FString IBSGameModeInterface::ExportCustomGameMode(const FBSConfig& InConfig)

@@ -3,6 +3,7 @@
 
 #include "Overlays/GameModeSharingWidget.h"
 #include "Components/MultiLineEditableTextBox.h"
+#include "Utilities/BSWidgetInterface.h"
 #include "Utilities/Buttons/BSButton.h"
 
 FString UGameModeSharingWidget::GetImportString() const
@@ -18,7 +19,7 @@ void UGameModeSharingWidget::SetImportButton(TObjectPtr<UBSButton> InImportButto
 void UGameModeSharingWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	MultilineTextBox->SetHintText(FText::FromString("Paste an exported game mode here."));
+	MultilineTextBox->SetHintText(IBSWidgetInterface::GetWidgetTextFromKey("GM_ExportCustomGameModeHint"));
 	MultilineTextBox->OnTextChanged.AddDynamic(this, &ThisClass::OnTextChanged_MultilineTextBox);
 }
 

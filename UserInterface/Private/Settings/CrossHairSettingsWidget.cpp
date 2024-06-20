@@ -45,7 +45,7 @@ void UCrossHairSettingsWidget::NativeConstruct()
 	MenuOption_ShowCrossHairDot->CheckBox->OnCheckStateChanged.AddDynamic(this,
 		&UCrossHairSettingsWidget::OnCheckStateChanged_MenuOption_ShowCrossHairDot);
 
-	SavedTextWidget->SetSavedText(FText::FromString("CrossHair Settings Saved"));
+	SavedTextWidget->SetSavedText(GetWidgetTextFromKey("SM_Saved_CrossHair"));
 	InitialCrossHairSettings = LoadPlayerSettings().CrossHair;
 	NewCrossHairSettings = InitialCrossHairSettings;
 	SetCrossHairOptions(InitialCrossHairSettings);

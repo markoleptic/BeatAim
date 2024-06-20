@@ -17,6 +17,9 @@ void UFeedbackWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	BugReportTitle = IBSWidgetInterface::GetWidgetTextFromKey("FeedbackInfo2");
+	FeedbackTitle = IBSWidgetInterface::GetWidgetTextFromKey("FeedbackInfo3");
+
 	Button_SubmitFeedback->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 	Button_Back->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);
 	Button_Okay->OnBSButtonPressed.AddUObject(this, &ThisClass::OnButtonClicked_BSButton);

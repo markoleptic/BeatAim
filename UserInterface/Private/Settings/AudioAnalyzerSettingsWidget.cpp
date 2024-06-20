@@ -280,12 +280,12 @@ void UAudioAnalyzerSettingsWidget::SortAndCheckOverlap()
 void UAudioAnalyzerSettingsWidget::ShowBandLimitErrorMessage()
 {
 	PopupMessageWidget = CreateWidget<UPopupMessageWidget>(GetWorld(), PopupMessageClass);
-	TArray<UBSButton*> Buttons = PopupMessageWidget->InitPopup(GetWidgetTextFromKey("ASW_SongPathErrorTitle"),
+	TArray<UBSButton*> Buttons = PopupMessageWidget->InitPopup(GetWidgetTextFromKey("G_Error"),
 		GetWidgetTextFromKey("AA_BandLimitThresholdError"), 1);
 
 	if (Buttons[0])
 	{
-		Buttons[0]->SetButtonText(GetWidgetTextFromKey("ASW_SongPathErrorButton"));
+		Buttons[0]->SetButtonText(GetWidgetTextFromKey("G_Okay"));
 		Buttons[0]->OnBSButtonPressed.AddLambda([this](const UBSButton* /*Button*/)
 		{
 			PopupMessageWidget->FadeOut();

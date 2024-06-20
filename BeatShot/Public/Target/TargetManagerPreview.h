@@ -6,6 +6,7 @@
 #include "TargetManager.h"
 #include "GameFramework/Actor.h"
 #include "GameModes/CustomGameModePreviewWidget.h"
+#include "Utilities/BSWidgetInterface.h"
 #include "TargetManagerPreview.generated.h"
 
 UCLASS()
@@ -45,18 +46,18 @@ protected:
 
 	/** Text to show when the max allowed floor distance has not been exceeded. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="TargetManagerPreview")
-	FText FloorDistanceText = FText::FromString("Floor Distance");
+	FText FloorDistanceText = IBSWidgetInterface::GetWidgetTextFromKey("GM_FloorDistance");
 
 	/** Text to show when the max allowed floor distance has been exceeded. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="TargetManagerPreview")
-	FText FloorDistanceExceededText = FText::FromString("Floor Distance (Clamped due to overflow)");
+	FText FloorDistanceExceededText = IBSWidgetInterface::GetWidgetTextFromKey("GM_FloorDistance_Overflow");
 
 	/** Whether the height of the total spawn area is exceeding the max allowed floor distance. */
 	mutable bool bIsExceedingMaxFloorDistance = false;
 
 	/** The max allowed floor distance. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="TargetManagerPreview")
-	float MaxAllowedFloorDistance = 600.f;
+	float MaxAllowedFloorDistance = 300.f;
 
 	/** The amount of overflow floor distance. */
 	mutable float ClampedOverflowAmount = 0.f;

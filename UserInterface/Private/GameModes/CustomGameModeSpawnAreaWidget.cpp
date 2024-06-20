@@ -278,11 +278,11 @@ void UCustomGameModeSpawnAreaWidget::OnSliderTextBoxValueChanged(USingleRangeInp
 	}
 	else if (Widget == SliderTextBoxOption_NumVerticalGridTargets)
 	{
+		BSConfig->GridConfig.NumVerticalGridTargets = Value;
 		OnPropertyChanged.Execute({
 			UBSGameModeValidator::FindBSConfigProperty(GET_MEMBER_NAME_CHECKED(FBSConfig, GridConfig),
 				GET_MEMBER_NAME_CHECKED(FBS_GridConfig, NumVerticalGridTargets))
 		});
-		BSConfig->GridConfig.NumVerticalGridTargets = Value;
 	}
 	else if (Widget == SliderTextBoxOption_HorizontalSpacing)
 	{

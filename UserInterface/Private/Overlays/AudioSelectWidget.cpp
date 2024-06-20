@@ -471,11 +471,11 @@ bool UAudioSelectWidget::FileDialogShared(bool bSave, const void* ParentWindowHa
 void UAudioSelectWidget::ShowSongPathErrorMessage()
 {
 	PopupMessageWidget = CreateWidget<UPopupMessageWidget>(GetWorld(), PopupMessageClass);
-	TArray<UBSButton*> Buttons = PopupMessageWidget->InitPopup(GetWidgetTextFromKey("ASW_SongPathErrorTitle"),
+	TArray<UBSButton*> Buttons = PopupMessageWidget->InitPopup(GetWidgetTextFromKey("G_Error"),
 		GetWidgetTextFromKey("ASW_SongPathErrorMessage"), 1);
 	if (!Buttons.IsEmpty())
 	{
-		Buttons[0]->SetButtonText(GetWidgetTextFromKey("ASW_SongPathErrorButton"));
+		Buttons[0]->SetButtonText(GetWidgetTextFromKey("G_Okay"));
 		Buttons[0]->OnBSButtonPressed.AddLambda([this](const UBSButton* /*Button*/)
 		{
 			if (PopupMessageWidget)

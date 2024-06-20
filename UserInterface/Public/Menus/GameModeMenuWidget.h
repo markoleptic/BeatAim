@@ -8,6 +8,7 @@
 #include "Blueprint/UserWidget.h"
 #include "GameModes/CustomGameModeStartWidget.h"
 #include "Utilities/BSCarouselNavBar.h"
+#include "Utilities/BSWidgetInterface.h"
 #include "Utilities/GameModeTransitionState.h"
 #include "GameModeMenuWidget.generated.h"
 
@@ -69,7 +70,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameModeBreakingChange, const bool bIsGam
  *  SettingsCategoryWidgets. Includes a default game modes section. */
 UCLASS()
 class USERINTERFACE_API UGameModeMenuWidget : public UUserWidget, public IHttpRequestInterface,
-                                              public IBSGameModeInterface
+                                              public IBSGameModeInterface, public IBSWidgetInterface
 {
 	GENERATED_BODY()
 
@@ -205,7 +206,7 @@ private:
 
 	/** Saves a CustomGameMode to save slot using GetCustomGameModeOptions(), displays the saved text,
 	 *  refreshes game mode template combo box and selects it. */
-	bool SaveCustomGameModeOptionsAndReselect(const FText& SuccessMessage = FText());
+	bool SaveCustomGameModeOptionsAndReselect();
 
 	/** Changes the Save and Start Button states depending on what is selected in ComboBox_GameModeName and
 	 *  TextBox_CustomGameModeName. */
@@ -216,10 +217,6 @@ private:
 
 	/** Returns BSConfig is identical to the currently selected template option. */
 	bool IsCurrentConfigIdenticalToSelectedCustom();
-
-	/** Checks to see if the GameModeName ComboBox or the CustomGameModeName text box has a matching custom game mode
-	 *  that is already saved. */
-	bool DoesCustomGameModeExist();
 
 	/** Initializes a PopupMessage asking the player if they want to overwrite an existing custom game mode, calling
 	 *  SaveCustomGameModeOptionsAndReselect if they choose to override. */
@@ -322,4 +319,17 @@ private:
 
 	/** Properties that should refresh the game mode preview any time they are changed. */
 	TSet<uint32> ForceRefreshProperties;
+
+	FTextFormat CustomGameModeImportSuccessFormattedText;
+	FTextFormat CustomGameModeImportFailureFormattedText;
+	FTextFormat ResetAIHistoryContentFormattedText;
+	FTextFormat ResetAIHistorySuccessFormattedText;
+	FTextFormat CustomGameModeUpToDateFormattedText;
+	FTextFormat CustomGameModeUpdatedFormattedText;
+	FTextFormat CustomGameModeRemovalContentFormattedText;
+	FTextFormat CustomGameModeRemovalSuccessFormattedText;
+	FTextFormat CustomGameModeRemoveAllSuccessFormattedText;
+	FTextFormat CustomGameModeSaveSuccessFormattedText;
+	FTextFormat CustomGameModeSaveFailureFormattedText;
+	FTextFormat CustomGameModeImportInvalidStringFormattedText;
 };
