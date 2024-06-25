@@ -457,6 +457,21 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 	AddValidationCheckData(CheckPtr, TEXT("Invalid_SpawnEveryOtherTargetInCenter_AllowSpawnWithoutActivation2"));
 	SpawnEveryOtherTargetInCenterPtr->AddDependent(AllowSpawnWithoutActivationPtr, CheckPtr);
 
+	auto VelocityLambda = [](const TSharedPtr<FBSConfig>& Config, FValidationCheckData& Data)
+	{
+		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && (Config->
+			TargetConfig.TargetSpawnResponses.Contains(ETargetSpawnResponse::ChangeVelocity) || Config->TargetConfig.
+			TargetActivationResponses.Contains(ETargetActivationResponse::ChangeVelocity) || Config->TargetConfig.
+			TargetDeactivationResponses.Contains(ETargetDeactivationResponse::ChangeVelocity)));
+	};
+	auto DirectionLambda = [](const TSharedPtr<FBSConfig>& Config, FValidationCheckData& Data)
+	{
+		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && (Config->
+			TargetConfig.TargetSpawnResponses.Contains(ETargetSpawnResponse::ChangeDirection) || Config->TargetConfig.
+			TargetActivationResponses.Contains(ETargetActivationResponse::ChangeDirection) || Config->TargetConfig.
+			TargetDeactivationResponses.Contains(ETargetDeactivationResponse::ChangeDirection)));
+	};
+
 	auto SpawnVelocityLambda = [](const TSharedPtr<FBSConfig>& Config, FValidationCheckData& Data)
 	{
 		return !(Config->TargetConfig.MovingTargetDirectionMode == EMovingTargetDirectionMode::None && Config->
@@ -493,58 +508,47 @@ void UBSGameModeValidator::FPrivate::SetupValidationChecks()
 			EMovingTargetDirectionMode::ForwardOnly);
 	};
 
-	// MovingTargetDirectionMode & Target Spawn Responses
-	CheckPtr = CreateValidationCheck(MovingTargetDirectionModePtr, EGameModeWarningType::Caution, SpawnVelocityLambda,
-		nullptr);
-	AddValidationCheckData(CheckPtr, TEXT("Invalid_Velocity_MTDM_None_2"));
-	TargetSpawnResponsesPtr->AddDependent(MovingTargetDirectionModePtr, CheckPtr);
+	auto VelocityCheckPtr = CreateValidationCheck(MovingTargetDirectionModePtr, EGameModeWarningType::Caution,
+		VelocityLambda, nullptr);
+	AddValidationCheckData(VelocityCheckPtr, TEXT("Invalid_Velocity_MTDM_None_2"));
+	auto DirectionCheckPtr = CreateValidationCheck(MovingTargetDirectionModePtr, EGameModeWarningType::Caution,
+		DirectionLambda, nullptr);
+	AddValidationCheckData(DirectionCheckPtr, TEXT("Invalid_Direction_MTDM_None_2"));
+
+	// Target Spawn Responses
+	TargetSpawnResponsesPtr->AddDependent(MovingTargetDirectionModePtr, VelocityCheckPtr);
 	CheckPtr = CreateValidationCheck(TargetSpawnResponsesPtr, EGameModeWarningType::Caution, SpawnVelocityLambda,
 		nullptr);
 	AddValidationCheckData(CheckPtr, TEXT("Invalid_Velocity_MTDM_None"));
 	MovingTargetDirectionModePtr->AddDependent(TargetSpawnResponsesPtr, CheckPtr);
 
-	CheckPtr = CreateValidationCheck(MovingTargetDirectionModePtr, EGameModeWarningType::Caution, SpawnDirectionLambda,
-		nullptr);
-	AddValidationCheckData(CheckPtr, TEXT("Invalid_Direction_MTDM_None_2"));
-	TargetSpawnResponsesPtr->AddDependent(MovingTargetDirectionModePtr, CheckPtr);
+	TargetSpawnResponsesPtr->AddDependent(MovingTargetDirectionModePtr, DirectionCheckPtr);
 	CheckPtr = CreateValidationCheck(TargetSpawnResponsesPtr, EGameModeWarningType::Caution, SpawnDirectionLambda,
 		nullptr);
 	AddValidationCheckData(CheckPtr, TEXT("Invalid_Direction_MTDM_None"));
 	MovingTargetDirectionModePtr->AddDependent(TargetSpawnResponsesPtr, CheckPtr);
 
-	// MovingTargetDirectionMode & Target Activation Responses
-	CheckPtr = CreateValidationCheck(MovingTargetDirectionModePtr, EGameModeWarningType::Caution,
-		ActivationVelocityLambda, nullptr);
-	AddValidationCheckData(CheckPtr, TEXT("Invalid_Velocity_MTDM_None_2"));
-	TargetActivationResponsesPtr->AddDependent(MovingTargetDirectionModePtr, CheckPtr);
+	// Target Activation Responses
+	TargetActivationResponsesPtr->AddDependent(MovingTargetDirectionModePtr, VelocityCheckPtr);
 	CheckPtr = CreateValidationCheck(TargetActivationResponsesPtr, EGameModeWarningType::Caution,
 		ActivationVelocityLambda, nullptr);
 	AddValidationCheckData(CheckPtr, TEXT("Invalid_Velocity_MTDM_None"));
 	MovingTargetDirectionModePtr->AddDependent(TargetActivationResponsesPtr, CheckPtr);
 
-	CheckPtr = CreateValidationCheck(MovingTargetDirectionModePtr, EGameModeWarningType::Caution,
-		ActivationDirectionLambda, nullptr);
-	AddValidationCheckData(CheckPtr, TEXT("Invalid_Direction_MTDM_None_2"));
-	TargetActivationResponsesPtr->AddDependent(MovingTargetDirectionModePtr, CheckPtr);
+	TargetActivationResponsesPtr->AddDependent(MovingTargetDirectionModePtr, DirectionCheckPtr);
 	CheckPtr = CreateValidationCheck(TargetActivationResponsesPtr, EGameModeWarningType::Caution,
 		ActivationDirectionLambda, nullptr);
 	AddValidationCheckData(CheckPtr, TEXT("Invalid_Direction_MTDM_None"));
 	MovingTargetDirectionModePtr->AddDependent(TargetActivationResponsesPtr, CheckPtr);
 
-	// MovingTargetDirectionMode & Target Deactivation Responses
-	CheckPtr = CreateValidationCheck(MovingTargetDirectionModePtr, EGameModeWarningType::Caution,
-		DeactivationVelocityLambda, nullptr);
-	AddValidationCheckData(CheckPtr, TEXT("Invalid_Velocity_MTDM_None_2"));
-	TargetDeactivationResponsesPtr->AddDependent(MovingTargetDirectionModePtr, CheckPtr);
+	// Target Deactivation Responses
+	TargetDeactivationResponsesPtr->AddDependent(MovingTargetDirectionModePtr, VelocityCheckPtr);
 	CheckPtr = CreateValidationCheck(TargetDeactivationResponsesPtr, EGameModeWarningType::Caution,
 		DeactivationVelocityLambda, nullptr);
 	AddValidationCheckData(CheckPtr, TEXT("Invalid_Velocity_MTDM_None"));
 	MovingTargetDirectionModePtr->AddDependent(TargetDeactivationResponsesPtr, CheckPtr);
 
-	CheckPtr = CreateValidationCheck(MovingTargetDirectionModePtr, EGameModeWarningType::Caution,
-		DeactivationDirectionLambda, nullptr);
-	AddValidationCheckData(CheckPtr, TEXT("Invalid_Direction_MTDM_None_2"));
-	TargetDeactivationResponsesPtr->AddDependent(MovingTargetDirectionModePtr, CheckPtr);
+	TargetDeactivationResponsesPtr->AddDependent(MovingTargetDirectionModePtr, DirectionCheckPtr);
 	CheckPtr = CreateValidationCheck(TargetDeactivationResponsesPtr, EGameModeWarningType::Caution,
 		DeactivationDirectionLambda, nullptr);
 	AddValidationCheckData(CheckPtr, TEXT("Invalid_Direction_MTDM_None"));

@@ -50,6 +50,7 @@ struct BEATSHOTGLOBAL_API FValidationCheckData
 	FValidationCheckData(EGameModeWarningType GameModeWarningType, const FString& InStringTableKey,
 		const FString& InDynamicStringTableKey, int32 InGridSnapSize, bool InCalculatedValuesAreIntegers);
 
+	/** Empties CalculatedValues and sets bRequireOtherPropertiesToBeChanged to false. */
 	void ResetLiveData();
 
 	/** @return true if there is no relevant data. */
