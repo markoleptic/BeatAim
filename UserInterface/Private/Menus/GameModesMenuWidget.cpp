@@ -365,18 +365,18 @@ void UGameModeMenuWidget::OnButtonClicked_ImportCustom()
 						{TEXT("DecodeFailureReason"), OutFailureReason}
 					})
 				}
-			}));
+			}), 0.5f);
 
 			break;
 		case ECustomGameModeImportResult::DefaultGameMode:
 			SetAndPlaySavedText(FText::Format(CustomGameModeImportFailureFormattedText, {
 				{TEXT("FailureReason"), GetWidgetTextFromKey("GM_CustomGameModeImportDefaultGameMode")}
-			}));
+			}), 0.5f);
 			break;
 		case ECustomGameModeImportResult::EmptyCustomGameModeName:
 			SetAndPlaySavedText(FText::Format(CustomGameModeImportFailureFormattedText, {
 				{TEXT("FailureReason"), GetWidgetTextFromKey("GM_CustomGameModeImportEmptyCustom")}
-			}));
+			}), 0.5f);
 			break;
 		case ECustomGameModeImportResult::Existing:
 			ShowConfirmOverwriteMessage_Import(ImportedConfig);
@@ -403,7 +403,7 @@ void UGameModeMenuWidget::OnButtonClicked_ExportCustom()
 	}
 	else
 	{
-		SetAndPlaySavedText(GetWidgetTextFromKey("GM_CustomGameModeExportFailure"));
+		SetAndPlaySavedText(GetWidgetTextFromKey("GM_CustomGameModeExportFailure"), 0.5f);
 	}
 }
 
@@ -655,45 +655,49 @@ void UGameModeMenuWidget::OnButtonClicked_RemoveSelectedCustom()
 		TSharedPtr<FAccessTokenResponse> AccessTokenResponse = MakeShareable(new FAccessTokenResponse());
 		AccessTokenResponse->OnHttpResponseReceived.BindLambda([this, AccessTokenResponse, GameModeNameToRemove]
 		{
-			if (AccessTokenResponse->AccessToken.IsEmpty())
+			if (AccessTokenResponse->OK)
 			{
-				return;
-			}
-			TSharedPtr<FDeleteScoresResponse> DeleteScoresResponse = MakeShareable(new FDeleteScoresResponse());
-			DeleteScoresResponse->OnHttpResponseReceived.BindLambda([this, DeleteScoresResponse, GameModeNameToRemove]
-			{
-				if (DeleteScoresResponse->OK)
-				{
-					if (FBSConfig Found; FindCustomGameMode(GameModeNameToRemove, Found))
+				TSharedPtr<FDeleteScoresResponse> DeleteScoresResponse = MakeShareable(new FDeleteScoresResponse());
+				DeleteScoresResponse->OnHttpResponseReceived.BindLambda(
+					[this, DeleteScoresResponse, GameModeNameToRemove]
 					{
-						if (RemoveCustomGameMode(Found))
+						if (DeleteScoresResponse->OK)
 						{
-							FFormatNamedArguments Args;
-							Args.Add(TEXT("GameMode"), FText::FromString(GameModeNameToRemove));
-							Args.Add(TEXT("NumRemoved"), FText::AsNumber(DeleteScoresResponse->NumRemoved));
-							SetAndPlaySavedText(FText::Format(CustomGameModeRemovalSuccessFormattedText, Args));
-							RefreshGameModes();
-
-							if (FBSConfig DefaultConfig; FindPresetGameMode(EBaseGameMode::MultiBeat,
-								EGameModeDifficulty::Normal, GameModeDataAsset.Get(), DefaultConfig))
+							if (FBSConfig Found; FindCustomGameMode(GameModeNameToRemove, Found))
 							{
-								PopulateGameModeOptions(DefaultConfig);
+								if (RemoveCustomGameMode(Found))
+								{
+									FFormatNamedArguments Args;
+									Args.Add(TEXT("GameMode"), FText::FromString(GameModeNameToRemove));
+									Args.Add(TEXT("NumRemoved"), FText::AsNumber(DeleteScoresResponse->NumRemoved));
+									SetAndPlaySavedText(FText::Format(CustomGameModeRemovalSuccessFormattedText, Args));
+									RefreshGameModes();
+
+									if (FBSConfig DefaultConfig; FindPresetGameMode(EBaseGameMode::MultiBeat,
+										EGameModeDifficulty::Normal, GameModeDataAsset.Get(), DefaultConfig))
+									{
+										PopulateGameModeOptions(DefaultConfig);
+									}
+									UpdateSaveStartButtonStates();
+								}
 							}
-							UpdateSaveStartButtonStates();
+							else
+							{
+								SetAndPlaySavedText(GetWidgetTextFromKey("GM_RemoveGameModeDatabaseOnlySuccess"), 0.5f);
+							}
 						}
-					}
-					else
-					{
-						SetAndPlaySavedText(GetWidgetTextFromKey("GM_RemoveGameModeDatabaseOnlySuccess"));
-					}
-				}
-				else
-				{
-					SetAndPlaySavedText(GetWidgetTextFromKey("GM_RemoveGameModeDatabaseFailure"));
-				}
-			});
-			DeleteScores(GameModeNameToRemove, IBSPlayerSettingsInterface::LoadPlayerSettings().User.UserID,
-				AccessTokenResponse->AccessToken, DeleteScoresResponse);
+						else
+						{
+							SetAndPlaySavedText(GetWidgetTextFromKey("GM_RemoveGameModeDatabaseFailure"), 0.5f);
+						}
+					});
+				DeleteScores(GameModeNameToRemove, IBSPlayerSettingsInterface::LoadPlayerSettings().User.UserID,
+					AccessTokenResponse->AccessToken, DeleteScoresResponse);
+			}
+			else
+			{
+				SetAndPlaySavedText(GetWidgetTextFromKey("GM_RemoveGameModeDatabaseFailure"), 0.5f);
+			}
 		});
 		RequestAccessToken(IBSPlayerSettingsInterface::LoadPlayerSettings().User.RefreshCookie, AccessTokenResponse);
 	});
@@ -788,7 +792,7 @@ bool UGameModeMenuWidget::SaveCustomGameModeOptionsAndReselect()
 	{
 		SetAndPlaySavedText(FText::Format(CustomGameModeSaveFailureFormattedText, {
 			{TEXT("GameMode"), FText::FromString(GameModeToSave.DefiningConfig.CustomGameModeName)}
-		}));
+		}), 0.5f);
 		return false;
 	}
 
@@ -958,17 +962,17 @@ void UGameModeMenuWidget::SynchronizeStartWidgets()
 	GetNotCurrentStartWidget()->RefreshProperties();
 }
 
-void UGameModeMenuWidget::SetAndPlaySavedText(const FText& InText)
+void UGameModeMenuWidget::SetAndPlaySavedText(const FText& InText, const float PlaybackRate)
 {
 	if (CurrentCustomGameModesWidget == CustomGameModesWidget_PropertyView)
 	{
 		SavedTextWidget_PropertyView->SetSavedText(InText);
-		SavedTextWidget_PropertyView->PlayFadeInFadeOut();
+		SavedTextWidget_PropertyView->PlayFadeInFadeOut(PlaybackRate);
 	}
 	else
 	{
 		CustomGameModesWidget_CreatorView->SavedTextWidget_CreatorView->SetSavedText(InText);
-		CustomGameModesWidget_CreatorView->SavedTextWidget_CreatorView->PlayFadeInFadeOut();
+		CustomGameModesWidget_CreatorView->SavedTextWidget_CreatorView->PlayFadeInFadeOut(PlaybackRate);
 	}
 }
 

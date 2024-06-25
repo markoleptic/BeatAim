@@ -24,8 +24,8 @@ protected:
 
 public:
 	UFUNCTION()
-	void PlayFadeInFadeOut();
+	void PlayFadeInFadeOut(float PlaybackRate = 0.75f);
 
 	/** Sets the text that should appear when PlayFadeInFadeOut is called. */
-	void SetSavedText(const FText& Text) { SavedText->SetText(Text); }
+	void SetSavedText(const FText& Text) const { SavedText->SetText(Text); }
 };

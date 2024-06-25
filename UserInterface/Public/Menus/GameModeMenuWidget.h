@@ -265,7 +265,7 @@ private:
 
 	/** Sets the SavedText and plays FadeInFadeOut for the SavedTextWidget corresponding to the
 	 *  CustomGameModesWidget_Current. */
-	void SetAndPlaySavedText(const FText& InText);
+	void SetAndPlaySavedText(const FText& InText, float PlaybackRate = 0.75f);
 
 	/** Called when one of the custom game modes widgets has at least one breaking game mode option, or none.
 	 *  Updates the value of bGameModeBreakingOptionPresent and Broadcasts OnGameModeBreakingChange if the value

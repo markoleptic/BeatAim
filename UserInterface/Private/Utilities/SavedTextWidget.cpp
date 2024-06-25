@@ -3,11 +3,11 @@
 
 #include "Utilities/SavedTextWidget.h"
 
-void USavedTextWidget::PlayFadeInFadeOut()
+void USavedTextWidget::PlayFadeInFadeOut(const float PlaybackRate)
 {
 	if (IsAnimationPlaying(FadeInFadeOut))
 	{
 		StopAnimation(FadeInFadeOut);
 	}
-	PlayAnimationForward(FadeInFadeOut);
+	PlayAnimationForward(FadeInFadeOut, PlaybackRate);
 }
