@@ -37,6 +37,6 @@ protected:
 	/* Array of Borders where each points to the first border found in every slot. */
 	TArray<TObjectPtr<UBorder>> Borders;
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="BSHorizontalBox")
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "BSHorizontalBox")
 	bool bForceSameBorderBrushTintAsPrevious = false;
 };

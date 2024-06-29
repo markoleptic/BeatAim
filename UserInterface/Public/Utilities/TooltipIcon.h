@@ -89,7 +89,7 @@ protected:
 	FTooltipData TooltipData;
 
 	/** Maps each tooltip icon type to a brush. */
-	UPROPERTY(EditDefaultsOnly, Category="TooltipIcon")
+	UPROPERTY(EditDefaultsOnly, Category = "TooltipIcon")
 	TMap<ETooltipIconType, FSlateBrush> TooltipIconBrushMap;
 
 	/** The type of tooltip icon. This determines the appearance of the tooltip icon. */

@@ -42,7 +42,7 @@ public:
 	FInputChord GetKeyFromSlot(const EPlayerMappableKeySlot& InSlot) const;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category="InputMappingWidget|Style")
+	UPROPERTY(EditDefaultsOnly, Category = "InputMappingWidget|Style")
 	TSubclassOf<UMenuOptionStyle> MenuOptionStyleClass;
 
 	UPROPERTY()

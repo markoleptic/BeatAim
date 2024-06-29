@@ -128,69 +128,69 @@ public:
 	UPROPERTY(BlueprintAssignable, Category=Events)
 	FOnOpeningEvent OnOpening;
 
-	UFUNCTION(BlueprintCallable, Category="ComboBox")
+	UFUNCTION(BlueprintCallable, Category = "ComboBox")
 	void SetSelectionMode(const ESelectionModeType InSelectionMode) { SelectionMode = InSelectionMode; }
 
-	UFUNCTION(BlueprintCallable, Category="ComboBox")
+	UFUNCTION(BlueprintCallable, Category = "ComboBox")
 	void SetCloseComboBoxOnSelectionChanged(const bool bClose) { bCloseComboBoxOnSelectionChanged = bClose; }
 
-	UFUNCTION(BlueprintCallable, Category="ComboBox")
+	UFUNCTION(BlueprintCallable, Category = "ComboBox")
 	void SetCanSelectNone(const bool bCan);
 
 	/** Adds a new option to the combo box. */
-	UFUNCTION(BlueprintCallable, Category="ComboBox")
+	UFUNCTION(BlueprintCallable, Category = "ComboBox")
 	void AddOption(const FString& Option);
 
 	/** Adds a new option to the combo box at the specified index. */
-	UFUNCTION(BlueprintCallable, Category="ComboBox")
+	UFUNCTION(BlueprintCallable, Category = "ComboBox")
 	void InsertOptionAt(const FString& Option, const int32 Index);
 
 	/** Removes existing option from the combo box. */
-	UFUNCTION(BlueprintCallable, Category="ComboBox")
+	UFUNCTION(BlueprintCallable, Category = "ComboBox")
 	bool RemoveOption(const FString& Option);
 
 	/** Removes existing option from the combo box. */
-	UFUNCTION(BlueprintCallable, Category="ComboBox")
+	UFUNCTION(BlueprintCallable, Category = "ComboBox")
 	bool HasOption(const FString& Option);
 
 	/** Returns the index corresponding to the Option, or -1 if not found. */
-	UFUNCTION(BlueprintPure, Category="ComboBox")
+	UFUNCTION(BlueprintPure, Category = "ComboBox")
 	int32 GetIndexOfOption(const FString& Option) const;
 
 	/** Returns string option corresponding to the Index, or empty string if not found. */
-	UFUNCTION(BlueprintPure, Category="ComboBox")
+	UFUNCTION(BlueprintPure, Category = "ComboBox")
 	FString GetOptionAtIndex(int32 Index) const;
 
 	/** Returns the selected index. Use GetSelectedIndices if it is possible for more than one to be selected. */
-	UFUNCTION(BlueprintPure, Category="ComboBox")
+	UFUNCTION(BlueprintPure, Category = "ComboBox")
 	int32 GetSelectedIndex() const;
 
 	/** Returns the selected option. Use GetSelectedOptions if it is possible for more than one to be selected. */
-	UFUNCTION(BlueprintPure, Category="ComboBox")
+	UFUNCTION(BlueprintPure, Category = "ComboBox")
 	FString GetSelectedOption() const;
 
 	/** Returns an array of selected indices. */
-	UFUNCTION(BlueprintPure, Category="ComboBox")
+	UFUNCTION(BlueprintPure, Category = "ComboBox")
 	TArray<int32> GetSelectedIndices() const;
 
 	/** Returns an array of selected string options. */
-	UFUNCTION(BlueprintPure, Category="ComboBox")
+	UFUNCTION(BlueprintPure, Category = "ComboBox")
 	TArray<FString> GetSelectedOptions() const;
 
 	/** Returns the number of options. */
-	UFUNCTION(BlueprintPure, Category="ComboBox")
+	UFUNCTION(BlueprintPure, Category = "ComboBox")
 	int32 GetOptionCount() const;
 
 	/** Returns the number of currently selected options. */
-	UFUNCTION(BlueprintPure, Category="ComboBox")
+	UFUNCTION(BlueprintPure, Category = "ComboBox")
 	int32 GetSelectedOptionCount() const;
 
 	/** Selects the specified index if it exists. */
-	UFUNCTION(BlueprintCallable, Category="ComboBox")
+	UFUNCTION(BlueprintCallable, Category = "ComboBox")
 	void SetSelectedIndex(const int32 InIndex, const bool bClearCurrentSelection = true);
 
 	/** Selects the specified option if it exists. DOES NOT clear selected options if multi-selection. */
-	UFUNCTION(BlueprintCallable, Category="ComboBox")
+	UFUNCTION(BlueprintCallable, Category = "ComboBox")
 	void SetSelectedOption(const FString InOption, const bool bClearCurrentSelection = true);
 
 	/** Selects the specified indices if they exists. Clears all selected options before setting new options. */
@@ -202,20 +202,20 @@ public:
 	void SetSelectedOptions(TArray<FString> InOptions);
 
 	/** Returns whether the combo box is open. */
-	UFUNCTION(BlueprintPure, Category="ComboBox", Meta = (ReturnDisplayName = "bOpen"))
+	UFUNCTION(BlueprintPure, Category = "ComboBox", Meta = (ReturnDisplayName = "bOpen"))
 	bool IsOpen() const;
 
 	/** Refreshes the list of options. If you added new ones, and want to update the list even if it's currently being
 	 *  displayed use this. */
-	UFUNCTION(BlueprintCallable, Category="ComboBox")
+	UFUNCTION(BlueprintCallable, Category = "ComboBox")
 	void RefreshOptions();
 
 	/** Clears all options. */
-	UFUNCTION(BlueprintCallable, Category="ComboBox")
+	UFUNCTION(BlueprintCallable, Category = "ComboBox")
 	void ClearOptions();
 
 	/** Clears all selected options. */
-	UFUNCTION(BlueprintCallable, Category="ComboBox")
+	UFUNCTION(BlueprintCallable, Category = "ComboBox")
 	void ClearSelection();
 
 	/** Executed to allow other widgets to create a combo box row. */

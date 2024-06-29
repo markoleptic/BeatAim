@@ -2,7 +2,7 @@
 
 
 #include "BSGameUserSettings.h"
-#include "AudioMixerBlueprintLibrary.h"
+#include "AudioMixerDevice.h"
 #include "AudioModulationStatics.h"
 #include "BSConstants.h"
 #include "DLSSLibrary.h"
@@ -42,6 +42,10 @@ namespace
 		if (IConsoleVariable* CVarAntiAliasingMethod = IConsoleManager::Get().FindConsoleVariable(
 			TEXT("r.AntiAliasingMethod")))
 		{
+			if (CVarAntiAliasingMethod->GetInt() == AntiAliasingMethod)
+			{
+				return;
+			}
 			CVarAntiAliasingMethod->Set(AntiAliasingMethod, ECVF_SetByGameOverride);
 		}
 		if (GConfig)
@@ -88,7 +92,10 @@ namespace
 			const bool bValidScreenPercentage = OptimalScreenPercentage > 0.f && bIsSupported;
 
 			// Enable/Disable DLSS
-			UDLSSLibrary::EnableDLSS(bShouldEnable);
+			if (bShouldEnable != UDLSSLibrary::IsDLSSEnabled())
+			{
+				UDLSSLibrary::EnableDLSS(bShouldEnable);
+			}
 
 			// Set screen percentage to 100 if DLAA mode or invalid screen percentage
 			ScreenPercentage = bIsDLAA || !bValidScreenPercentage ? 100.f : OptimalScreenPercentage;
@@ -99,7 +106,10 @@ namespace
 			if (static IConsoleVariable* CVarScreenPercentage = IConsoleManager::Get().FindConsoleVariable(
 				TEXT("r.ScreenPercentage")))
 			{
-				CVarScreenPercentage->Set(ScreenPercentage);
+				if (!FMath::IsNearlyEqual(CVarScreenPercentage->GetFloat(), ScreenPercentage))
+				{
+					CVarScreenPercentage->Set(ScreenPercentage);
+				}
 			}
 		}
 
@@ -110,21 +120,14 @@ namespace
 	USoundControlBus* TryLoadControlBus(const FSoftObjectPath& Path, TMap<FName, TObjectPtr<USoundControlBus>>& Map,
 		const FName& Key)
 	{
-		if (UObject* ObjPath = Path.TryLoad())
+		if (UObject* ObjPath = Path.TryLoad(); ensureMsgf(ObjPath, TEXT("Failed to load Control Bus.")))
 		{
-			if (USoundControlBus* SoundControlBus = Cast<USoundControlBus>(ObjPath))
+			if (USoundControlBus* SoundControlBus = Cast<USoundControlBus>(ObjPath); ensureMsgf(SoundControlBus,
+				TEXT("Control Bus reference missing from Audio Settings.")))
 			{
 				Map.Add(Key, SoundControlBus);
 				return SoundControlBus;
 			}
-			else
-			{
-				ensureMsgf(SoundControlBus, TEXT("Control Bus reference missing from Audio Settings."));
-			}
-		}
-		else
-		{
-			ensureMsgf(ObjPath, TEXT("Failed to load Control Bus."));
 		}
 		return nullptr;
 	}
@@ -153,15 +156,43 @@ void UBSGameUserSettings::Initialize(const UWorld* World)
 {
 	if (World && (World->WorldType == EWorldType::Game || World->WorldType == EWorldType::PIE))
 	{
+#if WITH_EDITOR
 		LoadDLSSSettings();
-		LoadUserControlBusMix(World);
-		FOnAudioOutputDevicesObtained OnAudioOutputDevicesObtained;
-		OnAudioOutputDevicesObtained.BindDynamic(this, &UBSGameUserSettings::HandleAudioOutputDevicesObtained);
-		UAudioMixerBlueprintLibrary::GetAvailableAudioOutputDevices(World, OnAudioOutputDevicesObtained);
+#endif
+		if (const Audio::FMixerDevice* AudioMixerDevice =
+			FAudioDeviceManager::GetAudioMixerDeviceFromWorldContext(World))
+		{
+			if (Audio::IAudioMixerPlatformInterface* MixerPlatform = AudioMixerDevice->GetAudioMixerPlatform())
+			{
+				Audio::FAudioPlatformDeviceInfo CurrentOutputDevice = MixerPlatform->GetPlatformDeviceInfo();
+				AudioOutputDeviceId = CurrentOutputDevice.Name;
+				if (const Audio::IAudioPlatformDeviceInfoCache* DeviceInfoCache = MixerPlatform->GetDeviceInfoCache())
+				{
+					const TArray<Audio::FAudioPlatformDeviceInfo> AllDevices = DeviceInfoCache->
+						GetAllActiveOutputDevices();
+					AudioDeviceNames.Reserve(AllDevices.Num());
+					for (Audio::FAudioPlatformDeviceInfo Device : DeviceInfoCache->GetAllActiveOutputDevices())
+					{
+						AudioDeviceNames.Add(Device.Name);
+					}
+				}
+				else
+				{
+					uint32 NumOutputDevices = 0;
+					MixerPlatform->GetNumOutputDevices(NumOutputDevices);
+					AudioDeviceNames.Reserve(NumOutputDevices);
 
-		FOnMainAudioOutputDeviceObtained OnMainAudioOutputDeviceObtained;
-		OnMainAudioOutputDeviceObtained.BindDynamic(this, &UBSGameUserSettings::HandleMainAudioOutputDeviceObtained);
-		UAudioMixerBlueprintLibrary::GetCurrentAudioOutputDeviceName(World, OnMainAudioOutputDeviceObtained);
+					for (uint32 i = 0; i < NumOutputDevices; ++i)
+					{
+						Audio::FAudioPlatformDeviceInfo DeviceInfo;
+						MixerPlatform->GetOutputDeviceInfo(i, DeviceInfo);
+						AudioDeviceNames.Emplace(MoveTemp(DeviceInfo.Name));
+					}
+				}
+			}
+		}
+
+		LoadUserControlBusMix(World);
 	}
 }
 
@@ -190,6 +221,7 @@ void UBSGameUserSettings::SetToBSDefaults()
 	// bSoundControlBusMixLoaded = false;
 	// VideoSettingEnumMap = nullptr;
 	// bInMenu = false;
+	// BSVersion = 0;
 	bDLSSInitialized = false;
 }
 
@@ -209,8 +241,13 @@ void UBSGameUserSettings::LoadDLSSSettings()
 {
 	if (!FModuleManager::Get().IsModuleLoaded(FName("DLSS")))
 	{
-		UE_LOG(LogBSGameUserSettings, Warning, TEXT("DLSS not loaded"));
+#if WITH_EDITOR
 		return;
+#else
+		FModuleManager::Get().LoadModule("DLSS");
+		FModuleManager::Get().LoadModule("NIS");
+		FModuleManager::Get().LoadModule("StreamlineCore");
+#endif
 	}
 
 	bool bDisableDLSS = true;
@@ -280,13 +317,14 @@ void UBSGameUserSettings::LoadDLSSSettings()
 		StreamlineReflexMode = UStreamlineReflexMode::Disabled;
 	}
 
-	UE_LOG(LogBSGameUserSettings, Warning, TEXT("DLSS Initialized"));
+	UE_LOG(LogBSGameUserSettings, Display, TEXT("DLSS Initialized"));
 	bDLSSInitialized = true;
 }
 
 void UBSGameUserSettings::LoadUserControlBusMix(const UWorld* World)
 {
-	if (World && (World->WorldType == EWorldType::Game || World->WorldType == EWorldType::PIE))
+	if (ensureMsgf(World && (World->WorldType == EWorldType::Game || World->WorldType == EWorldType::PIE),
+		TEXT("Failed to load current player world")))
 	{
 		const UBSAudioSettings* BSAudioSettings = GetDefault<UBSAudioSettings>();
 
@@ -301,9 +339,11 @@ void UBSGameUserSettings::LoadUserControlBusMix(const UWorld* World)
 		USoundControlBus* SoundFXControlBus = TryLoadControlBus(BSAudioSettings->SoundFXVolumeControlBus, ControlBusMap,
 			TEXT("SoundFX"));
 
-		if (UObject* ObjPath = BSAudioSettings->UserSettingsControlBusMix.TryLoad())
+		if (UObject* ObjPath = BSAudioSettings->UserSettingsControlBusMix.TryLoad(); ensureMsgf(ObjPath,
+			TEXT("Failed to load Control Bus Mix.")))
 		{
-			if (USoundControlBusMix* SoundControlBusMix = Cast<USoundControlBusMix>(ObjPath))
+			if (USoundControlBusMix* SoundControlBusMix = Cast<USoundControlBusMix>(ObjPath); ensureMsgf(ObjPath,
+				TEXT("User Settings Control Bus Mix reference missing.")))
 			{
 				ControlBusMix = SoundControlBusMix;
 				UAudioModulationStatics::ActivateBusMix(World, SoundControlBusMix);
@@ -326,20 +366,9 @@ void UBSGameUserSettings::LoadUserControlBusMix(const UWorld* World)
 				UAudioModulationStatics::UpdateMix(World, SoundControlBusMix, ControlBusMixStageArray);
 
 				bSoundControlBusMixLoaded = true;
-			}
-			else
-			{
-				UE_LOG(LogBSGameUserSettings, Warning, TEXT("User Settings Control Bus Mix reference missing."));
+				UE_LOG(LogBSGameUserSettings, Display, TEXT("Loaded Control Bus Mix."));
 			}
 		}
-		else
-		{
-			ensureMsgf(ObjPath, TEXT("Failed to load Control Bus Mix."));
-		}
-	}
-	else
-	{
-		ensureMsgf(World, TEXT("Failed to load current player world"));
 	}
 }
 
@@ -461,11 +490,17 @@ void UBSGameUserSettings::ApplyNvidiaSettings()
 	if (UStreamlineLibraryDLSSG::IsDLSSGSupported() && UStreamlineLibraryDLSSG::IsDLSSGModeSupported(
 		FrameGenerationEnabledMode))
 	{
-		UStreamlineLibraryDLSSG::SetDLSSGMode(FrameGenerationEnabledMode);
+		if (UStreamlineLibraryDLSSG::GetDLSSGMode() != FrameGenerationEnabledMode)
+		{
+			UStreamlineLibraryDLSSG::SetDLSSGMode(FrameGenerationEnabledMode);
+		}
 	}
 	if (UStreamlineLibraryReflex::IsReflexSupported())
 	{
-		UStreamlineLibraryReflex::SetReflexMode(StreamlineReflexMode);
+		if (UStreamlineLibraryReflex::GetReflexMode() != StreamlineReflexMode)
+		{
+			UStreamlineLibraryReflex::SetReflexMode(StreamlineReflexMode);
+		}
 	}
 	if (UDLSSLibrary::IsDLSSRRSupported())
 	{
@@ -485,7 +520,10 @@ void UBSGameUserSettings::ApplyNvidiaSettings()
 		{
 			SetVSyncEnabled(false);
 			static auto CVar = IConsoleManager::Get().FindConsoleVariable(TEXT("r.VSync"));
-			CVar->Set(IsVSyncEnabled(), ECVF_SetByGameSetting);
+			if (CVar->GetBool() != IsVSyncEnabled())
+			{
+				CVar->Set(IsVSyncEnabled(), ECVF_SetByGameSetting);
+			}
 		}
 	}
 	if (DLSSEnabledMode == EDLSSEnabledMode::On || NISEnabledMode == ENISEnabledMode::On)
@@ -514,45 +552,36 @@ void UBSGameUserSettings::SetToDefaults()
 	SetToBSDefaults();
 }
 
-void UBSGameUserSettings::LoadSettings(const bool bForceReload)
+void UBSGameUserSettings::LoadSettings(bool bForceReload)
 {
 	Super::LoadSettings(bForceReload);
+	LoadDLSSSettings();
 }
 
 void UBSGameUserSettings::ValidateSettings()
 {
-	const bool bGameUserSettingsValid = IsVersionValid();
-	const bool bBSGameUserSettingsValid = IsBSVersionValid();
+	Super::ValidateSettings();
 
-	// If GameUserSettings is invalid, ini file will be deleted and reloaded
-	if (bGameUserSettingsValid && !bBSGameUserSettingsValid)
+	if (!IsBSVersionValid())
 	{
 		// First try loading the settings, if they haven't been loaded before.
 		LoadSettings(true);
 
 		// If it still an old version, delete the user settings file and reload defaults.
-		if (!IsVersionValid())
+		if (!IsBSVersionValid())
 		{
 			SetToBSDefaults();
 			IFileManager::Get().Delete(*GGameUserSettingsIni);
+			UpdateBSVersion();
 			LoadSettings(true);
+			ApplySettings(false);
 		}
-		UpdateBSVersion();
 	}
 
 	DisplayGamma = FMath::Clamp(DisplayGamma, Constants::MinValue_DisplayGamma, Constants::MaxValue_DisplayGamma);
 	Brightness = FMath::Clamp(Brightness, Constants::MinValue_Brightness, Constants::MaxValue_Brightness);
 
 	ValidateNvidiaSettings();
-
-	Super::ValidateSettings();
-
-	UE_LOG(LogBSGameUserSettings, Warning, TEXT("Validate Settings"));
-}
-
-void UBSGameUserSettings::ResetToCurrentSettings()
-{
-	Super::ResetToCurrentSettings();
 }
 
 void UBSGameUserSettings::ApplyNonResolutionSettings()
@@ -561,11 +590,6 @@ void UBSGameUserSettings::ApplyNonResolutionSettings()
 	ApplyAntiAliasingMethod(AntiAliasingMethod);
 	ApplyDisplayGamma(DisplayGamma);
 	ApplyNvidiaSettings();
-}
-
-void UBSGameUserSettings::ApplySettings(bool bForceReload)
-{
-	Super::ApplySettings(bForceReload);
 }
 
 void UBSGameUserSettings::SaveSettings()
@@ -904,20 +928,6 @@ void UBSGameUserSettings::SetDLSSSharpness(const float InDLSSSharpness)
 void UBSGameUserSettings::SetNISSharpness(const float InNISSharpness)
 {
 	NISSharpness = InNISSharpness;
-}
-
-void UBSGameUserSettings::HandleAudioOutputDevicesObtained(const TArray<FAudioOutputDeviceInfo>& AvailableDevices)
-{
-	AudioDeviceNames.Empty();
-	for (auto& Device : AvailableDevices)
-	{
-		AudioDeviceNames.Add(Device.Name);
-	}
-}
-
-void UBSGameUserSettings::HandleMainAudioOutputDeviceObtained(const FString& CurrentDevice)
-{
-	AudioOutputDeviceId = CurrentDevice;
 }
 
 void UBSGameUserSettings::HandleApplicationActivationStateChanged(bool bIsActive)

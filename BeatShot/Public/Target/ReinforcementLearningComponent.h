@@ -153,7 +153,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, Category = "ReinforcementLearningComponent")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Tables")
 	UCompositeCurveTable* CompositeCurveTable_HyperParameters;
 
 public:

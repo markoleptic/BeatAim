@@ -49,7 +49,7 @@ public:
 	void OnGameModeBreakingChange(const bool bIsGameModeBreakingChange);
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Classes")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|Classes")
 	TSubclassOf<ATargetManagerPreview> TargetManagerClass;
 
 	/** The spawned TargetManager that provides preview logic for CustomGameModesWidget_Preview. */

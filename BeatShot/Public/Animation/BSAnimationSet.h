@@ -150,22 +150,22 @@ class BEATSHOT_API UBSAnimationSet : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Animation")
 	TMap<EBSAnimMovementMode, FBSAnimSet> AnimMap;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Animation")
 	FBSIdleAnimSet IdleAnimSet;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Animation")
 	FBSAimingAnimSet AimingAnimSet;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Animation")
 	FBSJumpingAnimSet JumpingAnimSet;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Animation")
 	TArray<UAnimSequence*> IdleBreaks;
 
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Animation")
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "BeatShot|Animation")
 	UAnimSequence* FindAnimSequence(const EBSAnimMovementMode MovementMode, const EBSAnimStateType StateType,
 		const EBSAnimCardinal AnimCardinal) const;
 };

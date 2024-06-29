@@ -112,13 +112,13 @@ protected:
 	TArray<TWeakObjectPtr<UMenuOptionWidget>> MenuOptionWidgets;
 
 	/** Whether to index this widget as part of the carousel. */
-	UPROPERTY(EditAnywhere, Category="CustomGameModesWidgetComponent")
+	UPROPERTY(EditAnywhere, Category = "CustomGameModesWidgetComponent")
 	bool bIndexOnCarousel = true;
 
-	UPROPERTY(EditDefaultsOnly, Category="CustomGameModesWidgetComponent")
+	UPROPERTY(EditDefaultsOnly, Category = "CustomGameModesWidgetComponent")
 	TObjectPtr<UEnumTagMap> EnumTagMap;
 
-	UPROPERTY(EditDefaultsOnly, Category="CustomGameModesWidgetComponent")
+	UPROPERTY(EditDefaultsOnly, Category = "CustomGameModesWidgetComponent")
 	TObjectPtr<UGameModeCategoryTagMap> GameModeCategoryTagMap;
 
 	EGameModeCategory GameModeCategory;

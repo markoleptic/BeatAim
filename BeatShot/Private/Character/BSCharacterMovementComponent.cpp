@@ -17,17 +17,28 @@ static TAutoConsoleVariable CVarShowPos(TEXT("cl.ShowPos"), 0, TEXT("Show positi
 DECLARE_CYCLE_STAT(TEXT("Char StepUp"), STAT_CharStepUp, STATGROUP_Character);
 DECLARE_CYCLE_STAT(TEXT("Char PhysFalling"), STAT_CharPhysFalling, STATGROUP_Character);
 
-// MAGIC NUMBERS
-constexpr float JumpVelocity = 266.7f;
-const float MAX_STEP_SIDE_Z = 0.08f; // maximum z value for the normal on the vertical side of steps
-const float VERTICAL_SLOPE_NORMAL_Z = 0.001f;
-// Slope is vertical if Abs(Normal.Z) <= this threshold. Accounts for precision problems that sometimes angle
+namespace
+{
+	constexpr float JumpVelocity = 266.7f;
+	// Slope is vertical if Abs(Normal.Z) <= this threshold. Accounts for precision problems that sometimes angle
+	constexpr float VerticalSlopeNormalZ = 0.001f;
+	constexpr float DesiredGravity = -1143.0f;
+	constexpr float ApexTimeMinimum = 0.0001f;
 
-constexpr float DesiredGravity = -1143.0f;
+	float GetFrictionFromHit(const FHitResult& Hit)
+	{
+		float SurfaceFriction = 1.0f;
+		if (Hit.PhysMaterial.IsValid())
+		{
+			SurfaceFriction = FMath::Min(1.0f, Hit.PhysMaterial->Friction * 1.25f);
+		}
+		return SurfaceFriction;
+	}
+}
 
 UBSCharacterMovementComponent::UBSCharacterMovementComponent()
 {
-	// We have our own air movement handling, so we can allow for full air control through UE's logic
+	// We have our own air movement handling, so we can allow for full air control through Unreal logic
 	AirControl = 1.0f;
 
 	// Disable air control boost
@@ -51,7 +62,7 @@ UBSCharacterMovementComponent::UBSCharacterMovementComponent()
 	// Historical value for Source
 	BrakingSubStepTime = 0.015f;
 
-	// Avoid breaking up time step
+	// Avoid breaking-up time step
 	MaxSimulationTimeStep = 0.5f;
 	MaxSimulationIterations = 1;
 
@@ -79,7 +90,7 @@ UBSCharacterMovementComponent::UBSCharacterMovementComponent()
 
 	// We aren't on a ladder at first
 	bOnLadder = false;
-	OffLadderTicks = LADDER_MOUNT_TIMEOUT;
+	OffLadderTicks = MovementDefaults::DefaultLadderMoundTimeout;
 
 	// Speed multiplier bounds
 	SpeedMultMin = SprintSpeed * 1.7f;
@@ -232,16 +243,6 @@ const FCharacterGroundInfo& UBSCharacterMovementComponent::GetGroundInfo()
 	return CachedGroundInfo;
 }
 
-float UBSCharacterMovementComponent::GetFrictionFromHit(const FHitResult& Hit) const
-{
-	float SurfaceFriction = 1.0f;
-	if (Hit.PhysMaterial.IsValid())
-	{
-		SurfaceFriction = FMath::Min(1.0f, Hit.PhysMaterial->Friction * 1.25f);
-	}
-	return SurfaceFriction;
-}
-
 void UBSCharacterMovementComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
@@ -309,7 +310,7 @@ void UBSCharacterMovementComponent::TickComponent(float DeltaTime, ELevelTick Ti
 	{
 		bBrakingWindowElapsed = false; // don't brake in the air lol
 		BrakingWindowTimeElapsed = 0;
-		// make sure this is cleared so the window doesn't shrink on subsequent bhops until it expires.
+		// make sure this is cleared so the window doesn't shrink on subsequent b-hops until it expires.
 	}
 
 	bCrouchFrameTolerated = IsCrouching();
@@ -560,7 +561,7 @@ void UBSCharacterMovementComponent::PhysFalling(float deltaTime, int32 Iteration
 		const FVector OldVelocity = Velocity;
 
 		// Apply input
-		const float MaxDecel = GetMaxBrakingDeceleration();
+		const float MaxDeceleration = GetMaxBrakingDeceleration();
 		if (!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
 		{
 			// Compute Velocity
@@ -568,7 +569,7 @@ void UBSCharacterMovementComponent::PhysFalling(float deltaTime, int32 Iteration
 				// Acceleration = FallAcceleration for CalcVelocity(), but we restore it after using it.
 				TGuardValue<FVector> RestoreAcceleration(Acceleration, FallAcceleration);
 				Velocity.Z = 0.f;
-				CalcVelocity(timeTick, FallingLateralFriction, false, MaxDecel);
+				CalcVelocity(timeTick, FallingLateralFriction, false, MaxDeceleration);
 				Velocity.Z = OldVelocity.Z;
 			}
 		}
@@ -609,7 +610,6 @@ void UBSCharacterMovementComponent::PhysFalling(float deltaTime, int32 Iteration
 
 				// The time-to-apex calculation should be precise, and we want to avoid adding a substep when we
 				// are basically already at the apex from the previous iteration's work.
-				const float ApexTimeMinimum = 0.0001f;
 				if (TimeToApex >= ApexTimeMinimum && TimeToApex < timeTick)
 				{
 					const FVector ApexVelocity = OldVelocity + DerivedAccel * TimeToApex;
@@ -717,7 +717,7 @@ void UBSCharacterMovementComponent::PhysFalling(float deltaTime, int32 Iteration
 					TGuardValue<FVector> RestoreAcceleration(Acceleration, FVector::ZeroVector);
 					TGuardValue<FVector> RestoreVelocity(Velocity, OldVelocity);
 					Velocity.Z = 0.f;
-					CalcVelocity(timeTick, FallingLateralFriction, false, MaxDecel);
+					CalcVelocity(timeTick, FallingLateralFriction, false, MaxDeceleration);
 					VelocityNoAirControl = FVector(Velocity.X, Velocity.Y, OldVelocity.Z);
 					VelocityNoAirControl = NewFallVelocity(VelocityNoAirControl, Gravity, GravityTime);
 				}
@@ -771,7 +771,7 @@ void UBSCharacterMovementComponent::PhysFalling(float deltaTime, int32 Iteration
 					}
 
 					// Act as if there was no air control on the last move when computing new deflection.
-					if (bHasLimitedAirControl && Hit.Normal.Z > VERTICAL_SLOPE_NORMAL_Z)
+					if (bHasLimitedAirControl && Hit.Normal.Z > VerticalSlopeNormalZ)
 					{
 						const FVector LastMoveNoAirControl = VelocityNoAirControl * LastMoveTimeSlice;
 						Delta = ComputeSlideVector(LastMoveNoAirControl, 1.f, OldHitNormal, Hit);
@@ -1133,7 +1133,7 @@ void UBSCharacterMovementComponent::DoUnCrouchResize(float TargetTime, float Del
 			FCollisionResponseParams ResponseParam;
 			InitCollisionParams(CapsuleParams, ResponseParam);
 
-			// Check how much we have left to go (with some wiggle room to still allow for partial uncrouches in some areas)
+			// Check how much we have left to go (with some wiggle room to still allow for partial un-crouches in some areas)
 			const float HalfHeightAdjust = ComponentScale * (UnCrouchedHeight - OldUnscaledHalfHeight) *
 				GroundUnCrouchCheckFactor;
 
@@ -1320,7 +1320,7 @@ bool UBSCharacterMovementComponent::MoveUpdatedComponentImpl(const FVector& Delt
 			float PawnRadius, PawnHalfHeight;
 			CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleSize(PawnRadius, PawnHalfHeight);
 			FVector LineTraceStart = UpdatedComponent->GetComponentLocation();
-			// Shrink our base height so we don't intersect any current floor, and find where we would end up if we moved
+			// Shrink base height to avoid intersecting current floor and find where we would end up if we moved
 			LineTraceStart.Z += -PawnHalfHeight + MAX_FLOOR_DIST + Delta.Z;
 			// Inflate our search radius so we can anticipate new surfaces
 			FVector DeltaDir = Delta.GetSafeNormal2D() * (PawnRadius + SWEEP_EDGE_REJECT_DISTANCE);
@@ -1331,10 +1331,8 @@ bool UBSCharacterMovementComponent::MoveUpdatedComponentImpl(const FVector& Delt
 			FHitResult Hit(1.f);
 			const bool bBlockingHit = GetWorld()->LineTraceSingleByChannel(Hit, LineTraceStart,
 				LineTraceStart + DeltaDir, CollisionChannel, QueryParams, ResponseParam);
-			if (bBlockingHit && FMath::Abs(Hit.ImpactNormal.Z) <= VERTICAL_SLOPE_NORMAL_Z)
+			if (bBlockingHit && FMath::Abs(Hit.ImpactNormal.Z) <= VerticalSlopeNormalZ)
 			{
-				// DrawDebugLine(GetWorld(), LineTraceStart, LineTraceStart + DeltaDir, FColor::Red, false, 10.0f, 0, 0.5f);
-				// UE_LOG(LogTemp, Log, TEXT("%f"), Hit.ImpactNormal.Z);
 				//  Blocked horizontally by box
 				NewDelta = Super::ComputeSlideVector(Delta, 1.0f, Hit.ImpactNormal, Hit);
 			}
@@ -1398,7 +1396,7 @@ FVector UBSCharacterMovementComponent::HandleSlopeBoosting(const FVector& SlideR
 	const float WallAngle = FMath::Abs(Hit.ImpactNormal.Z);
 	FVector ImpactNormal;
 	// If too extreme, use the more stable hit normal
-	if (WallAngle <= VERTICAL_SLOPE_NORMAL_Z || WallAngle == 1.0f)
+	if (WallAngle <= VerticalSlopeNormalZ || WallAngle == 1.0f)
 	{
 		ImpactNormal = Normal;
 	}
@@ -1420,8 +1418,8 @@ bool UBSCharacterMovementComponent::ShouldCatchAir(const FFindFloorResult& OldFl
 	const float OldSurfaceFriction = GetFrictionFromHit(OldFloor.HitResult);
 
 	// As we get faster, make our speed multiplier smaller (so it scales with smaller friction)
-	const float SpeedMult = SpeedMultMax / Velocity.Size2D();
-	const bool bSliding = OldSurfaceFriction * SpeedMult < 0.5f;
+	const float SpeedMulti = SpeedMultMax / Velocity.Size2D();
+	const bool bSliding = OldSurfaceFriction * SpeedMulti < 0.5f;
 
 	// See if we got less steep or are continuing at the same slope
 	const float ZDiff = NewFloor.HitResult.ImpactNormal.Z - OldFloor.HitResult.ImpactNormal.Z;
@@ -1512,7 +1510,7 @@ bool UBSCharacterMovementComponent::IsValidLandingSpot(const FVector& CapsuleLoc
 	// If moving up a slope...
 	if (Hit.Normal.Z < 1.0f && (Velocity | Hit.Normal) < 0.0f)
 	{
-		// Let's calculate how we are gonna deflect off the surface
+		// Let's calculate how we are going to deflect off the surface
 		FVector DeflectionVector = Velocity;
 		// a step of gravity
 		DeflectionVector.Z += 0.5f * GetGravityZ() * GetWorld()->GetDeltaSeconds();

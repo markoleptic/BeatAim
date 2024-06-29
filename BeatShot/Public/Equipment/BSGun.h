@@ -86,31 +86,31 @@ public:
 
 protected:
 	/** The skeletal mesh of the gun. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon|Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BeatShot|Components")
 	USkeletalMeshComponent* MeshComp;
 
 	/** The location of the muzzle. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon|Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BeatShot|Components")
 	USceneComponent* MuzzleLocationComp;
 
 	UPROPERTY()
 	UAudioComponent* FireAudioComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Audio")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|WeaponAudio")
 	FName FireTriggerParameterName = "Fire";
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Audio")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|WeaponAudio")
 	FName FireAttachPointName = "hand_r";
 
 	/** whether the player is holding down left click. */
-	UPROPERTY(BlueprintReadWrite, Category = "Weapon|State")
+	UPROPERTY(BlueprintReadWrite, Category = "BeatShot|WeaponState")
 	bool bIsFiring;
 
 	/** Determines if the player can fire. */
-	UPROPERTY(BlueprintReadWrite, Category = "Weapon|State")
+	UPROPERTY(BlueprintReadWrite, Category = "BeatShot|WeaponState")
 	bool bCanFire;
 
 	/** The fire rate of the weapon. */
-	UPROPERTY(BlueprintReadWrite, Category = "Weapon|Stats")
+	UPROPERTY(BlueprintReadWrite, Category = "BeatShot|WeaponStats")
 	float FireRate = 0.11f;
 };

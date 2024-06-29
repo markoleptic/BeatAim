@@ -25,11 +25,11 @@ public:
 		FActorComponentTickFunction* ThisTickFunction) override;
 
 	/** Returns the current spread rotation (Pitch and Yaw at the current time). Used by FireGun ability. */
-	UFUNCTION(BlueprintPure, Category = "Recoil")
+	UFUNCTION(BlueprintPure, Category = "BeatShot|Recoil")
 	virtual FRotator GetCurrentRecoilRotation() const;
 
 	/** Begins or resumes the recoil timeline, allowing UpdateRecoil to receive input from the timeline on tick. */
-	UFUNCTION(BlueprintCallable, Category = "Recoil")
+	UFUNCTION(BlueprintCallable, Category = "BeatShot|Recoil")
 	void Recoil(const float FireRate);
 
 	/** Callback function for FireRateTimer. */
@@ -38,30 +38,30 @@ public:
 
 protected:
 	/** Vector curve that implements vertical and horizontal recoil. */
-	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Recoil")
 	UCurveVector* RecoilCurve;
 
 	/** Float curve that implements a screen kickback (camera shake) effect. */
-	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Recoil")
 	UCurveFloat* KickbackCurve;
 
 	/** Float curve that controls the intensity of the KickbackCurve. */
-	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Recoil")
 	UCurveFloat* KickbackIntensityCurve;
 
 	/** The interpolation speed of the recoil. */
-	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Recoil")
 	float CameraRecoilInterpSpeed = 4.f;
 
 	/** The duration of each kickback animation. */
-	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Recoil")
 	float KickbackDuration = 0.2f;
 
 	/** The speed to play the timeline at when reversing (recoil recover). */
-	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Recoil")
 	float ReverseTimelinePlayRate = 5.454545f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Recoil")
 	int32 MagazineSize = 30;
 
 	/** Interpolates the current gun recoil, camera recoil, and kickback inside OnTick
@@ -89,7 +89,7 @@ protected:
 	FTimerHandle FireRateTimer;
 
 	/** whether the fire rate timer is currently active. */
-	UPROPERTY(BlueprintReadOnly, Category = "Recoil")
+	UPROPERTY(BlueprintReadOnly, Category = "BeatShot|Recoil")
 	bool bIsFiring;
 
 	/** whether the relative rotation is nearly equal to zero. */

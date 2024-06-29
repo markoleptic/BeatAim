@@ -27,12 +27,12 @@ protected:
 
 	/** Gameplay tags that can be mapped to blueprint variables. The variables will automatically update as the tags are
 	 *  added or removed. These should be used instead of manually querying for the gameplay tags. */
-	UPROPERTY(EditDefaultsOnly, Category = "GameplayTags")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|GameplayTags")
 	FGameplayTagBlueprintPropertyMap GameplayTagPropertyMap;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced, Category = "Animation")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced, Category = "BeatShot|Animation")
 	UBSAnimationSet* AnimationSet;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Character State Data")
+	UPROPERTY(BlueprintReadOnly, Category = "BeatShot|CharacterStateData")
 	float GroundDistance = -1.0f;
 };

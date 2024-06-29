@@ -15,6 +15,6 @@ class BEATSHOT_API UEquippableFragment : public UBSInventoryItemFragment
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, Category = "Equipment")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Equipment")
 	TSubclassOf<UBSEquipmentDefinition> EquipmentDefinition;
 };

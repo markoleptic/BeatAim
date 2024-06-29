@@ -72,7 +72,7 @@ public:
 	/** Returns the current time of day. */
 	ETimeOfDay GetTimeOfDay() const { return TimeOfDay; }
 
-	void SetSpotLightFrontEnabledState(const bool bEnable);
+	void SetSpotLightFrontEnabledState(const bool bEnable) const;
 
 	FOnTimeOfDayTransitionCompleted OnTimeOfDayTransitionCompleted;
 
@@ -83,101 +83,97 @@ protected:
 	/** Callback function to respond to NightMode change from WallMenu. */
 	void HandleGameUserSettingsChanged(const UBSGameUserSettings* InGameUserSettings);
 
-	/** Calls RefreshMaterial function in SkySphere. */
-	UFUNCTION(BlueprintImplementableEvent)
-	void RefreshSkySphereMaterial();
-
 	/** Soft Reference to SkySphere in Range level. */
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Lighting|References")
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "BeatShot|Lighting|References")
 	TSoftObjectPtr<AActor> SkySphere;
 
 	/** Soft Reference to Moon in Range level. */
-	UPROPERTY(EditInstanceOnly, Category = "Lighting|References")
+	UPROPERTY(EditInstanceOnly, Category = "BeatShot|Lighting|References")
 	TSoftObjectPtr<AMoon> Moon;
 
 	/** Soft Reference to Daylight in Range level. */
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Lighting|References")
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "BeatShot|Lighting|References")
 	TSoftObjectPtr<ADirectionalLight> DayDirectionalLight;
 
 	/** Soft Reference to Skylight in Range level. */
-	UPROPERTY(EditInstanceOnly, Category = "Lighting|References")
+	UPROPERTY(EditInstanceOnly, Category = "BeatShot|Lighting|References")
 	TSoftObjectPtr<ASkyLight> SkyLight;
 
 	/** Reference to left roof mesh to move. */
-	UPROPERTY(EditInstanceOnly, Category = "Lighting|References")
+	UPROPERTY(EditInstanceOnly, Category = "BeatShot|Lighting|References")
 	TSoftObjectPtr<AStaticMeshActor> LeftWindowCover;
 
 	/** Reference to right roof mesh to move. */
-	UPROPERTY(EditInstanceOnly, Category = "Lighting|References")
+	UPROPERTY(EditInstanceOnly, Category = "BeatShot|Lighting|References")
 	TSoftObjectPtr<AStaticMeshActor> RightWindowCover;
 
-	UPROPERTY(EditInstanceOnly, Category = "Lighting|References")
+	UPROPERTY(EditInstanceOnly, Category = "BeatShot|Lighting|References")
 	TSoftObjectPtr<ASpawnAreaSpotLight> SpawnAreaSpotLight;
 
-	UPROPERTY(EditInstanceOnly, Category = "Lighting|References")
+	UPROPERTY(EditInstanceOnly, Category = "BeatShot|Lighting|References")
 	TSoftObjectPtr<ARectLight> RectLight;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Lighting")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Lighting")
 	UCurveFloat* TransitionCurve;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Lighting")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Lighting")
 	UCurveFloat* SkyMaterialCurve;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Lighting")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Lighting")
 	UCurveFloat* MoonlightCurve;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Lighting")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Lighting")
 	UCurveFloat* SkyLightCurve;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Lighting")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Lighting")
 	UCurveFloat* SecondaryLightCurve;
 
-	UPROPERTY(EditAnywhere, Category = "Lighting")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Lighting")
 	ETimeOfDay TimeOfDay_Editor;
 
 	/** Distance along the x-axis the roofs covering the nighttime windows have to travel during the day to night
 	 *  transition. This value is reversed when the cycle goes from night to day. */
-	UPROPERTY(EditAnywhere, Category = "Lighting")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Lighting")
 	float DayToNightRoofXTravelDistance = -1000.f;
 
 	/** Distance along the z-axis the roofs covering the nighttime windows have to travel during the day to night
 	 *  transition. This value is reversed when the cycle goes from night to day. */
-	UPROPERTY(EditAnywhere, Category = "Lighting")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Lighting")
 	float DayToNightRoofZTravelDistance = 20.f;
 
-	UPROPERTY(EditAnywhere, Category = "Lighting")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Lighting")
 	bool bUseRectLight = true;
 
-	UPROPERTY(EditAnywhere, Category = "Lighting")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Lighting")
 	bool bUseSpotlight = true;
 
-	UPROPERTY(EditAnywhere, Category = "Lighting")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Lighting")
 	float LowGISettingSkyLightIntensity = 1.f;
 
 	/** Constant Light Intensity of the sun. */
-	UPROPERTY(EditAnywhere, Category = "Lighting|Day")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Lighting|Day")
 	float DayDirectionalLightIntensity = 10.f;
 
-	UPROPERTY(EditAnywhere, Category = "Lighting|Day")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Lighting|Day")
 	float DaySkylightIntensity = 3.f;
 
-	UPROPERTY(EditAnywhere, Category = "Lighting|Day")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Lighting|Day")
 	float DayRectLightIntensity = 0.f;
 
-	UPROPERTY(EditAnywhere, Category = "Lighting|Day")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Lighting|Day")
 	float DaySpotlightIntensity = 0.f;
 
 	/** Dynamic Light Intensity of the moon's directional light. */
-	UPROPERTY(EditAnywhere, Category = "Lighting|Night")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Lighting|Night")
 	float NightDirectionalLightIntensity = 1.f;
 
-	UPROPERTY(EditAnywhere, Category = "Lighting|Night")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Lighting|Night")
 	float NightSkylightIntensity = 3.f;
 
-	UPROPERTY(EditAnywhere, Category = "Lighting|Night")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Lighting|Night")
 	float NightRectLightIntensity = 160.f;
 
-	UPROPERTY(EditAnywhere, Category = "Lighting|Night")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Lighting|Night")
 	float NightSpotlightIntensity = 2000.f;
 
 	/** Reference to SkySphere dynamic material instance. */

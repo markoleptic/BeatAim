@@ -18,8 +18,7 @@ enum class ELoadingScreenState : uint8
 
 ENUM_RANGE_BY_FIRST_AND_LAST(ELoadingScreenState, ELoadingScreenState::None, ELoadingScreenState::FullOpacity);
 
-DECLARE_DELEGATE(FOnFadeOutComplete);
-
+using FOnFadeOutComplete = TDelegate<void()>;
 /**
  * Slate loading screen widget. Used instead of UUserWidget since UUserWidgets do not like to tick from any thread
  * but the game thread, and the ASyncLoadingThread ticks widgets supplied to the MoviePlayer.
@@ -28,15 +27,12 @@ class SLoadingScreenWidget : public SCompoundWidget
 {
 public:
 	SLATE_BEGIN_ARGS(SLoadingScreenWidget) : _LoadingScreenStyle(
-		                                         &FAppStyle::Get().GetWidgetStyle<
-			                                         FLoadingScreenStyle>("LoadingScreen")), _OnFadeOutComplete(),
-	                                         _bIsInitialLoadingScreen(false)
+			&FAppStyle::Get().GetWidgetStyle<FLoadingScreenStyle>("LoadingScreen"))
 		{
 		}
 
 		SLATE_STYLE_ARGUMENT(FLoadingScreenStyle, LoadingScreenStyle)
 		SLATE_EVENT(FOnFadeOutComplete, OnFadeOutComplete)
-		SLATE_ARGUMENT(bool, bIsInitialLoadingScreen)
 	SLATE_END_ARGS()
 
 	/** Constructs this widget with InArgs. */
@@ -44,7 +40,6 @@ public:
 	{
 		OnFadeOutComplete = InArgs._OnFadeOutComplete;
 		LoadingScreenStyle = InArgs._LoadingScreenStyle;
-		bIsInitialLoadingScreen = InArgs._bIsInitialLoadingScreen;
 
 		if (LoadingScreenStyle->FadeFromBlackDuration == 0.f)
 		{
@@ -53,19 +48,6 @@ public:
 		else
 		{
 			SetLoadingScreenState(ELoadingScreenState::FadingIn);
-		}
-
-		// Use fallback since material instance won't load on initial
-		if (bIsInitialLoadingScreen)
-		{
-			SAssignNew(LogoImage, SSpinningImage)
-			.Image(&LoadingScreenStyle->LogoImageTexture)
-			.Period(4.0f);
-		}
-		else
-		{
-			SAssignNew(LogoImage, SImage)
-			.Image(&LoadingScreenStyle->LogoImage);
 		}
 
 		ChildSlot
@@ -102,8 +84,9 @@ public:
 						.HAlign(HAlign_Center)
 						.VAlign(VAlign_Center)
 						[
-							LogoImage
-							.ToSharedRef()
+							SNew(SSpinningImage)
+							.Image(&LoadingScreenStyle->LogoImageTexture)
+							.Period(4.0f)
 						]
 						+ SVerticalBox::Slot()
 						.HAlign(HAlign_Center)
@@ -272,9 +255,6 @@ public:
 	/** The overlay containing the background and logo textures. */
 	TSharedPtr<SOverlay> MainOverlay;
 
-	/** The overlay containing the background and logo textures. */
-	TSharedPtr<SImage> LogoImage;
-
 	/** The opacity state of the MainOverlay. */
 	mutable ELoadingScreenState LoadingScreenState = ELoadingScreenState::None;
 
@@ -289,7 +269,4 @@ public:
 
 	/** Whether to immediately begin fading out once fading in is completed. */
 	mutable bool bStartFadeOutOnFadeInEnd = false;
-
-	/** Whether this is an initial loading screen. */
-	bool bIsInitialLoadingScreen = false;
 };

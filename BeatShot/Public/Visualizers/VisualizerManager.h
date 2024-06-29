@@ -47,33 +47,33 @@ public:
 	/** Updates visualizers based on player AudioAnalyzer settings. */
 	void UpdateAASettings(const FPlayerSettings_AudioAnalyzer& NewAASettings);
 
-	UPROPERTY(VisibleAnywhere, Category = "VisualizerManager | Update")
+	UPROPERTY(VisibleAnywhere, Category = "BeatShot|Update")
 	TArray<float> AvgSpectrumValues;
 
-	UPROPERTY(VisibleAnywhere, Category = "VisualizerManager | Update")
+	UPROPERTY(VisibleAnywhere, Category = "BeatShot|Update")
 	TArray<float> CurrentSpectrumValues;
 
-	UPROPERTY(VisibleAnywhere, Category = "VisualizerManager | Update")
+	UPROPERTY(VisibleAnywhere, Category = "BeatShot|Update")
 	TArray<float> CurrentCubeSpectrumValues;
 
-	UPROPERTY(VisibleAnywhere, Category = "VisualizerManager | Update")
+	UPROPERTY(VisibleAnywhere, Category = "BeatShot|Update")
 	TArray<float> MaxSpectrumValues;
 
 protected:
 	/* The base StaticCubeVisualizer class to spawn through code. */
-	UPROPERTY(EditDefaultsOnly, Category = "VisualizerManager | Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<AStaticCubeVisualizer> BaseClass_CubeVisualizer;
 
 	/** The base BeamVisualizer class to spawn through code. */
-	UPROPERTY(EditDefaultsOnly, Category = "VisualizerManager | Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<ABeamVisualizer> BaseClass_BeamVisualizer;
 
 	/** An array of visualizers that will be spawned when this actor is initialized. */
-	UPROPERTY(EditDefaultsOnly, Category = "VisualizerManager | Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TArray<TSubclassOf<AVisualizerBase>> DefaultSpawnThroughCode_Visualizers;
 
 	/** An array of visualizers that have already been placed in the level editor. */
-	UPROPERTY(EditDefaultsOnly, Category = "VisualizerManager | References")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|References")
 	TArray<TSoftObjectPtr<AVisualizerBase>> LevelVisualizers;
 
 	/** All visualizers being managed. */

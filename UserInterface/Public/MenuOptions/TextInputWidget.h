@@ -16,7 +16,7 @@ public:
 	UEditableTextBox* EditableTextBox;
 
 	/** The text alignment for the EditableTextBox. */
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="TextInputWidget")
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "TextInputWidget")
 	TEnumAsByte<ETextJustify::Type> TextJustify_EditableTextBox = ETextJustify::Type::Left;
 
 protected:

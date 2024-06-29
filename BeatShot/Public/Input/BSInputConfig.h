@@ -42,13 +42,13 @@ class UBSInputConfig : public UDataAsset
 public:
 	UBSInputConfig();
 
-	UFUNCTION(BlueprintCallable, Category = "BeatShot|Pawn")
+	UFUNCTION(BlueprintCallable, Category = "BeatShot|Input")
 	const UInputAction* FindNativeInputActionForTag(const FGameplayTag& InputTag, bool bLogNotFound = true) const;
 
-	UFUNCTION(BlueprintCallable, Category = "BeatShot|Pawn")
+	UFUNCTION(BlueprintCallable, Category = "BeatShot|Input")
 	const UInputAction* FindAbilityInputActionForTag(const FGameplayTag& InputTag, bool bLogNotFound = true) const;
 
-	UFUNCTION(BlueprintCallable, Category = "BeatShot|Pawn")
+	UFUNCTION(BlueprintCallable, Category = "BeatShot|Input")
 	FBSInputAction FindBSInputActionForTag(const FGameplayTag& InputTag, bool bLogNotFound = true) const;
 
 	/** List of input actions used by the owner.  These input actions are mapped to a gameplay tag and must be manually

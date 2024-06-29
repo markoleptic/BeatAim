@@ -846,7 +846,7 @@ protected:
 	static TArray<int32> FilterIndices(TArray<USpawnArea*>& ValidSpawnAreas, bool (USpawnArea::*FilterFunc)() const);
 
 	/** Preferred dimensions for a Spawn Area */
-	UPROPERTY(EditAnywhere, Category="SpawnArea")
+	UPROPERTY(EditAnywhere, Category = "BeatShot")
 	TArray<int32> PreferredSpawnAreaDimensions = {50, 45, 40, 30, 25, 20, 15, 10, 5};
 
 	/* ----------- */
@@ -854,57 +854,57 @@ protected:
 	/* ----------- */
 
 	/** Debug box color for all spawn areas. */
-	UPROPERTY(EditAnywhere, Category="Debug")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Debug")
 	FColor DebugColor_AllSpawnAreas = FColor::Cyan;
 
 	/** Debug box color for spawn areas removed due to overlap */
-	UPROPERTY(EditAnywhere, Category="Debug")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Debug")
 	FColor DebugColor_InvalidOverlap = FColor::Red;
 
 	/** Debug box color for spawn areas not removed due to overlap */
-	UPROPERTY(EditAnywhere, Category="Debug")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Debug")
 	FColor DebugColor_ValidOverlap = FColor::Emerald;
 
 	/** Debug box color for spawnable spawn areas. */
-	UPROPERTY(EditAnywhere, Category="Debug")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Debug")
 	FColor DebugColor_SpawnableSpawnAreas = FColor::Emerald;
 
 	/** Debug box color for activatable spawn areas. */
-	UPROPERTY(EditAnywhere, Category="Debug")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Debug")
 	FColor DebugColor_ActivatableSpawnAreas = FColor::Emerald;
 
 	/** Debug box color for activated spawn areas. */
-	UPROPERTY(EditAnywhere, Category="Debug")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Debug")
 	FColor DebugColor_ActivatedSpawnAreas = FColor::Blue;
 
 	/** Debug box color for deactivated managed spawn areas. */
-	UPROPERTY(EditAnywhere, Category="Debug")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Debug")
 	FColor DebugColor_DeactivatedSpawnAreas = FColor::Purple;
 
 	/** Debug box color for deactivated managed spawn areas. */
-	UPROPERTY(EditAnywhere, Category="Debug")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Debug")
 	FColor DebugColor_RecentSpawnAreas = FColor::Orange;
 
 	/** Debug box color for spawn areas removed due to the BoxBounds. */
-	UPROPERTY(EditAnywhere, Category="Debug")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Debug")
 	FColor DebugColor_RemovedFromExtremaChange = FColor::Red;
 
-	/** Debug box color for spawn areas removed due to being non adjacent. */
-	UPROPERTY(EditAnywhere, Category="Debug")
+	/** Debug box color for spawn areas removed due to being non-adjacent. */
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Debug")
 	FColor DebugColor_NonAdjacent = FColor::Yellow;
 
 	/** Line thickness for all debug boxes. */
-	UPROPERTY(EditAnywhere, Category="Debug")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Debug")
 	float DebugBoxLineThickness = 4.f;
 
 	/** Size of the debug point for occupied vertices and non-occupied vertices. */
-	UPROPERTY(EditAnywhere, Category="Debug")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Debug")
 	float DebugVertexSize = 24.f;
 
-	UPROPERTY(EditAnywhere, Category="Debug")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Debug")
 	float DebugBoxXOffset = 2.f;
 
-	UPROPERTY(EditAnywhere, Category="Debug")
+	UPROPERTY(EditAnywhere, Category = "BeatShot|Debug")
 	int32 DebugSphereSegments = 12;
 
 #if !UE_BUILD_SHIPPING

@@ -30,7 +30,6 @@
 #include "Player/BSPlayerState.h"
 #include "System/SteamManager.h"
 #include "Transitions/ScreenFadeWidget.h"
-#include "Utilities/TooltipWidget.h"
 
 void ABSPlayerController::BeginPlay()
 {
@@ -62,10 +61,6 @@ void ABSPlayerController::BeginPlay()
 				*UEnum::GetValueAsString(GetLocalRole()), *UEnum::GetValueAsString(GetRemoteRole()));
 		}
 	}*/
-
-	UE_LOG(LogTemp, Warning, TEXT("PlayerController::BeginPlay"));
-
-	UTooltipWidget::InitializeTooltipWidget(TooltipClass);
 
 	const UBSLoadingScreenSettings* LoadingScreenSettings = GetDefault<UBSLoadingScreenSettings>();
 	ScreenFadeWidgetAnimationDuration = LoadingScreenSettings->ScreenFadeWidgetAnimationDuration;
@@ -111,12 +106,6 @@ void ABSPlayerController::PostProcessInput(const float DeltaTime, const bool bGa
 		return;
 	}
 	GetBSAbilitySystemComponent()->ProcessAbilityInput(DeltaTime, bGamePaused);
-}
-
-void ABSPlayerController::Destroyed()
-{
-	Super::Destroyed();
-	UTooltipWidget::Cleanup();
 }
 
 ABSPlayerState* ABSPlayerController::GetBSPlayerState() const
@@ -173,7 +162,7 @@ void ABSPlayerController::ShowMainMenu()
 
 	MainMenuWidget = CreateWidget<UMainMenuWidget>(this, MainMenuClass);
 	MainMenuWidget->GameModesWidget->OnGameModeStateChanged.AddUObject(GI, &UBSGameInstance::HandleGameModeTransition);
-	MainMenuWidget->OnSteamLoginRequest.BindUObject(this, &ThisClass::InitiateSteamLogin);
+	MainMenuWidget->OnSteamLoginRequest.BindUObject(this, &ABSPlayerController::LoginUser);
 	GI->RegisterPlayerSettingsUpdaters(MainMenuWidget->SettingsMenuWidget->GetGameDelegate(),
 		MainMenuWidget->SettingsMenuWidget->GetCrossHairDelegate(),
 		MainMenuWidget->SettingsMenuWidget->GetAudioAnalyzerDelegate(),
@@ -529,11 +518,6 @@ void ABSPlayerController::LoginUser()
 		MainMenuWidget->UpdateLoginState(false, "SignInState_SteamSignInFailed");
 		MainMenuWidget->TryFallbackLogin();
 	}
-}
-
-void ABSPlayerController::InitiateSteamLogin()
-{
-	LoginUser();
 }
 
 void ABSPlayerController::HidePostGameMenu()

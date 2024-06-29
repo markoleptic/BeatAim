@@ -39,15 +39,15 @@ class BEATSHOT_API UBSInventoryItemDefinition : public UObject
 public:
 	UBSInventoryItemDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Display)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Inventory")
 	FText DisplayName;
 
 	/** An array of parts making up this inventory item. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Display, Instanced)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "BeatShot|Inventory")
 	TArray<TObjectPtr<UBSInventoryItemFragment>> Fragments;
 
 	/** Gameplay Tags associated with this item. */
-	UPROPERTY(EditDefaultsOnly, Category=Display)
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Inventory")
 	FGameplayTagContainer ItemTags;
 
 	/** Returns the first fragment found matching the Fragment Class, or nullptr if none found. */

@@ -22,7 +22,7 @@ class USERINTERFACE_API UBSComboBoxEntry : public UUserWidget
 	virtual void SetStyles();
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category="BSComboBoxEntry|Style")
+	UPROPERTY(EditDefaultsOnly, Category = "BSComboBoxEntry|Style")
 	TSubclassOf<UMenuOptionStyle> MenuOptionStyleClass;
 
 	UPROPERTY()

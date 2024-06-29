@@ -35,7 +35,7 @@ protected:
 	virtual void NativeConstruct() override;
 	virtual void NativePreConstruct() override;
 
-	UPROPERTY(EditDefaultsOnly, Category="MainMenuWidget")
+	UPROPERTY(EditDefaultsOnly, Category = "MainMenuWidget")
 	TSubclassOf<UMenuStyle> MenuStyleClass;
 
 	UPROPERTY()

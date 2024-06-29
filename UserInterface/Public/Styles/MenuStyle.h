@@ -14,14 +14,14 @@ class USERINTERFACE_API UMenuStyle : public UObject
 
 public:
 	/** The padding applied to main content windows. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MenuStyle|Content")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MenuStyle|Content")
 	FMargin Padding_MainContent;
 
 	/** The padding applied to sidebar windows. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MenuStyle|Sidebar")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MenuStyle|Sidebar")
 	FMargin Padding_Sidebar;
 
 	/** The font applied to SidebarButtons. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="MenuStyle|Sidebar")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MenuStyle|Sidebar")
 	FSlateFontInfo Font_SidebarButton;
 };

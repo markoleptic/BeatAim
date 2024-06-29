@@ -155,31 +155,31 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional))
 	UCheckBox* CheckBox_Lock;
 
-	UPROPERTY(EditDefaultsOnly, Category="MenuOptionWidget|Style")
+	UPROPERTY(EditDefaultsOnly, Category = "MenuOptionWidget|Style")
 	TSubclassOf<UMenuOptionStyle> MenuOptionStyleClass;
 
 	UPROPERTY()
 	const UMenuOptionStyle* MenuOptionStyle;
 
 	/** Text that describes the values this widget controls. */
-	UPROPERTY(EditInstanceOnly, Category="MenuOptionWidget")
+	UPROPERTY(EditInstanceOnly, Category = "MenuOptionWidget")
 	FText DescriptionText = FText();
 
-	UPROPERTY(EditInstanceOnly, Category="MenuOptionWidget")
+	UPROPERTY(EditInstanceOnly, Category = "MenuOptionWidget")
 	int32 IndentLevel = 0;
 
-	UPROPERTY(EditInstanceOnly, Category="MenuOptionWidget")
+	UPROPERTY(EditInstanceOnly, Category = "MenuOptionWidget")
 	bool bShowCheckBoxLock = false;
 
-	UPROPERTY(EditInstanceOnly, Category="MenuOptionWidget|Tooltip")
+	UPROPERTY(EditInstanceOnly, Category = "MenuOptionWidget|Tooltip")
 	bool bShowDescriptionTooltipIcon = true;
 
 	/** Text to show on the tooltip. */
-	UPROPERTY(EditInstanceOnly, Category="MenuOptionWidget|Tooltip")
+	UPROPERTY(EditInstanceOnly, Category = "MenuOptionWidget|Tooltip")
 	FText DescriptionTooltipText = FText();
 
 	/** The categories this menu option represents. */
-	UPROPERTY(EditInstanceOnly, Category="MenuOptionWidget|GameModeCategoryTags")
+	UPROPERTY(EditInstanceOnly, Category = "MenuOptionWidget|GameModeCategoryTags")
 	FGameplayTagContainer GameModeCategoryTags;
 
 	/** The custom enabled state of the menu option. */

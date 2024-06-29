@@ -23,6 +23,6 @@ protected:
 	/** Callback function to respond to video setting changes. */
 	void HandleGameUserSettingsChanged(const UBSGameUserSettings* InGameUserSettings);
 
-	UPROPERTY(EditDefaultsOnly, Category = "Lighting|References")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|References")
 	TSoftObjectPtr<APostProcessVolume> PostProcessVolume;
 };

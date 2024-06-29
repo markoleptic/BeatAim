@@ -17,10 +17,10 @@ class BEATSHOT_API UWeaponAudioFunctions : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category="Audio")
+	UFUNCTION(BlueprintCallable, Category = "Audio")
 	static void SetWeaponSoundParams(AActor* Actor, const FGameplayCueNotify_SpawnResult& SpawnResult);
 
-	UFUNCTION(BlueprintCallable, Category="Audio")
+	UFUNCTION(BlueprintCallable, Category = "Audio")
 	static void SetEarlyReflections(AActor* Target, const FGameplayCueParameters& Params,
 		USubmixEffectTapDelayPreset* SubmixEffect);
 

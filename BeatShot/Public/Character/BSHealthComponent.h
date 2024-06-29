@@ -41,7 +41,7 @@ protected:
 
 public:
 	/** Initialize the component using an ability system component. */
-	UFUNCTION(BlueprintCallable, Category = "BeatShot|Health")
+	UFUNCTION(BlueprintCallable, Category = "BeatShot")
 	void InitializeWithAbilitySystem(UBSAbilitySystemComponent* InASC);
 
 	/** Broadcasts when the health attribute changes. */

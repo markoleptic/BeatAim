@@ -28,7 +28,7 @@ public:
 protected:
 	virtual void Destroyed() override;
 
-	UPROPERTY(EditInstanceOnly, Category="Spline")
+	UPROPERTY(EditInstanceOnly, Category = "Spline")
 	USplineComponent* VisualizerPositioning;
 
 public:
@@ -64,39 +64,39 @@ public:
 	virtual UBSVisualizerDefinition* GetVisualizerDefinition() const { return VisualizerDefinition; }
 
 	/** The number of points to add to the spline (how many visualizers will be spawned). */
-	UPROPERTY(EditInstanceOnly, Category="Spline")
+	UPROPERTY(EditInstanceOnly, Category = "Spline")
 	int32 NumberOfPointsToAdd;
 
 	/** The direction to distribute the splint points towards. */
-	UPROPERTY(EditInstanceOnly, Category="Spline")
+	UPROPERTY(EditInstanceOnly, Category = "Spline")
 	FVector PointAddDirection;
 
 	/** The spacing in between spline points. */
-	UPROPERTY(EditInstanceOnly, Category="Spline")
+	UPROPERTY(EditInstanceOnly, Category = "Spline")
 	float Offset;
 
 	/** whether to distribute the points centered from the spline component location. */
-	UPROPERTY(EditInstanceOnly, Category="Spline")
+	UPROPERTY(EditInstanceOnly, Category = "Spline")
 	bool bDistributeFromCenter;
 
 	/** Clears all exiting spline points, and adds points according to NumberOfPointsToAdd, PointAddDirection, Offset,
 	 *  and DistributeFromCenter. */
-	UFUNCTION(CallInEditor, Category="Spline")
+	UFUNCTION(CallInEditor, Category = "Spline")
 	void AddVisualizerPointsToSpline();
 
-	UPROPERTY(EditInstanceOnly, Category="Spline")
+	UPROPERTY(EditInstanceOnly, Category = "Spline")
 	TSubclassOf<AActor> TestVisualizerToSpawn;
 
 	UPROPERTY(Transient)
 	AActor* SpawnedTestVisualizer;
 
 	/** The direction to distribute the splint points towards. */
-	UPROPERTY(EditInstanceOnly, Category="Spline")
+	UPROPERTY(EditInstanceOnly, Category = "Spline")
 	FRotator TestVisualizerRotation;
 
 	/** Spawns a visualizer specified in TestVisualizerToSpawn to determine what location and rotation is needed for
 	 *  alignment. */
-	UFUNCTION(CallInEditor, Category="Spline")
+	UFUNCTION(CallInEditor, Category = "Spline")
 	void AddTestVisualizer();
 
 protected:

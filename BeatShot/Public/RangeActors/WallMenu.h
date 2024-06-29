@@ -196,27 +196,27 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UBoxComponent* Box_LV_RightCube_Off;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Text3D|References")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|References")
 	TSoftObjectPtr<ATimeOfDayManager> TimeOfDayManager;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Text3D|Materials")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Text3D|Materials")
 	UMaterialInterface* Material_Main_Front_Text3D;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Text3D|Materials")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Text3D|Materials")
 	UMaterialInterface* Material_Toggle;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Text3D|Materials")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Text3D|Materials")
 	UMaterialInterface* Material_Extrude;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Text3D|Materials")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Text3D|Materials")
 	UMaterialInterface* Material_Bevel;
 
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Text3D")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Text3D")
 	UFont* Font_Text3D;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Text3D")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Text3D")
 	FVector Offset_MainText = {0.f, 0.f, -42.f};
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Text3D")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Text3D")
 	FVector Indent = {0.f, 40.f, 0.f};
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Text3D")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Text3D")
 	float MaxHeightMainText = 55.f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Text3D")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Text3D")
 	float MaxHeightIndentedText = 55.f;
 
 	/** Displays which settings are on/off etc. by lighting the correct words. */

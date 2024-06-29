@@ -37,10 +37,10 @@ public:
 protected:
 	UCombatTextWidget* GetCombatTextWidget() const;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Components")
 	UWidgetComponent* CombatTextWidgetComponent;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UUserWidget> CombatTextWidgetClass;
 
 	FText CombatText;

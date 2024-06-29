@@ -19,16 +19,16 @@ struct FBSEquipmentActorToSpawn
 	{
 	}
 
-	UPROPERTY(EditAnywhere, Category="Equipment")
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> ActorToSpawn;
 
-	UPROPERTY(EditAnywhere, Category="Equipment")
+	UPROPERTY(EditAnywhere)
 	FName AttachSocket;
 
-	UPROPERTY(EditAnywhere, Category="Equipment")
+	UPROPERTY(EditAnywhere)
 	FName RootBone;
 
-	UPROPERTY(EditAnywhere, Category="Equipment")
+	UPROPERTY(EditAnywhere)
 	FTransform AttachTransform;
 };
 
@@ -42,19 +42,19 @@ public:
 	UBSEquipmentDefinition(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/** Class default object for the piece of equipment. */
-	UPROPERTY(EditDefaultsOnly, Category="Equipment")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Equipment")
 	TSubclassOf<UBSEquipmentInstance> InstanceType;
 
 	/** Gameplay ability sets to grant when this piece is equipped. */
-	UPROPERTY(EditDefaultsOnly, Category="Equipment")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Equipment")
 	TArray<TObjectPtr<const UBSAbilitySet>> AbilitySetsToGrant;
 
 	/** Actors to spawn on the pawn when this piece is equipped. */
-	UPROPERTY(EditDefaultsOnly, Category="Equipment")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Equipment")
 	TArray<FBSEquipmentActorToSpawn> ActorsToSpawn;
 
 	/** Gameplay tags associated with this piece of equipment. Applied to the Owner's ASC when equipped,
 	 *  and removed when unequipped. */
-	UPROPERTY(EditDefaultsOnly, Category="Equipment")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Equipment")
 	FGameplayTagContainer EquippedTags;
 };

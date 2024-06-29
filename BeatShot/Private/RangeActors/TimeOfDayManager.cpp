@@ -244,11 +244,9 @@ void ATimeOfDayManager::SetTimeOfDay(const ETimeOfDay InTimeOfDay)
 		RectLight->GetLightComponent()->SetIntensity(bUseRectLight ? DayRectLightIntensity : 0.f);
 		SpawnAreaSpotLight->GetLightComponent()->SetIntensity(bUseSpotlight ? DaySpotlightIntensity : 0.f);
 	}
-
-	RefreshSkySphereMaterial();
 }
 
-void ATimeOfDayManager::SetSpotLightFrontEnabledState(const bool bEnable)
+void ATimeOfDayManager::SetSpotLightFrontEnabledState(const bool bEnable) const
 {
 	if (bEnable)
 	{
@@ -403,6 +401,4 @@ void ATimeOfDayManager::TransitionTimeOfDay(const float Value)
 	SkySphereMaterial->SetScalarParameterValue("NightAlpha", NightAlpha);
 	SpawnAreaSpotLight->GetLightComponent()->SetIntensity(SpotlightIntensity);
 	RectLight->GetLightComponent()->SetIntensity(RectLightIntensity);
-
-	RefreshSkySphereMaterial();
 }

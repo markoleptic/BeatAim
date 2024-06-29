@@ -20,11 +20,11 @@ class USERINTERFACE_API UPopupMessageWidget : public UUserWidget
 protected:
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(EditDefaultsOnly, Category="PopupMessageWidget")
+	UPROPERTY(EditDefaultsOnly, Category = "PopupMessageWidget")
 	TSubclassOf<UBSButton> ButtonClass;
-	UPROPERTY(EditDefaultsOnly, Category="PopupMessageWidget")
+	UPROPERTY(EditDefaultsOnly, Category = "PopupMessageWidget")
 	TEnumAsByte<EHorizontalAlignment> HorizontalAlignment = HAlign_Fill;
-	UPROPERTY(EditDefaultsOnly, Category="PopupMessageWidget")
+	UPROPERTY(EditDefaultsOnly, Category = "PopupMessageWidget")
 	TEnumAsByte<EVerticalAlignment> VerticalAlignment = VAlign_Fill;
 
 public:

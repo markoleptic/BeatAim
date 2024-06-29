@@ -29,15 +29,15 @@ public:
 	void SetIgnoreStartLocation(const FVector& In);
 
 	/** The Aim Bot will ignore targets with a location greater than a positive value or less than a negative value. */
-	UPROPERTY(EditDefaultsOnly, Category="BeatShot|AimBot")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|AimBot")
 	FVector IgnoreStartLocation = FVector::ZeroVector;
 
 	/** The interpolation curve to use during AimToTarget task. */
-	UPROPERTY(EditDefaultsOnly, Category="BeatShot|AimBot")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|AimBot")
 	UCurveFloat* SmoothingCurve;
 
 	/** The ability to try and activate to destroy the target. */
-	UPROPERTY(EditDefaultsOnly, Category="BeatShot")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot")
 	TSubclassOf<UBSGameplayAbility> GA_FireGun;
 
 private:

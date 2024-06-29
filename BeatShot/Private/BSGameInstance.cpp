@@ -17,6 +17,7 @@
 #include "Slate/SLoadingScreenWidget.h"
 #include "System/SteamManager.h"
 #include "Utilities/GameModeTransitionState.h"
+#include "Utilities/TooltipWidget.h"
 
 void UBSGameInstance::Init()
 {
@@ -29,12 +30,12 @@ void UBSGameInstance::Init()
 
 	GetMoviePlayer()->OnPrepareLoadingScreen().AddUObject(this, &ThisClass::PrepareLoadingScreen);
 
+	SetBSConfig(FBSConfig());
 	SteamManager = NewObject<USteamManager>(this);
 	SteamManager->AssignGameInstance(this);
 	SteamManager->InitializeSteamManager();
 	OnFadeCompleted.BindDynamic(this, &UBSGameInstance::HandleFadeCompleted);
 	PlaybackTime.BindDynamic(this, &UBSGameInstance::HandlePlaybackTimeChanged);
-	UE_LOG(LogTemp, Display, TEXT("UBSGameInstance::Init"));
 }
 
 #if WITH_EDITOR
@@ -44,42 +45,28 @@ FGameInstancePIEResult UBSGameInstance::PostCreateGameModeForPIE(const FGameInst
 	FGameInstancePIEResult Result = Super::PostCreateGameModeForPIE(Params, GameMode);
 	UBSGameUserSettings::Get()->Initialize(WorldContext->World());
 	InitializeAudioComponent(WorldContext->World());
-	SetBSConfig(FBSConfig());
 	return Result;
 }
 
 FGameInstancePIEResult UBSGameInstance::StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer,
 	const FGameInstancePIEParameters& Params)
 {
-	FGameInstancePIEResult Result = Super::StartPlayInEditorGameInstance(LocalPlayer, Params);
-	const FString MapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
-	const float FadeTarget = MapName.Equals(MainMenuLevelName.ToString()) ? 1.f : 0.f;
-	const float FadeDuration = bIsInitialLoadingScreen ? 2.f : 0.75f;
-	SetLoadingScreenAudioComponentState(FadeTarget, FadeDuration);
-	OnLoadingScreenFadeOutComplete();
-	return Result;
+	UTooltipWidget::InitializeTooltipWidget(TooltipClass);
+	return Super::StartPlayInEditorGameInstance(LocalPlayer, Params);
 }
 
 #else // WITH_EDITOR
 void UBSGameInstance::OnPreLoadMapWithContext(const FWorldContext& InWorldContext, const FString& /*MapName*/)
 {
 	UBSGameUserSettings::Get()->Initialize(InWorldContext.World());
+	UTooltipWidget::InitializeTooltipWidget(TooltipClass);
 	InitializeAudioComponent(InWorldContext.World());
 }
 #endif // WITH_EDITOR
 
-void UBSGameInstance::OnPostLoadMapWithWorld(UWorld* World)
+void UBSGameInstance::OnPostLoadMapWithWorld(UWorld* /*World*/)
 {
-	// Fade out the loading screen when map is ready
-	if (LoadingScreenWidget)
-	{
-		LoadingScreenWidget->SetLoadingScreenState(ELoadingScreenState::FadingOut);
-	}
-
-	const FString MapName = UGameplayStatics::GetCurrentLevelName(World);
-	const float FadeTarget = MapName.Equals(MainMenuLevelName.ToString()) ? 1.f : 0.f;
-	const float FadeDuration = bIsInitialLoadingScreen ? 2.f : 0.75f;
-	SetLoadingScreenAudioComponentState(FadeTarget, FadeDuration);
+	RemoveLoadingScreen();
 }
 
 void UBSGameInstance::OnLoadingScreenFadeOutComplete()
@@ -119,16 +106,10 @@ void UBSGameInstance::PrepareLoadingScreen()
 		{
 			SAssignNew(LoadingScreenWidget, SLoadingScreenWidget)
 			.LoadingScreenStyle(Style)
-			.OnFadeOutComplete(BIND_UOBJECT_DELEGATE(FOnFadeOutComplete, OnLoadingScreenFadeOutComplete))
-			.bIsInitialLoadingScreen(bIsInitialLoadingScreen);
+			.OnFadeOutComplete(BIND_UOBJECT_DELEGATE(FOnFadeOutComplete, OnLoadingScreenFadeOutComplete));
 		}
 	}
-	if (!LoadingScreenWidget)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("LoadingScreenWidget is null"));
-	}
 	Attributes.WidgetLoadingScreen = LoadingScreenWidget;
-	GetMoviePlayer()->SetIsPlayOnBlockingEnabled(true);
 	GetMoviePlayer()->SetupLoadingScreen(Attributes);
 }
 
@@ -139,6 +120,7 @@ void UBSGameInstance::OnStart()
 
 void UBSGameInstance::Shutdown()
 {
+	UTooltipWidget::Cleanup();
 	Super::Shutdown();
 }
 
@@ -267,7 +249,6 @@ void UBSGameInstance::SetLoadingScreenAudioComponentState(const float FadeTarget
 				Subsystem->WatchOutput(LoadingScreenAudioComponent.Get(), FName("OnFadeCompleted"), OnFadeCompleted);
 			}
 		}
-		UE_LOG(LogTemp, Warning, TEXT("FadeTarget: %.2f FadeDuration: %.2f"), FadeTarget, FadeDuration);
 	}
 }
 
@@ -341,6 +322,20 @@ void UBSGameInstance::SavePlayerScoresToDatabase(ABSPlayerController* PC, const 
 	RequestAccessToken(PC->GetPlayerSettings().User.RefreshCookie, AccessTokenResponse);
 }
 
+void UBSGameInstance::RemoveLoadingScreen()
+{
+	// Fade out the loading screen when map is ready
+	if (LoadingScreenWidget)
+	{
+		LoadingScreenWidget->SetLoadingScreenState(ELoadingScreenState::FadingOut);
+	}
+
+	const FString MapName = UGameplayStatics::GetCurrentLevelName(WorldContext->World());
+	const float FadeTarget = MapName.Equals(MainMenuLevelName.ToString()) ? 1.f : 0.f;
+	const float FadeDuration = bIsInitialLoadingScreen ? 2.f : 0.75f;
+	SetLoadingScreenAudioComponentState(FadeTarget, FadeDuration);
+}
+
 void UBSGameInstance::OnSteamOverlayIsOn()
 {
 	IsSteamOverlayActive = true;
@@ -384,30 +379,26 @@ void UBSGameInstance::OnPlayerSettingsChanged(const FPlayerSettings_CrossHair& C
 	OnPlayerSettingsChangedDelegate_CrossHair.Broadcast(CrossHairSettings);
 }
 
-void UBSGameInstance::HandleFadeCompleted(FName OutputName, const FMetaSoundOutput& Output)
+void UBSGameInstance::HandleFadeCompleted(FName /*OutputName*/, const FMetaSoundOutput& Output)
 {
 	if (float FadeTarget; Output.Get(FadeTarget))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HandleFadeCompleted: %f"), FadeTarget);
 		if (FadeTarget <= 0.f)
 		{
 			if (LoadingScreenAudioComponent)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Stopping AudioComponent"));
 				LoadingScreenAudioComponent->Stop();
 			}
 		}
 	}
 }
 
-void UBSGameInstance::HandlePlaybackTimeChanged(FName OutputName, const FMetaSoundOutput& Output)
+void UBSGameInstance::HandlePlaybackTimeChanged(FName /*OutputName*/, const FMetaSoundOutput& Output)
 {
 	if (float PlaybackPosition; Output.Get(PlaybackPosition))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HandlePlaybackTimeChanged: %f"), PlaybackPosition);
 		if (!LoadingScreenAudioComponent->IsPlaying())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Setting LastPlaybackPosition"));
 			LastPlaybackPosition = PlaybackPosition;
 		}
 		else

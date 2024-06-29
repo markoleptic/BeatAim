@@ -14,38 +14,38 @@ class USERINTERFACE_API USubmenuStyle : public UObject
 
 public:
 	/** The padding applied to the content window. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="SubmenuStyle|Content")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SubmenuStyle|Content")
 	FMargin Padding_Content;
 
 	/** The padding applied to the object containing the buttons. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="SubmenuStyle|Sidebar")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SubmenuStyle|Sidebar")
 	FMargin Padding_Sidebar;
 
 	/** The font applied to NavigationButtons. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="SubmenuStyle|Buttons")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SubmenuStyle|Buttons")
 	FSlateFontInfo NavigationButtonFont;
 
 	/** The font applied to first level headers. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="SubmenuStyle|Headers")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SubmenuStyle|Headers")
 	FSlateFontInfo Font_Header1;
 
 	/** The padding applied to first level headers. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="SubmenuStyle|Headers")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SubmenuStyle|Headers")
 	FSlateFontInfo Padding_Header1;
 
 	/** The font applied to second level headers. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="SubmenuStyle|Headers")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SubmenuStyle|Headers")
 	FSlateFontInfo Font_Header2;
 
 	/** The padding applied to second level headers. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="SubmenuStyle|Headers")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SubmenuStyle|Headers")
 	FSlateFontInfo Padding_Header2;
 
 	/** The font applied to third level headers. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="SubmenuStyle|Headers")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SubmenuStyle|Headers")
 	FSlateFontInfo Font_Header3;
 
 	/** The padding applied to third level headers. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="SubmenuStyle|Headers")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SubmenuStyle|Headers")
 	FSlateFontInfo Padding_Header3;
 };

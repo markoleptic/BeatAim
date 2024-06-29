@@ -143,52 +143,52 @@ protected:
 	UPROPERTY()
 	const UBSAttributeSetBase* AttributeSetBase;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Components")
 	UCapsuleComponent* CapsuleComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Components")
 	UStaticMeshComponent* SphereMesh;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Components")
 	UBSHealthComponent* HealthComponent;
 
-	UPROPERTY(VisibleAnywhere, Category = "Target Properties")
+	UPROPERTY(VisibleAnywhere, Category = "BeatShot|Components")
 	UProjectileMovementComponent* ProjectileMovementComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Effects")
 	UNiagaraSystem* TargetExplosion;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UGameplayEffect> GE_TargetImmunity;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UGameplayEffect> GE_HitImmunity;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UGameplayEffect> GE_TrackingImmunity;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UGameplayEffect> GE_ExpirationHealthPenalty;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UGameplayEffect> GE_ResetHealth;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Constants")
 	FName MaterialParameterColorName = "BaseColor";
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Constants")
 	FName TargetExplosionSphereRadiusParameterName = "SphereRadius";
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Constants")
 	FName TargetExplosionColorParameterName = "SphereColor";
 
-	UPROPERTY(EditDefaultsOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Curves")
 	UCurveFloat* StartToPeakCurve;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Curves")
 	UCurveFloat* PeakToEndCurve;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Target Properties")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Curves")
 	UCurveFloat* ShrinkQuickAndGrowSlowCurve;
 
 	UPROPERTY()

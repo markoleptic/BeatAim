@@ -5,7 +5,6 @@
 // ReSharper disable CppParameterMayBeConstPtrOrRef
 #include "Player/BSCheatManager.h"
 
-
 #if !UE_BUILD_SHIPPING
 #include "AbilitySystemComponent.h"
 #include "BSGameInstance.h"
@@ -20,6 +19,18 @@
 #include "Target/ReinforcementLearningComponent.h"
 #include "Target/SpawnAreaManagerComponent.h"
 #include "Target/TargetManager.h"
+
+/** Creates a UObject delegate binding a TAutoConsoleVariable to the given object and function. */
+#define BIND_BS_CVAR(Variable, Object, Function) \
+Variable.AsVariable()->SetOnChangedCallback(FConsoleVariableDelegate::CreateUObject(Object, Function))
+
+/** Creates a lambda delegate binding a TAutoConsoleVariable, which calls the function supplied. The function is
+ *  takes a reference to the MemberVariable. */
+#define BIND_BS_COMP_CVAR(Variable, Object, Function, MemberVariable) \
+Variable->AsVariable()->SetOnChangedCallback(FConsoleVariableDelegate::CreateLambda([Object] (IConsoleVariable* Var) \
+{ \
+Object->Function(Var, MemberVariable); \
+}));
 
 namespace BeatShotCVars
 {

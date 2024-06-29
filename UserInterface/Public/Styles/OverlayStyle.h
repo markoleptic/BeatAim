@@ -14,26 +14,26 @@ class USERINTERFACE_API UOverlayStyle : public UObject
 
 public:
 	/** The padding applied to main content windows. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="OverlayStyle|Content")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "OverlayStyle|Content")
 	FMargin Padding_Content;
 
 	/** The padding applied to the title. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="OverlayStyle|Title")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "OverlayStyle|Title")
 	FMargin Padding_Title;
 
 	/** The font applied to the title. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="OverlayStyle|Title")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "OverlayStyle|Title")
 	FSlateFontInfo Font_Title;
 
 	/** The font applied to the body. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="OverlayStyle|Body")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "OverlayStyle|Body")
 	FSlateFontInfo Font_Body;
 
 	/** The padding applied to buttons. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="OverlayStyle|Buttons")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "OverlayStyle|Buttons")
 	FMargin Padding_Buttons;
 
 	/** The font applied to buttons. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="OverlayStyle|Buttons")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "OverlayStyle|Buttons")
 	FSlateFontInfo Font_Button;
 };

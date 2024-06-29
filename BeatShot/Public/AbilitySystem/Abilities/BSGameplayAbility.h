@@ -70,11 +70,11 @@ public:
 	ABSCharacterBase* GetBSCharacterFromActorInfo() const;
 
 	// Defines how this ability is meant to activate.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Ability Activation")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Ability|Activation")
 	EBSAbilityActivationPolicy ActivationPolicy;
 
 	// Defines the relationship between this ability activating and other abilities activating.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Ability Activation")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Ability|Activation")
 	EBSAbilityActivationGroup ActivationGroup;
 
 	// If an ability is marked as 'ActivateAbilityOnGranted', activate them immediately when given here

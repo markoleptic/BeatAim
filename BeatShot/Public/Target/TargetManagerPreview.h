@@ -45,18 +45,18 @@ protected:
 	TObjectPtr<UCustomGameModePreviewWidget> GameModePreviewWidget;
 
 	/** Text to show when the max allowed floor distance has not been exceeded. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="TargetManagerPreview")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Preview")
 	FText FloorDistanceText = IBSWidgetInterface::GetWidgetTextFromKey("GM_FloorDistance");
 
 	/** Text to show when the max allowed floor distance has been exceeded. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="TargetManagerPreview")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Preview")
 	FText FloorDistanceExceededText = IBSWidgetInterface::GetWidgetTextFromKey("GM_FloorDistance_Overflow");
 
 	/** Whether the height of the total spawn area is exceeding the max allowed floor distance. */
 	mutable bool bIsExceedingMaxFloorDistance = false;
 
 	/** The max allowed floor distance. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="TargetManagerPreview")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Preview")
 	float MaxAllowedFloorDistance = 300.f;
 
 	/** The amount of overflow floor distance. */

@@ -59,38 +59,38 @@ protected:
 	TArray<ABSPlayerController*> Controllers;
 
 	/* The TargetManager class to spawn. */
-	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Spawnable Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<ATargetManager> TargetManagerClass;
 
 	/** The VisualizerManager class to spawn. */
-	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Spawnable Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<AVisualizerManager> VisualizerManagerClass;
 
 	/** The VisualizerManager class to spawn. */
-	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Spawnable Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<ACharacter> CharacterClass;
 
 	/* The spawned TargetManager. */
-	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Spawned Actors")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|SpawnedActors")
 	TObjectPtr<ATargetManager> TargetManager;
 
 	/** The Visualizer Manager. */
-	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Spawned Actors")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|SpawnedActors")
 	TObjectPtr<AVisualizerManager> VisualizerManager;
 
 	/** The spawned AATracker object. */
-	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Spawned Objects")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|SpawnedObjects")
 	TObjectPtr<UAudioAnalyzerManager> AATracker;
 
 	/** The spawned AAPlayer object. */
-	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Spawned Objects")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|SpawnedObjects")
 	TObjectPtr<UAudioAnalyzerManager> AAPlayer;
 
 	/** The ability set that contains the TrackGun ability for tracking damage type game modes. */
-	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Abilities")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Ability")
 	UBSAbilitySet* TrackGunAbilitySet;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Components")
 	TObjectPtr<UAudioComponent> AudioComponent;
 
 	UPROPERTY()

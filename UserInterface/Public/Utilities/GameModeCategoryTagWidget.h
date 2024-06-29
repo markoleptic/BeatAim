@@ -30,12 +30,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	UImage* Image_Material;
 
-	UPROPERTY(EditDefaultsOnly, Category="GameModeCategoryTagWidget")
+	UPROPERTY(EditDefaultsOnly, Category = "GameModeCategoryTagWidget")
 	FText CategoryText = FText();
 
-	UPROPERTY(EditDefaultsOnly, Category="GameModeCategoryTagWidget")
+	UPROPERTY(EditDefaultsOnly, Category = "GameModeCategoryTagWidget")
 	FGameplayTag GameModeCategoryTag;
 
-	UPROPERTY(EditDefaultsOnly, Category="GameModeCategoryTagWidget")
+	UPROPERTY(EditDefaultsOnly, Category = "GameModeCategoryTagWidget")
 	FLinearColor TagColor;
 };

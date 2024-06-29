@@ -35,6 +35,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	USpacer* Spacer_Mid;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="BSButton|Notification")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BSButton|Notification")
 	float NotificationImageSpacing = 5.f;
 };

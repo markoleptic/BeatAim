@@ -24,59 +24,59 @@ struct USERINTERFACE_API FLoadingScreenStyle : public FSlateWidgetStyle
 	static const FLoadingScreenStyle& GetDefault();
 
 	/** Static texture of the Background. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Background")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Background")
 	FSlateBrush BackgroundImage;
 
 	/** Static texture of the logo. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Logo")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Logo")
 	FSlateBrush LogoImageTexture;
 
 	/** Dynamic Material Instance of the logo. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Logo")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Logo")
 	FSlateBrush LogoImage;
 
 	/** Font for left brand text. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Brand")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Brand")
 	FSlateFontInfo BrandFontLeft;
 
 	/** Font for right brand text. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Brand")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Brand")
 	FSlateFontInfo BrandFontRight;
 
 	/** Spacing between left and right brand text. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Brand")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Brand")
 	FVector2D BrandTextSpacing = FVector2D(30, 0);
 
 	/** Left brand text color. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Brand")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Brand")
 	FLinearColor BrandTextLeftColor = FLinearColor::White;
 
 	/** Right brand text color. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Brand")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Brand")
 	FLinearColor BrandTextRightColor = Constants::BeatShotBlue;
 
 	/** Left brand text. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Brand")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Brand")
 	FText BrandTextLeft;
 
 	/** Right brand text. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Brand")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Brand")
 	FText BrandTextRight;
 
 	/** Padding for the overlay slot containing both logo and brand text. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="General")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
 	FMargin MainOverlaySlotPadding = FMargin(0, 0, 0, 128);
 
 	/** Padding for the horizontal box slot containing both logo and brand text. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="General")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
 	FMargin HorizontalBoxSlotPadding = FMargin(32, 0, 0, 16);
 
 	/** How long the fade from black transition takes. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="General")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
 	float FadeFromBlackDuration = 0.25f;
 
 	/** How long the fade to black transition takes. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="General")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
 	float FadeToBlackDuration = 0.5f;
 
 	FLoadingScreenStyle& SetBackgroundImage(const FSlateBrush& InBackgroundImage)
@@ -174,7 +174,7 @@ class ULoadingScreenWidgetStyle : public USlateWidgetStyleContainerBase
 
 public:
 	/** The actual data describing the widget appearance. */
-	UPROPERTY(Category="Style", EditAnywhere, BlueprintReadWrite, meta=(ShowOnlyInnerProperties))
+	UPROPERTY(Category = "Style", EditAnywhere, BlueprintReadWrite, meta=(ShowOnlyInnerProperties))
 	FLoadingScreenStyle WidgetStyle;
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override

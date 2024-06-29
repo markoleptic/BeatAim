@@ -74,15 +74,15 @@ protected:
 	FEnumTagMapping EnumTagMapping;
 
 	/** The type of selection for the combo box. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="MenuOptionWidget|ComboBox")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MenuOptionWidget|ComboBox")
 	ESelectionModeType SelectionMode = ESelectionModeType::Single;
 
 	/** Should the user be able to select no options. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="MenuOptionWidget|ComboBox")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MenuOptionWidget|ComboBox")
 	bool bCanSelectNone = false;
 
 	/** Should the combo box automatically close when a selection is made. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="MenuOptionWidget|ComboBox")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MenuOptionWidget|ComboBox")
 	bool bCloseComboBoxOnSelectionChanged = true;
 };
 

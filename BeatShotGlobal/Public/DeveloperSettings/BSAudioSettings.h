@@ -32,7 +32,7 @@ class UBSAudioSettings : public UDeveloperSettings
 
 public:
 	/** Maps a physical surface to the Gameplay Tag representation of the surface. */
-	UPROPERTY(config, EditAnywhere, Category = PhysicalSurfaces)
+	UPROPERTY(config, EditAnywhere, Category = "PhysicalSurfaces")
 	TMap<TEnumAsByte<EPhysicalSurface>, FGameplayTag> SurfaceTypeToGameplayTagMap;
 
 	/** The Default Base Control Bus Mix */

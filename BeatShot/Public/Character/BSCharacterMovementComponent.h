@@ -8,16 +8,20 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "BSCharacterMovementComponent.generated.h"
 
-
-/** Crouch Timings (in seconds). */
-#define MOVEMENT_DEFAULT_CROUCHTIME 0.4f
-#define MOVEMENT_DEFAULT_CROUCHJUMPTIME 0.1f
-#define MOVEMENT_DEFAULT_UNCROUCHTIME 0.2f
-#define MOVEMENT_DEFAULT_UNCROUCHJUMPTIME 0.8f
-#define LADDER_MOUNT_TIMEOUT 0.2f
-
 class UBSMovementSounds;
 class ABSCharacterBase;
+
+
+namespace MovementDefaults
+{
+	/** Crouch Timings (in seconds). */
+	static constexpr float DefaultCrouchTime = 0.4f;
+	static constexpr float DefaultCrouchJumpTime = 0.1f;
+	static constexpr float DefaultUncrouchTime = 0.2f;
+	static constexpr float DefaultUncrouchJumpTime = 0.8f;
+	static constexpr float DefaultLadderMoundTimeout = 0.2f;
+}
+
 
 /** Information about the ground under the character.  It only gets updated as needed. */
 USTRUCT(BlueprintType)
@@ -50,23 +54,20 @@ public:
 
 	void SetSprintSpeedMultiplier(float NewSpringSpeedMultiplier);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sprint")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement|Sprint")
 	float SprintSpeedMultiplier = 1.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|Trace")
 	float GroundTraceDistance = 100000.0f;
 
 	/** Returns the current ground info.  Calling this will update the ground info if it's out of date. */
-	UFUNCTION(BlueprintCallable, Category = "CharacterMovement")
+	UFUNCTION(BlueprintCallable, Category = "BeatShot|CharacterMovement")
 	const FCharacterGroundInfo& GetGroundInfo();
-
-	/** Gets the friction from cached ground info */
-	float GetFrictionFromHit(const FHitResult& Hit) const;
 
 	UPROPERTY()
 	TObjectPtr<ABSCharacterBase> BSCharacter;
 
-	UPROPERTY(EditDefaultsOnly, Category = "CharacterMovement|Sounds")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Sounds")
 	TObjectPtr<UBSMovementSounds> MovementSounds;
 
 protected:
@@ -85,43 +86,43 @@ protected:
 	bool StepSide;
 
 	/** The multiplier for acceleration when on ground. (HL2's sv_accelerate). */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Walking")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement|Walking")
 	float GroundAccelerationMultiplier = 10.0f;
 
 	/** The multiplier for acceleration when in air. (HL2's sv_airaccelerate). */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Walking")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement|Walking")
 	float AirAccelerationMultiplier = 10.0f;
 
 	/* The vector differential magnitude cap when in air. (30 air speed cap from HL2). */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Jumping/Falling")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement|Jumping/Falling")
 	float AirSpeedCap = 57.15f;
 
 	/** Time to crouch on ground in seconds. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Walking")
-	float CrouchTime = MOVEMENT_DEFAULT_CROUCHTIME;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement|Walking")
+	float CrouchTime = MovementDefaults::DefaultCrouchTime;
 
 	/** Time to UnCrouch on ground in seconds. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Walking")
-	float UnCrouchTime = MOVEMENT_DEFAULT_UNCROUCHTIME;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement|Walking")
+	float UnCrouchTime = MovementDefaults::DefaultUncrouchTime;
 
 	/** Time to crouch in air in seconds. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Walking")
-	float CrouchJumpTime = MOVEMENT_DEFAULT_CROUCHJUMPTIME;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement|Walking")
+	float CrouchJumpTime = MovementDefaults::DefaultCrouchJumpTime;
 
 	/** Time to UnCrouch in air in seconds. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Walking")
-	float UnCrouchJumpTime = MOVEMENT_DEFAULT_UNCROUCHJUMPTIME;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement|Walking")
+	float UnCrouchJumpTime = MovementDefaults::DefaultUncrouchTime;
 
 	/** the minimum step height from moving fast. */
-	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "BeatShot|CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite)
 	float MinStepHeight = 10.0f;
 
 	/** the minimum step height from moving fast. */
-	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "BeatShot|CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite)
 	float GroundBrakingDeceleration = 15.f;
 
 	/** Time (in millis) the player has to re-jump without applying friction. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Jumping/Falling",
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement|Jumping/Falling",
 		meta=(DisplayName="Rejump Window", ForceUnits="ms"))
 	float BrakingWindow = 15.f;
 
@@ -142,64 +143,64 @@ protected:
 	float CurrentCrouchProgress = 0.f;
 
 	/** The target ground speed when walking slowly. */
-	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
+	UPROPERTY(Category = "BeatShot|CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
 		meta = (ClampMin = "0", UIMin = "0"))
 	float WalkSpeed = 285.75f;
 
 	/** The target ground speed when running. */
-	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
+	UPROPERTY(Category = "BeatShot|CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
 		meta = (ClampMin = "0", UIMin = "0"))
 	float RunSpeed = 361.9f;
 
 	/** The target ground speed when sprinting. */
-	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
+	UPROPERTY(Category = "BeatShot|CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
 		meta = (ClampMin = "0", UIMin = "0"))
 	float SprintSpeed = 609.6f;
 
 	/** Speed on a ladder. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement|Ladder")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement|Ladder")
 	float LadderSpeed = 381.0f;
 
 	/** The minimum speed to scale up from for slope movement. */
-	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
+	UPROPERTY(Category = "BeatShot|CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
 		meta = (ClampMin = "0", UIMin = "0"))
 	float SpeedMultMin = SprintSpeed * 1.7f;
 
 	/** The maximum speed to scale up to for slope movement. */
-	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
+	UPROPERTY(Category = "BeatShot|CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
 		meta = (ClampMin = "0", UIMin = "0"))
 	float SpeedMultMax = SprintSpeed * 2.5f;
 
 	/** The maximum angle we can roll for camera adjust. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement")
 	float RollAngle = 0.0f;
 
 	/** Speed of rolling the camera. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement")
 	float RollSpeed = 0.0f;
 
 	/** Speed of rolling the camera. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement")
 	float BounceMultiplier = 0.0f;
 
-	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
+	UPROPERTY(Category = "BeatShot|CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
 		meta = (ClampMin = "0", UIMin = "0"))
 	float AxisSpeedLimit = 6667.5f;
 
 	/** Threshold relating to speed ratio and friction which causes us to catch air. */
-	UPROPERTY(Category = "CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
+	UPROPERTY(Category = "BeatShot|CharacterMovement|Walking", EditAnywhere, BlueprintReadWrite,
 		meta = (ClampMin = "0", UIMin = "0"))
 	float SlideLimit = 0.5f;
 
 	/** Fraction of UnCrouch half-height to check for before doing starting an UnCrouch. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement")
 	float GroundUnCrouchCheckFactor = 0.75f;
 
 	bool bShouldPlayMoveSounds = false;
 
 public:
 	/** Print pos and vel (Source: cl_showpos). */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterMovement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BeatShot|CharacterMovement")
 	uint32 bShowPos : 1;
 
 	virtual void InitializeComponent() override;
@@ -262,7 +263,7 @@ public:
 
 	/** Returns the progress transitioning to a crouched state from an un-crouched state, or vice-versa. A value of 0
 	 *  means the character is not crouched, while a value of 1 indicates the character is fully crouched. */
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Crouch")
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "BeatShot|CharacterMovement")
 	float GetCrouchProgress() const { return CurrentCrouchProgress; }
 
 	// AnimMotionEffect Implementation

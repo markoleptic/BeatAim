@@ -20,8 +20,8 @@ class USoundControlBus;
 DECLARE_LOG_CATEGORY_EXTERN(LogBSGameUserSettings, Log, All);
 
 /** Video and Sound Settings that are saved to GameUserSettings.ini. */
-UCLASS()
-class BEATSHOTGLOBAL_API UBSGameUserSettings : public UGameUserSettings
+UCLASS(config=inherit, configdonotcheckdefaults, MinimalAPI)
+class UBSGameUserSettings : public UGameUserSettings
 {
 	GENERATED_BODY()
 
@@ -29,10 +29,10 @@ public:
 	UBSGameUserSettings();
 
 	/** @return the game local machine settings (resolution, windowing mode, scalability settings, etc...). */
-	static UBSGameUserSettings* Get();
+	static BEATSHOTGLOBAL_API UBSGameUserSettings* Get();
 
 	/** Performs initialization of DLSS settings and the user control box mix. Binds to Slate application delegates. */
-	void Initialize(const UWorld* World);
+	BEATSHOTGLOBAL_API void Initialize(const UWorld* World);
 
 private:
 	/** Resets all BeatShot Video and Sound settings to default values. */
@@ -66,173 +66,163 @@ private:
 	void ApplyNvidiaSettings();
 
 public:
-	virtual void BeginDestroy() override;
-	virtual void SetToDefaults() override;
-	virtual void LoadSettings(bool bForceReload) override;
-	virtual void ValidateSettings() override;
-	virtual void ResetToCurrentSettings() override;
-	virtual void ApplyNonResolutionSettings() override;
-	virtual void ApplySettings(bool bForceReload) override;
-	virtual void SaveSettings() override;
-	virtual float GetEffectiveFrameRateLimit() override;
+	BEATSHOTGLOBAL_API virtual void BeginDestroy() override;
+	BEATSHOTGLOBAL_API virtual void SetToDefaults() override;
+	BEATSHOTGLOBAL_API virtual void LoadSettings(bool bForceReload) override;
+	BEATSHOTGLOBAL_API virtual void ValidateSettings() override;
+	BEATSHOTGLOBAL_API virtual void ApplyNonResolutionSettings() override;
+	BEATSHOTGLOBAL_API virtual void SaveSettings() override;
+	BEATSHOTGLOBAL_API virtual float GetEffectiveFrameRateLimit() override;
 
 	/** Queries the supported setting type and creates a map based on the results.
 	 *  @param NvidiaSettingType the Nvidia setting type to query for
 	 *  @return a map that maps each supported setting's string representation to its int equivalent enum value
 	 */
-	TMap<FString, uint8> GetSupportedNvidiaSettingModes(ENvidiaSettingType NvidiaSettingType) const;
+	BEATSHOTGLOBAL_API TMap<FString, uint8> GetSupportedNvidiaSettingModes(ENvidiaSettingType NvidiaSettingType) const;
 
 	/** @return an interpolated post process bias based on Brightness. */
-	float GetPostProcessBiasFromBrightness() const;
+	BEATSHOTGLOBAL_API float GetPostProcessBiasFromBrightness() const;
 
 	/** Updates the effective frame rate limit based on if in a menu screen.
 	 *  @param bIsInMenu whether the local player is in a menu screen or not
 	 */
-	void SetInMenu(bool bIsInMenu);
+	BEATSHOTGLOBAL_API void SetInMenu(bool bIsInMenu);
 
-	TArray<FString> GetAvailableAudioDeviceNames() const;
-	FString GetAudioOutputDeviceId() const;
-	float GetOverallVolume() const;
-	float GetMenuVolume() const;
-	float GetMusicVolume() const;
-	float GetSoundFXVolume() const;
-	uint8 GetAntiAliasingMethod() const;
-	float GetBrightness() const;
-	float GetDisplayGamma() const;
-	int32 GetFrameRateLimitGame() const;
-	int32 GetFrameRateLimitMenu() const;
-	int32 GetFrameRateLimitBackground() const;
-	bool GetShowFPSCounter() const;
+	BEATSHOTGLOBAL_API TArray<FString> GetAvailableAudioDeviceNames() const;
+	BEATSHOTGLOBAL_API FString GetAudioOutputDeviceId() const;
+	BEATSHOTGLOBAL_API float GetOverallVolume() const;
+	BEATSHOTGLOBAL_API float GetMenuVolume() const;
+	BEATSHOTGLOBAL_API float GetMusicVolume() const;
+	BEATSHOTGLOBAL_API float GetSoundFXVolume() const;
+	BEATSHOTGLOBAL_API uint8 GetAntiAliasingMethod() const;
+	BEATSHOTGLOBAL_API float GetBrightness() const;
+	BEATSHOTGLOBAL_API float GetDisplayGamma() const;
+	BEATSHOTGLOBAL_API int32 GetFrameRateLimitGame() const;
+	BEATSHOTGLOBAL_API int32 GetFrameRateLimitMenu() const;
+	BEATSHOTGLOBAL_API int32 GetFrameRateLimitBackground() const;
+	BEATSHOTGLOBAL_API bool GetShowFPSCounter() const;
 
-	uint8 GetDLSSEnabledMode() const;
-	uint8 GetNISEnabledMode() const;
-	uint8 GetFrameGenerationEnabledMode() const;
-	uint8 GetDLSSMode() const;
-	uint8 GetNISMode() const;
-	uint8 GetStreamlineReflexMode() const;
-	bool IsRayReconstitutionEnabled() const;
+	BEATSHOTGLOBAL_API uint8 GetDLSSEnabledMode() const;
+	BEATSHOTGLOBAL_API uint8 GetNISEnabledMode() const;
+	BEATSHOTGLOBAL_API uint8 GetFrameGenerationEnabledMode() const;
+	BEATSHOTGLOBAL_API uint8 GetDLSSMode() const;
+	BEATSHOTGLOBAL_API uint8 GetNISMode() const;
+	BEATSHOTGLOBAL_API uint8 GetStreamlineReflexMode() const;
+	BEATSHOTGLOBAL_API bool IsRayReconstitutionEnabled() const;
 
-	float GetDLSSSharpness() const;
-	float GetNISSharpness() const;
-	bool IsDLSSEnabled() const;
-	bool IsNISEnabled() const;
+	BEATSHOTGLOBAL_API float GetDLSSSharpness() const;
+	BEATSHOTGLOBAL_API float GetNISSharpness() const;
+	BEATSHOTGLOBAL_API bool IsDLSSEnabled() const;
+	BEATSHOTGLOBAL_API bool IsNISEnabled() const;
 
 	/** Sets the value of AudioOutputDeviceId and broadcasts it to the local player to change.\n
 	 *  Changes not automatically saved. */
-	void SetAudioOutputDeviceId(const FString& InAudioOutputDeviceId);
+	BEATSHOTGLOBAL_API void SetAudioOutputDeviceId(const FString& InAudioOutputDeviceId);
 
 	/** Sets the value of OverallVolume and the corresponding control bus.\n
 	 *  Changes not automatically saved. */
-	void SetOverallVolume(float InVolume);
+	BEATSHOTGLOBAL_API void SetOverallVolume(float InVolume);
 
 	/** Sets the value of MenuVolume and the corresponding control bus.\n
 	 *  Changes not automatically saved. */
-	void SetMenuVolume(float InVolume);
+	BEATSHOTGLOBAL_API void SetMenuVolume(float InVolume);
 
 	/** Sets the value of MusicVolume and the corresponding control bus.\n
 	 *  Changes not automatically saved. */
-	void SetMusicVolume(float InVolume);
+	BEATSHOTGLOBAL_API void SetMusicVolume(float InVolume);
 
 	/** Sets the value of SoundFXVolume and the corresponding control bus.\n
      *  Changes not automatically saved. */
-	void SetSoundFXVolume(float InVolume);
+	BEATSHOTGLOBAL_API void SetSoundFXVolume(float InVolume);
 
 	/** Sets the value of AntiAliasingMethod.\n
 	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
-	void SetAntiAliasingMethod(uint8 InAntiAliasingMethod);
+	BEATSHOTGLOBAL_API void SetAntiAliasingMethod(uint8 InAntiAliasingMethod);
 
 	/** Sets the value of Brightness.\n
 	 *  Changes not applied until calling ApplySettings or SaveSettings.\n
 	 *  Changes not automatically saved. */
-	void SetBrightness(float InBrightness);
+	BEATSHOTGLOBAL_API void SetBrightness(float InBrightness);
 
 	/** Sets the value of DisplayGamma and applies it.\n
 	 *  Changes not automatically saved. */
-	void SetDisplayGamma(float InGamma);
+	BEATSHOTGLOBAL_API void SetDisplayGamma(float InGamma);
 
 	/** Sets the value of FrameRateLimitMenu.\n
 	 *  Changes not automatically saved. */
-	void SetFrameRateLimitMenu(int32 InFrameRateLimitMenu);
+	BEATSHOTGLOBAL_API void SetFrameRateLimitMenu(int32 InFrameRateLimitMenu);
 
 	/** Sets the value of FrameRateLimitGame.\n
 	 *  Changes not automatically saved. */
-	void SetFrameRateLimitGame(int32 InFrameRateLimitGame);
+	BEATSHOTGLOBAL_API void SetFrameRateLimitGame(int32 InFrameRateLimitGame);
 
 	/** Sets the value of FrameRateLimitBackground.\n
 	 *  Changes not automatically saved. */
-	void SetFrameRateLimitBackground(int32 InFrameRateLimitBackground);
+	BEATSHOTGLOBAL_API void SetFrameRateLimitBackground(int32 InFrameRateLimitBackground);
 
 	/** Sets the resolution scale if DLSS and NIS are disabled.\n
 	 * 	Changes not applied until calling ApplySettings or ApplyResolutionSettings.\n
 	 *  Changes not automatically saved. */
-	void SetResolutionScaleChecked(float InResolutionScale);
+	BEATSHOTGLOBAL_API void SetResolutionScaleChecked(float InResolutionScale);
 
 	/** Sets the value of bShowFPSCounter.\n
 	 * 	Changes not applied until calling ApplySettings or SaveSettings.\n
 	 *  Changes not automatically saved. */
-	void SetShowFPSCounter(bool InShowFPSCounter);
+	BEATSHOTGLOBAL_API void SetShowFPSCounter(bool InShowFPSCounter);
 
 	/** Sets the value of DLSSEnabledMode.\n
 	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
-	void SetDLSSEnabledMode(uint8 InDLSSEnabledMode);
+	BEATSHOTGLOBAL_API void SetDLSSEnabledMode(uint8 InDLSSEnabledMode);
 
 	/** Sets the value of NISEnabledMode.\n
 	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
-	void SetNISEnabledMode(uint8 InNISEnabledMode);
+	BEATSHOTGLOBAL_API void SetNISEnabledMode(uint8 InNISEnabledMode);
 
 	/** Sets the value of FrameGenerationEnabledMode.\n
 	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
-	void SetFrameGenerationEnabledMode(uint8 InFrameGenerationEnabledMode);
+	BEATSHOTGLOBAL_API void SetFrameGenerationEnabledMode(uint8 InFrameGenerationEnabledMode);
 
 	/** Sets the value of DLSSMode.\n
 	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
-	void SetDLSSMode(uint8 InDLSSMode);
+	BEATSHOTGLOBAL_API void SetDLSSMode(uint8 InDLSSMode);
 
 	/** Sets the value of NISMode.\n
 	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
-	void SetNISMode(uint8 InNISMode);
+	BEATSHOTGLOBAL_API void SetNISMode(uint8 InNISMode);
 
 	/** Sets the value of StreamlineReflexMode.\n
 	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
-	void SetStreamlineReflexMode(uint8 InStreamlineReflexMode);
+	BEATSHOTGLOBAL_API void SetStreamlineReflexMode(uint8 InStreamlineReflexMode);
 
 	/** Sets the value of bEnableRayReconstitution.\n
 	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
-	void SetRayReconstitutionEnabled(bool Enable);
+	BEATSHOTGLOBAL_API void SetRayReconstitutionEnabled(bool Enable);
 
 	/** Sets the value of DLSSSharpness.\n
 	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
-	void SetDLSSSharpness(float InDLSSSharpness);
+	BEATSHOTGLOBAL_API void SetDLSSSharpness(float InDLSSSharpness);
 
 	/** Sets the value of NISharpness.\n
 	 *  Changes not applied until calling ApplySettings or ApplyNonResolutionSettings.\n
 	 *  Changes not automatically saved. */
-	void SetNISSharpness(float InNISSharpness);
+	BEATSHOTGLOBAL_API void SetNISSharpness(float InNISSharpness);
 
 	/** Broadcast when the Audio Output Device has been changed for the local player. */
 	TMulticastDelegate<void(const FString&)> OnAudioOutputDeviceChanged;
 
 	/** Broadcast when the settings are changed. */
-	static TMulticastDelegate<void(const UBSGameUserSettings*)> OnSettingsChanged;
+	static BEATSHOTGLOBAL_API TMulticastDelegate<void(const UBSGameUserSettings*)> OnSettingsChanged;
 
 private:
-	/** Callback function for when audio devices have been obtained. */
-	UFUNCTION()
-	void HandleAudioOutputDevicesObtained(const TArray<FAudioOutputDeviceInfo>& AvailableDevices);
-
-	/** Callback function for when the main audio device has been obtained. */
-	UFUNCTION()
-	void HandleMainAudioOutputDeviceObtained(const FString& CurrentDevice);
-
 	/** Callback function for when the slate application activation state is changed. */
 	UFUNCTION()
 	void HandleApplicationActivationStateChanged(bool bIsActive);

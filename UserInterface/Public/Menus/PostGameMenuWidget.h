@@ -39,9 +39,9 @@ public:
 	USettingsMenuWidget* SettingsMenuWidget;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category="PostGameMenuWidget")
+	UPROPERTY(EditDefaultsOnly, Category = "PostGameMenuWidget")
 	TSubclassOf<UMenuStyle> MenuStyleClass;
-	UPROPERTY(EditDefaultsOnly, Category="PostGameMenuWidget")
+	UPROPERTY(EditDefaultsOnly, Category = "PostGameMenuWidget")
 	TSubclassOf<UAudioSelectWidget> AudioSelectClass;
 	UPROPERTY()
 	TObjectPtr<UAudioSelectWidget> AudioSelectWidget;

@@ -10,6 +10,7 @@
 #include "Engine/GameInstance.h"
 #include "BSGameInstance.generated.h"
 
+class UTooltipWidget;
 struct FBSConfig;
 struct FGameModeTransitionState;
 struct FMetaSoundOutput;
@@ -78,10 +79,13 @@ public:
 	FName GetRangeLevelName() const { return RangeLevelName; }
 
 	/** Sets the actor that manages the time of day in the Range level. */
-	void SetTimeOfDayManager(const TObjectPtr<ATimeOfDayManager> InManager) { TimeOfDayManager = InManager; }
+	void SetTimeOfDayManager(const TObjectPtr<ATimeOfDayManager>& InManager) { TimeOfDayManager = InManager; }
 
 	/** Handles saving scores to database, called by BSGameMode. */
 	void SavePlayerScoresToDatabase(ABSPlayerController* PC, const bool bWasValidToSave) const;
+
+	/** Sets the loading screen state to fading out and updates the loading screen audio component state. */
+	void RemoveLoadingScreen();
 
 	/** A function pair that can be called externally, executes OnSteamOverlayIsActive(). */
 	void OnSteamOverlayIsOn();
@@ -133,17 +137,20 @@ protected:
 	/** The defining game mode options that are populated from a menu widget, and accessed by the GameMode. */
 	TSharedPtr<FBSConfig> BSConfig;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Sound")
 	USoundBase* LoadingScreenSound;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Levels")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Levels")
 	FName MainMenuLevelName;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Levels")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Levels")
 	FName RangeLevelName;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "LoadingScreen")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|LoadingScreen")
 	TObjectPtr<USlateWidgetStyleAsset> LoadingScreenStyle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
+	TSubclassOf<UTooltipWidget> TooltipClass;
 
 	/** Whether the Steam Overlay is active. */
 	bool IsSteamOverlayActive = false;

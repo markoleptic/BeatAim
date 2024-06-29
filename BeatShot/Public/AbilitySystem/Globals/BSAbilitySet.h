@@ -117,14 +117,14 @@ public:
 
 protected:
 	/** Gameplay abilities to grant when this ability set is granted. */
-	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Abilities", meta=(TitleProperty=Ability))
+	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Abilities")
 	TArray<FBSAbilitySetGameplayAbility> GrantedGameplayAbilities;
 
 	/** Gameplay effects to grant when this ability set is granted. */
-	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Effects", meta=(TitleProperty=GameplayEffect))
+	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Effects")
 	TArray<FBSAbilitySetGameplayEffect> GrantedGameplayEffects;
 
 	/** Attribute sets to grant when this ability set is granted. */
-	UPROPERTY(EditDefaultsOnly, Category = "Attribute Sets", meta=(TitleProperty=AttributeSet))
+	UPROPERTY(EditDefaultsOnly, Category = "Attribute Sets")
 	TArray<FBSAbilitySetAttributeSet> GrantedAttributes;
 };

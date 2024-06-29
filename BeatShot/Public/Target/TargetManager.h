@@ -62,58 +62,58 @@ protected:
 	virtual void Destroyed() override;
 
 	/** The current 2D spawn area. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Components")
 	TObjectPtr<UBoxComponent> SpawnBox;
 
 	/** The 2D spawn area representing the largest the SpawnBox will ever be. Visual only. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Components")
 	TObjectPtr<UBoxComponent> StaticExtentsBox;
 
 	/** Three-dimensional spawn area that all targets must fit inside. Used to update boundary boxes. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Components")
 	TObjectPtr<UBoxComponent> SpawnVolume;
 
 	/** All directional boxes act as a boundary for moving targets */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Components")
 	TObjectPtr<UBoxComponent> TopBox;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Components")
 	TObjectPtr<UBoxComponent> BottomBox;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Components")
 	TObjectPtr<UBoxComponent> LeftBox;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Components")
 	TObjectPtr<UBoxComponent> RightBox;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Components")
 	TObjectPtr<UBoxComponent> ForwardBox;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Components")
 	TObjectPtr<UBoxComponent> BackwardBox;
 
 	/** Reinforcement learning agent component. */
-	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Components")
 	TObjectPtr<UReinforcementLearningComponent> RLComponent;
 
 	/** Manages spawn points. */
-	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Components")
 	TObjectPtr<USpawnAreaManagerComponent> SpawnAreaManager;
 
 	/** The target actor to spawn. */
-	UPROPERTY(EditDefaultsOnly, Category = "Spawn Properties")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<ATarget> TargetToSpawn;
 
 	/** Curves to look up values for Dynamic SpawnArea scaling. */
-	UPROPERTY(EditDefaultsOnly, Category = "Spawn Properties")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Tables")
 	UCompositeCurveTable* CCT_SpawnArea;
 
 	/** Curves to look up values for Dynamic target scaling. */
-	UPROPERTY(EditDefaultsOnly, Category = "Spawn Properties")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Tables")
 	UCompositeCurveTable* CCT_TargetScale;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Spawn Properties")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Constants")
 	FName CurveTableRowName_Cubic_ThresholdMet = FName("Cubic_ThresholdMet");
 
-	UPROPERTY(EditDefaultsOnly, Category = "Spawn Properties")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Constants")
 	FName CurveTableRowName_Linear_ThresholdMet = FName("Linear_ThresholdMet");
 
-	UPROPERTY(EditDefaultsOnly, Category = "Spawn Properties")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Constants")
 	FName CurveTableRowName_Linear_PreThreshold = FName("Linear_PreThreshold");
 
 public:

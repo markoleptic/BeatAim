@@ -8,17 +8,6 @@
 
 class UGameplayAbility;
 
-/** Creates a UObject delegate binding a TAutoConsoleVariable to the given object and function. */
-#define BIND_BS_CVAR(Variable, Object, Function) \
-Variable.AsVariable()->SetOnChangedCallback(FConsoleVariableDelegate::CreateUObject(Object, Function))
-
-/** Creates a lambda delegate binding a TAutoConsoleVariable, which calls the function supplied. The function is
- *  takes a reference to the MemberVariable. */
-#define BIND_BS_COMP_CVAR(Variable, Object, Function, MemberVariable) \
-Variable->AsVariable()->SetOnChangedCallback(FConsoleVariableDelegate::CreateLambda([Object] (IConsoleVariable* Var) \
-{ \
-	Object->Function(Var, MemberVariable); \
-}));
 /** Base CheatManager for this game. */
 UCLASS(Blueprintable)
 class BEATSHOT_API UBSCheatManager : public UCheatManager
@@ -45,16 +34,16 @@ public:
 
 #endif
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Debug")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "BeatShot|Debug")
 	TSubclassOf<UGameplayAbility> AimBotAbility;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Debug")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "BeatShot|Debug")
 	float SpawnBoxLineThickness = 6.f;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Debug")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "BeatShot|Debug")
 	float StaticExtentsBoxLineThickness = 6.f;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Debug")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "BeatShot|Debug")
 	float SpawnVolumeLineThickness = 6.f;
 
 	UPROPERTY()

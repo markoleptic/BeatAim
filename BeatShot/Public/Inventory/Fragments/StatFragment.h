@@ -16,7 +16,7 @@ class BEATSHOT_API UStatFragment : public UBSInventoryItemFragment
 
 	virtual void OnInstanceCreated(UBSInventoryItemInstance* Instance) const override;
 
-	UPROPERTY(EditDefaultsOnly, Category=Equipment)
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Equipment")
 	TMap<FGameplayTag, int32> InitialItemStats;
 
 	int32 GetItemStatByTag(const FGameplayTag& Tag) const;

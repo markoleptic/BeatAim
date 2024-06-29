@@ -41,14 +41,13 @@ class BEATSHOT_API ABSPlayerController : public APlayerController, public IHttpR
 	virtual void BeginPlay() override;
 	virtual void PreProcessInput(const float DeltaTime, const bool bGamePaused) override;
 	virtual void PostProcessInput(const float DeltaTime, const bool bGamePaused) override;
-	virtual void Destroyed() override;
 
 	/** Returns the player state. */
-	UFUNCTION(BlueprintCallable, Category = "BSPlayerController")
+	UFUNCTION(BlueprintCallable, Category = "BeatShot")
 	ABSPlayerState* GetBSPlayerState() const;
 
 	/** Returns the ability system component. */
-	UFUNCTION(BlueprintCallable, Category = "BSPlayerController")
+	UFUNCTION(BlueprintCallable, Category = "BeatShot")
 	UBSAbilitySystemComponent* GetBSAbilitySystemComponent() const;
 
 public:
@@ -62,21 +61,25 @@ public:
 
 	/** Shows the main menu widget, creating it if it does not exist. */
 	void ShowMainMenu();
+
 	/** Hides and destroys the main menu widget, if it exists. */
 	void HideMainMenu();
 
 	/** Shows the pause menu widget, creating it if it does not exist. */
 	void ShowPauseMenu();
+
 	/** Hides and destroys the pause menu widget, if it exists. */
 	void HidePauseMenu();
 
 	/** Shows the crosshair widget, creating it if it does not exist. */
 	void ShowCrossHair();
+
 	/** Hides and destroys the crosshair widget, if it exists. */
 	void HideCrossHair();
 
 	/** Shows the PlayerHUD widget, creating it if it does not exist. */
 	void ShowPlayerHUD();
+
 	/** Hides and destroys the PlayerHUD widget, if it exists. */
 	void HidePlayerHUD();
 
@@ -85,28 +88,34 @@ public:
 
 	/** Shows the countdown widget, creating it if it does not exist. */
 	void ShowCountdown();
+
 	/** Hides and destroys the countdown widget, if it exists. */
 	void HideCountdown();
 
 	/** Shows the post game mode menu widget, creating it if it does not exist. */
 	void ShowPostGameMenu();
+
 	/** Hides and destroys the post game mode menu widget, if it exists. */
 	void HidePostGameMenu();
 
 	/** Shows the FPS counter widget, creating it if it does not exist. */
 	void ShowFPSCounter();
+
 	/** Hides and destroys the FPS counter widget, if it exists. */
 	void HideFPSCounter();
 
 	/** Creates the ScreenFadeWidget and binds to its OnScreenFadeToBlackFinish delegate. */
 	void CreateScreenFadeWidget(const float StartOpacity);
+
 	/** Calls CreateScreenFadeWidget if necessary and plays the fade to black animation. */
 	void FadeScreenToBlack();
+
 	/** Calls CreateScreenFadeWidget if necessary and plays the fade from black animation. */
 	void FadeScreenFromBlack();
 
 	/** Shows the interact info widget, creating it if it does not exist. */
 	void ShowInteractInfo();
+
 	/** Hides and destroys the interact info widget, if it exists. */
 	void HideInteractInfo();
 
@@ -114,11 +123,13 @@ public:
 	 *  widget's UpdatePanel function. */
 	void ShowQTableWidget(FOnQTableUpdate& OnQTableUpdate, const int32 Rows, const int32 Columns,
 		const TArray<float>& QTable);
+
 	/** Hides and destroys the RLAgent widget, if it exists. */
 	void HideQTableWidget();
 
 	/** Spawns the floating text actor (combat text) with text indicating the streak of targets destroyed. */
 	void ShowCombatText(const int32 Streak, const FTransform& Transform);
+
 	/** Spawns the floating text actor (combat text) with text indicating the accuracy based on time offset. */
 	void ShowAccuracyText(const float TimeOffset, const FTransform& Transform);
 
@@ -131,64 +142,54 @@ public:
 	/** Called by Character when receiving input from IA_LeftClick. */
 	void HandleLeftClick();
 
-	// Server only
+	/** Server only */
 	virtual void OnPossess(APawn* InPawn) override;
 
-	// Server only
+	/** Server only */
 	virtual void OnRep_PlayerState() override;
 
 	/** Login the user by authenticating using GetAuthTicketForWebApi. */
 	void LoginUser();
 
-	/** Executed when the player requests to try to log in through Steam after a failed attempt. */
-	void InitiateSteamLogin();
-
 	/** Delegate that executes when the screen fade widget completes its animation.  */
 	FOnScreenFadeToBlackFinish OnScreenFadeToBlackFinish;
-
-	/** The length of time to fade in MainMenu music. */
-	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Loading Screen")
-	float MainMenuMusicFadeInDuration = 2.f;
 
 	/** The time the screen fade widget plays its animations for. Also applies to fading out MainMenu music. */
 	float ScreenFadeWidgetAnimationDuration = 0.75f;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UMainMenuWidget> MainMenuClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UCrossHairWidget> CrossHairClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UPlayerHUD> PlayerHUDClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UPauseMenuWidget> PauseMenuClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UCountdownWidget> CountdownClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UPostGameMenuWidget> PostGameMenuWidgetClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UFrameCounterWidget> FPSCounterClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UScreenFadeWidget> ScreenFadeClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UUserWidget> InteractInfoWidgetClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<UQTableWidget> QTableWidgetClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
+	UPROPERTY(EditDefaultsOnly, Category = "BeatShot|Classes")
 	TSubclassOf<AFloatingTextActor> FloatingTextActorClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "BSPlayerController|Classes")
-	TSubclassOf<UTooltipWidget> TooltipClass;
 
 private:
 	/** Callback function for screen fade widget's OnFadeFromBlackFinish delegate. */
