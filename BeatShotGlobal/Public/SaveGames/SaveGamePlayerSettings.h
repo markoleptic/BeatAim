@@ -114,13 +114,13 @@ struct BEATSHOTGLOBAL_API FPlayerSettings_Game
 		bShowWeaponMesh = true;
 		bShowHitTimingWidget = true;
 		bNightModeSelected = false;
-		bShowLightVisualizers = false;
+		bShowLightVisualizers = true;
 		bShow_LVFrontBeam = false;
 		bShow_LVLeftBeam = false;
 		bShow_LVRightBeam = false;
-		bShow_LVTopBeam = false;
-		bShow_LVLeftCube = false;
-		bShow_LVRightCube = false;
+		bShow_LVTopBeam = true;
+		bShow_LVLeftCube = true;
+		bShow_LVRightCube = true;
 	}
 
 	/** Resets all game settings not on the wall menu. */

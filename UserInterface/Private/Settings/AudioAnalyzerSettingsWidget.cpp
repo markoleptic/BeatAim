@@ -2,7 +2,6 @@
 
 
 #include "Settings/AudioAnalyzerSettingsWidget.h"
-#include "Components/VerticalBox.h"
 #include "MenuOptions/BandChannelWidget.h"
 #include "MenuOptions/BandThresholdWidget.h"
 #include "MenuOptions/ComboBoxWidget.h"

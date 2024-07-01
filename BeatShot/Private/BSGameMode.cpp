@@ -793,10 +793,9 @@ void ABSGameMode::UpdateStreak(ABSPlayerController* Controller, FPlayerScore& In
 		InScore.Streak = Streak;
 	}
 	Controller->ShowCombatText(Streak, Transform);
-
-	if (Streak > StreakThreshold && !Controller->GetPlayerSettings().User.bNightModeUnlocked)
+	FPlayerSettings_User Settings = Controller->GetPlayerSettings().User;
+	if (Streak > StreakThreshold && !Settings.bNightModeUnlocked)
 	{
-		FPlayerSettings_User Settings = Controller->GetPlayerSettings().User;
 		Settings.bNightModeUnlocked = true;
 		Controller->SavePlayerSettings(Settings);
 	}

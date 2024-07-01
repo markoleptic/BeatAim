@@ -219,9 +219,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BeatShot|Text3D")
 	float MaxHeightIndentedText = 55.f;
 
-	/** Displays which settings are on/off etc. by lighting the correct words. */
-	void Init(const FPlayerSettings_Game& GameSettings, const FPlayerSettings_User& UserSettings,
-		const bool bFromSettingsUpdate = false);
 
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_Game& GameSettings) override;
 	virtual void OnPlayerSettingsChanged(const FPlayerSettings_User& UserSettings) override;
@@ -232,7 +229,19 @@ protected:
 	void SetupToggleText(USceneComponent* InParent, UText3DComponent* InToggleTextOn, UText3DComponent* InToggleTextOff,
 		UBoxComponent* InBoxOn, UBoxComponent* InBoxOff, const FVector& AdditionalOffset = FVector::ZeroVector);
 
-	void ToggleText(const bool bIsOn, UText3DComponent* InToggleTextOn, UText3DComponent* InToggleTextOff) const;
+	/** Displays which settings are on/off etc. by lighting the correct words. */
+	void ToggleAllText(const FPlayerSettings_Game& GameSettings, bool bNightModeUnlocked) const;
+
+	void ToggleText(const bool bIsOn, const UText3DComponent* InToggleTextOn,
+		const UText3DComponent* InToggleTextOff) const;
+
+	void ToggleNightModeText(const bool bIsOn) const;
+
+	void SetNightModeTextVisibility(bool bVisible) const;
+
+	static void SetDynamicMaterialPulseValue(const UText3DComponent* InText3D, float Value);
+
+	static void SetDynamicMaterialEmissiveColor(const UText3DComponent* InText3D, const FLinearColor& Color);
 
 	FVector Position_Corkboard = {300.f, 50.f, 0.f};
 
@@ -258,4 +267,6 @@ protected:
 	TMap<TObjectPtr<UBoxComponent>, FText3DToggle> BoxToTextMap;
 
 	mutable bool bIsWaitingOnTimeOfDayTransition = false;
+
+	bool bNightModeUnlockedAtInit = false;
 };

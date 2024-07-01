@@ -268,7 +268,13 @@ void AWallMenu::BeginPlay()
 	}
 
 	const FPlayerSettings PlayerSettings = LoadPlayerSettings();
-	Init(PlayerSettings.Game, PlayerSettings.User, false);
+	bNightModeUnlockedAtInit = PlayerSettings.User.bNightModeUnlocked;
+
+	SetNightModeTextVisibility(bNightModeUnlockedAtInit);
+	ToggleAllText(PlayerSettings.Game, bNightModeUnlockedAtInit);
+
+	SetDynamicMaterialPulseValue(ToggleText_NightMode_On, 0.0f);
+	SetDynamicMaterialPulseValue(ToggleText_NightMode_Off, 0.0f);
 	bIsWaitingOnTimeOfDayTransition = false;
 }
 
@@ -393,102 +399,53 @@ void AWallMenu::OnGameplayEffectAppliedToSelf(UAbilitySystemComponent* ABS, cons
 
 void AWallMenu::OnTimeOfDayChangeCompleted(const ETimeOfDay NewTimeOfDay)
 {
-	if (ToggleText_NightMode_On)
-	{
-		UMaterialInterface* FrontMat = ToggleText_NightMode_On->GetFrontMaterial();
-		if (UMaterialInstanceDynamic* Dynamic = Cast<UMaterialInstanceDynamic>(FrontMat))
-		{
-			Dynamic->SetScalarParameterValue(FName("bEnablePulse"), 0.0f);
-		}
-	}
-	if (ToggleText_NightMode_Off)
-	{
-		UMaterialInterface* FrontMat = ToggleText_NightMode_Off->GetFrontMaterial();
-		if (UMaterialInstanceDynamic* Dynamic = Cast<UMaterialInstanceDynamic>(FrontMat))
-		{
-			Dynamic->SetScalarParameterValue(FName("bEnablePulse"), 0.0f);
-		}
-	}
+	SetDynamicMaterialPulseValue(ToggleText_NightMode_On, 0.0f);
+	SetDynamicMaterialPulseValue(ToggleText_NightMode_Off, 0.0f);
 	bIsWaitingOnTimeOfDayTransition = false;
 }
 
-void AWallMenu::Init(const FPlayerSettings_Game& GameSettings, const FPlayerSettings_User& UserSettings,
-	const bool bFromSettingsUpdate)
+void AWallMenu::ToggleAllText(const FPlayerSettings_Game& GameSettings, const bool bNightModeUnlocked) const
 {
-	MainText_Enable_NightMode->SetVisibility(UserSettings.bNightModeUnlocked);
-	ToggleText_NightMode_On->SetVisibility(UserSettings.bNightModeUnlocked);
-	ToggleText_NightMode_Off->SetVisibility(UserSettings.bNightModeUnlocked);
-
-	if (bFromSettingsUpdate)
-	{
-		return;
-	}
-
 	ToggleText(GameSettings.bShowLightVisualizers, ToggleText_LightVisualizers_On, ToggleText_LightVisualizers_Off);
-	ToggleText(UserSettings.bNightModeUnlocked && GameSettings.bNightModeSelected, ToggleText_NightMode_On,
-		ToggleText_NightMode_Off);
+	ToggleNightModeText(GameSettings.bNightModeSelected && bNightModeUnlocked);
 	ToggleText(GameSettings.bShow_LVTopBeam, ToggleText_LV_TopBeam_On, ToggleText_LV_TopBeam_Off);
 	ToggleText(GameSettings.bShow_LVLeftCube, ToggleText_LV_LeftCube_On, ToggleText_LV_LeftCube_Off);
 	ToggleText(GameSettings.bShow_LVRightCube, ToggleText_LV_RightCube_On, ToggleText_LV_RightCube_Off);
 	ToggleText(GameSettings.bShow_LVFrontBeam, ToggleText_LVFrontBeam_On, ToggleText_LVFrontBeam_Off);
 	ToggleText(GameSettings.bShow_LVLeftBeam, ToggleText_LVLeftBeam_On, ToggleText_LVLeftBeam_Off);
 	ToggleText(GameSettings.bShow_LVRightBeam, ToggleText_LVRightBeam_On, ToggleText_LVRightBeam_Off);
-
-	if (ToggleText_NightMode_On)
-	{
-		UMaterialInterface* FrontMat = ToggleText_NightMode_On->GetFrontMaterial();
-		if (UMaterialInstanceDynamic* Dynamic = Cast<UMaterialInstanceDynamic>(FrontMat))
-		{
-			Dynamic->SetScalarParameterValue(FName("bEnablePulse"), 0.0f);
-		}
-	}
-	if (ToggleText_NightMode_Off)
-	{
-		UMaterialInterface* FrontMat = ToggleText_NightMode_Off->GetFrontMaterial();
-		if (UMaterialInstanceDynamic* Dynamic = Cast<UMaterialInstanceDynamic>(FrontMat))
-		{
-			Dynamic->SetScalarParameterValue(FName("bEnablePulse"), 0.0f);
-		}
-	}
 }
 
 void AWallMenu::OnPlayerSettingsChanged(const FPlayerSettings_Game& GameSettings)
 {
-	Init(GameSettings, LoadPlayerSettings().User, true);
+	ToggleAllText(GameSettings, LoadPlayerSettings().User.bNightModeUnlocked);
 }
 
 void AWallMenu::OnPlayerSettingsChanged(const FPlayerSettings_User& UserSettings)
 {
-	Init(LoadPlayerSettings().Game, UserSettings, true);
+	SetNightModeTextVisibility(UserSettings.bNightModeUnlocked);
+
+	if (!bNightModeUnlockedAtInit && UserSettings.bNightModeUnlocked)
+	{
+		bNightModeUnlockedAtInit = true;
+		FPlayerSettings_Game NewGameSettings = LoadPlayerSettings().Game;
+		NewGameSettings.bNightModeSelected = true;
+		SavePlayerSettings(NewGameSettings);
+	}
 }
 
 void AWallMenu::SetupMainText(UText3DComponent* InComponent, USceneComponent* InParent, const bool bFirstText,
 	const FString& Key, const FVector& AdditionalOffset) const
 {
 	InComponent->SetupAttachment(InParent);
-
+	InComponent->SetRelativeLocation(bFirstText ? Position_FirstMainText : Offset_MainText + AdditionalOffset);
 	if (bFirstText)
 	{
-		InComponent->SetRelativeLocation(Position_FirstMainText);
 		InComponent->SetRelativeRotation(Rotation_FirstMainText);
 	}
-	else
-	{
-		InComponent->SetRelativeLocation(Offset_MainText + AdditionalOffset);
-	}
-
 	InComponent->SetScaleProportionally(true);
 	InComponent->SetHasMaxHeight(true);
-
-	if (AdditionalOffset == FVector::ZeroVector)
-	{
-		InComponent->SetMaxHeight(MaxHeightMainText);
-	}
-	else
-	{
-		InComponent->SetMaxHeight(MaxHeightIndentedText);
-	}
-
+	InComponent->SetMaxHeight(AdditionalOffset == FVector::ZeroVector ? MaxHeightMainText : MaxHeightIndentedText);
 	InComponent->SetText(FText::FromStringTable("/Game/StringTables/ST_Widgets.ST_Widgets", Key));
 	InComponent->SetExtrude(5.f);
 	InComponent->SetBevel(2.f);
@@ -546,56 +503,59 @@ void AWallMenu::SetupToggleText(USceneComponent* InParent, UText3DComponent* InT
 	InBoxOff->SetCollisionProfileName(FName("BlockAll"));
 }
 
-void AWallMenu::ToggleText(const bool bIsOn, UText3DComponent* InToggleTextOn, UText3DComponent* InToggleTextOff) const
+void AWallMenu::ToggleText(const bool bIsOn, const UText3DComponent* InToggleTextOn,
+	const UText3DComponent* InToggleTextOff) const
 {
-	UMaterialInterface* MatFrontOn = InToggleTextOn->GetFrontMaterial();
-	UMaterialInterface* MatFrontOff = InToggleTextOff->GetFrontMaterial();
+	if (InToggleTextOn == ToggleText_NightMode_On && InToggleTextOff == ToggleText_NightMode_Off)
+	{
+		ToggleNightModeText(bIsOn);
+		return;
+	}
 
-	if (!MatFrontOn || !MatFrontOff)
+	SetDynamicMaterialEmissiveColor(InToggleTextOn, bIsOn ? FLinearColor::Green : FLinearColor::Red);
+	SetDynamicMaterialEmissiveColor(InToggleTextOff, bIsOn ? FLinearColor::Red : FLinearColor::Green);
+}
+
+void AWallMenu::ToggleNightModeText(const bool bIsOn) const
+{
+	if (bIsWaitingOnTimeOfDayTransition)
 	{
 		return;
 	}
 
-	UMaterialInstanceDynamic* DynamicMatFrontOn = Cast<UMaterialInstanceDynamic>(MatFrontOn);
-	UMaterialInstanceDynamic* DynamicMatFrontOff = Cast<UMaterialInstanceDynamic>(MatFrontOff);
+	SetDynamicMaterialEmissiveColor(ToggleText_NightMode_On, bIsOn ? FLinearColor::Green : FLinearColor::Red);
+	SetDynamicMaterialEmissiveColor(ToggleText_NightMode_Off, bIsOn ? FLinearColor::Red : FLinearColor::Green);
+	SetDynamicMaterialPulseValue(ToggleText_NightMode_On, bIsOn ? 1.0f : 0.0f);
+	SetDynamicMaterialPulseValue(ToggleText_NightMode_Off, bIsOn ? 0.0f : 1.0f);
 
-	if (!DynamicMatFrontOn || !DynamicMatFrontOff)
-	{
-		return;
-	}
+	bIsWaitingOnTimeOfDayTransition = true;
+}
 
-	if (InToggleTextOn == ToggleText_NightMode_On)
+void AWallMenu::SetNightModeTextVisibility(const bool bVisible) const
+{
+	MainText_Enable_NightMode->SetVisibility(bVisible);
+	ToggleText_NightMode_On->SetVisibility(bVisible);
+	ToggleText_NightMode_Off->SetVisibility(bVisible);
+}
+
+void AWallMenu::SetDynamicMaterialPulseValue(const UText3DComponent* InText3D, const float Value)
+{
+	if (InText3D)
 	{
-		if (!bIsWaitingOnTimeOfDayTransition)
+		if (UMaterialInstanceDynamic* Dynamic = Cast<UMaterialInstanceDynamic>(InText3D->GetFrontMaterial()))
 		{
-			if (bIsOn)
-			{
-				DynamicMatFrontOn->SetVectorParameterValue(FName("EmissiveColor"), FLinearColor::Green);
-				DynamicMatFrontOff->SetVectorParameterValue(FName("EmissiveColor"), FLinearColor::Red);
-				DynamicMatFrontOn->SetScalarParameterValue(FName("bEnablePulse"), 1.0f);
-				DynamicMatFrontOff->SetScalarParameterValue(FName("bEnablePulse"), 0.0f);
-			}
-			else
-			{
-				DynamicMatFrontOn->SetVectorParameterValue(FName("EmissiveColor"), FLinearColor::Red);
-				DynamicMatFrontOff->SetVectorParameterValue(FName("EmissiveColor"), FLinearColor::Green);
-				DynamicMatFrontOn->SetScalarParameterValue(FName("bEnablePulse"), 0.0f);
-				DynamicMatFrontOff->SetScalarParameterValue(FName("bEnablePulse"), 1.0f);
-			}
-			bIsWaitingOnTimeOfDayTransition = true;
+			Dynamic->SetScalarParameterValue(FName("bEnablePulse"), Value);
 		}
 	}
-	else
+}
+
+void AWallMenu::SetDynamicMaterialEmissiveColor(const UText3DComponent* InText3D, const FLinearColor& Color)
+{
+	if (InText3D)
 	{
-		if (bIsOn)
+		if (UMaterialInstanceDynamic* Dynamic = Cast<UMaterialInstanceDynamic>(InText3D->GetFrontMaterial()))
 		{
-			DynamicMatFrontOn->SetVectorParameterValue(FName("EmissiveColor"), FLinearColor::Green);
-			DynamicMatFrontOff->SetVectorParameterValue(FName("EmissiveColor"), FLinearColor::Red);
-		}
-		else
-		{
-			DynamicMatFrontOn->SetVectorParameterValue(FName("EmissiveColor"), FLinearColor::Red);
-			DynamicMatFrontOff->SetVectorParameterValue(FName("EmissiveColor"), FLinearColor::Green);
+			Dynamic->SetVectorParameterValue(FName("EmissiveColor"), Color);
 		}
 	}
 }

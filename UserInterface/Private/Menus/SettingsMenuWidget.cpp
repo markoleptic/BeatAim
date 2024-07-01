@@ -37,7 +37,6 @@ void USettingsMenuWidget::OnCarouselWidgetIndexChanged(UCommonWidgetCarousel* In
 {
 }
 
-
 FOnPlayerSettingsChanged_Game& USettingsMenuWidget::GetGameDelegate() const
 {
 	return Game_Widget->GetPublicGameSettingsChangedDelegate();

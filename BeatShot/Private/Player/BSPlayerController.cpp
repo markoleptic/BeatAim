@@ -70,14 +70,12 @@ void ABSPlayerController::BeginPlay()
 	Settings->OnSettingsChanged.AddUObject(this, &ABSPlayerController::HandleGameUserSettingsChanged);
 	HandleGameUserSettingsChanged(Settings);
 
-	// Load and bind to all types even if not used in this class because of GetPlayerSettings()
+	// Initial cache of PlayerSettings
 	PlayerSettings = LoadPlayerSettings();
-	OnPlayerSettingsChanged(PlayerSettings.AudioAnalyzer);
-	OnPlayerSettingsChanged(PlayerSettings.CrossHair);
-	OnPlayerSettingsChanged(PlayerSettings.Game);
-	OnPlayerSettingsChanged(PlayerSettings.User);
 
 	UBSGameInstance* GI = Cast<UBSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+
+	// Load and bind to all types even if not used in this class because of GetPlayerSettings()
 	GI->RegisterPlayerSettingsSubscriber<ABSPlayerController, FPlayerSettings_AudioAnalyzer>(this,
 		&ABSPlayerController::OnPlayerSettingsChanged);
 	GI->RegisterPlayerSettingsSubscriber<ABSPlayerController, FPlayerSettings_CrossHair>(this,
@@ -86,6 +84,20 @@ void ABSPlayerController::BeginPlay()
 		&ABSPlayerController::OnPlayerSettingsChanged);
 	GI->RegisterPlayerSettingsSubscriber<ABSPlayerController, FPlayerSettings_User>(this,
 		&ABSPlayerController::OnPlayerSettingsChanged);
+	GI->RegisterPlayerSettingsUpdaters(OnPlayerSettingsChangedDelegate_User);
+
+	if (!PlayerSettings.User.bNightModeUnlocked)
+	{
+		for (const TArray<FPlayerScore>& PlayerScores = LoadPlayerScores(); const FPlayerScore& Score : PlayerScores)
+		{
+			if (Score.Streak > 50)
+			{
+				PlayerSettings.User.bNightModeUnlocked = true;
+				SavePlayerSettings(PlayerSettings.User);
+				break;
+			}
+		}
+	}
 
 	if (UGameplayStatics::GetCurrentLevelName(GetWorld()).Equals(GI->GetMainMenuLevelName().ToString()))
 	{
