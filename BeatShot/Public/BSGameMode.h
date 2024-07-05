@@ -157,7 +157,7 @@ private:
 	/** Saves player scores to slot and calls SaveScoresToDatabase() if bShouldSavePlayerScores is true and
 	 *  GetCompletedPlayerScores() returns a valid score object, otherwise broadcasts OnPostScoresResponse with
 	 *  "None". */
-	void HandleScoreSaving(const bool bExternalSaveScores);
+	void HandleScoreSaving(bool bExternalSaveScores, bool bQuitToDesktopAfterSave);
 
 	/** Returns the current player scores, checking for NaNs and updating the time. */
 	void FinalizePlayerScore(FPlayerScore& InScore) const;

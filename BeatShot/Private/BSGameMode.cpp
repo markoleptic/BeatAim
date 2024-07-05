@@ -283,6 +283,7 @@ void ABSGameMode::EndGameMode(const bool bSaveScores, const ETransitionState Tra
 	AudioComponent->Stop();
 	AudioComponent->SetSound(nullptr);
 
+	bool bQuitToDesktopAfterSave = false;
 	for (ABSPlayerController* Controller : Controllers)
 	{
 		if (Controller->IsPaused())
@@ -322,13 +323,15 @@ void ABSGameMode::EndGameMode(const bool bSaveScores, const ETransitionState Tra
 				Controller->ShowPostGameMenu();
 			}
 		case ETransitionState::QuitToDesktop:
+			bQuitToDesktopAfterSave = true;
+			break;
 		case ETransitionState::StartFromMainMenu:
 			break;
 		}
 	}
 
 	// Handle saving scores before resetting Target Manager
-	HandleScoreSaving(bSaveScores);
+	HandleScoreSaving(bSaveScores, bQuitToDesktopAfterSave);
 
 	TargetManager->Clear();
 
@@ -597,7 +600,7 @@ void ABSGameMode::LoadMatchingPlayerScores()
 	}
 }
 
-void ABSGameMode::HandleScoreSaving(const bool bExternalSaveScores)
+void ABSGameMode::HandleScoreSaving(const bool bExternalSaveScores, const bool bQuitToDesktopAfterSave)
 {
 	if (!bExternalSaveScores)
 	{
@@ -658,7 +661,7 @@ void ABSGameMode::HandleScoreSaving(const bool bExternalSaveScores)
 		CurrentPlayerScore.Value = FPlayerScore();
 
 		// Let game instance handle posting scores to db
-		GI->SavePlayerScoresToDatabase(CurrentPlayerScore.Key, bValidToSave);
+		GI->SavePlayerScoresToDatabase(CurrentPlayerScore.Key, bValidToSave, bQuitToDesktopAfterSave);
 	}
 }
 

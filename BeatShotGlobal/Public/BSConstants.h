@@ -589,8 +589,11 @@ namespace Constants
 #pragma region URLs
 
 	/** base url. */
+#if UE_BUILD_DEVELOPMENT && !WITH_EDITOR
+	const FString OriginURL = TEXT("http://localhost:3000");
+#else
 	const FString OriginURL = TEXT("https://beatshot.gg");
-
+#endif
 	/** endpoint, safe to use as standalone URL. */
 	const FString Endpoint_PatchNotes = OriginURL + TEXT("/patchnotes");
 

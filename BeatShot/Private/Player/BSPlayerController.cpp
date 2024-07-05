@@ -370,12 +370,10 @@ void ABSPlayerController::ShowPostGameMenu()
 
 void ABSPlayerController::OnPostScoresResponseReceived(const FString& StringTableKey)
 {
-	if (!PostGameMenuWidget)
+	if (PostGameMenuWidget && PostGameMenuWidget->ScoresWidget)
 	{
-		return;
+		PostGameMenuWidget->ScoresWidget->InitScoreBrowser(EScoreBrowserType::PostGameModeMenuScores, StringTableKey);
 	}
-
-	PostGameMenuWidget->ScoresWidget->InitScoreBrowser(EScoreBrowserType::PostGameModeMenuScores, StringTableKey);
 }
 
 void ABSPlayerController::HandlePause()
@@ -483,7 +481,7 @@ void ABSPlayerController::LoginUser()
 		}
 		else
 		{
-			// Get display name, user id, and refresh token from BeatShot api request
+			// Get display name, user id, and refresh token from BeatShot API request
 			TSharedPtr<FSteamAuthTicketResponse> SteamAuthTicketResponse(new FSteamAuthTicketResponse());
 			SteamAuthTicketResponse->OnHttpResponseReceived.BindLambda([this, SteamAuthTicketResponse, CallbackHandler]
 			{

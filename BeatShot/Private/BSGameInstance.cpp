@@ -179,7 +179,7 @@ void UBSGameInstance::HandleGameModeTransition(const FGameModeTransitionState& N
 			// Can exit immediately if not saving scores, otherwise SavePlayerScoresToDatabase will handle it
 			if (!NewGameModeTransitionState.bSaveCurrentScores)
 			{
-				UKismetSystemLibrary::QuitGame(GetWorld(), UGameplayStatics::GetPlayerController(GetWorld(), 0),
+				UKismetSystemLibrary::QuitGame(GetWorld(), GetFirstLocalPlayerController(GetWorld()),
 					EQuitPreference::Quit, false);
 			}
 		}
@@ -252,74 +252,81 @@ void UBSGameInstance::SetLoadingScreenAudioComponentState(const float FadeTarget
 	}
 }
 
-void UBSGameInstance::SavePlayerScoresToDatabase(ABSPlayerController* PC, const bool bWasValidToSave) const
+void UBSGameInstance::SavePlayerScoresToDatabase(ABSPlayerController* PlayerController, const bool bWasValidToSave,
+	const bool bQuitToDesktopAfterSave) const
 {
+	const FPlayerSettings_User PlayerSettings = PlayerController->GetPlayerSettings().User;
 	// If game mode encountered a reason not to save to database
 	if (!bWasValidToSave)
 	{
-		PC->OnPostScoresResponseReceived("SBW_DidNotSaveScores");
+		PlayerController->OnPostScoresResponseReceived("SBW_DidNotSaveScores");
 		if (bQuitToDesktopAfterSave)
 		{
-			UKismetSystemLibrary::QuitGame(GetWorld(), UGameplayStatics::GetPlayerController(GetWorld(), 0),
-				EQuitPreference::Quit, false);
+			UKismetSystemLibrary::QuitGame(GetWorld(), GetFirstLocalPlayerController(GetWorld()), EQuitPreference::Quit,
+				false);
 		}
 		return;
 	}
 
 	// No account
-	if (PC->GetPlayerSettings().User.RefreshCookie.IsEmpty())
+	if (PlayerSettings.RefreshCookie.IsEmpty())
 	{
 		if (bQuitToDesktopAfterSave)
 		{
-			UKismetSystemLibrary::QuitGame(GetWorld(), UGameplayStatics::GetPlayerController(GetWorld(), 0),
-				EQuitPreference::Quit, false);
+			UKismetSystemLibrary::QuitGame(GetWorld(), GetFirstLocalPlayerController(GetWorld()), EQuitPreference::Quit,
+				false);
 		}
-		PC->OnPostScoresResponseReceived("SBW_NoAccount");
+		PlayerController->OnPostScoresResponseReceived("SBW_NoAccount");
 		return;
 	}
 
 	// Acquire access token
 	TSharedPtr<FAccessTokenResponse> AccessTokenResponse = MakeShareable(new FAccessTokenResponse());
-	AccessTokenResponse->OnHttpResponseReceived.BindLambda([this, AccessTokenResponse, PC]
-	{
-		if (AccessTokenResponse->OK) // Successful access token retrieval
+	AccessTokenResponse->OnHttpResponseReceived.BindLambda(
+		[this, AccessTokenResponse, UserID = PlayerSettings.UserID, bQuitToDesktopAfterSave]
 		{
-			TSharedPtr<FBSHttpResponse> PostScoresResponse = MakeShareable(new FBSHttpResponse());
-			PostScoresResponse->OnHttpResponseReceived.BindLambda([this, PostScoresResponse, PC]
+			if (AccessTokenResponse->OK) // Successful access token retrieval
 			{
-				check(PC);
-				if (PostScoresResponse->OK) // Successful scores post
-				{
-					SetAllPlayerScoresSavedToDatabase();
-					PC->OnPostScoresResponseReceived();
-				}
-				else // Unsuccessful scores post
-				{
-					PC->OnPostScoresResponseReceived("SBW_SavedScoresLocallyOnly");
-				}
+				TSharedPtr<FBSHttpResponse> PostScoresResponse = MakeShareable(new FBSHttpResponse());
+				PostScoresResponse->OnHttpResponseReceived.BindLambda(
+					[this, PostScoresResponse, bQuitToDesktopAfterSave]
+					{
+						if (ABSPlayerController* Controller = Cast<ABSPlayerController>(
+							GetFirstLocalPlayerController(GetWorld())))
+						{
+							if (PostScoresResponse->OK) // Successful scores post
+							{
+								SetAllPlayerScoresSavedToDatabase();
+								Controller->OnPostScoresResponseReceived();
+							}
+							else // Unsuccessful scores post
+							{
+								Controller->OnPostScoresResponseReceived("SBW_SavedScoresLocallyOnly");
+							}
 
-				if (bQuitToDesktopAfterSave)
-				{
-					UKismetSystemLibrary::QuitGame(GetWorld(), UGameplayStatics::GetPlayerController(GetWorld(), 0),
-						EQuitPreference::Quit, false);
-				}
-			});
-			PostPlayerScores(LoadPlayerScores_UnsavedToDatabase(), PC->GetPlayerSettings().User.UserID,
-				AccessTokenResponse->AccessToken, PostScoresResponse);
-		}
-		else // Unsuccessful access token retrieval
-		{
-			check(PC);
-			PC->OnPostScoresResponseReceived("SBW_SavedScoresLocallyOnly");
-
-			if (bQuitToDesktopAfterSave)
-			{
-				UKismetSystemLibrary::QuitGame(GetWorld(), UGameplayStatics::GetPlayerController(GetWorld(), 0),
-					EQuitPreference::Quit, false);
+							if (bQuitToDesktopAfterSave)
+							{
+								UKismetSystemLibrary::QuitGame(GetWorld(), Controller, EQuitPreference::Quit, false);
+							}
+						}
+					});
+				PostPlayerScores(LoadPlayerScores_UnsavedToDatabase(), UserID, AccessTokenResponse->AccessToken,
+					PostScoresResponse);
 			}
-		}
-	});
-	RequestAccessToken(PC->GetPlayerSettings().User.RefreshCookie, AccessTokenResponse);
+			else // Unsuccessful access token retrieval
+			{
+				if (ABSPlayerController* Controller = Cast<ABSPlayerController>(
+					GetFirstLocalPlayerController(GetWorld())))
+				{
+					Controller->OnPostScoresResponseReceived("SBW_SavedScoresLocallyOnly");
+					if (bQuitToDesktopAfterSave)
+					{
+						UKismetSystemLibrary::QuitGame(GetWorld(), Controller, EQuitPreference::Quit, false);
+					}
+				}
+			}
+		});
+	RequestAccessToken(PlayerSettings.RefreshCookie, AccessTokenResponse);
 }
 
 void UBSGameInstance::RemoveLoadingScreen()

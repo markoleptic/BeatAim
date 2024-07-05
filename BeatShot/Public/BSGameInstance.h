@@ -82,7 +82,8 @@ public:
 	void SetTimeOfDayManager(const TObjectPtr<ATimeOfDayManager>& InManager) { TimeOfDayManager = InManager; }
 
 	/** Handles saving scores to database, called by BSGameMode. */
-	void SavePlayerScoresToDatabase(ABSPlayerController* PC, const bool bWasValidToSave) const;
+	void SavePlayerScoresToDatabase(ABSPlayerController* PlayerController, bool bWasValidToSave,
+		bool bQuitToDesktopAfterSave) const;
 
 	/** Sets the loading screen state to fading out and updates the loading screen audio component state. */
 	void RemoveLoadingScreen();
@@ -154,9 +155,6 @@ protected:
 
 	/** Whether the Steam Overlay is active. */
 	bool IsSteamOverlayActive = false;
-
-	/** Whether to postpone QuitGame until after a save game Http response. */
-	bool bQuitToDesktopAfterSave = false;
 
 	/** Whether the loading screen is the initial one, which changes how the loading screen is rendered. */
 	bool bIsInitialLoadingScreen = true;
